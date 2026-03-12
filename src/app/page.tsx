@@ -1,65 +1,346 @@
-import Image from "next/image";
+'use client';
+import React from 'react';
+import Link from 'next/link';
+import { FaBullhorn, FaChartLine, FaUsers, FaComments, FaRobot, FaChartPie, FaBullseye, FaBrain, FaAward, FaUsersCog, FaArrowRight } from 'react-icons/fa';
 
-export default function Home() {
+const Hero = () => {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <section className="relative bg-[#191970] text-white py-20 min-h-screen flex items-center justify-center overflow-hidden">
+      {/* Animated background shapes */}
+      <div className="absolute top-0 left-0 w-full h-full z-0">
+        <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-yellow-400 rounded-full opacity-20 animate-blob"></div>
+        <div className="absolute top-1/2 right-1/4 w-32 h-32 bg-yellow-500 rounded-full opacity-20 animate-blob animation-delay-2000"></div>
+        <div className="absolute bottom-1/4 left-1/2 w-32 h-32 bg-yellow-300 rounded-full opacity-20 animate-blob animation-delay-4000"></div>
+        <div className="absolute bottom-1/2 right-1/2 w-24 h-24 bg-white rounded-full opacity-10 animate-pulse"></div>
+      </div>
+
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div className="text-center lg:text-left">
+            <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-4">
+              Welcome to <span className="text-yellow-400">Shain's Studio</span>
+            </h1>
+            <p className="text-lg md:text-2xl font-light text-gray-300 mb-8">
+              Where creativity meets results.
+            </p>
+            <p className="max-w-xl mx-auto lg:mx-0 text-gray-400 mb-10">
+              Explore my journey through marketing excellence, professional achievements, and creative solutions.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+              <Link href="/portfolio" className="cta-btn bg-yellow-400 text-[#191970] hover:bg-yellow-500 font-bold py-3 px-8 rounded-lg transition-transform transform hover:scale-105 shadow-lg">
+                View My Portfolio
+              </Link>
+              <Link href="/contact" className="cta-btn-secondary border-2 border-white text-white hover:bg-white hover:text-[#191970] font-bold py-3 px-8 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg">
+                Contact Me
+              </Link>
+            </div>
+          </div>
+
+          <div className="hidden lg:flex items-center justify-center perspective-1000">
+            <div className="w-64 h-64 relative transform-style-3d animate-rotate-y">
+              <div className="absolute w-full h-full bg-white/10 border border-yellow-400/50 flex items-center justify-center text-xl font-semibold transform-face-front">Marketing</div>
+              <div className="absolute w-full h-full bg-white/10 border border-yellow-400/50 flex items-center justify-center text-xl font-semibold transform-face-back">Strategy</div>
+              <div className="absolute w-full h-full bg-white/10 border border-yellow-400/50 flex items-center justify-center text-xl font-semibold transform-face-right">Creativity</div>
+              <div className="absolute w-full h-full bg-white/10 border border-yellow-400/50 flex items-center justify-center text-xl font-semibold transform-face-left">Results</div>
+              <div className="absolute w-full h-full bg-white/10 border border-yellow-400/50 flex items-center justify-center text-xl font-semibold transform-face-top">Innovation</div>
+              <div className="absolute w-full h-full bg-white/10 border border-yellow-400/50 flex items-center justify-center text-xl font-semibold transform-face-bottom">Excellence</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center space-y-2 animate-bounce">
+        <span className="text-sm text-gray-300">Scroll to explore</span>
+        <svg className="w-6 h-6 text-yellow-400" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
+          <path d="M19 9l-7 7-7-7"></path>
+        </svg>
+      </div>
+    </section>
+  );
+};
+
+const expertiseData = [
+  {
+    icon: <FaBullhorn size={48} className="text-yellow-400" />,
+    title: 'Digital Marketing',
+    description: 'Strategic campaigns that drive engagement, conversions, and brand awareness across digital channels.',
+  },
+  {
+    icon: <FaChartLine size={48} className="text-yellow-400" />,
+    title: 'Market Analysis',
+    description: 'In-depth research and analysis to identify market trends, opportunities, and competitive advantages.',
+  },
+  {
+    icon: <FaUsers size={48} className="text-yellow-400" />,
+    title: 'Brand Development',
+    description: 'Creating compelling brand identities that resonate with target audiences and drive business growth.',
+  },
+  {
+    icon: <FaComments size={48} className="text-yellow-400" />,
+    title: 'Content Strategy',
+    description: 'Developing engaging content that tells your brand story and connects with your audience.',
+  },
+];
+
+const Expertise = () => {
+  return (
+    <section className="bg-gray-50 py-20">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-12">
+          <h2 className="text-4xl font-extrabold text-gray-900">My Expertise</h2>
+          <p className="mt-4 text-lg text-gray-600">Areas where I deliver exceptional results</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {expertiseData.map((item, index) => (
+            <div key={index} className="group perspective-1000">
+              <div className="relative w-full h-64 transform-style-3d transition-transform duration-700 group-hover:rotate-y-180">
+                {/* Front of the card */}
+                <div className="absolute w-full h-full backface-hidden bg-white rounded-xl shadow-lg flex flex-col items-center justify-center p-6 border-2 border-gray-100">
+                  <div className="mb-4">{item.icon}</div>
+                  <h3 className="text-2xl font-bold text-gray-800">{item.title}</h3>
+                </div>
+                {/* Back of the card */}
+                <div className="absolute w-full h-full backface-hidden bg-[#191970] rounded-xl shadow-lg flex flex-col items-center justify-center p-6 text-white rotate-y-180">
+                  <p className="text-center text-gray-200 mb-4">{item.description}</p>
+                  <Link href="/portfolio" className="mt-4 bg-yellow-400 text-[#191970] font-semibold py-2 px-4 rounded-md hover:bg-yellow-500 transition-colors duration-300">
+                    Learn More
+                  </Link>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+const AiShowcase = () => {
+  return (
+    <section className="relative bg-gray-900 text-white py-24 overflow-hidden">
+      <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-gray-900"></div>
+      </div>
+
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 z-10 relative">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl lg:text-5xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-yellow-300 to-yellow-500">
+            AI-Powered Marketing
+          </h2>
+          <p className="mt-4 text-lg text-gray-400 max-w-3xl mx-auto">
+            Leveraging artificial intelligence to transform your marketing strategy
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          <div className="flex justify-center items-center">
+            <div className="relative w-64 h-64 md:w-80 md:h-80">
+              <div className="absolute inset-0 flex items-center justify-center animate-pulse-slow">
+                <div className="w-full h-full rounded-full bg-yellow-500/10"></div>
+              </div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <FaBrain className="text-yellow-400 text-8xl md:text-9xl opacity-80" />
+              </div>
+              {/* Connections */}
+              {[...Array(6)].map((_, i) => (
+                <div
+                  key={i}
+                  className="absolute w-2 h-2 bg-yellow-400 rounded-full animate-connection"
+                  style={{
+                    top: '50%',
+                    left: '50%',
+                    transformOrigin: '0 0',
+                    animationDelay: `${i * 1.5}s`,
+                  }}
+                ></div>
+              ))}
+            </div>
+          </div>
+
+          <div className="text-center lg:text-left">
+            <h3 className="text-3xl font-bold mb-6">The Future of Marketing is Here</h3>
+            <p className="text-gray-300 mb-8 text-lg">
+              I combine traditional marketing expertise with cutting-edge AI tools to create innovative, data-driven strategies that deliver exceptional results.
+            </p>
+            <div className="grid grid-cols-2 gap-6 mb-10">
+              <div className="flex items-center space-x-3">
+                <FaRobot className="text-yellow-400 text-2xl" />
+                <span className="font-medium">AI-Powered Content</span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <FaChartPie className="text-yellow-400 text-2xl" />
+                <span className="font-medium">Predictive Analytics</span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <FaBullseye className="text-yellow-400 text-2xl" />
+                <span className="font-medium">Audience Insights</span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <FaBrain className="text-yellow-400 text-2xl" />
+                <span className="font-medium">Prompt Engineering</span>
+              </div>
+            </div>
+            <Link href="/portfolio" className="cta-btn bg-yellow-400 text-gray-900 hover:bg-yellow-500 font-bold py-3 px-8 rounded-lg transition-transform transform hover:scale-105 shadow-lg">
+              See AI Marketing in Action
+            </Link>
+          </div>
         </div>
-      </main>
-    </div>
+      </div>
+    </section>
   );
-}
+};
+
+const marketingSkills = [
+  { name: 'Traditional Marketing', level: 98 },
+  { name: 'Digital Marketing', level: 95 },
+  { name: 'Analytics', level: 85 },
+];
+
+const creativeSkills = [
+  { name: 'Branding & Strategy', level: 92 },
+  { name: 'Social Media Design', level: 85 },
+  { name: 'Content Writing', level: 60 },
+];
+
+const Skills = () => {
+  return (
+    <section className="bg-white py-20">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-12">
+          <h2 className="text-4xl font-extrabold text-gray-900">Professional Skills</h2>
+          <p className="mt-4 text-lg text-gray-600">Tools and techniques I've mastered</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+          {/* Marketing Skills */}
+          <div>
+            <h3 className="text-2xl font-bold text-gray-800 mb-6">Marketing</h3>
+            <div className="space-y-6">
+              {marketingSkills.map((skill, index) => (
+                <div key={index}>
+                  <div className="flex justify-between mb-1">
+                    <span className="text-base font-medium text-gray-700">{skill.name}</span>
+                    <span className="text-sm font-medium text-gray-700">{skill.level}%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2.5">
+                    <div
+                      className="bg-gradient-to-r from-yellow-400 to-yellow-500 h-2.5 rounded-full"
+                      style={{ width: `${skill.level}%` }}
+                    ></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Creative Skills */}
+          <div>
+            <h3 className="text-2xl font-bold text-gray-800 mb-6">Creative</h3>
+            <div className="space-y-6">
+              {creativeSkills.map((skill, index) => (
+                <div key={index}>
+                  <div className="flex justify-between mb-1">
+                    <span className="text-base font-medium text-gray-700">{skill.name}</span>
+                    <span className="text-sm font-medium text-gray-700">{skill.level}%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2.5">
+                    <div
+                      className="bg-gradient-to-r from-[#191970] to-blue-800 h-2.5 rounded-full"
+                      style={{ width: `${skill.level}%` }}
+                    ></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+const certificates = [
+  {
+    icon: <FaAward size={40} className="text-yellow-400" />,
+    title: 'Digital Marketing',
+    description: 'Certified Digital Marketing Professional',
+  },
+  {
+    icon: <FaChartPie size={40} className="text-yellow-400" />,
+    title: 'Analytics',
+    description: 'Advanced Analytics Certification',
+  },
+  {
+    icon: <FaUsersCog size={40} className="text-yellow-400" />,
+    title: 'Business Management',
+    description: 'ICM Business Management and Administration Course',
+  },
+];
+
+const CertificatePreview = () => {
+  return (
+    <section className="relative bg-fixed bg-cover bg-center bg-no-repeat py-24" style={{ backgroundImage: "url('/images/certificate-bg.jpg')" }}>
+      <div className="absolute inset-0 bg-black opacity-60"></div>
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="text-center mb-12">
+          <h2 className="text-4xl font-extrabold text-white">Professional Certifications</h2>
+          <p className="mt-4 text-lg text-gray-300">Credentials that validate my expertise</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+          {certificates.map((cert, index) => (
+            <div key={index} className="bg-white/10 backdrop-blur-sm p-8 rounded-xl border border-gray-200/20 shadow-lg hover:shadow-2xl transition-shadow duration-300 transform hover:-translate-y-2">
+              <div className="flex justify-center mb-4">{cert.icon}</div>
+              <h3 className="text-2xl font-bold text-white mb-2">{cert.title}</h3>
+              <p className="text-gray-300 mb-6">{cert.description}</p>
+              <Link href="/certificate" className="text-yellow-400 font-semibold hover:underline">
+                View Certificate
+              </Link>
+            </div>
+          ))}
+        </div>
+        <div className="text-center mt-12">
+          <Link href="/certificate" className="cta-btn bg-yellow-400 text-[#191970] hover:bg-yellow-500 font-bold py-3 px-8 rounded-lg transition-transform transform hover:scale-105 shadow-lg">
+            View All Certificates
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+const Cta = () => {
+  return (
+    <section className="relative bg-gray-800 py-20">
+      <div className="absolute inset-0 opacity-5">
+        <div className="absolute inset-0 bg-cta-pattern"></div>
+      </div>
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+        <h2 className="text-4xl font-extrabold text-white">Ready to Transform Your Marketing?</h2>
+        <p className="mt-4 text-lg text-gray-300 max-w-2xl mx-auto">
+          Let's discuss how my expertise can help achieve your business goals.
+        </p>
+        <div className="mt-8">
+          <Link href="/contact" className="inline-flex items-center gap-3 cta-btn bg-yellow-400 text-[#191970] hover:bg-yellow-500 font-bold py-4 px-10 rounded-lg transition-transform transform hover:scale-105 shadow-lg text-lg">
+            <span>Get In Touch</span>
+            <FaArrowRight />
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+const Home = () => {
+  return (
+    <main>
+      <Hero />
+      <Expertise />
+      <AiShowcase />
+      <Skills />
+      <CertificatePreview />
+      <Cta />
+    </main>
+  );
+};
+
+export default Home;

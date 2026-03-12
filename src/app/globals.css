@@ -1,26 +1,2164 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer utilities {
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+  .transform-style-3d {
+    transform-style: preserve-3d;
+  }
+  .backface-hidden {
+    backface-visibility: hidden;
+  }
+  .rotate-y-180 {
+    transform: rotateY(180deg);
+  }
+  .transform-face-front {
+    transform: translateZ(8rem);
+  }
+  .transform-face-back {
+    transform: rotateY(180deg) translateZ(8rem);
+  }
+  .transform-face-right {
+    transform: rotateY(90deg) translateZ(8rem);
+  }
+  .transform-face-left {
+    transform: rotateY(-90deg) translateZ(8rem);
+  }
+  .transform-face-top {
+    transform: rotateX(90deg) translateZ(8rem);
+  }
+  .transform-face-bottom {
+    transform: rotateX(-90deg) translateZ(8rem);
+  }
+  .bg-grid-pattern {
+    background-image: linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 2rem 2rem;
+  }
+  .bg-cta-pattern {
+    background-image: radial-gradient(circle, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 1.5rem 1.5rem;
   }
 }
 
+@keyframes blob {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-20px) scale(1.1);
+  }
+}
+
+.animate-blob {
+  animation: blob 8s infinite ease-in-out;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+@keyframes rotate-y {
+  0% {
+    transform: rotateY(0deg) rotateX(0deg);
+  }
+  100% {
+    transform: rotateY(360deg) rotateX(360deg);
+  }
+}
+
+.animate-rotate-y {
+  animation: rotate-y 20s linear infinite;
+}
+
+@keyframes pulse-slow {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.1;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 0.2;
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 6s infinite ease-in-out;
+}
+
+@keyframes connection {
+  0% {
+    transform: rotate(0deg) translateX(10rem) scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: rotate(180deg) translateX(10rem) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(360deg) translateX(10rem) scale(0);
+    opacity: 0;
+  }
+}
+
+.animate-connection {
+  animation: connection 9s infinite linear;
+}
+
+/* ========== ENHANCED GLOBAL STYLES ========== */
+:root {
+  /* Color Palette */
+  --primary: #191970;
+  --primary-light: #2a2a9a;
+  --primary-dark: #0f0f45;
+  --accent: #ffd700;
+  --accent-light: #ffe347;
+  --accent-dark: #e6c200;
+  --text: #333333;
+  --text-light: #666666;
+  --text-dark: #111111;
+  --background: #ffffff;
+  --background-alt: #f8f9fa;
+  --error: #dc3545;
+  --success: #28a745;
+  --warning: #ffc107;
+  --info: #17a2b8;
+
+  /* Typography */
+  --font-primary: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  --font-secondary: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+
+  /* Spacing */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 2rem;
+  --space-xl: 4rem;
+
+  /* Transitions */
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s ease;
+
+  /* Shadows */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.15);
+
+  /* Border Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+}
+
+/* Dark mode variables with enhanced deep gold color scheme */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Deep, luxurious gold palette for dark mode */
+    --primary: #a67c00; /* Deeper, richer gold base color */
+    --primary-light: #d4af37; /* Rich gold */
+    --primary-dark: #704700; /* Dark amber gold */
+    --primary-highlight: #f9df85; /* Light gold for accents */
+
+    --accent: #191970; /* Keep midnight blue as accent */
+    --accent-light: #2a2a9a;
+    --accent-dark: #0f0f45;
+
+    /* Keep text colors as they were */
+    --text: #e0e0e0;
+    --text-light: #b0b0b0;
+    --text-dark: #ffffff;
+
+    --background: #121212; /* Dark background */
+    --background-alt: #1e1e1e;
+    --error: #ff6b6b; /* Brighter error for visibility */
+    --success: #4ade80; /* Brighter success for visibility */
+    --warning: #ffda6a; /* Brighter warning for visibility */
+    --info: #60cdff; /* Brighter info for visibility */
+
+    /* Adjusted shadows for dark mode */
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.4);
+
+    /* Gold gradients for dark mode */
+    --gold-gradient: linear-gradient(
+      135deg,
+      #704700 0%,
+      #a67c00 20%,
+      #d4af37 40%,
+      #f9df85 50%,
+      #d4af37 60%,
+      #a67c00 80%,
+      #704700 100%
+    );
+
+    --gold-gradient-simple: linear-gradient(
+      135deg,
+      #704700,
+      #a67c00,
+      #d4af37,
+      #f9df85,
+      #d4af37,
+      #a67c00,
+      #704700
+    );
+  }
+
+  /* Add glittery text effect to headings in dark mode */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    position: relative;
+  }
+
+  /* Gold shimmer effect for important elements */
+  .text-gradient,
+  .page-title,
+  .hero h1,
+  .bio-text h1,
+  .contact-form-section h1,
+  .portfolio-header h2,
+  .social-links h2 {
+    background: var(--gold-gradient-simple);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent !important;
+    animation: goldShimmer 8s linear infinite;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Add subtle glitter effect to important headings */
+  .page-title::before,
+  .hero h1::before,
+  .bio-text h1::before,
+  .contact-form-section h1::before,
+  .portfolio-header h2::before,
+  .social-links h2::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: radial-gradient(
+        circle at 20% 30%,
+        rgba(249, 223, 133, 0.7) 0.1%,
+        transparent 0.5%
+      ),
+      radial-gradient(
+        circle at 50% 70%,
+        rgba(249, 223, 133, 0.5) 0.1%,
+        transparent 0.5%
+      ),
+      radial-gradient(
+        circle at 80% 10%,
+        rgba(249, 223, 133, 0.7) 0.1%,
+        transparent 0.5%
+      ),
+      radial-gradient(
+        circle at 10% 90%,
+        rgba(249, 223, 133, 0.5) 0.1%,
+        transparent 0.5%
+      );
+    background-size: 150% 150%;
+    mix-blend-mode: overlay;
+    animation: glitterEffect 6s ease-in-out infinite alternate;
+    pointer-events: none;
+  }
+
+  /* Enhanced gold gradients for UI elements */
+  .header,
+  .header.scrolled,
+  .cta-btn,
+  .submit-btn,
+  .footer {
+    background: var(--gold-gradient);
+    background-size: 200% 200%;
+    animation: goldWave 12s ease infinite;
+  }
+
+  /* Add wave effect to gold elements */
+  .header::after,
+  .cta-btn::after,
+  .submit-btn::after {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+      45deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.05) 25%,
+      rgba(255, 255, 255, 0.1) 50%,
+      rgba(255, 255, 255, 0.05) 75%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    animation: waveEffect 8s linear infinite;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Enhance gold accents */
+  .nav li a::after,
+  .bio-text h1::after,
+  .contact-form-section h1::after,
+  .social-links h2::after,
+  .footer::before {
+    background: var(--gold-gradient-simple) !important;
+    background-size: 200% 200%;
+    animation: goldShimmer 8s linear infinite;
+  }
+
+  /* Add gold glow to interactive elements */
+  .cta-btn:hover,
+  .submit-btn:hover,
+  .portfolio-item:hover {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3), 0 0 15px rgba(166, 124, 0, 0.2) !important;
+  }
+
+  /* Gold pulse effect on hover */
+  .nav li a:hover,
+  .footer-links a:hover,
+  .social-icon:hover {
+    animation: goldPulse 2s ease infinite alternate;
+  }
+}
+
+/* For manually toggled dark mode - same enhancements */
+.dark-mode {
+  /* Deep, luxurious gold palette */
+  --primary: #a67c00; /* Deeper, richer gold base color */
+  --primary-light: #d4af37; /* Rich gold */
+  --primary-dark: #704700; /* Dark amber gold */
+  --primary-highlight: #f9df85; /* Light gold for accents */
+
+  --accent: #191970; /* Keep midnight blue as accent */
+  --accent-light: #2a2a9a;
+  --accent-dark: #0f0f45;
+
+  /* Keep text colors as they were */
+  --text: #e0e0e0;
+  --text-light: #b0b0b0;
+  --text-dark: #ffffff;
+
+  --background: #121212; /* Dark background */
+  --background-alt: #1e1e1e;
+
+  /* Gold gradients */
+  --gold-gradient: linear-gradient(
+    135deg,
+    #704700 0%,
+    #a67c00 20%,
+    #d4af37 40%,
+    #f9df85 50%,
+    #d4af37 60%,
+    #a67c00 80%,
+    #704700 100%
+  );
+
+  --gold-gradient-simple: linear-gradient(
+    135deg,
+    #704700,
+    #a67c00,
+    #d4af37,
+    #f9df85,
+    #d4af37,
+    #a67c00,
+    #704700
+  );
+}
+
+/* Modern CSS Reset */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  outline: none;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px; /* Account for fixed header */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  background-color: var(--background);
+  color: var(--text);
+  line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+  transition: background-color var(--transition-normal),
+    color var(--transition-normal);
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+  transition: color var(--transition-normal), transform var(--transition-normal);
+  position: relative;
+}
+
+button,
+.btn {
+  cursor: pointer;
+  font-family: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  border: none;
+  background: none;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+/* ========== ENHANCED TYPOGRAPHY ========== */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 0.5em;
+  color: var(--text-dark);
+  transition: color var(--transition-normal);
+}
+
+h1 {
+  font-size: 2.5rem;
+}
+
+h2 {
+  font-size: 2rem;
+}
+
+h3 {
+  font-size: 1.8rem;
+}
+
+h4 {
+  font-size: 1.5rem;
+}
+
+p {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  margin-bottom: 1.5rem;
+  transition: color var(--transition-normal);
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, var(--primary), var(--accent-dark));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  transition: background var(--transition-normal);
+}
+
+.text-center {
+  text-align: center;
+}
+
+/* ========== ENHANCED HEADER & NAVIGATION ========== */
+.header {
+  background-color: var(
+    --primary
+  ); /* Uses primary color variable which changes in dark mode */
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  box-shadow: var(--shadow-md);
+  transition: background-color var(--transition-normal),
+    box-shadow var(--transition-normal);
+  animation: slideInDown 0.7s ease forwards;
+}
+/* Logo styling for all pages */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.logo a {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.logo-image {
+  width: 45px;
+  height: 45px;
+  object-fit: contain;
+  border-radius: 4px;
+}
+
+/* Responsive logo sizing */
+@media (max-width: 768px) {
+  .logo-image {
+    width: 35px;
+    height: 35px;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo-image {
+    width: 30px;
+    height: 30px;
+  }
+
+  .logo a {
+    gap: 0.3rem;
+  }
+}
+
+/* Ensure logo text doesn't wrap */
+.logo a {
+  white-space: nowrap;
+}
+
+/* Logo hover effects */
+.logo a:hover .logo-image {
+  transform: scale(1.05);
+  transition: transform 0.2s ease;
+}
+
+/* Remove the transparency effect when scrolled */
+.header.scrolled {
+  background-color: var(
+    --primary
+  ); /* Keep solid color instead of transparent */
+  backdrop-filter: none;
+}
+
+.nav-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.logo a {
+  font-family: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.logo a:hover {
+  transform: scale(1.05);
+}
+
+/* Navigation Menu */
+.nav > ul {
+  display: flex;
+  gap: 2rem;
+}
+
+.nav li a {
+  font-family: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  color: #fff;
+  transition: transform 0.3s ease, color 0.3s ease;
+  padding: 0.5rem 0;
+  position: relative;
+}
+
+.nav li a::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: var(--accent);
+  transition: width var(--transition-normal);
+}
+
+.nav li a:hover::after,
+.nav li a.active::after {
+  width: 100%;
+}
+
+/* Active nav link becomes gold in light mode, midnight blue in dark mode */
+.nav li a.active {
+  color: var(--accent); /* Uses accent which swaps in dark mode */
+}
+
+.nav li a:hover {
+  transform: scale(1.1);
+  color: var(--accent-light);
+}
+
+/* ========== ENHANCED HAMBURGER MENU ========== */
+/* Make sure the hamburger is visible on mobile */
+@media (max-width: 768px) {
+  /* Force the hamburger to display on mobile */
+  .hamburger {
+    display: flex !important; /* Use !important to override any other styles */
+    flex-direction: column;
+    justify-content: space-between;
+    width: 30px;
+    height: 24px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    z-index: 1100;
+    position: relative; /* Ensure it's positioned properly */
+  }
+
+  /* Hamburger bars style - WHITE initially */
+  .hamburger .bar {
+    display: block;
+    width: 100%;
+    height: 3px;
+    background-color: #fff !important; /* WHITE bars initially */
+    border-radius: 2px;
+    transition: transform 0.3s ease, opacity 0.3s ease,
+      background-color 0.3s ease;
+    transform-origin: center;
+  }
+
+  /* When active, transform to form an X with balanced arms AND change color based on mode */
+  .hamburger.active .bar {
+    background-color: var(
+      --primary
+    ) !important; /* Uses primary variable which changes in dark mode */
+  }
+
+  .hamburger.active .bar:nth-child(1) {
+    transform: translateY(10px) rotate(45deg);
+  }
+  .hamburger.active .bar:nth-child(2) {
+    opacity: 0;
+  }
+  .hamburger.active .bar:nth-child(3) {
+    transform: translateY(-10px) rotate(-45deg);
+  }
+
+  /* Mobile navigation menu styling */
+  .nav {
+    display: none; /* Initially hidden */
+    position: fixed;
+    top: 0;
+    right: -100%; /* Start off-screen to the right */
+    width: 33%; /* Take up one-third of the screen width */
+    height: 100vh;
+    background-color: var(
+      --background
+    ); /* Use background variable for dark mode support */
+    color: var(--primary); /* Use primary variable which changes in dark mode */
+    padding: 80px 1rem 1rem; /* Add padding at the top for the header */
+    transition: right 0.3s ease; /* Smooth transition */
+    z-index: 1000;
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1); /* Lighter shadow for white background */
+  }
+
+  /* When the nav has 'active' class, slide it in from the right */
+  .nav.active {
+    display: block;
+    right: 0; /* Slide in to visible area */
+  }
+
+  .nav ul {
+    flex-direction: column;
+    gap: 1.5rem;
+    width: 100%;
+    padding: 1rem;
+  }
+
+  .nav li {
+    width: 100%;
+    text-align: left;
+    border-bottom: 1px solid rgba(var(--primary), 0.1); /* Border color adapts to dark mode */
+    padding-bottom: 0.5rem;
+  }
+
+  .nav li:last-child {
+    border-bottom: none;
+  }
+
+  .nav li a {
+    display: block;
+    padding: 0.5rem 0;
+    font-size: 1.1rem;
+    color: var(--primary) !important; /* Force color with !important */
+    transition: color 0.3s ease;
+  }
+
+  /* Active and hover states - use accent color */
+  .nav li a:hover,
+  .nav li a:active,
+  .nav li a.active {
+    color: var(
+      --accent
+    ) !important; /* Force accent color on hover/active with !important */
+  }
+
+  /* Fix for random dots - remove any potential pseudo-elements */
+  .nav::before,
+  .nav::after {
+    display: none !important; /* Remove any pseudo-elements that might be causing dots */
+  }
+
+  /* Add overlay when menu is open - but fix to prevent dots */
+  body.menu-open::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.3);
+    z-index: 999; /* Below the menu but above other content */
+  }
+
+  /* Make sure the menu is still usable on very small screens */
+  @media (max-width: 480px) {
+    .nav {
+      width: 250px; /* Set a minimum width in pixels for very small screens */
+    }
+  }
+}
+
+/* Fix for the random white dot in desktop mode */
+/* First, ensure the body.menu-open::before is only applied in mobile view */
+body.menu-open::before {
+  display: none; /* Hide by default */
+}
+/* Additional fix to ensure no other pseudo-elements are causing issues */
+.nav::before,
+.nav::after,
+.hamburger::before,
+.hamburger::after {
+  display: none !important;
+}
+/* Fix for any potential positioning issues */
+.hamburger {
+  position: relative;
+  z-index: 1100;
+}
+
+/* Ensure the hamburger is only visible on mobile */
+@media (min-width: 769px) {
+  .hamburger {
+    display: none !important;
+  }
+}
+
+/* Fix for mobile menu items in dark mode - make them white when active/pressed */
+@media (prefers-color-scheme: dark) {
+  .nav li a {
+    color: #fff;
+  }
+
+  .nav li a:hover,
+  .nav li a:active,
+  .nav li a.active {
+    color: #ffffff !important; /* Force white color on hover/active in dark mode */
+  }
+
+  /* For mobile menu */
+  @media (max-width: 768px) {
+    .nav li a {
+      color: var(--primary) !important; /* Keep gold color for normal state */
+    }
+
+    .nav li a:hover,
+    .nav li a:active,
+    .nav li a.active {
+      color: #ffffff !important; /* Force white color on hover/active in dark mode */
+    }
+  }
+}
+
+/* For manually toggled dark mode */
+.dark-mode .nav li a:hover,
+.dark-mode .nav li a:active,
+.dark-mode .nav li a.active {
+  color: #ffffff !important; /* Force white color on hover/active in dark mode */
+}
+
+/* For mobile menu in manually toggled dark mode */
+@media (max-width: 768px) {
+  .dark-mode .nav li a:hover,
+  .dark-mode .nav li a:active,
+  .dark-mode .nav li a.active {
+    color: #ffffff !important; /* Force white color on hover/active in dark mode */
+  }
+}
+
+/* ========== ENHANCED HOME PAGE ========== */
+.home {
+  margin-top: 80px; /* space for fixed header */
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+  min-height: calc(100vh - 80px);
+  position: relative;
+  overflow: hidden;
+}
+
+.home::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(var(--primary), 0.05) 0%,
+    rgba(255, 255, 255, 0) 70%
+  );
+  z-index: -1;
+  transition: background var(--transition-normal);
+}
+
+.hero {
+  max-width: 900px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.hero h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  line-height: 1.1;
+  animation: fadeInUp 0.8s var(--transition-normal) forwards;
+  animation-delay: 0.2s;
+  opacity: 0;
+}
+
+.hero p {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  color: var(--text-light);
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+  animation: fadeInUp 0.8s var(--transition-normal) forwards;
+  animation-delay: 0.4s;
+  opacity: 0;
+}
+
+.cta-container {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  animation: fadeInUp 0.8s var(--transition-normal) forwards;
+  animation-delay: 0.6s;
+  opacity: 0;
+}
+
+.cta-btn {
+  font-family: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  background-color: var(
+    --primary
+  ); /* Uses primary color variable which changes in dark mode */
+  color: #fff;
+  padding: 0.8rem 2rem;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.cta-btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, var(--primary-light), var(--primary));
+  z-index: -1;
+  transition: opacity var(--transition-normal);
+  opacity: 0;
+}
+
+.cta-btn:hover {
+  background-color: var(
+    --accent
+  ); /* Uses accent variable which changes in dark mode */
+  transform: scale(1.05);
+  box-shadow: var(--shadow-md);
+}
+
+.cta-btn:hover::before {
+  opacity: 1;
+}
+
+.cta-btn:active,
+.cta-btn:focus {
+  background-color: var(
+    --accent
+  ); /* Uses accent variable which changes in dark mode */
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
+.cta-btn.secondary {
+  background-color: transparent;
+  color: var(--primary); /* Uses primary variable which changes in dark mode */
+  border: 2px solid var(--primary); /* Uses primary variable which changes in dark mode */
+}
+
+.cta-btn.secondary::before {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+}
+
+.cta-btn.secondary:hover {
+  color: var(
+    --background
+  ); /* Uses background variable which changes in dark mode */
+}
+
+/* ========== ENHANCED ABOUT ME ========== */
+.about .bio {
+  margin-top: 80px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  background-color: var(--background-alt);
+  position: relative;
+  transition: background-color var(--transition-normal);
+}
+
+.about .bio::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23191970' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  z-index: 0;
+  opacity: 0.5;
+}
+
+/* Dark mode pattern adjustment */
+@media (prefers-color-scheme: dark) {
+  .about .bio::before {
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23a67c00' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+}
+
+.profile-img {
+  position: relative;
+  z-index: 1;
+}
+
+.profile-img img {
+  border-radius: 50%;
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+  border: 4px solid var(--background);
+  box-shadow: var(--shadow-lg);
+  transition: transform var(--transition-normal),
+    box-shadow var(--transition-normal);
+}
+
+.profile-img:hover img {
+  transform: scale(1.05);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+}
+
+.profile-img::after {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  right: -10px;
+  bottom: -10px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  z-index: -1;
+  opacity: 0.2;
+  transition: background var(--transition-normal);
+}
+
+.bio-text {
+  max-width: 800px;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.bio-text h1 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  position: relative;
+  display: inline-block;
+}
+
+.bio-text h1::after {
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(to right, var(--primary), var(--accent));
+  border-radius: var(--radius-full);
+  transition: background var(--transition-normal);
+}
+
+.bio-text p {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  line-height: 1.8;
+}
+
+.motto {
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: var(--primary);
+  margin: 2rem 0;
+  padding: 1rem;
+  border-left: 4px solid var(--accent);
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  box-shadow: var(--shadow-sm);
+  transition: color var(--transition-normal),
+    background-color var(--transition-normal);
+}
+
+/* Dark mode adjustment for motto */
+@media (prefers-color-scheme: dark) {
+  .motto {
+    background-color: rgba(30, 30, 30, 0.8);
+    border-left: 4px solid var(--accent);
+    color: var(--primary-highlight);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2), 0 0 10px rgba(166, 124, 0, 0.1);
+  }
+}
+
+.link-bottom {
+  display: block;
+  margin: 2rem auto;
+  text-align: center;
+  color: var(--primary);
+  font-weight: bold;
+  transition: color 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.link-bottom::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--primary);
+  z-index: -1;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform var(--transition-normal),
+    background-color var(--transition-normal);
+}
+
+.link-bottom:hover {
+  color: var(--accent);
+}
+
+.link-bottom:hover::before {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* ========== ENHANCED PORTFOLIO ========== */
+.portfolio {
+  padding: var(--space-xl) var(--space-lg);
+  background-color: var(--background);
+  transition: background-color var(--transition-normal);
+}
+
+.portfolio-header {
+  text-align: center;
+  margin-bottom: var(--space-xl);
+}
+
+
+.portfolio-item {
+  background-color: var(--background-alt);
+  padding: 1.5rem;
+  border: 1px solid var(--text-light);
+  border-radius: 5px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease,
+    background-color var(--transition-normal); /* Add smooth transition for shadow */
+  position: relative;
+  cursor: pointer; /* Indicating interactivity */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.portfolio-item-image {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+}
+
+.portfolio-item-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--transition-slow);
+}
+
+.portfolio-item-content {
+  padding: 1.5rem;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.portfolio-item-title {
+  font-size: 1.3rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-dark);
+  transition: color var(--transition-normal);
+}
+
+.portfolio-item-description {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  color: var(--text-light);
+  margin-bottom: 1rem;
+  flex-grow: 1;
+  transition: color var(--transition-normal);
+}
+
+.portfolio-item-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: auto;
+}
+
+.portfolio-item-tag {
+  background-color: rgba(var(--primary), 0.1);
+  color: var(--primary);
+  padding: 0.3rem 0.8rem;
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: background-color var(--transition-normal),
+    color var(--transition-normal);
+}
+
+.portfolio-item::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(to right, var(--primary), var(--accent));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--transition-normal),
+    background var(--transition-normal);
+}
+
+/* Subtle movement without large shadows */
+.portfolio-item:hover {
+  transform: translateY(-5px) scale(1.05); /* Slight lift and scale */
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15); /* Slightly stronger shadow on hover */
+}
+
+/* Movement effect when mouse is close to portfolio items */
+.portfolio-item {
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s ease-out;
+}
+
+/* Subtle translation when the mouse is near */
+.portfolio-item:hover {
+  transform: translateX(10px) translateY(-10px); /* Move around */
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1); /* Add shadow during hover */
+}
+
+/* Ensure smooth movement */
+.portfolio-item .portfolio-item-content {
+  transition: transform 0.3s ease-out;
+}
+
+.portfolio-item:hover .portfolio-item-content {
+  transform: translateX(10px); /* Move content to the right on hover */
+}
+
+.portfolio-item .portfolio-item-image {
+  transition: transform 0.3s ease-out;
+}
+
+.portfolio-item:hover .portfolio-item-image {
+  transform: scale(1.05); /* Slight zoom-in effect on hover */
+}
+
+/* Added page title and description */
+.page-title {
+  color: var(--primary);
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  text-align: center;
+  transition: color var(--transition-normal);
+}
+
+.page-description {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  color: var(--text-light);
+  margin-bottom: 2rem;
+  text-align: center;
+  max-width: 800px;
+  transition: color var(--transition-normal);
+}
+
+/* ========== ENHANCED LOADING & ERROR STATES ========== */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 1rem;
+  width: 100%; /* Ensure it takes full width */
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(var(--text-light), 0.2);
+  border-top: 4px solid var(--primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  position: relative;
+  transition: border-color var(--transition-normal);
+}
+
+.loading-spinner::before,
+.loading-spinner::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+}
+
+.loading-spinner::before {
+  width: 60px;
+  height: 60px;
+  border: 2px solid rgba(var(--primary), 0.05);
+  animation: pulse 2s ease-out infinite;
+  transition: border-color var(--transition-normal);
+}
+
+.loading-spinner::after {
+  width: 70px;
+  height: 70px;
+  border: 1px solid rgba(var(--primary), 0.02);
+  animation: pulse 2s 0.5s ease-out infinite;
+  transition: border-color var(--transition-normal);
+}
+
+.loading-text {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  font-size: 1.2rem;
+  color: var(--text-light);
+  text-align: center;
+  transition: color var(--transition-normal);
+}
+
+/* ========== ERROR STATE ========== */
+.error {
+  text-align: center;
+  padding: 2rem;
+  color: var(--error);
+  border: 2px solid var(--error);
+  border-radius: 8px;
+  margin: 2rem auto;
+  max-width: 600px;
+  width: 100%;
+  background-color: rgba(220, 53, 69, 0.05);
+  position: relative;
+  transition: color var(--transition-normal),
+    background-color var(--transition-normal),
+    border-color var(--transition-normal);
+}
+
+.error::before {
+  content: "!";
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 60px;
+  background-color: var(--error);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: bold;
+  transition: background-color var(--transition-normal);
+}
+
+.error h3 {
+  color: var(--error);
+  margin-bottom: 1rem;
+  transition: color var(--transition-normal);
+}
+
+.error p {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  margin-bottom: 1.5rem;
+}
+
+.error small {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--text-light);
+  transition: color var(--transition-normal);
+}
+
+.error .retry-btn {
+  font-family: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  background-color: var(--error);
+  color: white;
+  padding: 0.5rem 1.5rem;
+  border-radius: var(--radius-md);
+  display: inline-block;
+  margin-top: 1rem;
+  transition: background-color var(--transition-normal),
+    color var(--transition-normal);
+}
+
+.error .retry-btn:hover {
+  background-color: #c82333;
+}
+
+/* ========== ENHANCED SOCIAL LINKS ========== */
+.social-links {
+  text-align: center;
+  padding: var(--space-xl) var(--space-lg);
+  background-color: var(--background-alt);
+  position: relative;
+  transition: background-color var(--transition-normal);
+}
+
+.social-links::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    135deg,
+    rgba(var(--primary), 0.03) 0%,
+    rgba(var(--accent), 0.03) 100%
+  );
+  z-index: 0;
+  transition: background var(--transition-normal);
+}
+
+.social-links h2 {
+  margin-bottom: 1rem;
+  color: var(--primary);
+  position: relative;
+  display: inline-block;
+  transition: color var(--transition-normal);
+}
+
+.social-links h2::after {
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(to right, var(--primary), var(--accent));
+  border-radius: var(--radius-full);
+  transition: background var(--transition-normal);
+}
+
+.social-icons {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+  margin-top: 2rem;
+}
+
+.social-icon {
+  margin: 0 1rem;
+  transition: transform 0.3s ease;
+  position: relative;
+}
+
+.social-icon img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  transition: transform var(--transition-normal);
+  position: relative;
+  z-index: 1;
+}
+
+.social-icon::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  border-radius: 50%;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity var(--transition-normal),
+    background var(--transition-normal);
+}
+
+.social-icon:hover {
+  transform: scale(1.1);
+}
+
+.social-icon:hover::before {
+  opacity: 0.2;
+}
+
+.social-icon:hover img {
+  transform: scale(1.1);
+}
+
+/* ========== ENHANCED FOOTER ========== */
+.footer {
+  font-family: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  background-color: var(--primary);
+  color: #fff;
+  text-align: center;
+  padding: 1rem 0;
+  animation: slideInUp 0.7s ease forwards;
+  position: relative;
+  margin-top: auto; /* Push footer to bottom */
+  transition: background-color var(--transition-normal);
+}
+
+.footer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 5px;
+  background: linear-gradient(
+    to right,
+    var(--primary),
+    var(--accent),
+    var(--primary)
+  );
+  transition: background var(--transition-normal);
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--space-lg);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  text-align: left;
+}
+
+.footer-section h3 {
+  color: var(--accent);
+  margin-bottom: 1.5rem;
+  position: relative;
+  display: inline-block;
+  transition: color var(--transition-normal);
+}
+
+.footer-section h3::after {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 40px;
+  height: 3px;
+  background-color: var(--accent);
+  border-radius: var(--radius-full);
+  transition: background-color var(--transition-normal);
+}
+
+.footer-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.footer-links a {
+  font-family: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  color: rgba(255, 255, 255, 0.8);
+  transition: color var(--transition-normal), transform var(--transition-normal);
+  display: inline-block;
+}
+
+.footer-links a:hover {
+  color: var(--accent);
+  transform: translateX(5px);
+}
+
+.footer-contact p {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  margin-bottom: 0.8rem;
+  color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: color var(--transition-normal);
+}
+
+.footer-bottom {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.6);
+  transition: color var(--transition-normal),
+    border-color var(--transition-normal);
+}
+
+/* ========== ENHANCED CONTACT FORM ========== */
+.contact {
+  margin-top: 80px;
+  padding: 2rem;
+  text-align: center;
+  background-color: var(--background);
+  position: relative;
+  transition: background-color var(--transition-normal);
+}
+
+.contact::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23191970' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* Dark mode pattern adjustment */
+@media (prefers-color-scheme: dark) {
+  .contact::before {
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23a67c00' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+}
+
+.contact-header {
+  text-align: center;
+  margin-bottom: var(--space-xl);
+}
+
+.contact-form-section {
+  max-width: 600px;
+  margin: 0 auto 2rem;
+  text-align: left;
+  background-color: var(--background);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  z-index: 1;
+  transition: background-color var(--transition-normal),
+    box-shadow var(--transition-normal);
+}
+
+.contact-form-section h1 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: var(--primary);
+  position: relative;
+  display: inline-block;
+  transition: color var(--transition-normal);
+}
+
+.contact-form-section h1::after {
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(to right, var(--primary), var(--accent));
+  border-radius: var(--radius-full);
+  transition: background var(--transition-normal);
+}
+
+.contact-form-section label {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+  color: var(--text-dark);
+  transition: color var(--transition-normal);
+}
+
+.contact-form-section input,
+.contact-form-section textarea {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  width: 100%;
+  padding: 0.8rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--text-light);
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: border-color var(--transition-normal),
+    box-shadow var(--transition-normal),
+    background-color var(--transition-normal), color var(--transition-normal);
+  background-color: var(--background);
+  color: var(--text);
+}
+
+.contact-form-section input:focus,
+.contact-form-section textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(var(--primary), 0.1);
+}
+
+.contact-form-section textarea {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  min-height: 150px;
+  resize: vertical;
+}
+
+/* Form validation styles */
+input.error,
+textarea.error {
+  border-color: var(--error) !important;
+  background-color: rgba(var(--error), 0.05);
+}
+
+.error-message {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  color: var(--error);
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+  transition: color var(--transition-normal);
+}
+
+.form-message {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  margin-top: 1rem;
+  transition: opacity 0.3s ease, background-color var(--transition-normal),
+    color var(--transition-normal), border-color var(--transition-normal);
+}
+
+.form-message.success {
+  background-color: rgba(var(--success), 0.1);
+  color: var(--success);
+  border: 1px solid var(--success);
+}
+
+.form-message.error {
+  background-color: rgba(var(--error), 0.1);
+  color: var(--error);
+  border: 1px solid var(--error);
+}
+
+.submit-btn {
+  font-family: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: white;
+  padding: 0.8rem 2rem;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 1rem;
+  transition: transform var(--transition-normal),
+    box-shadow var(--transition-normal), background var(--transition-normal);
+  display: block;
+  margin: 2rem auto 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.submit-btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: left 0.7s;
+}
+
+.submit-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+.submit-btn:hover::before {
+  left: 100%;
+}
+
+.submit-btn:active {
+  transform: translateY(0);
+}
+
+/* ========== ENHANCED ANIMATIONS ========== */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.5);
+  }
+}
+
+/* Gold effect animations */
+@keyframes goldShimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes goldWave {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes waveEffect {
+  0% {
+    transform: rotate(0deg) translate(-50%, -50%);
+  }
+  100% {
+    transform: rotate(360deg) translate(-50%, -50%);
+  }
+}
+
+@keyframes glitterEffect {
+  0% {
+    background-position: 0% 0%;
+  }
+  25% {
+    background-position: 100% 0%;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
+  75% {
+    background-position: 0% 100%;
+  }
+  100% {
+    background-position: 0% 0%;
+  }
+}
+
+@keyframes goldPulse {
+  0% {
+    text-shadow: 0 0 5px rgba(249, 223, 133, 0.1);
+  }
+  100% {
+    text-shadow: 0 0 15px rgba(249, 223, 133, 0.4);
+  }
+}
+
+/* Animation classes */
+.pre-animation {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.animated {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ========== ENHANCED ACCESSIBILITY ========== */
+.skip-to-content {
+  font-family: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--primary);
+  color: white;
+  padding: 8px;
+  z-index: 100;
+  transition: top 0.3s ease, background-color var(--transition-normal);
+}
+
+.skip-to-content:focus {
+  top: 0;
+}
+
+.sr-only {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Focus styles for keyboard navigation */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ========== ENHANCED RESPONSIVE STYLES ========== */
+@media (max-width: 768px) {
+  /* General responsive adjustments */
+  .nav ul {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  /* Certificate page responsive adjustments */
+  .carousel {
+    max-width: 95%;
+    margin: 1rem auto;
+  }
+
+  .carousel-arrow {
+    padding: 0.5rem 0.75rem;
+    font-size: 1.5rem;
+  }
+
+  .carousel-prev {
+    left: 10px;
+  }
+
+  .carousel-next {
+    right: 10px;
+  }
+
+  .meta {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .certificate-info h3 {
+    font-size: 1.3rem;
+  }
+
+  .carousel-track {
+    min-height: 400px;
+  }
+
+  /* Page title responsive */
+  .page-title {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .carousel-slide {
+    padding: 1rem;
+  }
+
+  .certificate-info {
+    padding: 1rem;
+  }
+
+  .description {
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+      sans-serif;
+    font-size: 0.9rem;
+  }
+
+  .page-title {
+    font-size: 2rem;
+  }
+}
+
+/* Ensure main content takes up available space */
+main {
+  flex: 1;
+}
+
+/* ========== ENHANCED PRINT STYLES ========== */
+@media print {
+  /* Reset margins and padding for print */
+  body {
+    margin: 0;
+    padding: 0;
+    background: white;
+  }
+
+  /* Hide elements not needed for print */
+  .header,
+  .footer,
+  .carousel-arrow,
+  .carousel-nav,
+  .cta-btn,
+  .social-links,
+  .contact::before {
+    display: none !important;
+  }
+
+  /* Adjust certificate container for print */
+  .certificate {
+    margin: 0;
+    padding: 0.5cm;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Make carousel static for print */
+  .carousel-track-container {
+    overflow: visible;
+    box-shadow: none;
+  }
+
+  .carousel-track {
+    display: block;
+    transform: none !important;
+  }
+
+  /* Adjust slides for print */
+  .carousel-slide {
+    min-width: auto;
+    page-break-inside: avoid;
+    break-inside: avoid;
+    margin-bottom: 1cm;
+  }
+
+  /* Optimize images for print */
+  .carousel-slide img {
+    max-height: 45% !important;
+    width: auto;
+    max-width: 100%;
+    margin: 0 auto;
+    display: block;
+  }
+
+  /* Portrait orientation adjustments */
+  @page {
+    size: A4 portrait;
+    margin: 1cm;
+  }
+
+  /* Landscape orientation adjustments */
+  @media (orientation: landscape) {
+    @page {
+      size: A4 landscape;
+      margin: 1cm;
+    }
+
+    .carousel-slide {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 2cm;
+    }
+
+    .carousel-slide img {
+      max-width: 45%;
+    }
+
+    .certificate-info {
+      flex: 1;
+    }
+  }
+
+  /* Ensure text is black for better printing */
+  * {
+    color: black !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  a {
+    text-decoration: underline;
+  }
+
+  a[href]:after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+  }
 }
