@@ -1,18 +1,22 @@
 'use client';
-import React from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
-import { FaLinkedin, FaGithub, FaTwitter, FaEnvelope } from 'react-icons/fa';
+import { FaLinkedin, FaGithub, FaEnvelope } from 'react-icons/fa';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 
-  const footerLinks = [
-    { href: '/about', label: 'About' },
-    { href: '/portfolio', label: 'Portfolio' },
-    { href: '/certificate', label: 'Certificates' },
-    { href: '/blog', label: 'Blog' },
-    { href: '/contact', label: 'Contact' },
-  ];
+  // Load the Credly script after the component mounts
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = "//cdn.credly.com/assets/utilities/embed.js";
+    script.async = true;
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
 
   const socialLinks = [
     { href: 'https://www.linkedin.com/in/shainwaiyan/', label: 'LinkedIn', icon: FaLinkedin },
@@ -23,8 +27,8 @@ const Footer = () => {
   return (
     <footer style={{ backgroundColor: '#191970', borderTop: '4px solid #ffd700' }} className="text-white py-16 mt-24 w-full">
       <div className="px-4 sm:px-6 lg:px-8 max-w-full">
-        {/* Footer Content Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+          
           {/* Brand Section */}
           <div className="flex flex-col gap-4">
             <Link href="/" className="flex items-center gap-3 hover:opacity-90 transition-opacity duration-300 w-fit group">
@@ -43,23 +47,34 @@ const Footer = () => {
             </p>
           </div>
 
-          {/* Links Section */}
+          {/* Badges Section (Replaced Quick Links) */}
           <div>
-            <h3 style={{ color: '#ffd700', borderColor: '#ffd700' }} className="font-bold text-lg mb-6 pb-2 border-b-2">Quick Links</h3>
-            <ul className="flex flex-col gap-3">
-              {footerLinks.map((link) => (
-                <li key={link.href}>
-                  <Link 
-                    href={link.href}
-                    style={{ color: '#cccccc' }}
-                    className="hover:text-[#ffd700] transition-all duration-300 relative group inline-block font-medium"
-                  >
-                    {link.label}
-                    <span style={{ backgroundColor: '#ffd700', height: '2px' }} className="absolute bottom-0 left-0 w-0 group-hover:w-full transition-all duration-300"></span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            <h3 style={{ color: '#ffd700', borderColor: '#ffd700' }} className="font-bold text-lg mb-6 pb-2 border-b-2">Certifications</h3>
+            <div className="flex flex-wrap gap-2 justify-start items-center">
+              {/* Badge 1 */}
+              <div 
+                data-iframe-width="120" 
+                data-iframe-height="240" 
+                data-share-badge-id="69accbc5-d047-45d9-a997-544af3a0d61a" 
+                data-share-badge-host="https://www.credly.com"
+              ></div>
+              
+              {/* Badge 2 */}
+              <div 
+                data-iframe-width="120" 
+                data-iframe-height="240" 
+                data-share-badge-id="335116bf-3f68-4605-8c27-26a59e7716c4" 
+                data-share-badge-host="https://www.credly.com"
+              ></div>
+              
+              {/* Badge 3 */}
+              <div 
+                data-iframe-width="120" 
+                data-iframe-height="240" 
+                data-share-badge-id="a40dacba-cd6a-496d-8275-88339c8f18d4" 
+                data-share-badge-host="https://www.credly.com"
+              ></div>
+            </div>
           </div>
 
           {/* Social Links Section */}
@@ -74,10 +89,8 @@ const Footer = () => {
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-12 h-12 flex items-center justify-center rounded-lg transition-all duration-300 transform hover:scale-120 font-bold text-white hover:shadow-gold"
-                    style={{ 
-                      backgroundColor: '#2a2a9a',
-                    }}
+                    className="w-12 h-12 flex items-center justify-center rounded-lg transition-all duration-300 transform hover:scale-125 font-bold text-white"
+                    style={{ backgroundColor: '#2a2a9a' }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.backgroundColor = '#ffd700';
                       e.currentTarget.style.color = '#191970';
@@ -96,10 +109,8 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Divider */}
         <div style={{ borderColor: '#2a2a9a' }} className="border-t my-12"></div>
 
-        {/* Copyright Section */}
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-sm">
           <p style={{ color: '#e0e0e0' }}>
             &copy; {currentYear} Shain Studio. All Rights Reserved.
