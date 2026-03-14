@@ -1,0 +1,74 @@
+{
+  "nav": {
+    "home": "首页",
+    "about": "关于我",
+    "portfolio": "作品集",
+    "businessPlans": "商业计划",
+    "marketingPlans": "营销计划",
+    "marketingInMotion": "营销实战",
+    "codingProjects": "编程项目",
+    "photography": "摄影",
+    "amvEditing": "AMV编辑",
+    "certificate": "证书",
+    "blog": "博客",
+    "contact": "联系我"
+  },
+  "hero": {
+    "title": "欢迎来到Shain的工作室",
+    "titleHighlight": "Shain的工作室",
+    "subtitle": "创意与成果完美结合。",
+    "description": "探索我通过营销卓越、专业成就和创意解决方案的历程。",
+    "viewPortfolio": "查看我的作品集",
+    "contactMe": "联系我"
+  },
+  "expertise": {
+    "title": "我的专长",
+    "subtitle": "我能卓越交付的领域",
+    "items": [
+      {
+        "title": "数字营销",
+        "description": "跨数字渠道推动参与度、转化率和品牌知名度的战略性活动。"
+      },
+      {
+        "title": "市场分析",
+        "description": "深入研究和分析，以确定市场趋势、机会和竞争优势。"
+      },
+      {
+        "title": "品牌开发",
+        "description": "创建与目标受众产生共鸣并推动业务增长的引人注目的品牌身份。"
+      },
+      {
+        "title": "内容策略",
+        "description": "开发讲述品牌故事并与受众联系的引人入胜的内容。"
+      }
+    ]
+  },
+  "aiShowcase": {
+    "title": "AI驱动的营销",
+    "subtitle": "利用人工智能转变您的营销策略",
+    "items": [
+      {
+        "title": "预测分析",
+        "description": "使用AI预测市场趋势和客户行为模式"
+      },
+      {
+        "title": "内容生成",
+        "description": "AI辅助创建个性化、引人入胜的营销内容"
+      },
+      {
+        "title": "客户细分",
+        "description": "先进的算法识别和定位高价值客户群"
+      }
+    ]
+  },
+  "footer": {
+    "quickLinks": "快速链接",
+    "getInTouch": "联系我",
+    "followMe": "关注我",
+    "rights": "版权所有。"
+  },
+  "common": {
+    "learnMore": "了解更多",
+    "scrollToExplore": "向下滚动以浏览"
+  }
+}

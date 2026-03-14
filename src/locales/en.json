@@ -1,0 +1,74 @@
+{
+  "nav": {
+    "home": "Home",
+    "about": "About Me",
+    "portfolio": "Portfolio",
+    "businessPlans": "Business Plans",
+    "marketingPlans": "Marketing Plans",
+    "marketingInMotion": "Marketing in Motion",
+    "codingProjects": "Coding Projects",
+    "photography": "Photography",
+    "amvEditing": "AMV Editing",
+    "certificate": "Certificate",
+    "blog": "Blog",
+    "contact": "Contact Me"
+  },
+  "hero": {
+    "title": "Welcome to Shain's Studio",
+    "titleHighlight": "Shain's Studio",
+    "subtitle": "Where creativity meets results.",
+    "description": "Explore my journey through marketing excellence, professional achievements, and creative solutions.",
+    "viewPortfolio": "View My Portfolio",
+    "contactMe": "Contact Me"
+  },
+  "expertise": {
+    "title": "My Expertise",
+    "subtitle": "Areas where I deliver exceptional results",
+    "items": [
+      {
+        "title": "Digital Marketing",
+        "description": "Strategic campaigns that drive engagement, conversions, and brand awareness across digital channels."
+      },
+      {
+        "title": "Market Analysis",
+        "description": "In-depth research and analysis to identify market trends, opportunities, and competitive advantages."
+      },
+      {
+        "title": "Brand Development",
+        "description": "Creating compelling brand identities that resonate with target audiences and drive business growth."
+      },
+      {
+        "title": "Content Strategy",
+        "description": "Developing engaging content that tells your brand story and connects with your audience."
+      }
+    ]
+  },
+  "aiShowcase": {
+    "title": "AI-Powered Marketing",
+    "subtitle": "Leveraging artificial intelligence to transform your marketing strategy",
+    "items": [
+      {
+        "title": "Predictive Analytics",
+        "description": "Using AI to forecast market trends and customer behavior patterns"
+      },
+      {
+        "title": "Content Generation",
+        "description": "AI-assisted creation of personalized, engaging marketing content"
+      },
+      {
+        "title": "Customer Segmentation",
+        "description": "Advanced algorithms to identify and target high-value customer segments"
+      }
+    ]
+  },
+  "footer": {
+    "quickLinks": "Quick Links",
+    "getInTouch": "Get In Touch",
+    "followMe": "Follow Me",
+    "rights": "All rights reserved."
+  },
+  "common": {
+    "learnMore": "Learn More",
+    "scrollToExplore": "Scroll to explore"
+  }
+}
