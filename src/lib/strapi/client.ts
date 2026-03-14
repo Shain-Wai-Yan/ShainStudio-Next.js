@@ -1,0 +1,154 @@
+/**
+ * Strapi API Client Configuration
+ * Handles authentication, error handling, and data fetching from Strapi CMS
+ * Supports both Strapi v5 flat structure and v4 nested structure
+ */
+
+const STRAPI_API_URL = (process.env.NEXT_PUBLIC_STRAPI_API_URL || 'https://api.shainwaiyan.com/api').replace(/\/$/, '');
+
+const STRAPI_API_TOKEN = process.env.NEXT_PUBLIC_STRAPI_API_TOKEN || 'ae2fdd66167465a3dbef4c71ed375a28a0530b41047111a65563c182950afbf1dd445255ffeea3dc2f00345ea264c007e16e09ff1682d8f887babff2d110226e6f4f20de5d17950106f91a6c46b58c7f9bd7c972e406a51a98d9c2804c491c8ba2b027f5a2ea81ef99d3bcf08b4cd4eea607f7f03cea136a766c1b26d44229b8';
+
+const API_TIMEOUT = 10000; // 10 seconds
+
+interface FetchOptions {
+  method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
+  queryParams?: Record<string, string | number | boolean>;
+  timeout?: number;
+}
+
+interface FetchResponse<T> {
+  data: T | null;
+  error: string | null;
+}
+
+/**
+ * Fetches data from Strapi API with error handling and timeout
+ */
+export async function fetchFromStrapi<T>(
+  endpoint: string,
+  options: FetchOptions = {}
+): Promise<FetchResponse<T>> {
+  try {
+    const { method = 'GET', queryParams = {}, timeout = API_TIMEOUT } = options;
+
+    // Build query string from params object
+    const queryString = Object.keys(queryParams)
+      .map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(String(queryParams[key]))}`)
+      .join('&');
+
+    const url = `${STRAPI_API_URL}/${endpoint}${queryString ? `?${queryString}` : ''}`;
+
+    console.log(`[Strapi Client] Fetching from: ${url}`);
+
+    // Prepare headers with authentication if token is available
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+
+    if (STRAPI_API_TOKEN) {
+      headers['Authorization'] = `Bearer ${STRAPI_API_TOKEN}`;
+    }
+
+    // Add timeout to fetch to avoid long waits
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    try {
+      const response = await fetch(url, {
+        method,
+        headers,
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      // Handle common HTTP error codes
+      if (response.status === 403) {
+        console.error('[Strapi Client] Authentication error: You need a valid API token');
+        return {
+          data: null,
+          error: 'Authentication required. Please check your API token.',
+        };
+      }
+
+      if (response.status === 404) {
+        console.error(`[Strapi Client] API endpoint not found: ${url}`);
+        return {
+          data: null,
+          error: 'API endpoint not found. Please check the collection name.',
+        };
+      }
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('[Strapi Client] API Response:', data);
+      return { data: data as T, error: null };
+    } catch (fetchError) {
+      if (fetchError instanceof Error && fetchError.name === 'AbortError') {
+        return {
+          data: null,
+          error: 'Request timed out. The API server might be unreachable.',
+        };
+      }
+      throw fetchError;
+    }
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    console.error('[Strapi Client] Error fetching from Strapi:', errorMessage);
+
+    if (
+      errorMessage.includes('Failed to fetch') ||
+      errorMessage.includes('NetworkError') ||
+      errorMessage.includes('timed out')
+    ) {
+      return {
+        data: null,
+        error: 'Network error: Please check if the Strapi server is running and accessible.',
+      };
+    }
+
+    return { data: null, error: errorMessage };
+  }
+}
+
+/**
+ * Extracts URL from various Strapi data structures
+ * Handles both v5 flat structure and v4 nested structure
+ */
+export function extractUrl(
+  fileObject: any,
+  fallbackUrl: string = ''
+): string {
+  if (!fileObject) return fallbackUrl;
+
+  let url = '';
+
+  // Handle Strapi v5 flat structure (direct object with url)
+  if (fileObject.url) {
+    url = fileObject.url;
+  }
+  // Handle Strapi v4 nested structure (data.attributes.url)
+  else if (fileObject.data?.attributes?.url) {
+    url = fileObject.data.attributes.url;
+  }
+  // Handle array format
+  else if (Array.isArray(fileObject) && fileObject.length > 0) {
+    const file = fileObject[0];
+    url = file?.url || file?.data?.attributes?.url || '';
+  }
+  // Handle direct string URL
+  else if (typeof fileObject === 'string') {
+    url = fileObject;
+  }
+
+  // Ensure URL is absolute
+  if (url && !url.startsWith('http') && !url.startsWith('data:')) {
+    const baseUrl = STRAPI_API_URL.replace('/api/', '');
+    url = `${baseUrl}${url}`;
+  }
+
+  return url || fallbackUrl;
+}
