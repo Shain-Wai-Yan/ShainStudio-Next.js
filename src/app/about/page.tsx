@@ -210,108 +210,137 @@ export default function AboutPage() {
       </section>
 
       {/* Timeline Section */}
-      <section className="py-12 md:py-20 px-4 md:px-0 bg-background-alt relative">
-        <div className="max-w-6xl mx-auto px-4 md:px-8">
-          <h2 className="text-3xl md:text-4xl font-bold text-primary dark:text-white text-center mb-12 font-secondary relative pb-4 inline-block w-full">
-            My Journey
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-20 h-1 bg-accent rounded"></div>
-          </h2>
+<section className="py-12 md:py-20 px-4 md:px-0 bg-background-alt relative">
+  <div className="max-w-6xl mx-auto px-4 md:px-8">
+    <h2 className="text-3xl md:text-4xl font-bold text-primary dark:text-white text-center mb-12 font-secondary relative pb-4 inline-block w-full">
+      My Journey
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-20 h-1 bg-accent rounded"></div>
+    </h2>
 
-          {/* Timeline */}
-          <div className="relative">
-            {/* Timeline Line */}
-            <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-primary to-accent hidden md:block transform -translate-x-1/2"></div>
+    <div className="relative">
+      {/* CENTER VERTICAL LINE */}
+      <div
+        className="hidden md:block absolute top-0 bottom-0 w-1 z-0"
+        style={{
+          left: '50%',
+          transform: 'translateX(-50%)',
+          background: 'linear-gradient(to bottom, var(--primary, #191970), var(--accent, #ffd700))',
+        }}
+      />
 
-            {/* Timeline Items */}
-            <div className="space-y-12">
-              {/* Item 1 */}
-              <div className="relative animate-on-scroll">
-                <div className="md:flex items-center md:gap-8">
-                  <div className="md:w-1/2 md:text-right md:pr-8">
-                    <div className="bg-background rounded-lg p-6 shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300">
-                      <h3 className="text-xl font-bold text-primary dark:text-white mb-2 font-secondary">Started University</h3>
-                      <span className="inline-block px-3 py-1 bg-primary/10 dark:bg-accent/10 text-primary dark:text-accent rounded-full text-sm font-bold mb-3">2019</span>
-                      <p className="text-muted font-primary">
-                        Began my academic journey at Taunggyi University, specializing in English.
-                      </p>
-                    </div>
-                  </div>
-                  <div className="hidden md:flex absolute left-1/2 transform -translate-x-1/2 items-center justify-center w-5 h-5 bg-white border-4 border-accent rounded-full -top-1"></div>
-                  <div className="md:w-1/2 md:pl-8"></div>
-                </div>
-              </div>
+      <div className="space-y-12">
 
-              {/* Item 2 */}
-              <div className="relative animate-on-scroll">
-                <div className="md:flex items-center md:gap-8 flex-row-reverse">
-                  <div className="md:w-1/2 md:text-left md:pl-8">
-                    <div className="bg-background rounded-lg p-6 shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300">
-                      <h3 className="text-xl font-bold text-primary dark:text-white mb-2 font-secondary">Started Learning Chinese</h3>
-                      <span className="inline-block px-3 py-1 bg-primary/10 dark:bg-accent/10 text-primary dark:text-accent rounded-full text-sm font-bold mb-3">2023</span>
-                      <p className="text-muted font-primary">
-                        Expanded my language skills by beginning to learn Chinese, adding to my trilingual abilities.
-                      </p>
-                    </div>
-                  </div>
-                  <div className="hidden md:flex absolute left-1/2 transform -translate-x-1/2 items-center justify-center w-5 h-5 bg-white border-4 border-accent rounded-full top-6"></div>
-                  <div className="md:w-1/2 md:pr-8"></div>
-                </div>
-              </div>
+        {/* Item 1 - LEFT: Started University */}
+        <div className="relative flex flex-col md:flex-row md:items-start">
+          <div className="md:w-1/2 md:pr-16 w-full">
+            <div className="bg-background rounded-lg p-6 shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300">
+              <h3 className="text-xl font-bold text-primary dark:text-white mb-2 font-secondary">Started University</h3>
+              <span className="inline-block px-3 py-1 bg-primary/10 dark:bg-accent/10 text-primary dark:text-accent rounded-full text-sm font-bold mb-3">2019</span>
+              <p className="text-muted font-primary">
+                Began my academic journey at Taunggyi University, specializing in English.
+              </p>
+            </div>
+          </div>
+          {/* DOT */}
+          <div className="hidden md:flex absolute top-6 w-5 h-5 rounded-full bg-white dark:bg-slate-900 border-4 border-accent z-10"
+            style={{ left: '50%', transform: 'translateX(-50%)' }}
+          />
+          <div className="md:w-1/2 md:pl-16" />
+        </div>
 
-              {/* Item 3 */}
-              <div className="relative animate-on-scroll">
-                <div className="md:flex items-center md:gap-8">
-                  <div className="md:w-1/2 md:text-right md:pr-8">
-                    <div className="bg-background rounded-lg p-6 shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300">
-                      <h3 className="text-xl font-bold text-primary dark:text-white mb-2 font-secondary">Business Studies</h3>
-                      <span className="inline-block px-3 py-1 bg-primary/10 dark:bg-accent/10 text-primary dark:text-accent rounded-full text-sm font-bold mb-3">2024</span>
-                      <p className="text-muted font-primary">
-                        Started learning about business at Strategy First University, focusing on marketing fundamentals.
-                      </p>
-                    </div>
-                  </div>
-                  <div className="hidden md:flex absolute left-1/2 transform -translate-x-1/2 items-center justify-center w-5 h-5 bg-white border-4 border-accent rounded-full top-6"></div>
-                  <div className="md:w-1/2 md:pl-8"></div>
-                </div>
-              </div>
-
-              {/* Item 4 */}
-              <div className="relative animate-on-scroll">
-                <div className="md:flex items-center md:gap-8 flex-row-reverse">
-                  <div className="md:w-1/2 md:text-left md:pl-8">
-                    <div className="bg-background rounded-lg p-6 shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300">
-                      <h3 className="text-xl font-bold text-primary dark:text-white mb-2 font-secondary">Digital Marketing Certificate</h3>
-                      <span className="inline-block px-3 py-1 bg-primary/10 dark:bg-accent/10 text-primary dark:text-accent rounded-full text-sm font-bold mb-3">2025</span>
-                      <p className="text-muted font-primary">
-                        Began the Google Professional Certificate in Digital Marketing and E-Commerce through Coursera to enhance my digital skills.
-                      </p>
-                    </div>
-                  </div>
-                  <div className="hidden md:flex absolute left-1/2 transform -translate-x-1/2 items-center justify-center w-5 h-5 bg-white border-4 border-accent rounded-full top-6"></div>
-                  <div className="md:w-1/2 md:pr-8"></div>
-                </div>
-              </div>
-
-              {/* Item 5 */}
-              <div className="relative animate-on-scroll">
-                <div className="md:flex items-center md:gap-8">
-                  <div className="md:w-1/2 md:text-right md:pr-8">
-                    <div className="bg-background rounded-lg p-6 shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300">
-                      <h3 className="text-xl font-bold text-primary dark:text-white mb-2 font-secondary">Meta Social Media Marketing Certificate</h3>
-                      <span className="inline-block px-3 py-1 bg-primary/10 dark:bg-accent/10 text-primary dark:text-accent rounded-full text-sm font-bold mb-3">2025</span>
-                      <p className="text-muted font-primary">
-                        Began the Meta Professional Certificate in Social Media Marketing through Coursera to enhance my social media marketing skills.
-                      </p>
-                    </div>
-                  </div>
-                  <div className="hidden md:flex absolute left-1/2 transform -translate-x-1/2 items-center justify-center w-5 h-5 bg-white border-4 border-accent rounded-full top-6"></div>
-                  <div className="md:w-1/2 md:pl-8"></div>
-                </div>
-              </div>
+        {/* Item 2 - RIGHT: Started Learning Chinese */}
+        <div className="relative flex flex-col md:flex-row md:items-start">
+          <div className="md:w-1/2 md:pr-16" />
+          {/* DOT */}
+          <div className="hidden md:flex absolute top-6 w-5 h-5 rounded-full bg-white dark:bg-slate-900 border-4 border-accent z-10"
+            style={{ left: '50%', transform: 'translateX(-50%)' }}
+          />
+          <div className="md:w-1/2 md:pl-16 w-full">
+            <div className="bg-background rounded-lg p-6 shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300">
+              <h3 className="text-xl font-bold text-primary dark:text-white mb-2 font-secondary">Started Learning Chinese</h3>
+              <span className="inline-block px-3 py-1 bg-primary/10 dark:bg-accent/10 text-primary dark:text-accent rounded-full text-sm font-bold mb-3">2023</span>
+              <p className="text-muted font-primary">
+                Expanded my language skills by beginning to learn Chinese, adding to my trilingual abilities.
+              </p>
             </div>
           </div>
         </div>
-      </section>
+
+        {/* Item 3 - LEFT: Business Studies */}
+        <div className="relative flex flex-col md:flex-row md:items-start">
+          <div className="md:w-1/2 md:pr-16 w-full">
+            <div className="bg-background rounded-lg p-6 shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300">
+              <h3 className="text-xl font-bold text-primary dark:text-white mb-2 font-secondary">Business Studies</h3>
+              <span className="inline-block px-3 py-1 bg-primary/10 dark:bg-accent/10 text-primary dark:text-accent rounded-full text-sm font-bold mb-3">2024</span>
+              <p className="text-muted font-primary">
+                Started learning about business at Strategy First University, focusing on marketing fundamentals.
+              </p>
+            </div>
+          </div>
+          {/* DOT */}
+          <div className="hidden md:flex absolute top-6 w-5 h-5 rounded-full bg-white dark:bg-slate-900 border-4 border-accent z-10"
+            style={{ left: '50%', transform: 'translateX(-50%)' }}
+          />
+          <div className="md:w-1/2 md:pl-16" />
+        </div>
+
+        {/* Item 4 - RIGHT: Digital Marketing Certificate */}
+        <div className="relative flex flex-col md:flex-row md:items-start">
+          <div className="md:w-1/2 md:pr-16" />
+          {/* DOT */}
+          <div className="hidden md:flex absolute top-6 w-5 h-5 rounded-full bg-white dark:bg-slate-900 border-4 border-accent z-10"
+            style={{ left: '50%', transform: 'translateX(-50%)' }}
+          />
+          <div className="md:w-1/2 md:pl-16 w-full">
+            <div className="bg-background rounded-lg p-6 shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300">
+              <h3 className="text-xl font-bold text-primary dark:text-white mb-2 font-secondary">Digital Marketing Certificate</h3>
+              <span className="inline-block px-3 py-1 bg-primary/10 dark:bg-accent/10 text-primary dark:text-accent rounded-full text-sm font-bold mb-3">2025</span>
+              <p className="text-muted font-primary">
+                Began the Google Professional Certificate in Digital Marketing and E-Commerce through Coursera to enhance my digital skills.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Item 5 - LEFT: Meta Social Media Marketing Certificate */}
+        <div className="relative flex flex-col md:flex-row md:items-start">
+          <div className="md:w-1/2 md:pr-16 w-full">
+            <div className="bg-background rounded-lg p-6 shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300">
+              <h3 className="text-xl font-bold text-primary dark:text-white mb-2 font-secondary">Meta Social Media Marketing Certificate</h3>
+              <span className="inline-block px-3 py-1 bg-primary/10 dark:bg-accent/10 text-primary dark:text-accent rounded-full text-sm font-bold mb-3">2025</span>
+              <p className="text-muted font-primary">
+                Began the Meta Professional Certificate in Social Media Marketing through Coursera to enhance my social media marketing skills.
+              </p>
+            </div>
+          </div>
+          {/* DOT */}
+          <div className="hidden md:flex absolute top-6 w-5 h-5 rounded-full bg-white dark:bg-slate-900 border-4 border-accent z-10"
+            style={{ left: '50%', transform: 'translateX(-50%)' }}
+          />
+          <div className="md:w-1/2 md:pl-16" />
+        </div>
+
+        {/* Item 6 - RIGHT: BSBA at UoPeople */}
+        <div className="relative flex flex-col md:flex-row md:items-start">
+          <div className="md:w-1/2 md:pr-16" />
+          {/* DOT */}
+          <div className="hidden md:flex absolute top-6 w-5 h-5 rounded-full bg-white dark:bg-slate-900 border-4 border-accent z-10"
+            style={{ left: '50%', transform: 'translateX(-50%)' }}
+          />
+          <div className="md:w-1/2 md:pl-16 w-full">
+            <div className="bg-background rounded-lg p-6 shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300">
+              <h3 className="text-xl font-bold text-primary dark:text-white mb-2 font-secondary">Started BSBA at University of the People</h3>
+              <span className="inline-block px-3 py-1 bg-primary/10 dark:bg-accent/10 text-primary dark:text-accent rounded-full text-sm font-bold mb-3">2026</span>
+              <p className="text-muted font-primary">
+               Enrolled in the Bachelor of Science in Business Administration program at UoPeople. Pursuing this degree to deepen my foundation in business strategy, management, and entrepreneurship while continuing to grow as a marketing professional.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
 
       {/* Mar-Tech Stack Section */}
       <MarTechStack language="en" />

@@ -78,7 +78,7 @@ const Header = () => {
               alt="Shain Studio Logo"
               className="w-10 h-10 sm:w-12 sm:h-12 object-contain rounded"
             />
-            <span style={{ color: '#ffffff' }} className="font-bold text-lg sm:text-xl hidden sm:inline">Shain's Portfolio</span>
+            <span style={{ color: '#ffffff' }} className="font-bold text-lg sm:text-xl hidden sm:inline">Shain Studio</span>
           </Link>
         </div>
 

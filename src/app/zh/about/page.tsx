@@ -210,108 +210,138 @@ const calculateAge = () => {
       </section>
 
       {/* Timeline Section */}
-      <section className="py-12 md:py-20 px-4 md:px-0 bg-background-alt relative">
-        <div className="max-w-6xl mx-auto px-4 md:px-8">
-          <h2 className="text-3xl md:text-4xl font-bold text-primary dark:text-white text-center mb-12 font-secondary relative pb-4 inline-block w-full">
-            我的成长旅程
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-20 h-1 bg-accent rounded"></div>
-          </h2>
+<section className="py-12 md:py-20 px-4 md:px-0 bg-background-alt relative">
+  <div className="max-w-6xl mx-auto px-4 md:px-8">
+    <h2 className="text-3xl md:text-4xl font-bold text-primary dark:text-white text-center mb-12 font-secondary relative pb-4 inline-block w-full">
+      我的成长旅程
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-20 h-1 bg-accent rounded"></div>
+    </h2>
 
-          {/* Timeline */}
-          <div className="relative">
-            {/* Timeline Line */}
-            <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-primary to-accent hidden md:block transform -translate-x-1/2"></div>
+    <div className="relative">
+      {/* CENTER VERTICAL LINE */}
+      <div
+        className="hidden md:block absolute top-0 bottom-0 w-1 z-0"
+        style={{
+          left: '50%',
+          transform: 'translateX(-50%)',
+          background: 'linear-gradient(to bottom, var(--primary, #191970), var(--accent, #ffd700))',
+        }}
+      />
 
-            {/* Timeline Items */}
-            <div className="space-y-12">
-              {/* Item 1 */}
-              <div className="relative animate-on-scroll">
-                <div className="md:flex items-center md:gap-8">
-                  <div className="md:w-1/2 md:text-right md:pr-8">
-                    <div className="bg-background rounded-lg p-6 shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300">
-                      <h3 className="text-xl font-bold text-primary dark:text-white mb-2 font-secondary">开启大学生活</h3>
-                      <span className="inline-block px-3 py-1 bg-primary/10 dark:bg-accent/10 text-primary dark:text-accent rounded-full text-sm font-bold mb-3">2019</span>
-                      <p className="text-muted font-primary">
-                        我在东枝大学开始了英语专业的本科学习，迈出了学术探索的第一步。
-                      </p>
-                    </div>
-                  </div>
-                  <div className="hidden md:flex absolute left-1/2 transform -translate-x-1/2 items-center justify-center w-5 h-5 bg-white border-4 border-accent rounded-full -top-1"></div>
-                  <div className="md:w-1/2 md:pl-8"></div>
-                </div>
-              </div>
+      <div className="space-y-12">
 
-              {/* Item 2 */}
-              <div className="relative animate-on-scroll">
-                <div className="md:flex items-center md:gap-8 flex-row-reverse">
-                  <div className="md:w-1/2 md:text-left md:pl-8">
-                    <div className="bg-background rounded-lg p-6 shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300">
-                      <h3 className="text-xl font-bold text-primary dark:text-white mb-2 font-secondary">开始学习中文</h3>
-                      <span className="inline-block px-3 py-1 bg-primary/10 dark:bg-accent/10 text-primary dark:text-accent rounded-full text-sm font-bold mb-3">2023</span>
-                      <p className="text-muted font-primary">
-                        为了拓展语言技能，我开始自学中文，提升了跨文化沟通能力。
-                      </p>
-                    </div>
-                  </div>
-                  <div className="hidden md:flex absolute left-1/2 transform -translate-x-1/2 items-center justify-center w-5 h-5 bg-white border-4 border-accent rounded-full top-6"></div>
-                  <div className="md:w-1/2 md:pr-8"></div>
-                </div>
-              </div>
+        {/* Item 1 - LEFT: 开启大学生活 */}
+        <div className="relative flex flex-col md:flex-row md:items-start">
+          <div className="md:w-1/2 md:pr-16 w-full">
+            <div className="bg-background rounded-lg p-6 shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300">
+              <h3 className="text-xl font-bold text-primary dark:text-white mb-2 font-secondary">开启大学生活</h3>
+              <span className="inline-block px-3 py-1 bg-primary/10 dark:bg-accent/10 text-primary dark:text-accent rounded-full text-sm font-bold mb-3">2019</span>
+              <p className="text-muted font-primary">
+                我在东枝大学开始了英语专业的本科学习，迈出了学术探索的第一步。
+              </p>
+            </div>
+          </div>
+          {/* DOT */}
+          <div className="hidden md:flex absolute top-6 w-5 h-5 rounded-full bg-white dark:bg-slate-900 border-4 border-accent z-10"
+            style={{ left: '50%', transform: 'translateX(-50%)' }}
+          />
+          <div className="md:w-1/2 md:pl-16" />
+        </div>
 
-              {/* Item 3 */}
-              <div className="relative animate-on-scroll">
-                <div className="md:flex items-center md:gap-8">
-                  <div className="md:w-1/2 md:text-right md:pr-8">
-                    <div className="bg-background rounded-lg p-6 shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300">
-                      <h3 className="text-xl font-bold text-primary dark:text-white mb-2 font-secondary">进修商业与市场营销</h3>
-                      <span className="inline-block px-3 py-1 bg-primary/10 dark:bg-accent/10 text-primary dark:text-accent rounded-full text-sm font-bold mb-3">2024</span>
-                      <p className="text-muted font-primary">
-                        在 Strategy First University 学习市场营销基础，正式踏入商业领域。
-                      </p>
-                    </div>
-                  </div>
-                  <div className="hidden md:flex absolute left-1/2 transform -translate-x-1/2 items-center justify-center w-5 h-5 bg-white border-4 border-accent rounded-full top-6"></div>
-                  <div className="md:w-1/2 md:pl-8"></div>
-                </div>
-              </div>
-
-              {/* Item 4 */}
-              <div className="relative animate-on-scroll">
-                <div className="md:flex items-center md:gap-8 flex-row-reverse">
-                  <div className="md:w-1/2 md:text-left md:pl-8">
-                    <div className="bg-background rounded-lg p-6 shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300">
-                      <h3 className="text-xl font-bold text-primary dark:text-white mb-2 font-secondary">获得数字营销与电商证书</h3>
-                      <span className="inline-block px-3 py-1 bg-primary/10 dark:bg-accent/10 text-primary dark:text-accent rounded-full text-sm font-bold mb-3">2025</span>
-                      <p className="text-muted font-primary">
-                        通过 Coursera 开始修读 Google 专业认证课程，提升数字营销和电商技能。
-                      </p>
-                    </div>
-                  </div>
-                  <div className="hidden md:flex absolute left-1/2 transform -translate-x-1/2 items-center justify-center w-5 h-5 bg-white border-4 border-accent rounded-full top-6"></div>
-                  <div className="md:w-1/2 md:pr-8"></div>
-                </div>
-              </div>
-
-              {/* Item 5 */}
-              <div className="relative animate-on-scroll">
-                <div className="md:flex items-center md:gap-8">
-                  <div className="md:w-1/2 md:text-right md:pr-8">
-                    <div className="bg-background rounded-lg p-6 shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300">
-                      <h3 className="text-xl font-bold text-primary dark:text-white mb-2 font-secondary">学习社交媒体营销</h3>
-                      <span className="inline-block px-3 py-1 bg-primary/10 dark:bg-accent/10 text-primary dark:text-accent rounded-full text-sm font-bold mb-3">2025</span>
-                      <p className="text-muted font-primary">
-                        通过 Coursera 修读 Meta 专业认证课程，进一步提升社交媒体策略能力。
-                      </p>
-                    </div>
-                  </div>
-                  <div className="hidden md:flex absolute left-1/2 transform -translate-x-1/2 items-center justify-center w-5 h-5 bg-white border-4 border-accent rounded-full top-6"></div>
-                  <div className="md:w-1/2 md:pl-8"></div>
-                </div>
-              </div>
+        {/* Item 2 - RIGHT: 开始学习中文 */}
+        <div className="relative flex flex-col md:flex-row md:items-start">
+          <div className="md:w-1/2 md:pr-16" />
+          {/* DOT */}
+          <div className="hidden md:flex absolute top-6 w-5 h-5 rounded-full bg-white dark:bg-slate-900 border-4 border-accent z-10"
+            style={{ left: '50%', transform: 'translateX(-50%)' }}
+          />
+          <div className="md:w-1/2 md:pl-16 w-full">
+            <div className="bg-background rounded-lg p-6 shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300">
+              <h3 className="text-xl font-bold text-primary dark:text-white mb-2 font-secondary">开始学习中文</h3>
+              <span className="inline-block px-3 py-1 bg-primary/10 dark:bg-accent/10 text-primary dark:text-accent rounded-full text-sm font-bold mb-3">2023</span>
+              <p className="text-muted font-primary">
+                为了拓展语言技能，我开始自学中文，提升了跨文化沟通能力。
+              </p>
             </div>
           </div>
         </div>
-      </section>
+
+        {/* Item 3 - LEFT: 进修商业与市场营销 */}
+        <div className="relative flex flex-col md:flex-row md:items-start">
+          <div className="md:w-1/2 md:pr-16 w-full">
+            <div className="bg-background rounded-lg p-6 shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300">
+              <h3 className="text-xl font-bold text-primary dark:text-white mb-2 font-secondary">进修商业与市场营销</h3>
+              <span className="inline-block px-3 py-1 bg-primary/10 dark:bg-accent/10 text-primary dark:text-accent rounded-full text-sm font-bold mb-3">2024</span>
+              <p className="text-muted font-primary">
+                在 Strategy First University 学习市场营销基础，正式踏入商业领域。
+              </p>
+            </div>
+          </div>
+          {/* DOT */}
+          <div className="hidden md:flex absolute top-6 w-5 h-5 rounded-full bg-white dark:bg-slate-900 border-4 border-accent z-10"
+            style={{ left: '50%', transform: 'translateX(-50%)' }}
+          />
+          <div className="md:w-1/2 md:pl-16" />
+        </div>
+
+        {/* Item 4 - RIGHT: 获得数字营销与电商证书 */}
+        <div className="relative flex flex-col md:flex-row md:items-start">
+          <div className="md:w-1/2 md:pr-16" />
+          {/* DOT */}
+          <div className="hidden md:flex absolute top-6 w-5 h-5 rounded-full bg-white dark:bg-slate-900 border-4 border-accent z-10"
+            style={{ left: '50%', transform: 'translateX(-50%)' }}
+          />
+          <div className="md:w-1/2 md:pl-16 w-full">
+            <div className="bg-background rounded-lg p-6 shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300">
+              <h3 className="text-xl font-bold text-primary dark:text-white mb-2 font-secondary">获得数字营销与电商证书</h3>
+              <span className="inline-block px-3 py-1 bg-primary/10 dark:bg-accent/10 text-primary dark:text-accent rounded-full text-sm font-bold mb-3">2025</span>
+              <p className="text-muted font-primary">
+                通过 Coursera 开始修读 Google 专业认证课程，提升数字营销和电商技能。
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Item 5 - LEFT: 学习社交媒体营销 */}
+        <div className="relative flex flex-col md:flex-row md:items-start">
+          <div className="md:w-1/2 md:pr-16 w-full">
+            <div className="bg-background rounded-lg p-6 shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300">
+              <h3 className="text-xl font-bold text-primary dark:text-white mb-2 font-secondary">学习社交媒体营销</h3>
+              <span className="inline-block px-3 py-1 bg-primary/10 dark:bg-accent/10 text-primary dark:text-accent rounded-full text-sm font-bold mb-3">2025</span>
+              <p className="text-muted font-primary">
+                通过 Coursera 修读 Meta 专业认证课程，进一步提升社交媒体策略能力。
+              </p>
+            </div>
+          </div>
+          {/* DOT */}
+          <div className="hidden md:flex absolute top-6 w-5 h-5 rounded-full bg-white dark:bg-slate-900 border-4 border-accent z-10"
+            style={{ left: '50%', transform: 'translateX(-50%)' }}
+          />
+          <div className="md:w-1/2 md:pl-16" />
+        </div>
+
+        {/* Item 6 - RIGHT: 就读工商管理学士 */}
+        <div className="relative flex flex-col md:flex-row md:items-start">
+          <div className="md:w-1/2 md:pr-16" />
+          {/* DOT */}
+          <div className="hidden md:flex absolute top-6 w-5 h-5 rounded-full bg-white dark:bg-slate-900 border-4 border-accent z-10"
+            style={{ left: '50%', transform: 'translateX(-50%)' }}
+          />
+          <div className="md:w-1/2 md:pl-16 w-full">
+            <div className="bg-background rounded-lg p-6 shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300">
+              <h3 className="text-xl font-bold text-primary dark:text-white mb-2 font-secondary">就读工商管理学士（人民大学）</h3>
+              <span className="inline-block px-3 py-1 bg-primary/10 dark:bg-accent/10 text-primary dark:text-accent rounded-full text-sm font-bold mb-3">2026</span>
+              <p className="text-muted font-primary">
+                正式入读人民大学（University of the People）工商管理学士课程——这是一所获认证的免学费在线大学。攻读此学位旨在深化商业战略、管理学及创业学的理论基础，同时持续精进市场营销专业能力。
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
 
       {/* Mar-Tech Stack Section */}
       <MarTechStack language="zh" />
