@@ -16,6 +16,14 @@ interface DocumentCardProps {
   isLoading?: boolean;
 }
 
+// Simple function to make <a> tags in description open in new tab safely
+function sanitizeDescription(html: string): string {
+  return html.replace(
+    /<a\s+href="([^"]+)"[^>]*>(.*?)<\/a>/gi,
+    '<a href="$1" target="_blank" rel="noopener noreferrer" class="desc-link">$2</a>'
+  );
+}
+
 export function DocumentCard({
   title,
   description,
@@ -29,20 +37,42 @@ export function DocumentCard({
   const [showMore, setShowMore] = useState(false);
   const [imageError, setImageError] = useState(false);
 
+  // Check if description contains HTML tags
+  const hasHtml = /<[a-z][\s\S]*>/i.test(description);
+
   const truncatedDescription = description.length > 150 && !showMore
     ? description.substring(0, 150) + '...'
     : description;
+
+  const sanitizedFull = sanitizeDescription(description);
+  const sanitizedTruncated = !showMore && description.length > 150
+    ? sanitizeDescription(description.substring(0, 150)) + '...'
+    : sanitizedFull;
 
   const displayImage = (!coverImage || imageError) ? PLACEHOLDER_IMAGE : coverImage;
 
   return (
     <div className="rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 bg-white border border-gray-200 w-full">
-      
+
+      {/* Inline styles for description links */}
+      <style>{`
+        .desc-link {
+          color: #2563eb;
+          font-weight: 600;
+          text-decoration: underline;
+          text-underline-offset: 2px;
+          transition: color 0.2s;
+        }
+        .desc-link:hover {
+          color: #1d4ed8;
+        }
+      `}</style>
+
       {/* Mobile: stack vertically / Desktop: side by side */}
       <div className="flex flex-col sm:flex-row">
 
-        {/* Image — full width on mobile, fixed width on desktop */}
-        <div className="relative w-full sm:w-48 md:w-64 flex-shrink-0 bg-gray-100">
+        {/* Image */}
+        <div className="relative w-full sm:w-56 md:w-80 lg:w-96 flex-shrink-0 bg-gray-100">
           <div className="relative w-full aspect-[16/9] sm:aspect-auto sm:h-full sm:min-h-[200px]">
             <Image
               src={displayImage}
@@ -53,7 +83,6 @@ export function DocumentCard({
               priority={false}
               unoptimized={displayImage.startsWith('https://')}
             />
-            {/* File type badge */}
             {fileType && (
               <div className="absolute top-2 right-2 bg-[#191970] text-white px-2 py-0.5 rounded text-xs font-bold">
                 {fileType}
@@ -82,9 +111,16 @@ export function DocumentCard({
               <span>{formattedDate}</span>
             </div>
 
-            {/* Description */}
+            {/* Description — renders HTML links if present, plain text otherwise */}
             <div className="text-xs sm:text-sm text-gray-700">
-              <p className="leading-relaxed">{truncatedDescription}</p>
+              {hasHtml ? (
+                <p
+                  className="leading-relaxed"
+                  dangerouslySetInnerHTML={{ __html: sanitizedTruncated }}
+                />
+              ) : (
+                <p className="leading-relaxed">{truncatedDescription}</p>
+              )}
               {description.length > 150 && (
                 <button
                   onClick={() => setShowMore(!showMore)}
@@ -96,7 +132,7 @@ export function DocumentCard({
             </div>
           </div>
 
-          {/* Button — full width on mobile */}
+          {/* Button */}
           <button
             onClick={onViewClick}
             disabled={!documentUrl || isLoading}
