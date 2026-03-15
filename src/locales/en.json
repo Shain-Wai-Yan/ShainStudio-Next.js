@@ -70,5 +70,36 @@
   "common": {
     "learnMore": "Learn More",
     "scrollToExplore": "Scroll to explore"
+  },
+  "codingProjects": {
+    "title": "Coding Projects",
+    "description": "As a digital marketer and brand strategist with a passion for technology, I've developed coding skills to enhance my marketing capabilities and create interactive tools. While I'm not a professional programmer or CS major graduate by trade, coding has become an invaluable complement to my business and marketing expertise, allowing me to build custom solutions that bridge strategy and implementation.",
+    "myGitHub": "My GitHub Gallery",
+    "loading": "Loading...",
+    "loadingPinned": "Loading pinned repositories...",
+    "loadingLanguages": "Loading language statistics...",
+    "loadingRepositories": "Loading repositories...",
+    "loadingActivity": "Loading activity...",
+    "repositories": "Public Repositories",
+    "followers": "Followers",
+    "following": "Following",
+    "contributions": "Contributions",
+    "contributionsYear": "contributions in the last year",
+    "languages": "Programming Languages",
+    "pinnedRepositories": "Pinned Repositories",
+    "recentActivity": "Recent Activity",
+    "viewFiles": "View Files",
+    "stars": "stars",
+    "forks": "forks",
+    "language": "Language",
+    "noDescription": "No description",
+    "noPinnedRepos": "No pinned repositories",
+    "noPinnedReposDesc": "This user has not pinned any repositories yet.",
+    "noRepositories": "No repositories found",
+    "noRepositoriesDesc": "This user has not created any public repositories yet.",
+    "noActivity": "No recent activity",
+    "noActivityDesc": "This user has not had any public activity recently.",
+    "errorLoading": "Error loading GitHub data. Please try again later.",
+    "backToPortfolio": "Back to Portfolio"
   }
 }

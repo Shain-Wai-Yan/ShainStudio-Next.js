@@ -59,6 +59,14 @@ const Header = () => {
     return pathname === href || pathname.startsWith(href + '/');
   };
 
+  // Shared nav item styles — border-bottom on the element itself so it
+  // always aligns exactly under the text, never wider than the label.
+  const navItemStyle = (active: boolean): React.CSSProperties => ({
+    color: active ? '#ffd700' : '#ffffff',
+    borderBottom: `3px solid ${active ? '#ffd700' : 'transparent'}`,
+    transition: 'color 0.2s, border-color 0.2s',
+  });
+
   return (
     <header
       style={{ backgroundColor: '#191970', width: '100%' }}
@@ -88,56 +96,47 @@ const Header = () => {
         {/* Desktop Navigation */}
         <nav className="hidden lg:flex items-center gap-0">
           <ul className="flex gap-0 items-center">
-            {navLinks.map((link) => (
-              <li key={link.href} className="group relative">
-                {link.dropdown ? (
-                  <>
-                    <button
-                      style={{ color: isActiveRoute(link.href) ? '#ffd700' : '#ffffff' }}
-                      className="px-4 py-2 font-medium transition-colors duration-300 relative hover:text-[#ffd700]"
+            {navLinks.map((link) => {
+              const active = isActiveRoute(link.href);
+              return (
+                <li key={link.href} className="group relative">
+                  {link.dropdown ? (
+                    <>
+                      <button
+                        style={navItemStyle(active)}
+                        className="px-4 py-2 font-medium hover:text-[#ffd700] hover:[border-bottom-color:#ffd700]"
+                      >
+                        {link.label}
+                      </button>
+                      <ul className="absolute hidden group-hover:block bg-white text-[#191970] shadow-xl rounded-lg mt-0 py-2 w-56 z-20 border-t-4 border-[#ffd700]">
+                        {link.dropdown.map((item) => (
+                          <li key={item.href}>
+                            <Link
+                              href={item.href}
+                              className={`block px-4 py-3 text-sm font-medium transition-all duration-300 ${
+                                pathname === item.href
+                                  ? 'bg-[#ffd700] text-white'
+                                  : 'hover:bg-[#ffd700] hover:text-white text-[#191970]'
+                              }`}
+                            >
+                              {item.label}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </>
+                  ) : (
+                    <Link
+                      href={link.href}
+                      style={navItemStyle(active)}
+                      className="px-4 py-2 font-medium hover:text-[#ffd700] hover:[border-bottom-color:#ffd700] inline-block"
                     >
                       {link.label}
-                      <span
-                        style={{ height: '3px', backgroundColor: '#ffd700' }}
-                        className={`absolute bottom-0 left-0 transition-all duration-300 ${
-                          isActiveRoute(link.href) ? 'w-full' : 'w-0 group-hover:w-full'
-                        }`}
-                      />
-                    </button>
-                    <ul className="absolute hidden group-hover:block bg-white text-[#191970] shadow-xl rounded-lg mt-0 py-2 w-56 z-20 border-t-4 border-[#ffd700]">
-                      {link.dropdown.map((item) => (
-                        <li key={item.href}>
-                          <Link
-                            href={item.href}
-                            className={`block px-4 py-3 text-sm font-medium transition-all duration-300 ${
-                              pathname === item.href
-                                ? 'bg-[#ffd700] text-white'
-                                : 'hover:bg-[#ffd700] hover:text-white text-[#191970]'
-                            }`}
-                          >
-                            {item.label}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </>
-                ) : (
-                  <Link
-                    href={link.href}
-                    style={{ color: isActiveRoute(link.href) ? '#ffd700' : '#ffffff' }}
-                    className="px-4 py-2 font-medium transition-colors duration-300 relative hover:text-[#ffd700]"
-                  >
-                    {link.label}
-                    <span
-                      style={{ height: '3px', backgroundColor: '#ffd700' }}
-                      className={`absolute bottom-0 left-0 transition-all duration-300 ${
-                        isActiveRoute(link.href) ? 'w-full' : 'w-0 hover:w-full'
-                      }`}
-                    />
-                  </Link>
-                )}
-              </li>
-            ))}
+                    </Link>
+                  )}
+                </li>
+              );
+            })}
           </ul>
         </nav>
 
@@ -219,6 +218,10 @@ const Header = () => {
           animation: headerGlow 4s linear infinite;
           box-shadow: 0 0 12px rgba(212,175,55,0.6), 0 0 24px rgba(212,175,55,0.2);
           filter: blur(0.3px);
+        }
+        /* Hover underline for nav items — scoped so it never bleeds */
+        nav a:hover, nav button:hover {
+          border-bottom-color: #ffd700 !important;
         }
       `}</style>
     </header>

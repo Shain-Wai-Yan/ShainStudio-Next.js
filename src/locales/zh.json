@@ -70,5 +70,36 @@
   "common": {
     "learnMore": "了解更多",
     "scrollToExplore": "向下滚动以浏览"
+  },
+  "codingProjects": {
+    "title": "编程项目",
+    "description": "作为一名数字营销和品牌策略专家，我对技术充满热情，并通过编程技能来增强我的营销能力并创建交互式工具。虽然我并非专业程序员或计算机科学专业毕业生，但编程已成为我商业和营销专长的重要补充，使我能够构建将战略与实施相结合的定制解决方案。",
+    "myGitHub": "我的代码展示",
+    "loading": "加载中...",
+    "loadingPinned": "加载精选仓库中...",
+    "loadingLanguages": "加载语言统计中...",
+    "loadingRepositories": "加载仓库中...",
+    "loadingActivity": "加载活动中...",
+    "repositories": "代码仓库",
+    "followers": "关注者",
+    "following": "正在关注",
+    "contributions": "贡献活动",
+    "contributionsYear": "次过去一年的贡献",
+    "languages": "编程语言",
+    "pinnedRepositories": "精选仓库",
+    "recentActivity": "最近活动",
+    "viewFiles": "查看文件",
+    "stars": "颗星",
+    "forks": "个分支",
+    "language": "语言",
+    "noDescription": "无描述",
+    "noPinnedRepos": "未找到精选仓库",
+    "noPinnedReposDesc": "该用户还没有精选任何仓库。",
+    "noRepositories": "未找到仓库",
+    "noRepositoriesDesc": "该用户尚未创建任何公开仓库。",
+    "noActivity": "无最近活动",
+    "noActivityDesc": "该用户最近没有任何公开活动。",
+    "errorLoading": "加载 GitHub 数据出错。请稍后重试。",
+    "backToPortfolio": "返回作品集"
   }
 }
