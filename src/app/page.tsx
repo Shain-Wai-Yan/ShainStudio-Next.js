@@ -447,7 +447,7 @@ const Cta = () => {
 
 const Home = () => {
   return (
-    <main>
+    <main className="overflow-x-hidden">
       <Hero />
       <Expertise />
       <AiShowcase />

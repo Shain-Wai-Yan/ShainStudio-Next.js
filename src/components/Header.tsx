@@ -13,14 +13,10 @@ const Header = () => {
   const isChineseRoute = pathname.startsWith('/zh');
   const translations = getTranslations(isChineseRoute ? 'zh' : 'en');
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
+    const handleScroll = () => setIsScrolled(window.scrollY > 10);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -31,14 +27,11 @@ const Header = () => {
     } else {
       document.body.classList.remove('menu-open');
     }
-    return () => {
-      document.body.classList.remove('menu-open');
-    };
+    return () => document.body.classList.remove('menu-open');
   }, [isMenuOpen]);
 
-  // Build base path for current locale
   const basePath = isChineseRoute ? '/zh' : '';
-  
+
   const navLinks = [
     { href: `${basePath}/`, label: translations.nav.home },
     { href: `${basePath}/about`, label: translations.nav.about },
@@ -59,7 +52,6 @@ const Header = () => {
     { href: `${basePath}/contact`, label: translations.nav.contact },
   ];
 
-  // Helper to check if a route is active
   const isActiveRoute = (href: string): boolean => {
     if (href === `${basePath}/`) {
       return pathname === `${basePath}/` || pathname === '/';
@@ -68,8 +60,17 @@ const Header = () => {
   };
 
   return (
-    <header style={{ backgroundColor: '#191970', width: '100%' }} className="fixed top-0 left-0 right-0 z-[1000] transition-all duration-300 shadow-lg">
+    <header
+      style={{ backgroundColor: '#191970', width: '100%' }}
+      className="fixed top-0 left-0 right-0 z-[1000] transition-all duration-300 shadow-lg"
+    >
+      {/* Animated gold glow bottom border */}
+      <div className="absolute bottom-0 left-0 right-0 h-[3px] overflow-hidden z-10">
+        <div className="header-glow-bar" />
+      </div>
+
       <div className="flex justify-between items-center px-4 sm:px-6 lg:px-8 py-4 max-w-full">
+
         {/* Logo */}
         <div className="flex items-center gap-3 flex-shrink-0">
           <Link href={basePath || '/'} className="flex items-center gap-3 hover:opacity-90 transition-opacity duration-300">
@@ -78,7 +79,9 @@ const Header = () => {
               alt="Shain Studio Logo"
               className="w-10 h-10 sm:w-12 sm:h-12 object-contain rounded"
             />
-            <span style={{ color: '#ffffff' }} className="font-bold text-lg sm:text-xl hidden sm:inline">Shain Studio</span>
+            <span style={{ color: '#ffffff' }} className="font-bold text-lg sm:text-xl hidden sm:inline">
+              Shain Studio
+            </span>
           </Link>
         </div>
 
@@ -89,14 +92,17 @@ const Header = () => {
               <li key={link.href} className="group relative">
                 {link.dropdown ? (
                   <>
-                    <button 
+                    <button
                       style={{ color: isActiveRoute(link.href) ? '#ffd700' : '#ffffff' }}
                       className="px-4 py-2 font-medium transition-colors duration-300 relative hover:text-[#ffd700]"
                     >
                       {link.label}
-                      <span style={{ height: '3px', backgroundColor: '#ffd700' }} className={`absolute bottom-0 left-0 transition-all duration-300 ${
-                        isActiveRoute(link.href) ? 'w-full' : 'w-0 group-hover:w-full'
-                      }`}></span>
+                      <span
+                        style={{ height: '3px', backgroundColor: '#ffd700' }}
+                        className={`absolute bottom-0 left-0 transition-all duration-300 ${
+                          isActiveRoute(link.href) ? 'w-full' : 'w-0 group-hover:w-full'
+                        }`}
+                      />
                     </button>
                     <ul className="absolute hidden group-hover:block bg-white text-[#191970] shadow-xl rounded-lg mt-0 py-2 w-56 z-20 border-t-4 border-[#ffd700]">
                       {link.dropdown.map((item) => (
@@ -104,10 +110,11 @@ const Header = () => {
                           <Link
                             href={item.href}
                             className={`block px-4 py-3 text-sm font-medium transition-all duration-300 ${
-                              pathname === item.href 
-                                ? 'bg-[#ffd700] text-white' 
+                              pathname === item.href
+                                ? 'bg-[#ffd700] text-white'
                                 : 'hover:bg-[#ffd700] hover:text-white text-[#191970]'
-                            }`}>
+                            }`}
+                          >
                             {item.label}
                           </Link>
                         </li>
@@ -121,9 +128,12 @@ const Header = () => {
                     className="px-4 py-2 font-medium transition-colors duration-300 relative hover:text-[#ffd700]"
                   >
                     {link.label}
-                    <span style={{ height: '3px', backgroundColor: '#ffd700' }} className={`absolute bottom-0 left-0 transition-all duration-300 ${
-                      isActiveRoute(link.href) ? 'w-full' : 'w-0 hover:w-full'
-                    }`}></span>
+                    <span
+                      style={{ height: '3px', backgroundColor: '#ffd700' }}
+                      className={`absolute bottom-0 left-0 transition-all duration-300 ${
+                        isActiveRoute(link.href) ? 'w-full' : 'w-0 hover:w-full'
+                      }`}
+                    />
                   </Link>
                 )}
               </li>
@@ -131,18 +141,18 @@ const Header = () => {
           </ul>
         </nav>
 
-        {/* Language Switcher */}
-        <LanguageSwitcher />
-
-        {/* Mobile Menu Button */}
-        <button
-          style={{ color: '#ffffff' }}
-          className="lg:hidden hover:text-[#ffd700] transition-colors duration-300 flex items-center justify-center p-2 mr-2"
-          onClick={toggleMenu}
-          aria-label="Toggle menu"
-        >
-          {isMenuOpen ? <FaTimes size={28} /> : <FaBars size={28} />}
-        </button>
+        {/* Language Switcher + Mobile Button */}
+        <div className="flex items-center gap-2">
+          <LanguageSwitcher />
+          <button
+            style={{ color: '#ffffff' }}
+            className="lg:hidden hover:text-[#ffd700] transition-colors duration-300 flex items-center justify-center p-2"
+            onClick={toggleMenu}
+            aria-label="Toggle menu"
+          >
+            {isMenuOpen ? <FaTimes size={28} /> : <FaBars size={28} />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile Navigation */}
@@ -154,9 +164,11 @@ const Header = () => {
                 <li key={link.href} className="border-b border-gray-100">
                   {link.dropdown ? (
                     <details className="w-full">
-                      <summary className={`px-6 py-4 font-medium hover:bg-[#f8f9fa] cursor-pointer flex justify-between items-center ${
-                        isActiveRoute(link.href) ? 'text-[#ffd700] bg-[#f8f9fa]' : 'text-[#191970]'
-                      }`}>
+                      <summary
+                        className={`px-6 py-4 font-medium hover:bg-[#f8f9fa] cursor-pointer flex justify-between items-center ${
+                          isActiveRoute(link.href) ? 'text-[#ffd700] bg-[#f8f9fa]' : 'text-[#191970]'
+                        }`}
+                      >
                         {link.label}
                         <span className="text-[#ffd700]">+</span>
                       </summary>
@@ -178,8 +190,8 @@ const Header = () => {
                     <Link
                       href={link.href}
                       className={`block px-6 py-4 font-medium transition-colors duration-300 ${
-                        isActiveRoute(link.href) 
-                          ? 'text-[#ffd700] bg-[#f8f9fa]' 
+                        isActiveRoute(link.href)
+                          ? 'text-[#ffd700] bg-[#f8f9fa]'
                           : 'text-[#191970] hover:text-[#ffd700] hover:bg-[#f8f9fa]'
                       }`}
                       onClick={() => setIsMenuOpen(false)}
@@ -193,6 +205,22 @@ const Header = () => {
           </nav>
         </div>
       )}
+
+      <style>{`
+        @keyframes headerGlow {
+          0% { background-position: -200% 0; }
+          100% { background-position: 200% 0; }
+        }
+        .header-glow-bar {
+          height: 100%;
+          width: 100%;
+          background-image: linear-gradient(90deg, transparent 0%, #3d2800 10%, #a67c00 20%, #d4af37 35%, #f9df85 50%, #d4af37 65%, #a67c00 80%, #3d2800 90%, transparent 100%);
+          background-size: 200% 100%;
+          animation: headerGlow 4s linear infinite;
+          box-shadow: 0 0 12px rgba(212,175,55,0.6), 0 0 24px rgba(212,175,55,0.2);
+          filter: blur(0.3px);
+        }
+      `}</style>
     </header>
   );
 };

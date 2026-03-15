@@ -25,7 +25,7 @@ const Footer = () => {
   ];
 
   return (
-    <footer style={{ backgroundColor: '#191970', borderTop: '4px solid #ffd700' }} className="text-white py-16 mt-24 w-full">
+    <footer style={{ backgroundColor: '#191970', borderTop: '4px solid #ffd700' }} className="text-white py-16 w-full">
       <div className="px-4 sm:px-6 lg:px-8 max-w-full">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
           
