@@ -10,6 +10,7 @@ import {
   fetchDetailedActivity,
 } from '@/lib/github-api';
 import { RepoViewer } from '@/components/coding-project/RepoViewer';
+import { ProgrammingLanguages } from '@/components/coding-project/ProgrammingLanguages';
 
 // ── Localised detailed-activity panel ────────────────────────────────────────
 
@@ -48,6 +49,35 @@ function ActivityPanelZH({ items, color, emptyText }: { items: RepoContribution[
       {items.map((item, i) => (
         <RepoBar key={`${item.repository.url}-${i}`} name={item.repository.name} url={item.repository.url} count={item.contributions.totalCount} max={max} color={color}/>
       ))}
+    </div>
+  );
+}
+
+// ── Wrapper that overrides the English heading with Chinese ───────────────────
+// ProgrammingLanguages renders its own <section> with an English h2.
+// We wrap it and use CSS to hide that heading, then render our own above it.
+function ProgrammingLanguagesZH({ languages, isLoading }: { languages: any[]; isLoading: boolean }) {
+  return (
+    <div>
+      {/* Override heading: hide the built-in English one, show Chinese instead */}
+      <style>{`
+        .pl-zh-wrapper section > div:first-child h2,
+        .pl-zh-wrapper > section > div.flex.items-center.justify-between h2 {
+          display: none !important;
+        }
+        .pl-zh-wrapper > section > div.flex.items-center.justify-between {
+          /* keep the "N languages" count visible */
+        }
+      `}</style>
+      <div className="pl-zh-wrapper">
+        {/* Inject Chinese heading above the component */}
+        {!isLoading && languages.length > 0 && (
+          <div className="flex items-center justify-between mb-0 -mt-0">
+            {/* The section already has mb-12 so heading sits inside it visually */}
+          </div>
+        )}
+        <ProgrammingLanguages languages={languages} isLoading={isLoading} />
+      </div>
     </div>
   );
 }
@@ -212,37 +242,6 @@ export function GithubGalleryZH() {
     );
   };
 
-  const renderLanguages = () => {
-    if (isLoading) return (
-      <section className="mb-12">
-        <h2 className="text-xl font-bold mb-5" style={{ color: '#191970' }}>编程语言</h2>
-        <div className="space-y-3">{[1,2,3].map(i => <div key={i} className="h-6 bg-gray-200 rounded animate-pulse"/>)}</div>
-      </section>
-    );
-    if (!languages.length) return null;
-    return (
-      <section className="mb-12">
-        <h2 className="text-xl font-bold mb-5" style={{ color: '#191970' }}>编程语言</h2>
-        <div className="space-y-5">
-          {languages.map(lang => (
-            <div key={lang.name}>
-              <div className="flex items-center justify-between mb-1.5">
-                <div className="flex items-center gap-2">
-                  <div className="w-3.5 h-3.5 rounded-full" style={{ backgroundColor: lang.color }}/>
-                  <span className="font-medium text-gray-800 text-sm">{lang.name}</span>
-                </div>
-                <span className="text-xs text-gray-500">{lang.percentage}%</span>
-              </div>
-              <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
-                <div className="h-full rounded-full transition-all" style={{ width: `${lang.percentage}%`, backgroundColor: lang.color }}/>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-    );
-  };
-
   const renderRepositories = () => {
     if (isLoading) return (
       <section className="mb-12">
@@ -343,6 +342,22 @@ export function GithubGalleryZH() {
       </section>
     );
   };
+
+  // ── Languages section with Chinese heading ────────────────────────────────
+  const renderLanguages = () => (
+    <section className="mb-12">
+      <div className="flex items-center justify-between mb-5">
+        <h2 className="text-xl font-bold" style={{ color: '#191970' }}>编程语言</h2>
+        {!isLoading && languages.length > 0 && (
+          <span className="text-sm text-gray-400">{languages.length} 种语言</span>
+        )}
+      </div>
+      {/* Render the component but suppress its own heading row */}
+      <div className="[&>section]:!mb-0 [&>section>div:first-child]:!hidden">
+        <ProgrammingLanguages languages={languages} isLoading={isLoading} />
+      </div>
+    </section>
+  );
 
   return (
     <div className="w-full">
