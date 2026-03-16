@@ -293,9 +293,9 @@ export function GithubGalleryZH() {
 
   const renderDetailedActivity = () => {
     const TABS = [
-      { id: 'commits' as const, label: '提交',  color: '#2ea44f', key: 'commitContributionsByRepository' },
+      { id: 'commits' as const, label: '提交',    color: '#2ea44f', key: 'commitContributionsByRepository' },
       { id: 'prs'     as const, label: '拉取请求', color: '#6f42c1', key: 'pullRequestContributionsByRepository' },
-      { id: 'issues'  as const, label: '议题',  color: '#e36209', key: 'issueContributionsByRepository' },
+      { id: 'issues'  as const, label: '议题',    color: '#e36209', key: 'issueContributionsByRepository' },
     ];
 
     if (isLoading) return (
@@ -318,7 +318,6 @@ export function GithubGalleryZH() {
       <section className="mb-12">
         <h2 className="text-xl font-bold mb-5" style={{ color: '#191970' }}>贡献详情</h2>
         <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-          {/* Tab bar */}
           <div className="flex border-b border-gray-200 bg-gray-50">
             {TABS.map(tab => {
               const count = (detailedActivity[tab.key] ?? []).reduce((s: number, i: any) => s + i.contributions.totalCount, 0);
@@ -337,7 +336,6 @@ export function GithubGalleryZH() {
               );
             })}
           </div>
-          {/* Panel */}
           <div className="p-6">
             <ActivityPanelZH items={items} color={active.color} emptyText={`过去一年内没有${active.label}活动。`}/>
           </div>
@@ -359,8 +357,8 @@ export function GithubGalleryZH() {
       {renderPinnedRepos()}
       {renderContributions()}
       {renderLanguages()}
-      {renderRepositories()}
       {renderDetailedActivity()}
+      {renderRepositories()}
 
       {viewerRepo && (
         <RepoViewer repoName={viewerRepo} defaultBranch="main" onClose={() => setViewerRepo(null)}/>

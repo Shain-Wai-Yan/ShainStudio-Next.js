@@ -84,14 +84,16 @@ export function GithubGallery() {
 
       <ProgrammingLanguages languages={languages} isLoading={isLoading} />
 
+       {/* Detailed activity — commits, PRs, issues by repo — at the bottom */}
+      <DetailedActivity data={detailedActivity} isLoading={isLoading} />
+
       <RepositoriesList
         repositories={repositories}
         isLoading={isLoading}
         onViewFiles={(name) => setViewerRepo(name)}
       />
 
-      {/* Detailed activity — commits, PRs, issues by repo — at the bottom */}
-      <DetailedActivity data={detailedActivity} isLoading={isLoading} />
+     
 
       {viewerRepo && (
         <RepoViewer
