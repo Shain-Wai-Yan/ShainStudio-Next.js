@@ -52,11 +52,11 @@ export const metadata: Metadata = {
     alternateLocale: "zh_CN",
   },
   twitter: {
-  card: 'summary_large_image',
-  title: 'Digital Marketing & Brand Strategist | Shain Wai Yan',
-  description: 'Explore AI‑powered campaigns, content strategy, & market analysis in the portfolio of Shain Wai Yan (xolbine).',
-  images: ['https://www.shainwaiyan.com/images/Shain Studio.png'],  // ✅ Also make this an array
-},
+    card: 'summary_large_image',
+    title: 'Digital Marketing & Brand Strategist | Shain Wai Yan',
+    description: 'Explore AI‑powered campaigns, content strategy, & market analysis in the portfolio of Shain Wai Yan (xolbine).',
+    images: ['https://www.shainwaiyan.com/images/Shain Studio.png'],
+  },
   icons: {
     icon: [
         { url: '/images/Shain Studio.png', type: 'image/png' },
