@@ -82,6 +82,39 @@ const MOCK_VIDEOS = [
   },
 ];
 
+interface YouTubeApiResponse {
+  items: Array<{
+    snippet?: {
+      title?: string;
+      description?: string;
+      thumbnails?: {
+        high?: {
+          url?: string;
+        };
+      };
+      resourceId?: {
+        videoId?: string;
+      };
+      publishedAt?: string;
+      channelTitle?: string;
+    };
+    statistics?: {
+      subscriberCount?: string;
+      videoCount?: string;
+      viewCount?: string;
+    };
+    contentDetails?: {
+      duration?: string;
+    };
+    brandingSettings?: {
+      image?: {
+        bannerExternalUrl?: string;
+      };
+    };
+  }>;
+  nextPageToken?: string;
+}
+
 export default function AMVEditingPage() {
   const [channelData, setChannelData] = useState<ChannelData | null>(null);
   const [videos, setVideos] = useState<TransformedVideo[]>([]);
@@ -89,19 +122,19 @@ export default function AMVEditingPage() {
   const [error, setError] = useState<string | null>(null);
 
   // ─── FIX: fetch ALL pages from the paginated YouTube API ───────────────────
-  const fetchAllVideos = useCallback(async (): Promise<any[]> => {
-    const allItems: any[] = [];
+  const fetchAllVideos = useCallback(async (): Promise<YouTubeApiResponse['items']> => {
+    const allItems: YouTubeApiResponse['items'] = [];
     let pageToken: string | null = null;
 
     do {
-      const url = pageToken
+      const url: string = pageToken
         ? `/api/amv-editing?endpoint=videos&maxResults=50&pageToken=${encodeURIComponent(pageToken)}`
         : `/api/amv-editing?endpoint=videos&maxResults=50`;
 
-      const res = await fetch(url);
+      const res: Response = await fetch(url);
       if (!res.ok) throw new Error(`Videos API error: ${res.status}`);
 
-      const data = await res.json();
+      const data: YouTubeApiResponse = await res.json();
 
       if (data.items && data.items.length > 0) {
         allItems.push(...data.items);
@@ -126,7 +159,7 @@ export default function AMVEditingPage() {
 
       if (!channelRes.ok) throw new Error('Channel API request failed');
 
-      const channelRawData = await channelRes.json();
+      const channelRawData: YouTubeApiResponse = await channelRes.json();
 
       // Transform channel data
       if (channelRawData.items && channelRawData.items.length > 0) {
