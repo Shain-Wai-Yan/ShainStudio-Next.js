@@ -9,13 +9,13 @@ import {
   fetchTopLanguages,
   fetchDetailedActivity,
 } from '@/lib/github-api';
-import { GithubProfileHeader } from './GithubProfileHeader';
-import { PinnedRepositories } from './PinnedRepositories';
-import { ContributionsGraph } from './ContributionsGraph';
-import { RepositoriesList } from './RepositoriesList';
+import { GithubProfileHeader }  from './GithubProfileHeader';
+import { PinnedRepositories }   from './PinnedRepositories';
+import { ContributionsGraph }   from './ContributionsGraph';
+import { RepositoriesList }     from './RepositoriesList';
 import { ProgrammingLanguages } from './ProgrammingLanguages';
-import { DetailedActivity } from './Detailedactivity';
-import { RepoViewer } from './RepoViewer';
+import { DetailedActivity }     from './Detailedactivity';   // ← fixed capital A
+import { RepoViewer }           from './RepoViewer';
 
 export function GithubGallery() {
   const [user, setUser]               = useState<any>(null);
@@ -60,9 +60,15 @@ export function GithubGallery() {
   return (
     <div className="w-full">
       {error && (
-        <div className="mb-8 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm flex items-center justify-between">
+        <div className="mb-8 p-4 rounded-xl text-sm flex items-center justify-between
+          bg-red-50 dark:bg-red-900/20
+          border border-red-200 dark:border-red-800
+          text-red-700 dark:text-red-400">
           <span>{error}</span>
-          <button onClick={loadGithubData} className="ml-4 underline hover:no-underline font-medium">
+          <button
+            onClick={loadGithubData}
+            className="ml-4 underline hover:no-underline font-medium"
+          >
             Retry
           </button>
         </div>
@@ -84,7 +90,7 @@ export function GithubGallery() {
 
       <ProgrammingLanguages languages={languages} isLoading={isLoading} />
 
-       {/* Detailed activity — commits, PRs, issues by repo — at the bottom */}
+      {/* Detailed activity — commits, PRs, issues by repo */}
       <DetailedActivity data={detailedActivity} isLoading={isLoading} />
 
       <RepositoriesList
@@ -92,8 +98,6 @@ export function GithubGallery() {
         isLoading={isLoading}
         onViewFiles={(name) => setViewerRepo(name)}
       />
-
-     
 
       {viewerRepo && (
         <RepoViewer

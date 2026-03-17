@@ -59,17 +59,17 @@ export default function BusinessPlanPageZH() {
 
   return (
     <>
-      <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-[#121212] dark:to-[#1e1e1e]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
           {/* Breadcrumb Navigation */}
           <Breadcrumb items={breadcrumbItems} />
 
           {/* Page Header */}
           <div className="mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-[#d4af37] mb-4">
               商业战略规划
             </h1>
-            <p className="text-xl text-gray-600 max-w-2xl">
+            <p className="text-xl text-gray-600 dark:text-[#b0b0b0] max-w-2xl">
               系统化的战略规划方案，助力品牌提升市场定位，实现业务持续增长。
             </p>
           </div>

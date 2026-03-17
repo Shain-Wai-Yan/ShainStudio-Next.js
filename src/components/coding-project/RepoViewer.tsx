@@ -40,54 +40,35 @@ function getLang(name: string) {
     yaml:'yaml', yml:'yaml', toml:'toml', html:'html', css:'css',
     scss:'scss', sass:'sass', md:'markdown', mdx:'markdown',
   };
-  const ext = name.split('.').pop()?.toLowerCase() || '';
-  return map[ext] || 'plaintext';
+  return map[name.split('.').pop()?.toLowerCase() || ''] || 'plaintext';
 }
 
 function escapeHtml(s: string) {
-  return s
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-/**
- * Properly decode GitHub's base64 content preserving UTF-8 emojis & CJK chars.
- * atob() only handles latin1 — we need to go through Uint8Array → TextDecoder.
- */
+/** Properly decode GitHub's base64 — preserves UTF-8 emojis & CJK */
 function decodeBase64UTF8(b64: string): string {
   try {
     const cleaned = b64.replace(/\n/g, '');
-    const binary = atob(cleaned);
-    const bytes = new Uint8Array(binary.length);
-    for (let i = 0; i < binary.length; i++) {
-      bytes[i] = binary.charCodeAt(i);
-    }
+    const binary  = atob(cleaned);
+    const bytes   = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
     return new TextDecoder('utf-8').decode(bytes);
   } catch {
-    // last-resort fallback
     return atob(b64.replace(/\n/g, ''));
   }
 }
 
-/** Load an external script exactly once, return a promise */
 function loadScript(src: string): Promise<void> {
   return new Promise((resolve, reject) => {
     if (document.querySelector(`script[src="${src}"]`)) {
-      // already injected — wait a tick in case it's still loading
-      const check = () => {
-        if ((window as any).marked) resolve();
-        else setTimeout(check, 50);
-      };
-      check();
-      return;
+      const check = () => { if ((window as any).marked) resolve(); else setTimeout(check, 50); };
+      check(); return;
     }
     const s = document.createElement('script');
-    s.src = src;
-    s.async = true;
-    s.onload = () => resolve();
-    s.onerror = () => reject(new Error(`Failed to load ${src}`));
+    s.src = src; s.async = true;
+    s.onload = () => resolve(); s.onerror = () => reject(new Error(`Failed to load ${src}`));
     document.head.appendChild(s);
   });
 }
@@ -95,8 +76,7 @@ function loadScript(src: string): Promise<void> {
 function loadLink(href: string) {
   if (!document.querySelector(`link[href="${href}"]`)) {
     const l = document.createElement('link');
-    l.rel = 'stylesheet';
-    l.href = href;
+    l.rel = 'stylesheet'; l.href = href;
     document.head.appendChild(l);
   }
 }
@@ -127,31 +107,35 @@ export function RepoViewer({ repoName, defaultBranch = 'main', onClose }: RepoVi
   const [loadingContent, setLoadingContent] = useState(false);
   const [fileError, setFileError]       = useState<string | null>(null);
   const [dirError, setDirError]         = useState<string | null>(null);
-  const [libsReady, setLibsReady]       = useState(false);
+  const [isDark, setIsDark]             = useState(false);
   const contentRef                      = useRef<HTMLDivElement>(null);
 
-  // ── Load CDN libs on mount ────────────────────────────────────────────────
+  // Detect dark mode reactively
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-color-scheme: dark)');
+    setIsDark(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsDark(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+
+  // Load CDN libs once
   useEffect(() => {
     loadLink('https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css');
     Promise.all([
       loadScript('https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js'),
       loadScript('https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js'),
-    ])
-      .then(() => setLibsReady(true))
-      .catch(() => setLibsReady(true)); // still usable with fallback
+    ]).catch(() => {});
   }, []);
 
   // ── Load directory ────────────────────────────────────────────────────────
   const fetchDir = useCallback(async (path: string) => {
-    setLoadingFiles(true);
-    setDirError(null);
+    setLoadingFiles(true); setDirError(null);
     try {
-      const p = new URLSearchParams({
-        username: 'Shain-Wai-Yan', type: 'contents', repo: repoName, path, branch,
-      });
+      const p = new URLSearchParams({ username: 'Shain-Wai-Yan', type: 'contents', repo: repoName, path, branch });
       const res = await fetch(`/api/github?${p}`);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const raw = await res.json();
+      const raw   = await res.json();
       const items: RepoFile[] = Array.isArray(raw) ? raw : [raw];
       const sorted = [...items].sort((a, b) => {
         if (a.type === 'dir' && b.type !== 'dir') return -1;
@@ -159,11 +143,8 @@ export function RepoViewer({ repoName, defaultBranch = 'main', onClose }: RepoVi
         return a.name.localeCompare(b.name);
       });
       setFiles(sorted);
-      // Auto-open README.md at root
       if (path === '') {
-        const readme = sorted.find(
-          f => f.type === 'file' && f.name.toLowerCase() === 'readme.md'
-        );
+        const readme = sorted.find(f => f.type === 'file' && f.name.toLowerCase() === 'readme.md');
         if (readme) openFile(readme);
       }
     } catch (e) {
@@ -185,23 +166,15 @@ export function RepoViewer({ repoName, defaultBranch = 'main', onClose }: RepoVi
 
   // ── Open a file ───────────────────────────────────────────────────────────
   const openFile = async (file: RepoFile) => {
-    setSelectedFile(file);
-    setRenderedHTML('');
-    setFileError(null);
+    setSelectedFile(file); setRenderedHTML(''); setFileError(null);
     if (isBinary(file.name)) return;
-
     setLoadingContent(true);
     try {
-      const p = new URLSearchParams({
-        username: 'Shain-Wai-Yan', type: 'file', repo: repoName, path: file.path, branch,
-      });
+      const p = new URLSearchParams({ username: 'Shain-Wai-Yan', type: 'file', repo: repoName, path: file.path, branch });
       const res = await fetch(`/api/github?${p}`);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
-
-      // ✅ Proper UTF-8 decode — fixes emoji/CJK corruption
       const text = data.content ? decodeBase64UTF8(data.content) : '';
-
       if (isMD(file.name)) {
         await renderMarkdown(text);
       } else {
@@ -216,22 +189,13 @@ export function RepoViewer({ repoName, defaultBranch = 'main', onClose }: RepoVi
 
   const renderMarkdown = async (text: string) => {
     const win = window as any;
-    // Ensure libs are loaded (may have finished after initial mount)
     if (!win.marked) {
-      try {
-        await loadScript('https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js');
-      } catch { /* use fallback */ }
+      try { await loadScript('https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js'); } catch {}
     }
-
     if (win.marked) {
-      // Configure marked v9 API
-      win.marked.use({
-        gfm: true,
-        breaks: true,
-      });
+      win.marked.use({ gfm: true, breaks: true });
       const html: string = await win.marked.parse(text);
       setRenderedHTML(html);
-      // Syntax-highlight code blocks inside the rendered markdown
       setTimeout(() => {
         if (win.hljs && contentRef.current) {
           contentRef.current.querySelectorAll('pre code').forEach((block: any) => {
@@ -240,8 +204,7 @@ export function RepoViewer({ repoName, defaultBranch = 'main', onClose }: RepoVi
         }
       }, 80);
     } else {
-      // Fallback renderer
-      setRenderedHTML(basicMarkdown(text));
+      setRenderedHTML(basicMarkdown(text, isDark));
     }
   };
 
@@ -249,40 +212,39 @@ export function RepoViewer({ repoName, defaultBranch = 'main', onClose }: RepoVi
     const win = window as any;
     if (win.hljs) {
       try {
-        const lang = getLang(filename);
-        const result = win.hljs.highlight(text, { language: lang, ignoreIllegals: true });
-        setRenderedHTML(result.value);
-        return;
-      } catch { /* fall through */ }
+        const result = win.hljs.highlight(text, { language: getLang(filename), ignoreIllegals: true });
+        setRenderedHTML(result.value); return;
+      } catch {}
     }
     setRenderedHTML(escapeHtml(text));
   };
 
   // ── Navigate directory ────────────────────────────────────────────────────
   const navigateTo = (path: string) => {
-    setCurrentPath(path);
-    setSelectedFile(null);
-    setRenderedHTML('');
-    fetchDir(path);
+    setCurrentPath(path); setSelectedFile(null); setRenderedHTML(''); fetchDir(path);
   };
 
   const breadcrumbs = currentPath ? currentPath.split('/') : [];
 
-  // ── Render ────────────────────────────────────────────────────────────────
+  // Colours derived from dark mode state
+  const headingColor  = isDark ? '#d4af37' : '#191970';
+  const btnBg         = isDark ? '#a67c00' : '#191970';
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6"
-      style={{ backgroundColor: 'rgba(15,15,30,0.75)', backdropFilter: 'blur(6px)' }}
+      style={{ backgroundColor: 'rgba(10,10,20,0.8)', backdropFilter: 'blur(6px)' }}
       onClick={e => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div
-        className="bg-white rounded-2xl shadow-2xl flex flex-col w-full max-w-5xl overflow-hidden border border-gray-100"
+        className="flex flex-col w-full max-w-5xl overflow-hidden rounded-2xl shadow-2xl
+          bg-white dark:bg-[#1a1a1a] border border-gray-100 dark:border-gray-700"
         style={{ height: 'min(90vh, 820px)' }}
       >
         {/* ── Header ── */}
         <div
           className="flex items-center justify-between px-4 py-3 flex-shrink-0"
-          style={{ background: 'linear-gradient(135deg, #191970 0%, #2d2da0 100%)' }}
+          style={{ backgroundColor: btnBg }}
         >
           <div className="flex items-center gap-3 min-w-0">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="white" className="flex-shrink-0 opacity-80">
@@ -290,7 +252,7 @@ export function RepoViewer({ repoName, defaultBranch = 'main', onClose }: RepoVi
             </svg>
             <div className="min-w-0">
               <p className="text-white font-semibold text-sm truncate">{repoName}</p>
-              <p className="text-blue-200 text-xs">branch: {branch}</p>
+              <p className="text-white/60 text-xs">branch: {branch}</p>
             </div>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
@@ -298,22 +260,19 @@ export function RepoViewer({ repoName, defaultBranch = 'main', onClose }: RepoVi
               href={`https://github.com/Shain-Wai-Yan/${repoName}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden sm:flex items-center gap-1.5 text-white/70 hover:text-white text-xs px-3 py-1.5 rounded-lg border border-white/20 hover:border-white/50 transition-colors"
+              className="hidden sm:flex items-center gap-1.5 text-white/70 hover:text-white text-xs
+                px-3 py-1.5 rounded-lg border border-white/20 hover:border-white/50 transition-colors"
             >
               Open on GitHub
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-                <polyline points="15 3 21 3 21 9"/>
-                <line x1="10" y1="14" x2="21" y2="3"/>
+                <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
               </svg>
             </a>
-            <button
-              onClick={onClose}
-              className="text-white/60 hover:text-white p-1.5 rounded-lg hover:bg-white/10 transition-colors"
-            >
+            <button onClick={onClose}
+              className="text-white/60 hover:text-white p-1.5 rounded-lg hover:bg-white/10 transition-colors">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <line x1="18" y1="6" x2="6" y2="18"/>
-                <line x1="6" y1="6" x2="18" y2="18"/>
+                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
               </svg>
             </button>
           </div>
@@ -323,50 +282,46 @@ export function RepoViewer({ repoName, defaultBranch = 'main', onClose }: RepoVi
         <div className="flex flex-1 overflow-hidden">
 
           {/* ── Sidebar ── */}
-          <div className="w-56 sm:w-64 border-r border-gray-200 flex flex-col bg-gray-50 flex-shrink-0">
-            {/* Breadcrumb path */}
-            <div className="px-3 py-2 border-b border-gray-200 flex items-center flex-wrap gap-0.5 text-xs min-h-[34px]">
-              <button
-                onClick={() => navigateTo('')}
+          <div className="w-56 sm:w-64 border-r border-gray-200 dark:border-gray-700
+            flex flex-col bg-gray-50 dark:bg-[#141414] flex-shrink-0">
+
+            {/* Breadcrumb */}
+            <div className="px-3 py-2 border-b border-gray-200 dark:border-gray-700
+              flex items-center flex-wrap gap-0.5 text-xs min-h-[34px]">
+              <button onClick={() => navigateTo('')}
                 className="font-semibold truncate max-w-[90px] hover:underline"
-                style={{ color: '#191970' }}
-                title={repoName}
-              >
-                {repoName}
-              </button>
+                style={{ color: headingColor }}
+                title={repoName}>{repoName}</button>
               {breadcrumbs.map((seg, i) => {
                 const segPath = breadcrumbs.slice(0, i + 1).join('/');
                 const isLast  = i === breadcrumbs.length - 1;
                 return (
                   <span key={`bc-${i}`} className="flex items-center gap-0.5">
-                    <span className="text-gray-400 mx-0.5">/</span>
+                    <span className="text-gray-400 dark:text-gray-600 mx-0.5">/</span>
                     {isLast ? (
-                      <span className="text-gray-600 truncate max-w-[80px]" title={seg}>{seg}</span>
+                      <span className="text-gray-600 dark:text-gray-400 truncate max-w-[80px]" title={seg}>{seg}</span>
                     ) : (
-                      <button
-                        onClick={() => navigateTo(segPath)}
+                      <button onClick={() => navigateTo(segPath)}
                         className="hover:underline truncate max-w-[80px]"
-                        style={{ color: '#191970' }}
-                        title={seg}
-                      >
-                        {seg}
-                      </button>
+                        style={{ color: headingColor }}
+                        title={seg}>{seg}</button>
                     )}
                   </span>
                 );
               })}
             </div>
 
-            {/* Back button */}
+            {/* Back */}
             {currentPath && (
               <button
                 onClick={() => {
-                  const parent = currentPath.includes('/')
-                    ? currentPath.split('/').slice(0, -1).join('/')
-                    : '';
+                  const parent = currentPath.includes('/') ? currentPath.split('/').slice(0, -1).join('/') : '';
                   navigateTo(parent);
                 }}
-                className="flex items-center gap-2 px-3 py-2 text-xs text-gray-500 hover:bg-gray-100 border-b border-gray-100 transition-colors"
+                className="flex items-center gap-2 px-3 py-2 text-xs
+                  text-gray-500 dark:text-gray-400
+                  hover:bg-gray-100 dark:hover:bg-[#1e1e1e]
+                  border-b border-gray-100 dark:border-gray-700 transition-colors"
               >
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <polyline points="15 18 9 12 15 6"/>
@@ -380,27 +335,29 @@ export function RepoViewer({ repoName, defaultBranch = 'main', onClose }: RepoVi
               {loadingFiles ? (
                 <div className="p-3 space-y-2">
                   {[1,2,3,4,5,6].map(i => (
-                    <div key={i} className="h-7 bg-gray-200 rounded animate-pulse"/>
+                    <div key={i} className="h-7 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"/>
                   ))}
                 </div>
               ) : dirError ? (
-                <div className="p-4 text-xs text-red-500 leading-relaxed">{dirError}</div>
+                <div className="p-4 text-xs text-red-500 dark:text-red-400 leading-relaxed">{dirError}</div>
               ) : (
                 files.map((file, i) => (
                   <button
                     key={`${file.path}-${i}`}
                     onClick={() => file.type === 'dir' ? navigateTo(file.path) : openFile(file)}
-                    className={`w-full flex items-center gap-2 px-3 py-2 text-xs text-left border-b border-gray-50 transition-colors
+                    className={`w-full flex items-center gap-2 px-3 py-2 text-xs text-left
+                      border-b border-gray-50 dark:border-gray-800 transition-colors
                       ${selectedFile?.path === file.path
-                        ? 'bg-indigo-50 font-semibold'
-                        : 'hover:bg-gray-100 text-gray-700'
+                        ? 'bg-indigo-50 dark:bg-[#1e1e2e] font-semibold'
+                        : 'hover:bg-gray-100 dark:hover:bg-[#1e1e1e] text-gray-700 dark:text-gray-300'
                       }`}
-                    style={selectedFile?.path === file.path ? { color: '#191970' } : {}}
+                    style={selectedFile?.path === file.path ? { color: headingColor } : {}}
                   >
                     {file.type === 'dir' ? <FolderIcon /> : <FileIconSmall />}
                     <span className="truncate flex-1" title={file.name}>{file.name}</span>
                     {file.type === 'dir' && (
-                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-300 flex-shrink-0">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+                        className="text-gray-300 dark:text-gray-600 flex-shrink-0">
                         <polyline points="9 18 15 12 9 6"/>
                       </svg>
                     )}
@@ -411,27 +368,26 @@ export function RepoViewer({ repoName, defaultBranch = 'main', onClose }: RepoVi
           </div>
 
           {/* ── Main pane ── */}
-          <div className="flex-1 flex flex-col overflow-hidden bg-white">
+          <div className="flex-1 flex flex-col overflow-hidden bg-white dark:bg-[#1a1a1a]">
             {selectedFile ? (
               <>
                 {/* File header bar */}
-                <div className="flex items-center justify-between px-4 py-2 border-b border-gray-200 bg-gray-50 flex-shrink-0">
+                <div className="flex items-center justify-between px-4 py-2
+                  border-b border-gray-200 dark:border-gray-700
+                  bg-gray-50 dark:bg-[#141414] flex-shrink-0">
                   <div className="flex items-center gap-2 min-w-0">
                     <FileIconSmall />
-                    <span className="text-xs font-mono text-gray-500 truncate">{selectedFile.path}</span>
+                    <span className="text-xs font-mono text-gray-500 dark:text-gray-400 truncate">
+                      {selectedFile.path}
+                    </span>
                   </div>
                   {selectedFile.download_url && (
-                    <a
-                      href={selectedFile.download_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                    <a href={selectedFile.download_url} target="_blank" rel="noopener noreferrer"
                       className="flex items-center gap-1 text-xs flex-shrink-0 ml-2 hover:underline"
-                      style={{ color: '#191970' }}
-                    >
+                      style={{ color: headingColor }}>
                       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                        <polyline points="7 10 12 15 17 10"/>
-                        <line x1="12" y1="15" x2="12" y2="3"/>
+                        <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
                       </svg>
                       Raw
                     </a>
@@ -442,58 +398,44 @@ export function RepoViewer({ repoName, defaultBranch = 'main', onClose }: RepoVi
                 <div className="flex-1 overflow-auto" ref={contentRef}>
                   {loadingContent ? (
                     <div className="p-6 space-y-3">
-                      {[80, 65, 90, 55, 75, 60, 85, 50, 70].map((w, i) => (
-                        <div key={i} className="h-4 bg-gray-100 rounded animate-pulse" style={{ width: `${w}%` }}/>
+                      {[80,65,90,55,75,60,85,50,70].map((w, i) => (
+                        <div key={i} className="h-4 bg-gray-100 dark:bg-gray-800 rounded animate-pulse"
+                          style={{ width: `${w}%` }}/>
                       ))}
                     </div>
                   ) : fileError ? (
-                    <div className="p-6 text-sm text-red-500">{fileError}</div>
+                    <div className="p-6 text-sm text-red-500 dark:text-red-400">{fileError}</div>
                   ) : isBinary(selectedFile.name) ? (
                     isImage(selectedFile.name) ? (
                       <div className="flex items-center justify-center p-8">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={selectedFile.download_url}
-                          alt={selectedFile.name}
-                          className="max-w-full max-h-[70vh] rounded-lg shadow"
-                        />
+                        <img src={selectedFile.download_url} alt={selectedFile.name}
+                          className="max-w-full max-h-[70vh] rounded-lg shadow"/>
                       </div>
                     ) : (
                       <div className="flex flex-col items-center justify-center h-full text-gray-400 gap-3 p-8">
                         <div className="text-5xl">📦</div>
                         <p className="text-sm text-center">Binary file — cannot be previewed.</p>
                         {selectedFile.download_url && (
-                          <a
-                            href={selectedFile.download_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-sm px-4 py-2 rounded-lg text-white transition-all hover:opacity-90"
-                            style={{ backgroundColor: '#191970' }}
-                          >
+                          <a href={selectedFile.download_url} target="_blank" rel="noopener noreferrer"
+                            className="text-sm px-4 py-2 rounded-lg text-white hover:opacity-90 transition-opacity"
+                            style={{ backgroundColor: btnBg }}>
                             Download File
                           </a>
                         )}
                       </div>
                     )
                   ) : isMD(selectedFile.name) ? (
-                    /* ── Markdown output ── */
+                    /* ── Markdown ── */
                     <div
                       ref={contentRef}
-                      className="markdown-body p-6 max-w-3xl"
+                      className="rv-markdown p-6 max-w-3xl"
                       dangerouslySetInnerHTML={{ __html: renderedHTML }}
-                      style={{
-                        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-                        fontSize: '14px',
-                        lineHeight: '1.7',
-                        color: '#24292e',
-                      }}
                     />
                   ) : (
-                    /* ── Code output ── */
-                    <pre
-                      className="p-4 m-0 text-xs font-mono leading-relaxed overflow-auto bg-white h-full"
-                      style={{ tabSize: 2 }}
-                    >
+                    /* ── Code ── */
+                    <pre className="p-4 m-0 text-xs font-mono leading-relaxed overflow-auto
+                      bg-white dark:bg-[#1a1a1a] h-full" style={{ tabSize: 2 }}>
                       <code
                         className={`hljs language-${getLang(selectedFile.name)}`}
                         dangerouslySetInnerHTML={{ __html: renderedHTML }}
@@ -503,141 +445,153 @@ export function RepoViewer({ repoName, defaultBranch = 'main', onClose }: RepoVi
                 </div>
               </>
             ) : (
-              /* Empty state */
-              <div className="flex flex-col items-center justify-center h-full text-gray-300 gap-4">
+              <div className="flex flex-col items-center justify-center h-full gap-4
+                text-gray-300 dark:text-gray-600">
                 <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
                   <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                   <polyline points="14 2 14 8 20 8"/>
                 </svg>
-                <p className="text-sm text-gray-400">Select a file to preview</p>
+                <p className="text-sm text-gray-400 dark:text-gray-500">Select a file to preview</p>
               </div>
             )}
           </div>
         </div>
       </div>
 
-      {/* ── Inline styles for markdown-body (GitHub style) ── */}
+      {/* ── Markdown styles ──
+          Uses @media (prefers-color-scheme: dark) so it works regardless of
+          where the .dark class lives in the DOM tree.
+      */}
       <style>{`
-        .markdown-body h1 { font-size: 1.75em; font-weight: 700; margin: 1.2em 0 .6em; padding-bottom: .3em; border-bottom: 1px solid #e1e4e8; color: #191970; }
-        .markdown-body h2 { font-size: 1.35em; font-weight: 700; margin: 1.2em 0 .5em; padding-bottom: .25em; border-bottom: 1px solid #eaecef; color: #191970; }
-        .markdown-body h3 { font-size: 1.1em; font-weight: 600; margin: 1em 0 .4em; color: #24292e; }
-        .markdown-body h4, .markdown-body h5, .markdown-body h6 { font-size: .95em; font-weight: 600; margin: .8em 0 .4em; }
-        .markdown-body p  { margin: 0 0 1em; }
-        .markdown-body ul, .markdown-body ol { padding-left: 1.8em; margin: 0 0 1em; }
-        .markdown-body li { margin: .25em 0; line-height: 1.6; }
-        .markdown-body li > ul, .markdown-body li > ol { margin: .25em 0; }
-        .markdown-body a  { color: #0366d6; text-decoration: none; }
-        .markdown-body a:hover { text-decoration: underline; }
-        .markdown-body strong { font-weight: 600; }
-        .markdown-body em { font-style: italic; }
-        .markdown-body hr { border: none; border-top: 1px solid #e1e4e8; margin: 1.5em 0; }
-        .markdown-body blockquote { margin: 0 0 1em; padding: .5em 1em; color: #6a737d; border-left: 4px solid #dfe2e5; }
-        .markdown-body blockquote p { margin: 0; }
-        .markdown-body code { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: .85em; background: rgba(27,31,35,.07); padding: .2em .45em; border-radius: 3px; }
-        .markdown-body pre  { background: #f6f8fa; border-radius: 6px; padding: 1em; overflow-x: auto; margin: 0 0 1em; line-height: 1.5; }
-        .markdown-body pre code { background: transparent; padding: 0; font-size: .8em; color: inherit; }
-        .markdown-body table { border-collapse: collapse; width: 100%; margin: 0 0 1em; display: block; overflow-x: auto; }
-        .markdown-body th, .markdown-body td { border: 1px solid #dfe2e5; padding: .4em .8em; }
-        .markdown-body th { background: #f6f8fa; font-weight: 600; }
-        .markdown-body tr:nth-child(even) td { background: #f6f8fa; }
-        .markdown-body img { max-width: 100%; border-radius: 4px; }
+        /* ── Light mode base ── */
+        .rv-markdown {
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+          font-size: 14px;
+          line-height: 1.7;
+          color: #24292e;
+        }
+        .rv-markdown h1 { font-size:1.75em; font-weight:700; margin:1.2em 0 .6em; padding-bottom:.3em; border-bottom:1px solid #e1e4e8; color:#191970; }
+        .rv-markdown h2 { font-size:1.35em; font-weight:700; margin:1.2em 0 .5em; padding-bottom:.25em; border-bottom:1px solid #eaecef; color:#191970; }
+        .rv-markdown h3 { font-size:1.1em; font-weight:600; margin:1em 0 .4em; color:#24292e; }
+        .rv-markdown h4, .rv-markdown h5, .rv-markdown h6 { font-size:.95em; font-weight:600; margin:.8em 0 .4em; color:#24292e; }
+        .rv-markdown p  { margin:0 0 1em; color:#24292e; }
+        .rv-markdown ul, .rv-markdown ol { padding-left:1.8em; margin:0 0 1em; }
+        .rv-markdown li { margin:.25em 0; line-height:1.6; color:#24292e; }
+        .rv-markdown a  { color:#0366d6; text-decoration:none; }
+        .rv-markdown a:hover { text-decoration:underline; }
+        .rv-markdown strong { font-weight:600; }
+        .rv-markdown em { font-style:italic; }
+        .rv-markdown hr { border:none; border-top:1px solid #e1e4e8; margin:1.5em 0; }
+        .rv-markdown blockquote { margin:0 0 1em; padding:.5em 1em; color:#6a737d; border-left:4px solid #dfe2e5; }
+        .rv-markdown blockquote p { margin:0; color:#6a737d; }
+        .rv-markdown code { font-family:"SFMono-Regular",Consolas,monospace; font-size:.85em; background:rgba(27,31,35,.07); padding:.2em .45em; border-radius:3px; color:#e36209; }
+        .rv-markdown pre { background:#f6f8fa; border-radius:6px; padding:1em; overflow-x:auto; margin:0 0 1em; line-height:1.5; }
+        .rv-markdown pre code { background:transparent; padding:0; font-size:.8em; color:inherit; }
+        .rv-markdown table { border-collapse:collapse; width:100%; margin:0 0 1em; display:block; overflow-x:auto; }
+        .rv-markdown th, .rv-markdown td { border:1px solid #dfe2e5; padding:.4em .8em; color:#24292e; }
+        .rv-markdown th { background:#f6f8fa; font-weight:600; }
+        .rv-markdown tr:nth-child(even) td { background:#f6f8fa; }
+        .rv-markdown img { max-width:100%; border-radius:4px; }
+
+        /* ── Dark mode overrides — uses media query so it works in any DOM position ── */
+        @media (prefers-color-scheme: dark) {
+          .rv-markdown { color: #e0e0e0; }
+          .rv-markdown h1 { color:#d4af37; border-bottom-color:#333; }
+          .rv-markdown h2 { color:#d4af37; border-bottom-color:#333; }
+          .rv-markdown h3, .rv-markdown h4, .rv-markdown h5, .rv-markdown h6 { color:#e0e0e0; }
+          .rv-markdown p  { color:#e0e0e0; }
+          .rv-markdown li { color:#e0e0e0; }
+          .rv-markdown a  { color:#d4af37; }
+          .rv-markdown hr { border-top-color:#444; }
+          .rv-markdown blockquote { color:#9ca3af; border-left-color:#444; }
+          .rv-markdown blockquote p { color:#9ca3af; }
+          .rv-markdown code { background:rgba(255,255,255,.1); color:#f1a040; }
+          .rv-markdown pre { background:#1e1e1e; }
+          .rv-markdown pre code { color:inherit; }
+          .rv-markdown th, .rv-markdown td { border-color:#444; color:#e0e0e0; }
+          .rv-markdown th { background:#252525; }
+          .rv-markdown tr:nth-child(even) td { background:#1e1e1e; }
+        }
       `}</style>
     </div>
   );
 }
 
-// ── Pure-JS fallback markdown renderer (used only if CDN fails) ──────────────
-function basicMarkdown(md: string): string {
+// ── Fallback markdown renderer (no deps) ─────────────────────────────────────
+function basicMarkdown(md: string, dark: boolean): string {
   if (!md) return '';
+
+  const bodyColor    = dark ? '#e0e0e0'  : '#24292e';
+  const headingColor = dark ? '#d4af37'  : '#191970';
+  const mutedColor   = dark ? '#9ca3af'  : '#6a737d';
+  const linkColor    = dark ? '#d4af37'  : '#0366d6';
+  const codeBg       = dark ? 'rgba(255,255,255,.1)' : 'rgba(27,31,35,.07)';
+  const preBg        = dark ? '#1e1e1e'  : '#f6f8fa';
+  const hrColor      = dark ? '#444'     : '#e1e4e8';
+  const borderColor  = dark ? '#444'     : '#dfe2e5';
+
+  const inline = (s: string) =>
+    s.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, `<img src="$2" alt="$1" style="max-width:100%;border-radius:4px"/>`)
+     .replace(/\[([^\]]+)\]\(([^)]+)\)/g, `<a href="$2" target="_blank" rel="noopener noreferrer" style="color:${linkColor}">$1</a>`)
+     .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
+     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+     .replace(/\*(.+?)\*/g, '<em>$1</em>')
+     .replace(/`([^`]+)`/g, `<code style="background:${codeBg};padding:.2em .45em;border-radius:3px;font-size:.85em;font-family:monospace">$1</code>`);
+
+  const escHtml = (s: string) => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
   const lines = md.split('\n');
   const out: string[] = [];
-  let inCode = false;
-  let codeLang = '';
-  let codeLines: string[] = [];
-  let inList = false;
+  let inCode = false; let codeLang = ''; let codeLines: string[] = [];
   let listLines: string[] = [];
 
   const flushList = () => {
     if (listLines.length) {
-      out.push(`<ul>${listLines.map(l => `<li>${l}</li>`).join('')}</ul>`);
+      out.push(`<ul style="padding-left:1.8em;margin:0 0 1em;color:${bodyColor}">${
+        listLines.map(l => `<li style="margin:.25em 0;line-height:1.6">${l}</li>`).join('')
+      }</ul>`);
       listLines = [];
-      inList = false;
     }
   };
 
-  const inlineFormat = (s: string) =>
-    s
-      .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" style="max-width:100%;border-radius:4px"/>')
-      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" style="color:#0366d6">$1</a>')
-      .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
-      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.+?)\*/g, '<em>$1</em>')
-      .replace(/`([^`]+)`/g, '<code style="background:rgba(27,31,35,.07);padding:.2em .45em;border-radius:3px;font-size:.85em">$1</code>');
-
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-
-    // Fenced code blocks
+  for (const line of lines) {
     if (line.startsWith('```')) {
-      if (!inCode) {
-        inCode = true;
-        codeLang = line.slice(3).trim() || 'text';
-        codeLines = [];
-      } else {
+      if (!inCode) { inCode = true; codeLang = line.slice(3).trim() || 'text'; codeLines = []; }
+      else {
         inCode = false;
-        out.push(`<pre style="background:#f6f8fa;border-radius:6px;padding:1em;overflow-x:auto;margin:0 0 1em;font-size:.8em"><code class="language-${codeLang}">${escapeHtml(codeLines.join('\n'))}</code></pre>`);
+        out.push(`<pre style="background:${preBg};border-radius:6px;padding:1em;overflow-x:auto;margin:0 0 1em;font-size:.8em;line-height:1.5"><code class="language-${codeLang}">${escHtml(codeLines.join('\n'))}</code></pre>`);
         codeLines = [];
       }
       continue;
     }
     if (inCode) { codeLines.push(line); continue; }
-
-    // Blank line
     if (!line.trim()) { flushList(); out.push('<br/>'); continue; }
 
-    // Headings
     const hm = line.match(/^(#{1,6})\s+(.+)$/);
     if (hm) {
       flushList();
       const level = hm[1].length;
       const sizes = ['1.75em','1.35em','1.1em','.95em','.9em','.85em'];
-      const borderStyle = level <= 2 ? `border-bottom:1px solid #eaecef;padding-bottom:.25em;` : '';
-      out.push(`<h${level} style="font-size:${sizes[level-1]};font-weight:700;margin:1.2em 0 .5em;color:#191970;${borderStyle}">${inlineFormat(hm[2])}</h${level}>`);
+      const border = level <= 2 ? `border-bottom:1px solid ${hrColor};padding-bottom:.25em;` : '';
+      out.push(`<h${level} style="font-size:${sizes[level-1]};font-weight:700;margin:1.2em 0 .5em;color:${headingColor};${border}">${inline(hm[2])}</h${level}>`);
       continue;
     }
-
-    // Horizontal rule
     if (/^---+$/.test(line.trim())) {
       flushList();
-      out.push('<hr style="border:none;border-top:1px solid #e1e4e8;margin:1.5em 0"/>');
+      out.push(`<hr style="border:none;border-top:1px solid ${hrColor};margin:1.5em 0"/>`);
       continue;
     }
-
-    // Blockquote
     if (line.startsWith('> ')) {
       flushList();
-      out.push(`<blockquote style="margin:0 0 1em;padding:.5em 1em;color:#6a737d;border-left:4px solid #dfe2e5">${inlineFormat(line.slice(2))}</blockquote>`);
+      out.push(`<blockquote style="margin:0 0 1em;padding:.5em 1em;color:${mutedColor};border-left:4px solid ${borderColor}">${inline(line.slice(2))}</blockquote>`);
       continue;
     }
-
-    // List item
-    if (/^\s*[-*+] /.test(line)) {
-      inList = true;
-      listLines.push(inlineFormat(line.replace(/^\s*[-*+] /, '')));
-      continue;
-    }
-    // Ordered list
-    if (/^\s*\d+\. /.test(line)) {
-      inList = true;
-      listLines.push(inlineFormat(line.replace(/^\s*\d+\. /, '')));
-      continue;
-    }
+    if (/^\s*[-*+] /.test(line)) { listLines.push(inline(line.replace(/^\s*[-*+] /,''))); continue; }
+    if (/^\s*\d+\. /.test(line)) { listLines.push(inline(line.replace(/^\s*\d+\. /,''))); continue; }
 
     flushList();
-    out.push(`<p style="margin:0 0 .75em;line-height:1.7">${inlineFormat(line)}</p>`);
+    out.push(`<p style="margin:0 0 .75em;line-height:1.7;color:${bodyColor}">${inline(line)}</p>`);
   }
-
   flushList();
   return out.join('\n');
 }

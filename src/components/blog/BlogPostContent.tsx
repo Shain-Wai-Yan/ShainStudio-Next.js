@@ -89,8 +89,8 @@ export default function BlogPostContent({ blog, language }: BlogPostContentProps
       <div ref={contentRef} className="blog-post-body" dangerouslySetInnerHTML={{ __html: sanitised }} />
 
       {/* Share section */}
-      <div className="mt-12 pt-8 border-t border-[#d0d0d0] dark:border-[#444]">
-        <p className="text-sm font-semibold text-[#111] dark:text-white mb-3 text-center">
+      <div className="mt-12 pt-8 border-t border-gray-300 dark:border-gray-700">
+        <p className="text-sm font-semibold text-gray-900 dark:text-white mb-3 text-center">
           {language === 'zh' ? '分享此文章' : 'Share this article'}
         </p>
         <div className="flex justify-center gap-3">
@@ -99,11 +99,10 @@ export default function BlogPostContent({ blog, language }: BlogPostContentProps
           <a
             href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(`https://www.shainwaiyan.com/blog/${blog.Slug}`)}&text=${encodeURIComponent(blog.Title)}`}
             target="_blank" rel="noopener noreferrer"
-            className="w-10 h-10 rounded-full flex items-center justify-center text-white transition-transform hover:scale-110"
-            style={{ background: '#000', boxShadow: '0 2px 4px rgba(0,0,0,0.2)' }}
+            className="w-10 h-10 rounded-full flex items-center justify-center text-white transition-transform hover:scale-110 shadow-sm"
+            style={{ background: '#000' }}
             aria-label="Share on X (Twitter)"
           >
-            {/* X logo */}
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 1200 1227">
               <path d="M714.163 519.284L1160.89 0H1055.03L667.137 450.887L357.328 0H0L468.492 681.821L0 1226.37H105.866L515.491 750.218L842.672 1226.37H1200L714.137 519.284H714.163ZM569.165 687.828L521.697 619.934L144.011 79.6944H306.615L611.412 515.685L658.88 583.579L1055.08 1150.3H892.476L569.165 687.854V687.828Z"/>
             </svg>
@@ -113,11 +112,10 @@ export default function BlogPostContent({ blog, language }: BlogPostContentProps
           <a
             href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(`https://www.shainwaiyan.com/blog/${blog.Slug}`)}`}
             target="_blank" rel="noopener noreferrer"
-            className="w-10 h-10 rounded-full flex items-center justify-center text-white transition-transform hover:scale-110"
-            style={{ background: '#0a66c2', boxShadow: '0 2px 4px rgba(0,0,0,0.2)' }}
+            className="w-10 h-10 rounded-full flex items-center justify-center text-white transition-transform hover:scale-110 shadow-sm"
+            style={{ background: '#0a66c2' }}
             aria-label="Share on LinkedIn"
           >
-            {/* LinkedIn "in" logo */}
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 448 512">
               <path d="M100.28 448H7.4V148.9h92.88zM53.79 108.1C24.09 108.1 0 83.5 0 53.8a53.79 53.79 0 0 1 107.58 0c0 29.7-24.1 54.3-53.79 54.3zM447.9 448h-92.68V302.4c0-34.7-.7-79.2-48.29-79.2-48.29 0-55.69 37.7-55.69 76.7V448h-92.78V148.9h89.08v40.8h1.3c12.4-23.5 42.69-48.3 87.88-48.3 94 0 111.28 61.9 111.28 142.3V448z"/>
             </svg>
@@ -127,11 +125,10 @@ export default function BlogPostContent({ blog, language }: BlogPostContentProps
           <a
             href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`https://www.shainwaiyan.com/blog/${blog.Slug}`)}`}
             target="_blank" rel="noopener noreferrer"
-            className="w-10 h-10 rounded-full flex items-center justify-center text-white transition-transform hover:scale-110"
-            style={{ background: '#1877f2', boxShadow: '0 2px 4px rgba(0,0,0,0.2)' }}
+            className="w-10 h-10 rounded-full flex items-center justify-center text-white transition-transform hover:scale-110 shadow-sm"
+            style={{ background: '#1877f2' }}
             aria-label="Share on Facebook"
           >
-            {/* Facebook f logo */}
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 320 512">
               <path d="M279.14 288l14.22-92.66h-88.91v-60.13c0-25.35 12.42-50.06 52.24-50.06h40.42V6.26S260.43 0 225.36 0c-73.22 0-121.08 44.38-121.08 124.72v70.62H22.89V288h81.39v224h100.17V288z"/>
             </svg>
@@ -142,11 +139,10 @@ export default function BlogPostContent({ blog, language }: BlogPostContentProps
             onClick={() => {
               navigator.clipboard.writeText(`https://www.shainwaiyan.com/blog/${blog.Slug}`);
             }}
-            className="w-10 h-10 rounded-full flex items-center justify-center text-white transition-transform hover:scale-110"
-            style={{ background: '#191970', boxShadow: '0 2px 4px rgba(0,0,0,0.2)' }}
+            className="w-10 h-10 rounded-full flex items-center justify-center text-white transition-transform hover:scale-110 shadow-sm"
+            style={{ background: '#191970' }}
             aria-label="Copy link"
           >
-            {/* Chain link icon */}
             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.658 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
             </svg>
@@ -155,17 +151,11 @@ export default function BlogPostContent({ blog, language }: BlogPostContentProps
         </div>
       </div>
 
-      {/* ── Global prose styles scoped to .blog-post-body ── */}
-      {/* Uses plain <style> tag so it works without styled-jsx */}
+      {/* Tailwind prose styles with YouTube iframe support */}
       <style>{`
         .blog-post-body {
-          font-size: 1.05rem;
-          line-height: 1.7;
-          color: #333333;
-          max-width: 100%;
-          overflow: hidden;
+          @apply text-base leading-relaxed text-gray-900 dark:text-gray-200 max-w-full overflow-visible;
         }
-        .dark .blog-post-body { color: #e0e0e0; }
 
         .blog-post-body h1,
         .blog-post-body h2,
@@ -173,178 +163,147 @@ export default function BlogPostContent({ blog, language }: BlogPostContentProps
         .blog-post-body h4,
         .blog-post-body h5,
         .blog-post-body h6 {
-          color: #111111;
-          margin: 1.8rem 0 0.8rem;
-          line-height: 1.3;
-          font-weight: 700;
+          @apply text-gray-900 dark:text-white font-bold my-6 leading-snug;
         }
-        .dark .blog-post-body h1,
-        .dark .blog-post-body h2,
-        .dark .blog-post-body h3,
-        .dark .blog-post-body h4,
-        .dark .blog-post-body h5,
-        .dark .blog-post-body h6 { color: #ffffff; }
 
-        .blog-post-body h2 { font-size: 1.7rem; }
-        .blog-post-body h3 { font-size: 1.4rem; }
-        .blog-post-body h4 { font-size: 1.2rem; }
-        .blog-post-body p  { margin-bottom: 1.2rem; }
+        .blog-post-body h1 { @apply text-4xl; }
+        .blog-post-body h2 { @apply text-2xl; }
+        .blog-post-body h3 { @apply text-xl; }
+        .blog-post-body h4 { @apply text-lg; }
 
-        /* ── Links: #191970 light, #ffd700 dark — NOT orange ── */
+        .blog-post-body p { @apply mb-4 leading-relaxed; }
+
         .blog-post-body a {
-          color: #191970;
-          text-decoration: underline;
-          text-underline-offset: 2px;
-          transition: color 0.2s;
+          @apply text-blue-900 dark:text-amber-400 underline underline-offset-2 transition-colors duration-200 hover:text-blue-700 dark:hover:text-amber-300;
         }
-        .blog-post-body a:hover { color: #ffd700; }
-        .dark .blog-post-body a { color: #ffd700; }
-        .dark .blog-post-body a:hover { color: #ffe347; }
-
-        /* ── Highlighted / marked text ── */
-        .blog-post-body mark,
-        .blog-post-body ::selection {
-          background: rgba(25, 25, 112, 0.15);
-          color: #191970;
-        }
-        .dark .blog-post-body mark { background: rgba(255,215,0,0.2); color: #ffd700; }
 
         .blog-post-body ul,
-        .blog-post-body ol { margin: 1.2rem 0; padding-left: 1.8rem; }
-        .blog-post-body li { margin-bottom: 0.4rem; line-height: 1.6; }
+        .blog-post-body ol { @apply my-5 ml-7; }
+        .blog-post-body li { @apply mb-1 leading-relaxed; }
 
         .blog-post-body blockquote {
-          margin: 1.5rem 0;
-          padding: 1rem 1.2rem;
-          background: #f8f9fa;
-          border-left: 3px solid #191970;
-          border-radius: 4px;
-          font-style: italic;
-        }
-        .dark .blog-post-body blockquote {
-          background: #1e1e1e;
-          border-left-color: #a67c00;
+          @apply my-6 p-4 bg-gray-100 dark:bg-gray-800 border-l-4 border-blue-900 dark:border-amber-400 italic text-gray-700 dark:text-gray-300 rounded;
         }
 
         .blog-post-body code {
-          background: #f8f9fa;
-          padding: 0.15rem 0.35rem;
-          border-radius: 4px;
-          font-family: 'Fira Code', 'Courier New', monospace;
-          font-size: 0.85em;
-          color: #191970;
-        }
-        .dark .blog-post-body code {
-          background: #1e1e1e;
-          color: #ffd700;
+          @apply bg-gray-100 dark:bg-gray-800 text-blue-900 dark:text-amber-400 px-1 py-0.5 rounded text-sm font-mono;
         }
 
         .blog-post-body pre {
-          background: #f8f9fa;
-          padding: 1.2rem;
-          border-radius: 4px;
-          overflow-x: auto;
-          font-family: 'Fira Code', 'Consolas', monospace;
-          font-size: 0.9em;
-          line-height: 1.5;
-          margin: 1.2rem 0;
+          @apply bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-200 p-4 rounded-lg overflow-x-auto my-5 font-mono text-sm leading-relaxed;
         }
-        .dark .blog-post-body pre { background: #1e1e1e; color: #e0e0e0; }
-        .blog-post-body pre code { background: none; padding: 0; color: inherit; }
+
+        .blog-post-body pre code {
+          @apply bg-transparent p-0 text-inherit;
+        }
+
+        .blog-post-body mark {
+          @apply bg-blue-100 dark:bg-amber-900 dark:bg-opacity-30 text-blue-900 dark:text-amber-400 px-1 py-0.5 rounded;
+        }
 
         .blog-post-body img {
-          max-width: 100%;
-          height: auto;
-          border-radius: 4px;
-          display: block;
-          margin: 1.5em auto;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+          @apply max-w-full h-auto rounded-lg block mx-auto my-6 shadow-md;
         }
 
         .blog-post-body figure {
-          margin: 1.5em auto;
-          max-width: 100%;
-          text-align: center;
+          @apply my-6 text-center;
         }
-        .blog-post-body figcaption {
-          font-size: 0.875em;
-          color: #666;
-          margin-top: 0.5em;
-        }
-        .dark .blog-post-body figcaption { color: #b0b0b0; }
 
-        /* Tables */
-        .blog-post-body table {
-          width: 100%;
-          border-collapse: collapse;
-          font-size: 0.95em;
-          margin: 1.5em 0;
+        .blog-post-body figcaption {
+          @apply text-sm text-gray-600 dark:text-gray-400 mt-2;
         }
+
+        .blog-post-body table {
+          @apply w-full border-collapse my-6 text-sm;
+        }
+
         .blog-post-body th,
         .blog-post-body td {
-          border: 1px solid #d0d0d0;
-          padding: 10px 14px;
-          text-align: left;
+          @apply border border-gray-300 dark:border-gray-600 px-4 py-3 text-left text-gray-900 dark:text-gray-200;
         }
-        .blog-post-body th {
-          background: #f8f9fa;
-          font-weight: 700;
-          color: #111;
-        }
-        .blog-post-body tr:nth-child(even) { background: #f8f9fa; }
-        .dark .blog-post-body th { background: #1e1e1e; color: #fff; }
-        .dark .blog-post-body th,
-        .dark .blog-post-body td { border-color: #444; }
-        .dark .blog-post-body tr:nth-child(even) { background: #1e1e1e; }
 
-        /* Responsive YouTube / media embeds */
+        .blog-post-body th {
+          @apply bg-gray-100 dark:bg-gray-800 font-bold text-gray-900 dark:text-white;
+        }
+
+        .blog-post-body tr:nth-child(even) {
+          @apply bg-gray-50 dark:bg-gray-900;
+        }
+
+        .blog-post-body strong {
+          @apply font-bold text-gray-900 dark:text-white;
+        }
+
+        .blog-post-body em {
+          @apply italic;
+        }
+
+        .blog-post-body hr {
+          @apply border-none border-t border-gray-300 dark:border-gray-600 my-8;
+        }
+
+        /* YouTube & Media Iframe Wrapper - 16:9 Aspect Ratio */
+        .blog-post-body .yt-wrapper {
+          position: relative;
+          width: 100%;
+          height: 0;
+          padding-bottom: 56.25%;
+          margin: 1.5rem 0;
+          border-radius: 0.5rem;
+          background: #000;
+          overflow: hidden;
+        }
+
+        .blog-post-body .yt-wrapper iframe {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          border: 0;
+          border-radius: 0.5rem;
+        }
+
+        /* CKEditor Media Elements */
         .blog-post-body .media,
         .blog-post-body figure.media {
           position: relative;
           width: 100%;
-          padding-bottom: 56.25%;
           height: 0;
-          overflow: hidden;
-          margin: 1.5em 0;
+          padding-bottom: 56.25%;
+          margin: 1.5rem 0;
           background: #000;
-          border-radius: 4px;
-        }
-        .blog-post-body .media iframe,
-        .blog-post-body figure.media iframe,
-        .blog-post-body .yt-wrapper iframe {
-          position: absolute;
-          top: 0; left: 0;
-          width: 100%; height: 100%;
-          border: 0;
+          border-radius: 0.5rem;
+          overflow: hidden;
         }
 
-        /* CKEditor image alignment */
+        .blog-post-body .media iframe,
+        .blog-post-body figure.media iframe {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          border: 0;
+          border-radius: 0.5rem;
+        }
+
+        /* Image Alignment */
         .blog-post-body .image-style-align-left,
         .blog-post-body figure.image-style-align-left {
-          float: left;
-          margin-right: 1.5em;
-          margin-left: 0;
+          @apply float-left mr-6;
         }
+
         .blog-post-body .image-style-align-right,
         .blog-post-body figure.image-style-align-right {
-          float: right;
-          margin-left: 1.5em;
-          margin-right: 0;
+          @apply float-right ml-6;
         }
-        .blog-post-body::after { content: ''; display: table; clear: both; }
 
-        /* Strong / em */
-        .blog-post-body strong { font-weight: 700; color: #111; }
-        .dark .blog-post-body strong { color: #fff; }
-        .blog-post-body em { font-style: italic; }
-
-        /* HR */
-        .blog-post-body hr {
-          border: none;
-          border-top: 1px solid #d0d0d0;
-          margin: 2rem 0;
+        .blog-post-body::after {
+          content: '';
+          display: table;
+          clear: both;
         }
-        .dark .blog-post-body hr { border-top-color: #444; }
       `}</style>
     </div>
   );

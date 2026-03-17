@@ -69,8 +69,7 @@ const Header = () => {
 
   return (
     <header
-      style={{ backgroundColor: '#191970', width: '100%' }}
-      className="fixed top-0 left-0 right-0 z-[1000] transition-all duration-300 shadow-lg"
+      className="fixed top-0 left-0 right-0 z-[1000] transition-all duration-300 shadow-lg bg-[#191970] dark:bg-[#0f0f1e]"
     >
       {/* Animated gold glow bottom border */}
       <div className="absolute bottom-0 left-0 right-0 h-[3px] overflow-hidden z-10">
@@ -108,15 +107,15 @@ const Header = () => {
                       >
                         {link.label}
                       </button>
-                      <ul className="absolute hidden group-hover:block bg-white text-[#191970] shadow-xl rounded-lg mt-0 py-2 w-56 z-20 border-t-4 border-[#ffd700]">
+                      <ul className="absolute hidden group-hover:block bg-white dark:bg-[#1e1e2e] text-[#191970] dark:text-white shadow-xl rounded-lg mt-0 py-2 w-56 z-20 border-t-4 border-[#ffd700]">
                         {link.dropdown.map((item) => (
                           <li key={item.href}>
                             <Link
                               href={item.href}
                               className={`block px-4 py-3 text-sm font-medium transition-all duration-300 ${
                                 pathname === item.href
-                                  ? 'bg-[#ffd700] text-white'
-                                  : 'hover:bg-[#ffd700] hover:text-white text-[#191970]'
+                                  ? 'bg-[#ffd700] text-[#191970] dark:bg-[#d4af37] dark:text-[#191970]'
+                                  : 'hover:bg-[#ffd700] hover:text-[#191970] text-[#191970] dark:text-white dark:hover:bg-[#d4af37] dark:hover:text-[#191970]'
                               }`}
                             >
                               {item.label}
@@ -156,27 +155,27 @@ const Header = () => {
 
       {/* Mobile Navigation */}
       {isMenuOpen && (
-        <div className="lg:hidden absolute top-full left-0 right-0 bg-white border-t-4 border-[#ffd700] shadow-xl z-50">
+        <div className="lg:hidden absolute top-full left-0 right-0 bg-white dark:bg-[#1e1e2e] border-t-4 border-[#ffd700] shadow-xl z-50">
           <nav className="w-full">
             <ul className="flex flex-col">
               {navLinks.map((link) => (
-                <li key={link.href} className="border-b border-gray-100">
+                <li key={link.href} className="border-b border-gray-100 dark:border-[#333333]">
                   {link.dropdown ? (
                     <details className="w-full">
                       <summary
-                        className={`px-6 py-4 font-medium hover:bg-[#f8f9fa] cursor-pointer flex justify-between items-center ${
-                          isActiveRoute(link.href) ? 'text-[#ffd700] bg-[#f8f9fa]' : 'text-[#191970]'
+                        className={`px-6 py-4 font-medium hover:bg-[#f8f9fa] dark:hover:bg-[#2a2a3a] cursor-pointer flex justify-between items-center transition-colors duration-300 ${
+                          isActiveRoute(link.href) ? 'text-[#ffd700] bg-[#f8f9fa] dark:bg-[#2a2a3a]' : 'text-[#191970] dark:text-white'
                         }`}
                       >
                         {link.label}
                         <span className="text-[#ffd700]">+</span>
                       </summary>
-                      <ul className="bg-[#f8f9fa] pl-6">
+                      <ul className="bg-[#f8f9fa] dark:bg-[#2a2a3a] pl-6">
                         {link.dropdown.map((item) => (
-                          <li key={item.href} className="border-t border-gray-100">
+                          <li key={item.href} className="border-t border-gray-100 dark:border-[#333333]">
                             <Link
                               href={item.href}
-                              className="block px-6 py-3 text-sm text-[#191970] hover:text-[#ffd700] hover:bg-white transition-colors duration-300"
+                              className="block px-6 py-3 text-sm text-[#191970] dark:text-white hover:text-[#ffd700] dark:hover:text-[#d4af37] hover:bg-white dark:hover:bg-[#333333] transition-colors duration-300"
                               onClick={() => setIsMenuOpen(false)}
                             >
                               {item.label}
@@ -190,8 +189,8 @@ const Header = () => {
                       href={link.href}
                       className={`block px-6 py-4 font-medium transition-colors duration-300 ${
                         isActiveRoute(link.href)
-                          ? 'text-[#ffd700] bg-[#f8f9fa]'
-                          : 'text-[#191970] hover:text-[#ffd700] hover:bg-[#f8f9fa]'
+                          ? 'text-[#ffd700] bg-[#f8f9fa] dark:bg-[#2a2a3a]'
+                          : 'text-[#191970] dark:text-white hover:text-[#ffd700] dark:hover:text-[#d4af37] hover:bg-[#f8f9fa] dark:hover:bg-[#2a2a3a]'
                       }`}
                       onClick={() => setIsMenuOpen(false)}
                     >

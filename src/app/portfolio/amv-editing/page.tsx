@@ -179,7 +179,7 @@ export default function AMVEditingPage() {
   const featuredVideo = videos[0];
 
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-screen bg-white dark:bg-[#121212]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
         {/* Breadcrumb */}
         <Breadcrumb items={breadcrumbItems} />
@@ -193,11 +193,11 @@ export default function AMVEditingPage() {
 
         {/* Error State */}
         {error && (
-          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-8 text-center">
-            <p className="text-amber-800 text-sm">{error}</p>
+          <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 rounded-xl p-4 mb-8 text-center">
+            <p className="text-amber-800 dark:text-amber-400 text-sm">{error}</p>
             <button
               onClick={loadData}
-              className="mt-2 px-5 py-2 bg-midnight text-white text-sm rounded-full hover:bg-midnight/80 transition-colors"
+              className="mt-2 px-5 py-2 bg-[#191970] dark:bg-[#a67c00] text-white dark:text-[#0f0f45] text-sm rounded-full hover:bg-[#0f0f4d] dark:hover:bg-[#c9a236] transition-colors"
             >
               Retry
             </button>

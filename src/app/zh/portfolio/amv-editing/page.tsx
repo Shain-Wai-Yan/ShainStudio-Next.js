@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Breadcrumb } from '@/components/Breadcrumb';
 import AMVHeader from '@/components/amv-editing/AMVHeader';
 import ChannelInfo from '@/components/amv-editing/ChannelInfo';
@@ -86,46 +86,57 @@ export default function AMVEditingPageZH() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadData();
+  // ─── Fetch ALL pages from the paginated YouTube API (same as EN) ──────────
+  const fetchAllVideos = useCallback(async (): Promise<any[]> => {
+    const allItems: any[] = [];
+    let pageToken: string | null = null;
+
+    do {
+      const url = pageToken
+        ? `/api/amv-editing?endpoint=videos&maxResults=50&pageToken=${encodeURIComponent(pageToken)}`
+        : `/api/amv-editing?endpoint=videos&maxResults=50`;
+
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`Videos API error: ${res.status}`);
+
+      const data = await res.json();
+
+      if (data.items && data.items.length > 0) {
+        allItems.push(...data.items);
+      }
+
+      pageToken = data.nextPageToken ?? null;
+    } while (pageToken);
+
+    return allItems;
   }, []);
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     setIsLoading(true);
     setError(null);
 
     try {
-      // Try to load from Cloudflare Worker
-      const [channelRes, videosRes] = await Promise.all([
+      const [channelRes, allVideoItems] = await Promise.all([
         fetch('/api/amv-editing?endpoint=channel'),
-        fetch('/api/amv-editing?endpoint=videos&maxResults=50'),
+        fetchAllVideos(),
       ]);
 
-      // Use fallback data if requests fail
-      if (!channelRes.ok || !videosRes.ok) {
-        throw new Error('API request failed');
-      }
+      if (!channelRes.ok) throw new Error('Channel API request failed');
 
       const channelRawData = await channelRes.json();
-      const videosRawData = await videosRes.json();
 
       // Transform channel data
-      if (
-        channelRawData.items &&
-        channelRawData.items.length > 0
-      ) {
+      if (channelRawData.items && channelRawData.items.length > 0) {
         const channelItem = channelRawData.items[0];
         setChannelData({
           title: channelItem.snippet?.title || MOCK_CHANNEL_DATA.title,
           description:
-            channelItem.snippet?.description ||
-            MOCK_CHANNEL_DATA.description,
+            channelItem.snippet?.description || MOCK_CHANNEL_DATA.description,
           subscriberCount:
             channelItem.statistics?.subscriberCount ||
             MOCK_CHANNEL_DATA.subscriberCount,
           videoCount:
-            channelItem.statistics?.videoCount ||
-            MOCK_CHANNEL_DATA.videoCount,
+            channelItem.statistics?.videoCount || MOCK_CHANNEL_DATA.videoCount,
           avatarUrl:
             channelItem.snippet?.thumbnails?.high?.url ||
             MOCK_CHANNEL_DATA.avatarUrl,
@@ -135,27 +146,26 @@ export default function AMVEditingPageZH() {
         setChannelData(MOCK_CHANNEL_DATA);
       }
 
-      // Transform video data
-      if (videosRawData.items && videosRawData.items.length > 0) {
-        const transformedVideos = videosRawData.items
-          .slice(0, 9)
-          .map(transformVideoData);
+      // Transform ALL video data (no slice — show everything)
+      if (allVideoItems.length > 0) {
+        const transformedVideos = allVideoItems.map(transformVideoData);
         setVideos(transformedVideos);
       } else {
-        const transformedMockVideos = MOCK_VIDEOS.map(transformVideoData);
-        setVideos(transformedMockVideos);
+        setVideos(MOCK_VIDEOS.map(transformVideoData));
       }
     } catch (err) {
       console.error('Failed to load data:', err);
-      setError('未能加载视频');
-      // Use mock data as fallback
+      setError('未能加载视频 — 正在显示示例内容。');
       setChannelData(MOCK_CHANNEL_DATA);
-      const transformedMockVideos = MOCK_VIDEOS.map(transformVideoData);
-      setVideos(transformedMockVideos);
+      setVideos(MOCK_VIDEOS.map(transformVideoData));
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [fetchAllVideos]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   const breadcrumbItems = [
     { label: '首页', href: '/zh' },
@@ -166,7 +176,7 @@ export default function AMVEditingPageZH() {
   const featuredVideo = videos[0];
 
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-screen bg-white dark:bg-[#121212]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
         {/* Breadcrumb */}
         <Breadcrumb items={breadcrumbItems} />
@@ -175,15 +185,16 @@ export default function AMVEditingPageZH() {
         <AMVHeader
           title="动漫视频剪辑"
           description="动态视频剪辑，融合故事叙述与震撼视觉效果"
+          totalVideos={videos.length}
         />
 
         {/* Error State */}
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-8 text-center">
-            <p className="text-red-700">{error}</p>
+          <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 rounded-xl p-4 mb-8 text-center">
+            <p className="text-amber-800 dark:text-amber-400 text-sm">{error}</p>
             <button
               onClick={loadData}
-              className="mt-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+              className="mt-2 px-5 py-2 bg-[#191970] dark:bg-[#a67c00] text-white text-sm rounded-full hover:bg-[#0f0f4d] dark:hover:bg-[#c9a236] transition-colors"
             >
               重试
             </button>
@@ -206,7 +217,7 @@ export default function AMVEditingPageZH() {
           />
         )}
 
-        {/* Video Grid */}
+        {/* Video Grid — all videos except the featured one */}
         <VideoGrid
           videos={videos.slice(1)}
           isLoading={isLoading}

@@ -126,7 +126,7 @@ export default function AboutPage() {
                 My Story
               </h2>
 
-              <p className="text-base md:text-lg text-text leading-relaxed mb-6 text-justify font-primary animate-on-scroll">
+              <p className="text-base md:text-lg text-text dark:text-gray-300 leading-relaxed mb-6 text-justify font-primary animate-on-scroll">
                 Curious by nature and relentless in pursuit, I'm someone who turned limited resources into limitless
                 possibilities. From rural classrooms to building advanced web architecture powered by Strapi,
                 Cloudflare Workers, and custom logic—all without a CS degree—I've taught myself to think beyond
@@ -172,7 +172,7 @@ export default function AboutPage() {
                       transition-colors duration-300 group-hover:text-accent dark:group-hover:text-accent">
                       Trilingual Fluency
                     </h4>
-                    <p className="text-muted font-primary transition-colors duration-300 group-hover:text-text">
+                    <p className="text-muted dark:text-gray-400 font-primary transition-colors duration-300 group-hover:text-text dark:group-hover:text-gray-200">
                       Myanmar (Native), English, and Chinese – bridging cultures through communication.
                     </p>
                   </div>
@@ -191,7 +191,7 @@ export default function AboutPage() {
                       transition-colors duration-300 group-hover:text-accent dark:group-hover:text-accent">
                       Digital-First Skills
                     </h4>
-                    <p className="text-muted font-primary transition-colors duration-300 group-hover:text-text">
+                    <p className="text-muted dark:text-gray-400 font-primary transition-colors duration-300 group-hover:text-text dark:group-hover:text-gray-200">
                       SEO, social strategy, analytics, and content creation.
                     </p>
                   </div>
@@ -210,7 +210,7 @@ export default function AboutPage() {
                       transition-colors duration-300 group-hover:text-accent dark:group-hover:text-accent">
                       Relentless Curiosity
                     </h4>
-                    <p className="text-muted font-primary transition-colors duration-300 group-hover:text-text">
+                    <p className="text-muted dark:text-gray-400 font-primary transition-colors duration-300 group-hover:text-text dark:group-hover:text-gray-200">
                       A fresh perspective and hunger to learn from every project.
                     </p>
                   </div>
@@ -354,7 +354,7 @@ export default function AboutPage() {
                       transition-all duration-300 group-hover:bg-accent group-hover:text-white">
                       2019
                     </span>
-                    <p className="text-muted font-primary transition-colors duration-300 group-hover:text-text">
+                    <p className="text-muted dark:text-gray-400 font-primary transition-colors duration-300 group-hover:text-text dark:group-hover:text-gray-200">
                       Began my academic journey at Taunggyi University, specializing in English.
                     </p>
                   </div>
@@ -389,7 +389,7 @@ export default function AboutPage() {
                       transition-all duration-300 group-hover:bg-accent group-hover:text-white">
                       2023
                     </span>
-                    <p className="text-muted font-primary transition-colors duration-300 group-hover:text-text">
+                    <p className="text-muted dark:text-gray-400 font-primary transition-colors duration-300 group-hover:text-text dark:group-hover:text-gray-200">
                       Expanded my language skills by beginning to learn Chinese, adding to my trilingual abilities.
                     </p>
                   </div>
@@ -410,7 +410,7 @@ export default function AboutPage() {
                       transition-all duration-300 group-hover:bg-accent group-hover:text-white">
                       2024
                     </span>
-                    <p className="text-muted font-primary transition-colors duration-300 group-hover:text-text">
+                    <p className="text-muted dark:text-gray-400 font-primary transition-colors duration-300 group-hover:text-text dark:group-hover:text-gray-200">
                       Started learning about business at Strategy First University, focusing on marketing fundamentals.
                     </p>
                   </div>
@@ -445,7 +445,7 @@ export default function AboutPage() {
                       transition-all duration-300 group-hover:bg-accent group-hover:text-white">
                       2025
                     </span>
-                    <p className="text-muted font-primary transition-colors duration-300 group-hover:text-text">
+                    <p className="text-muted dark:text-gray-400 font-primary transition-colors duration-300 group-hover:text-text dark:group-hover:text-gray-200">
                       Began the Google Professional Certificate in Digital Marketing and E-Commerce
                       through Coursera to enhance my digital skills.
                     </p>
@@ -467,7 +467,7 @@ export default function AboutPage() {
                       transition-all duration-300 group-hover:bg-accent group-hover:text-white">
                       2025
                     </span>
-                    <p className="text-muted font-primary transition-colors duration-300 group-hover:text-text">
+                    <p className="text-muted dark:text-gray-400 font-primary transition-colors duration-300 group-hover:text-text dark:group-hover:text-gray-200">
                       Began the Meta Professional Certificate in Social Media Marketing through
                       Coursera to enhance my social media marketing skills.
                     </p>
@@ -503,7 +503,7 @@ export default function AboutPage() {
                       transition-all duration-300 group-hover:bg-accent group-hover:text-white">
                       2026
                     </span>
-                    <p className="text-muted font-primary transition-colors duration-300 group-hover:text-text">
+                    <p className="text-muted dark:text-gray-400 font-primary transition-colors duration-300 group-hover:text-text dark:group-hover:text-gray-200">
                       Enrolled in the Bachelor of Science in Business Administration program at
                       University of the People — a tuition-free, accredited online university.
                       Pursuing this degree to deepen my foundation in business strategy, management,

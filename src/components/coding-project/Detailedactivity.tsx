@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+
 interface RepoContribution {
   repository: { name: string; url: string };
   contributions: { totalCount: number };
@@ -62,13 +64,13 @@ function RepoBar({
         href={url}
         target="_blank"
         rel="noopener noreferrer"
-        className="text-xs font-mono truncate w-44 hover:underline flex-shrink-0"
-        style={{ color: '#191970' }}
+        className="text-xs font-mono truncate w-44 hover:underline flex-shrink-0
+          text-[#191970] dark:text-[#d4af37]"
         title={name}
       >
         {name}
       </a>
-      <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+      <div className="flex-1 h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
         <div
           className="h-full rounded-full transition-all duration-500"
           style={{ width: `${pct}%`, backgroundColor: color }}
@@ -91,10 +93,10 @@ function ActivityPanel({
   emptyText: string;
 }) {
   if (items.length === 0) {
-    return <p className="text-sm text-gray-400 py-4 text-center">{emptyText}</p>;
+    return <p className="text-sm text-gray-400 dark:text-gray-500 py-4 text-center">{emptyText}</p>;
   }
 
-  const max = Math.max(...items.map(i => i.contributions.totalCount));
+  const max   = Math.max(...items.map(i => i.contributions.totalCount));
   const total = items.reduce((s, i) => s + i.contributions.totalCount, 0);
 
   return (
@@ -107,7 +109,9 @@ function ActivityPanel({
         >
           {total} total
         </span>
-        <span className="text-xs text-gray-400">across {items.length} {items.length === 1 ? 'repository' : 'repositories'}</span>
+        <span className="text-xs text-gray-400 dark:text-gray-500">
+          across {items.length} {items.length === 1 ? 'repository' : 'repositories'}
+        </span>
       </div>
 
       {items.map((item, i) => (
@@ -132,16 +136,20 @@ export function DetailedActivity({ data, isLoading }: DetailedActivityProps) {
   if (isLoading) {
     return (
       <section className="mb-12">
-        <h2 className="text-xl font-bold mb-5" style={{ color: '#191970' }}>Contribution Activity</h2>
-        <div className="bg-white border border-gray-200 rounded-xl p-6 animate-pulse space-y-4">
+        <h2 className="text-xl font-bold mb-5 text-[#191970] dark:text-[#d4af37]">
+          Contribution Activity
+        </h2>
+        <div className="bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-gray-700 rounded-xl p-6 animate-pulse space-y-4">
           <div className="flex gap-3">
-            {[1,2,3].map(i => <div key={i} className="h-8 w-28 bg-gray-200 rounded-lg"/>)}
+            {[1,2,3].map(i => (
+              <div key={i} className="h-8 w-28 bg-gray-200 dark:bg-gray-700 rounded-lg"/>
+            ))}
           </div>
           {[1,2,3,4,5].map(i => (
             <div key={i} className="flex items-center gap-3">
-              <div className="h-3 bg-gray-200 rounded w-36"/>
-              <div className="flex-1 h-2 bg-gray-200 rounded-full"/>
-              <div className="h-3 w-6 bg-gray-200 rounded"/>
+              <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-36"/>
+              <div className="flex-1 h-2 bg-gray-200 dark:bg-gray-700 rounded-full"/>
+              <div className="h-3 w-6 bg-gray-200 dark:bg-gray-700 rounded"/>
             </div>
           ))}
         </div>
@@ -158,22 +166,24 @@ export function DetailedActivity({ data, isLoading }: DetailedActivityProps) {
   if (commits.length === 0 && prs.length === 0 && issues.length === 0) return null;
 
   const tabs: { id: typeof activeTab; label: string; icon: React.ReactNode; items: RepoContribution[]; color: string }[] = [
-    { id: 'commits', label: 'Commits',       icon: <CommitIcon />,     items: commits, color: '#2ea44f' },
-    { id: 'prs',     label: 'Pull Requests',  icon: <PullRequestIcon/>, items: prs,     color: '#6f42c1' },
-    { id: 'issues',  label: 'Issues',         icon: <IssueIcon />,      items: issues,  color: '#e36209' },
+    { id: 'commits', label: 'Commits',      icon: <CommitIcon />,      items: commits, color: '#2ea44f' },
+    { id: 'prs',     label: 'Pull Requests', icon: <PullRequestIcon/>, items: prs,     color: '#6f42c1' },
+    { id: 'issues',  label: 'Issues',        icon: <IssueIcon />,      items: issues,  color: '#e36209' },
   ];
 
   const active = tabs.find(t => t.id === activeTab)!;
 
   return (
     <section className="mb-12">
-      <h2 className="text-xl font-bold mb-5" style={{ color: '#191970' }}>Contribution Activity</h2>
+      <h2 className="text-xl font-bold mb-5 text-[#191970] dark:text-[#d4af37]">
+        Contribution Activity
+      </h2>
 
-      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+      <div className="bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
         {/* Tab bar */}
-        <div className="flex border-b border-gray-200 bg-gray-50">
+        <div className="flex border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-[#252525]">
           {tabs.map(tab => {
-            const count = tab.items.reduce((s, i) => s + i.contributions.totalCount, 0);
+            const count    = tab.items.reduce((s, i) => s + i.contributions.totalCount, 0);
             const isActive = activeTab === tab.id;
             return (
               <button
@@ -181,8 +191,8 @@ export function DetailedActivity({ data, isLoading }: DetailedActivityProps) {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 px-4 py-3 text-sm font-medium transition-all border-b-2 -mb-px
                   ${isActive
-                    ? 'border-current bg-white'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+                    ? 'border-current bg-white dark:bg-[#1e1e1e]'
+                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-[#2a2a2a]'
                   }`}
                 style={isActive ? { color: tab.color, borderColor: tab.color } : {}}
               >
@@ -193,7 +203,9 @@ export function DetailedActivity({ data, isLoading }: DetailedActivityProps) {
                 {count > 0 && (
                   <span
                     className={`text-xs px-1.5 py-0.5 rounded-full font-semibold ${
-                      isActive ? 'text-white' : 'bg-gray-200 text-gray-600'
+                      isActive
+                        ? 'text-white'
+                        : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
                     }`}
                     style={isActive ? { backgroundColor: tab.color } : {}}
                   >
@@ -217,6 +229,3 @@ export function DetailedActivity({ data, isLoading }: DetailedActivityProps) {
     </section>
   );
 }
-
-// Need useState import
-import { useState } from 'react';

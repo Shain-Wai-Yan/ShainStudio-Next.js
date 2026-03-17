@@ -19,15 +19,15 @@ interface ChannelInfoProps {
 export default function ChannelInfo({ data, isLoading }: ChannelInfoProps) {
   if (isLoading || !data) {
     return (
-      <section className="rounded-2xl overflow-hidden shadow-lg border border-midnight/10 mb-14 animate-pulse">
-        <div className="h-44 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200" />
+      <section className="rounded-2xl overflow-hidden shadow-lg border border-midnight/10 dark:border-[#a67c00]/30 mb-14 animate-pulse">
+        <div className="h-44 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 dark:from-[#3a3a3a] dark:via-[#2a2a2a] dark:to-[#3a3a3a]" />
         <div className="p-6 md:p-8 flex gap-5">
-          <div className="w-24 h-24 rounded-full bg-gray-200 flex-shrink-0 -mt-12 ring-4 ring-white" />
+          <div className="w-24 h-24 rounded-full bg-gray-200 dark:bg-[#3a3a3a] flex-shrink-0 -mt-12 ring-4 ring-white dark:ring-[#1e1e1e]" />
           <div className="flex-1 pt-2 space-y-3">
-            <div className="h-5 bg-gray-200 rounded-full w-1/3" />
-            <div className="h-4 bg-gray-100 rounded-full w-1/4" />
-            <div className="h-4 bg-gray-100 rounded-full w-2/3" />
-            <div className="h-4 bg-gray-100 rounded-full w-1/2" />
+            <div className="h-5 bg-gray-200 dark:bg-[#3a3a3a] rounded-full w-1/3" />
+            <div className="h-4 bg-gray-100 dark:bg-[#2a2a2a] rounded-full w-1/4" />
+            <div className="h-4 bg-gray-100 dark:bg-[#2a2a2a] rounded-full w-2/3" />
+            <div className="h-4 bg-gray-100 dark:bg-[#2a2a2a] rounded-full w-1/2" />
           </div>
         </div>
       </section>
@@ -35,9 +35,9 @@ export default function ChannelInfo({ data, isLoading }: ChannelInfoProps) {
   }
 
   return (
-    <section className="rounded-2xl overflow-hidden shadow-lg border border-midnight/10 mb-14 group">
+    <section className="rounded-2xl overflow-hidden shadow-lg border border-midnight/10 dark:border-[#a67c00]/30 mb-14 group bg-white dark:bg-[#1e1e1e]">
       {/* Banner */}
-      <div className="relative h-44 md:h-52 w-full bg-gradient-to-br from-midnight via-midnight/90 to-indigo-900">
+      <div className="relative h-44 md:h-52 w-full bg-gradient-to-br from-midnight via-midnight/90 to-indigo-900 dark:from-[#191970] dark:via-[#704700] dark:to-[#a67c00]">
         {data.bannerUrl && (
           <Image
             src={data.bannerUrl}
@@ -71,7 +71,7 @@ export default function ChannelInfo({ data, isLoading }: ChannelInfoProps) {
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
             <div className="flex-1">
               <h2
-                className="text-2xl md:text-3xl font-black text-midnight mb-1 tracking-tight"
+                className="text-2xl md:text-3xl font-black text-midnight dark:text-[#d4af37] mb-1 tracking-tight"
                 style={{ fontFamily: "'Playfair Display', serif" }}
               >
                 {data.title}
@@ -79,13 +79,13 @@ export default function ChannelInfo({ data, isLoading }: ChannelInfoProps) {
 
               {/* Stats chips */}
               <div className="flex flex-wrap items-center gap-3 mb-4">
-                <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-midnight/70 bg-midnight/8 px-3 py-1 rounded-full border border-midnight/10">
+                <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-midnight/70 dark:text-[#999999] bg-midnight/8 dark:bg-[#a67c00]/15 px-3 py-1 rounded-full border border-midnight/10 dark:border-[#a67c00]/30">
                   <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v1h8v-1zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-1a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v1h-3zM4.75 14.094A5.973 5.973 0 004 17v1H1v-1a3 3 0 013.75-2.906z" />
                   </svg>
                   {data.subscriberCount} subscribers
                 </span>
-                <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-midnight/70 bg-midnight/8 px-3 py-1 rounded-full border border-midnight/10">
+                <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-midnight/70 dark:text-[#999999] bg-midnight/8 dark:bg-[#a67c00]/15 px-3 py-1 rounded-full border border-midnight/10 dark:border-[#a67c00]/30">
                   <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z" />
                   </svg>
@@ -93,7 +93,7 @@ export default function ChannelInfo({ data, isLoading }: ChannelInfoProps) {
                 </span>
               </div>
 
-              <p className="text-gray-600 text-sm leading-relaxed max-w-2xl">
+              <p className="text-gray-600 dark:text-[#b0b0b0] text-sm leading-relaxed max-w-2xl">
                 {data.description}
               </p>
             </div>

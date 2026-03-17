@@ -21,14 +21,14 @@ export function RepositoriesList({ repositories, isLoading, onViewFiles }: Repos
   if (isLoading) {
     return (
       <section className="mb-12">
-        <h2 className="text-xl font-bold mb-5" style={{ color: '#191970' }}>Public Repositories</h2>
+        <h2 className="text-xl font-bold mb-5 text-[#191970] dark:text-[#d4af37]">Public Repositories</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1,2,3,4,5,6].map(i => (
-            <div key={i} className="bg-white border border-gray-200 rounded-xl p-5 animate-pulse space-y-3">
-              <div className="h-5 bg-gray-200 rounded w-2/3"/>
-              <div className="h-3 bg-gray-200 rounded w-full"/>
-              <div className="h-3 bg-gray-200 rounded w-1/2"/>
-              <div className="h-8 bg-gray-200 rounded-lg"/>
+            <div key={i} className="bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-gray-700 rounded-xl p-5 animate-pulse space-y-3">
+              <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-2/3" />
+              <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-full" />
+              <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2" />
+              <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded-lg" />
             </div>
           ))}
         </div>
@@ -40,59 +40,45 @@ export function RepositoriesList({ repositories, isLoading, onViewFiles }: Repos
 
   return (
     <section className="mb-12">
-      <h2 className="text-xl font-bold mb-5" style={{ color: '#191970' }}>Public Repositories</h2>
+      <h2 className="text-xl font-bold mb-5 text-[#191970] dark:text-[#d4af37]">Public Repositories</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {repositories.map((repo, index) => {
-          // url + index guarantees uniqueness even if repo names are identical
-          const uniqueKey = `${repo.url ?? repo.name}-${index}`;
+          const uniqueKey  = `${repo.url ?? repo.name}-${index}`;
           const updatedDate = repo.updatedAt
             ? new Date(repo.updatedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
             : '';
 
           return (
-            <div
-              key={uniqueKey}
-              className="bg-white border border-gray-200 rounded-xl p-5 hover:shadow-md transition-shadow flex flex-col"
-            >
+            <div key={uniqueKey}
+              className="bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-gray-700
+                rounded-xl p-5 hover:shadow-md dark:hover:shadow-[0_4px_20px_rgba(166,124,0,0.1)]
+                transition-shadow flex flex-col">
+
               <div className="flex items-start justify-between mb-1.5">
                 <h3 className="font-semibold text-sm leading-snug break-all pr-2">
-                  <a
-                    href={repo.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:underline"
-                    style={{ color: '#191970' }}
-                  >
+                  <a href={repo.url} target="_blank" rel="noopener noreferrer"
+                    className="hover:underline text-[#191970] dark:text-[#d4af37]">
                     {repo.name}
                   </a>
                 </h3>
-                <a
-                  href={repo.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title="Open on GitHub"
-                  className="text-gray-300 hover:text-gray-500 flex-shrink-0 mt-0.5"
-                >
+                <a href={repo.url} target="_blank" rel="noopener noreferrer"
+                  className="text-gray-300 dark:text-gray-600 hover:text-gray-500 dark:hover:text-gray-400 flex-shrink-0 mt-0.5">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-                    <polyline points="15 3 21 3 21 9"/>
-                    <line x1="10" y1="14" x2="21" y2="3"/>
+                    <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
                   </svg>
                 </a>
               </div>
 
-              <p className="text-gray-500 text-xs mb-4 line-clamp-2 flex-1">
+              <p className="text-gray-500 dark:text-gray-400 text-xs mb-4 line-clamp-2 flex-1">
                 {repo.description || 'No description'}
               </p>
 
-              <div className="flex flex-wrap gap-3 items-center text-xs text-gray-400 mb-3">
+              <div className="flex flex-wrap gap-3 items-center text-xs text-gray-400 dark:text-gray-500 mb-3">
                 {repo.primaryLanguage && (
                   <div className="flex items-center gap-1.5">
-                    <div
-                      className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-                      style={{ backgroundColor: repo.primaryLanguage.color }}
-                    />
-                    <span className="text-gray-600">{repo.primaryLanguage.name}</span>
+                    <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: repo.primaryLanguage.color }} />
+                    <span className="text-gray-600 dark:text-gray-300">{repo.primaryLanguage.name}</span>
                   </div>
                 )}
                 <div className="flex items-center gap-1">
@@ -108,22 +94,19 @@ export function RepositoriesList({ repositories, isLoading, onViewFiles }: Repos
                   {repo.forkCount ?? 0}
                 </div>
                 {updatedDate && (
-                  <span className="ml-auto text-gray-400 hidden sm:block">{updatedDate}</span>
+                  <span className="ml-auto text-gray-400 dark:text-gray-500 hidden sm:block">{updatedDate}</span>
                 )}
               </div>
 
-              <div className="w-full h-0.5 rounded bg-green-100 mb-3 overflow-hidden">
-                <div className="h-full rounded bg-green-400 w-full"/>
+              <div className="w-full h-0.5 rounded bg-green-100 dark:bg-green-900/30 mb-3 overflow-hidden">
+                <div className="h-full rounded bg-green-400 dark:bg-green-600 w-full" />
               </div>
 
-              <button
-                onClick={() => onViewFiles(repo.name)}
-                className="w-full flex items-center justify-center gap-1.5 text-xs font-medium py-2 px-3 rounded-lg transition-all hover:opacity-90 text-white"
-                style={{ backgroundColor: '#191970' }}
-              >
+              <button onClick={() => onViewFiles(repo.name)}
+                className="w-full flex items-center justify-center gap-1.5 text-xs font-medium py-2 px-3
+                  rounded-lg text-white bg-[#191970] dark:bg-[#a67c00] hover:opacity-90 transition-opacity">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                  <circle cx="12" cy="12" r="3"/>
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
                 </svg>
                 View Files
               </button>

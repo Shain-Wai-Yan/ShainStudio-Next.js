@@ -126,7 +126,7 @@ export default function AboutPageZh() {
                 我的故事
               </h2>
 
-              <p className="text-base md:text-lg text-text leading-relaxed mb-6 text-justify font-primary animate-on-scroll">
+              <p className="text-base md:text-lg text-text dark:text-gray-300 leading-relaxed mb-6 text-justify font-primary animate-on-scroll">
                 出于天性好奇、坚持不懈，我在资源有限的环境中，探索出无限可能。从乡村课堂到亲手打造由
                 Strapi、Cloudflare Workers 和自定义逻辑驱动的高级网站——没有计算机科学学位，我依靠自学走出了一条非传统的路。
                 我擅长跨文化沟通，也善于整合系统。我的热情源于营销、叙事与技术的交汇处，致力于打造既能打动人心，
@@ -167,7 +167,7 @@ export default function AboutPageZh() {
                       transition-colors duration-300 group-hover:text-accent dark:group-hover:text-accent">
                       三语沟通能力
                     </h4>
-                    <p className="text-muted font-primary transition-colors duration-300 group-hover:text-text">
+                    <p className="text-muted dark:text-gray-400 font-primary transition-colors duration-300 group-hover:text-text dark:group-hover:text-gray-200">
                       缅甸语（母语）、英语和中文 —— 在跨文化交流中架起沟通桥梁。
                     </p>
                   </div>
@@ -186,7 +186,7 @@ export default function AboutPageZh() {
                       transition-colors duration-300 group-hover:text-accent dark:group-hover:text-accent">
                       数字化核心技能
                     </h4>
-                    <p className="text-muted font-primary transition-colors duration-300 group-hover:text-text">
+                    <p className="text-muted dark:text-gray-400 font-primary transition-colors duration-300 group-hover:text-text dark:group-hover:text-gray-200">
                       熟悉 SEO、社交媒体策略、数据分析及内容创作。
                     </p>
                   </div>
@@ -205,7 +205,7 @@ export default function AboutPageZh() {
                       transition-colors duration-300 group-hover:text-accent dark:group-hover:text-accent">
                       持续的好奇心
                     </h4>
-                    <p className="text-muted font-primary transition-colors duration-300 group-hover:text-text">
+                    <p className="text-muted dark:text-gray-400 font-primary transition-colors duration-300 group-hover:text-text dark:group-hover:text-gray-200">
                       带着新颖的视角，从每一个项目中不断学习与成长。
                     </p>
                   </div>
@@ -348,7 +348,7 @@ export default function AboutPageZh() {
                       transition-all duration-300 group-hover:bg-accent group-hover:text-white">
                       2019
                     </span>
-                    <p className="text-muted font-primary transition-colors duration-300 group-hover:text-text">
+                    <p className="text-muted dark:text-gray-400 font-primary transition-colors duration-300 group-hover:text-text dark:group-hover:text-gray-200">
                       我在东枝大学开始了英语专业的本科学习，迈出了学术探索的第一步。
                     </p>
                   </div>
@@ -383,7 +383,7 @@ export default function AboutPageZh() {
                       transition-all duration-300 group-hover:bg-accent group-hover:text-white">
                       2023
                     </span>
-                    <p className="text-muted font-primary transition-colors duration-300 group-hover:text-text">
+                    <p className="text-muted dark:text-gray-400 font-primary transition-colors duration-300 group-hover:text-text dark:group-hover:text-gray-200">
                       为了拓展语言技能，我开始自学中文，提升了跨文化沟通能力。
                     </p>
                   </div>
@@ -404,7 +404,7 @@ export default function AboutPageZh() {
                       transition-all duration-300 group-hover:bg-accent group-hover:text-white">
                       2024
                     </span>
-                    <p className="text-muted font-primary transition-colors duration-300 group-hover:text-text">
+                    <p className="text-muted dark:text-gray-400 font-primary transition-colors duration-300 group-hover:text-text dark:group-hover:text-gray-200">
                       在 Strategy First University 学习市场营销基础，正式踏入商业领域。
                     </p>
                   </div>
@@ -439,7 +439,7 @@ export default function AboutPageZh() {
                       transition-all duration-300 group-hover:bg-accent group-hover:text-white">
                       2025
                     </span>
-                    <p className="text-muted font-primary transition-colors duration-300 group-hover:text-text">
+                    <p className="text-muted dark:text-gray-400 font-primary transition-colors duration-300 group-hover:text-text dark:group-hover:text-gray-200">
                       通过 Coursera 开始修读 Google 专业认证课程，提升数字营销和电商技能。
                     </p>
                   </div>
@@ -460,7 +460,7 @@ export default function AboutPageZh() {
                       transition-all duration-300 group-hover:bg-accent group-hover:text-white">
                       2025
                     </span>
-                    <p className="text-muted font-primary transition-colors duration-300 group-hover:text-text">
+                    <p className="text-muted dark:text-gray-400 font-primary transition-colors duration-300 group-hover:text-text dark:group-hover:text-gray-200">
                       通过 Coursera 修读 Meta 专业认证课程，进一步提升社交媒体策略能力。
                     </p>
                   </div>
@@ -495,7 +495,7 @@ export default function AboutPageZh() {
                       transition-all duration-300 group-hover:bg-accent group-hover:text-white">
                       2026
                     </span>
-                    <p className="text-muted font-primary transition-colors duration-300 group-hover:text-text">
+                    <p className="text-muted dark:text-gray-400 font-primary transition-colors duration-300 group-hover:text-text dark:group-hover:text-gray-200">
                       正式入读人民大学（University of the People）工商管理学士课程——这是一所获认证的免学费在线大学。
                       攻读此学位旨在深化商业战略、管理学及创业学的理论基础，同时持续精进市场营销专业能力。
                     </p>

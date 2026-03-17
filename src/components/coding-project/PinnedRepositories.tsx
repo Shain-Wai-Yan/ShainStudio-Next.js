@@ -20,15 +20,10 @@ export function PinnedRepositories({ repos, isLoading, onViewFiles }: PinnedRepo
   if (isLoading) {
     return (
       <section className="mb-12">
-        <h2 className="text-xl font-bold mb-5" style={{ color: '#191970' }}>Pinned Repositories</h2>
+        <h2 className="text-xl font-bold mb-5 text-[#191970] dark:text-[#d4af37]">Pinned Repositories</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {[1,2,3].map(i => (
-            <div key={i} className="bg-white border border-gray-200 rounded-xl p-5 animate-pulse space-y-3">
-              <div className="h-5 bg-gray-200 rounded w-2/3" />
-              <div className="h-3 bg-gray-200 rounded w-full" />
-              <div className="h-3 bg-gray-200 rounded w-4/5" />
-              <div className="h-9 bg-gray-200 rounded-lg mt-4" />
-            </div>
+            <div key={i} className="bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-gray-700 rounded-xl p-5 animate-pulse space-y-3 h-48" />
           ))}
         </div>
       </section>
@@ -39,34 +34,39 @@ export function PinnedRepositories({ repos, isLoading, onViewFiles }: PinnedRepo
 
   return (
     <section className="mb-12">
-      <h2 className="text-xl font-bold mb-5" style={{ color: '#191970' }}>Pinned Repositories</h2>
+      <h2 className="text-xl font-bold mb-5 text-[#191970] dark:text-[#d4af37]">Pinned Repositories</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {repos.map((repo) => {
-          const updatedDate = new Date(repo.updatedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+          const updatedDate = new Date(repo.updatedAt).toLocaleDateString('en-US', {
+            year: 'numeric', month: 'short', day: 'numeric',
+          });
           return (
-            <div key={repo.name} className="bg-white border border-gray-200 rounded-xl p-5 hover:shadow-md transition-shadow flex flex-col">
-              {/* Repo name */}
+            <div key={repo.name}
+              className="bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-gray-700
+                rounded-xl p-5 hover:shadow-md dark:hover:shadow-[0_4px_20px_rgba(166,124,0,0.15)]
+                transition-shadow flex flex-col">
+
               <div className="flex items-start justify-between mb-2">
                 <h3 className="font-semibold text-base leading-tight">
                   <a href={repo.url} target="_blank" rel="noopener noreferrer"
-                    className="hover:underline" style={{ color: '#191970' }}>
+                    className="hover:underline text-[#191970] dark:text-[#d4af37]">
                     {repo.name}
                   </a>
                 </h3>
-                <a href={repo.url} target="_blank" rel="noopener noreferrer" title="Open on GitHub"
-                  className="text-gray-400 hover:text-gray-600 ml-2 flex-shrink-0">
+                <a href={repo.url} target="_blank" rel="noopener noreferrer"
+                  className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 ml-2 flex-shrink-0">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                    <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
                   </svg>
                 </a>
               </div>
 
-              <p className="text-gray-500 text-sm mb-4 line-clamp-2 flex-1">
+              <p className="text-gray-500 dark:text-gray-400 text-sm mb-4 line-clamp-2 flex-1">
                 {repo.description || 'No description'}
               </p>
 
-              {/* Stats row */}
-              <div className="flex flex-wrap gap-3 items-center text-xs text-gray-500 mb-4">
+              <div className="flex flex-wrap gap-3 items-center text-xs text-gray-500 dark:text-gray-400 mb-4">
                 {repo.primaryLanguage && (
                   <div className="flex items-center gap-1.5">
                     <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: repo.primaryLanguage.color }} />
@@ -85,23 +85,23 @@ export function PinnedRepositories({ repos, isLoading, onViewFiles }: PinnedRepo
                   </svg>
                   {repo.forkCount}
                 </div>
-                <span className="ml-auto text-gray-400">Updated {updatedDate}</span>
+                <span className="ml-auto text-gray-400 dark:text-gray-500">Updated {updatedDate}</span>
               </div>
 
-              {/* Action buttons */}
               <div className="flex gap-2">
-                <button
-                  onClick={() => onViewFiles(repo.name)}
-                  className="flex-1 flex items-center justify-center gap-1.5 text-sm font-medium py-2 px-3 rounded-lg border transition-all hover:opacity-90 text-white"
-                  style={{ backgroundColor: '#191970', borderColor: '#191970' }}
-                >
+                <button onClick={() => onViewFiles(repo.name)}
+                  className="flex-1 flex items-center justify-center gap-1.5 text-sm font-medium py-2 px-3 rounded-lg
+                    text-white bg-[#191970] dark:bg-[#a67c00] hover:opacity-90 transition-opacity">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
                   </svg>
                   View Files
                 </button>
                 <a href={repo.url} target="_blank" rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-1.5 text-sm font-medium py-2 px-3 rounded-lg border border-gray-200 text-gray-600 hover:border-gray-400 transition-colors">
+                  className="flex items-center justify-center gap-1.5 text-sm font-medium py-2 px-3 rounded-lg
+                    border border-gray-200 dark:border-gray-600
+                    text-gray-600 dark:text-gray-300
+                    hover:border-gray-400 dark:hover:border-gray-400 transition-colors">
                   GitHub
                 </a>
               </div>

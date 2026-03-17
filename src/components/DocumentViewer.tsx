@@ -258,10 +258,10 @@ export function DocumentViewer({
   const PdfPage = PdfComponents?.Page;
 
   return (
-    <div ref={viewerRef} className="fixed inset-0 z-[9999] flex flex-col bg-[#1a1a2e]">
+    <div ref={viewerRef} className="fixed inset-0 z-[9999] flex flex-col bg-[#1a1a2e] dark:bg-[#0f0f0f]">
 
       {/* ── Top Bar ── */}
-      <div className="flex items-center justify-between px-3 py-2 bg-[#191970] flex-shrink-0 gap-2">
+      <div className="flex items-center justify-between px-3 py-2 bg-[#191970] dark:bg-[#0a0a1a] flex-shrink-0 gap-2 border-b border-[#a67c00]/30">
 
         {/* Left: thumbnail toggle + title */}
         <div className="flex items-center gap-2 min-w-0 flex-shrink-0">
@@ -269,14 +269,14 @@ export function DocumentViewer({
             onClick={() => setShowThumbnails(s => !s)}
             className={`p-1.5 rounded-lg transition-colors text-xs font-bold flex-shrink-0 ${
               showThumbnails
-                ? 'bg-yellow-400 text-[#191970]'
-                : 'bg-[#0f0f4d] text-white hover:bg-[#191970]'
+                ? 'bg-[#d4af37] dark:bg-[#d4af37] text-[#191970] dark:text-[#191970]'
+                : 'bg-[#0f0f4d] dark:bg-[#2a2a3a] text-white dark:text-gray-200 hover:bg-[#191970] dark:hover:bg-[#3a3a4a]'
             }`}
             title="Toggle thumbnails (T)"
           >
             ☰
           </button>
-          <h2 className="text-xs font-bold text-white truncate max-w-[180px] hidden md:block">
+          <h2 className="text-xs font-bold text-white dark:text-gray-200 truncate max-w-[180px] hidden md:block">
             {title}
           </h2>
         </div>
@@ -285,36 +285,36 @@ export function DocumentViewer({
         <div className="flex items-center gap-1 flex-1 justify-center flex-wrap">
 
           {/* Zoom */}
-          <div className="flex items-center gap-0.5 bg-[#0f0f4d] rounded-lg px-2 py-1">
+          <div className="flex items-center gap-0.5 bg-[#0f0f4d] dark:bg-[#2a2a3a] rounded-lg px-2 py-1">
             <button
               onClick={() => setZoom(z => Math.max(0.25, parseFloat((z - 0.25).toFixed(2))))}
-              className="text-white hover:text-yellow-400 font-bold w-5 h-5 flex items-center justify-center text-base"
+              className="text-white dark:text-gray-300 hover:text-[#d4af37] dark:hover:text-[#d4af37] font-bold w-5 h-5 flex items-center justify-center text-base"
               title="Zoom out (−)"
             >−</button>
             <button
               onClick={() => setZoom(1)}
-              className="text-yellow-400 text-xs font-bold w-10 text-center hover:text-white transition-colors"
+              className="text-[#d4af37] dark:text-[#d4af37] text-xs font-bold w-10 text-center hover:text-white dark:hover:text-white transition-colors"
               title="Reset zoom (0)"
             >
               {Math.round(zoom * 100)}%
             </button>
             <button
               onClick={() => setZoom(z => Math.min(3, parseFloat((z + 0.25).toFixed(2))))}
-              className="text-white hover:text-yellow-400 font-bold w-5 h-5 flex items-center justify-center text-base"
+              className="text-white dark:text-gray-300 hover:text-[#d4af37] dark:hover:text-[#d4af37] font-bold w-5 h-5 flex items-center justify-center text-base"
               title="Zoom in (+)"
             >+</button>
           </div>
 
           {/* Zoom presets — desktop only */}
-          <div className="hidden lg:flex items-center gap-0.5 bg-[#0f0f4d] rounded-lg px-1 py-1">
+          <div className="hidden lg:flex items-center gap-0.5 bg-[#0f0f4d] dark:bg-[#2a2a3a] rounded-lg px-1 py-1">
             {[0.5, 0.75, 1, 1.5, 2].map(z => (
               <button
                 key={z}
                 onClick={() => setZoom(z)}
                 className={`text-xs px-1.5 py-0.5 rounded transition-colors ${
                   zoom === z
-                    ? 'bg-yellow-400 text-[#191970] font-bold'
-                    : 'text-gray-300 hover:text-white'
+                    ? 'bg-[#d4af37] dark:bg-[#d4af37] text-[#191970] dark:text-[#191970] font-bold'
+                    : 'text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-gray-200'
                 }`}
               >
                 {z * 100}%
@@ -325,7 +325,7 @@ export function DocumentViewer({
           {/* Fit toggle */}
           <button
             onClick={() => setFitMode(f => f === 'width' ? 'height' : 'width')}
-            className="bg-[#0f0f4d] hover:bg-[#191970] text-white text-xs font-semibold px-2 py-1.5 rounded-lg border border-white/20 transition-colors"
+            className="bg-[#0f0f4d] dark:bg-[#2a2a3a] hover:bg-[#191970] dark:hover:bg-[#3a3a4a] text-white dark:text-gray-200 text-xs font-semibold px-2 py-1.5 rounded-lg border border-white/20 dark:border-white/10 transition-colors"
             title="Toggle fit width / fit height"
           >
             {fitMode === 'width' ? '↔ W' : '↕ H'}
@@ -337,8 +337,8 @@ export function DocumentViewer({
               onClick={() => setDualPage(d => !d)}
               className={`text-xs font-semibold px-2 py-1.5 rounded-lg border transition-colors ${
                 dualPage
-                  ? 'bg-yellow-400 text-[#191970] border-yellow-400'
-                  : 'bg-[#0f0f4d] text-white border-white/20 hover:bg-[#191970]'
+                  ? 'bg-[#d4af37] dark:bg-[#d4af37] text-[#191970] dark:text-[#191970] border-[#d4af37] dark:border-[#d4af37]'
+                  : 'bg-[#0f0f4d] dark:bg-[#2a2a3a] text-white dark:text-gray-200 border-white/20 dark:border-white/10 hover:bg-[#191970] dark:hover:bg-[#3a3a4a]'
               }`}
               title="Toggle dual page"
             >
@@ -349,7 +349,7 @@ export function DocumentViewer({
           {/* ── Rotate button — mobile only ── */}
           <button
             onClick={() => setRotation(r => (r + 90) % 360)}
-            className="flex sm:hidden items-center gap-1 text-xs font-semibold px-2 py-1.5 rounded-lg border transition-colors bg-[#0f0f4d] text-white border-white/20 hover:bg-[#191970]"
+            className="flex sm:hidden items-center gap-1 text-xs font-semibold px-2 py-1.5 rounded-lg border transition-colors bg-[#0f0f4d] dark:bg-[#2a2a3a] text-white dark:text-gray-300 border-white/20 dark:border-white/10 hover:bg-[#191970] dark:hover:bg-[#3a3a4a]"
             title="Rotate page (R)"
           >
             ↻ {rotation > 0 ? `${rotation}°` : 'Rotate'}
@@ -361,20 +361,20 @@ export function DocumentViewer({
         <div className="flex items-center gap-1.5 flex-shrink-0">
           <button
             onClick={toggleFullscreen}
-            className="text-white hover:text-yellow-400 p-1.5 rounded-lg bg-[#0f0f4d] hover:bg-[#191970] transition-colors text-xs hidden sm:flex items-center gap-1"
+            className="text-white dark:text-gray-300 hover:text-[#d4af37] dark:hover:text-[#d4af37] p-1.5 rounded-lg bg-[#0f0f4d] dark:bg-[#2a2a3a] hover:bg-[#191970] dark:hover:bg-[#3a3a4a] transition-colors text-xs hidden sm:flex items-center gap-1"
             title="Fullscreen (F)"
           >
             ⛶ <span className="hidden md:inline">{isFullscreen ? 'Exit' : 'Full'}</span>
           </button>
           <button
             onClick={handleDownload}
-            className="px-2 py-1.5 bg-yellow-400 text-[#191970] rounded-lg font-bold hover:bg-yellow-300 transition-colors text-xs hidden sm:flex items-center gap-1"
+            className="px-2 py-1.5 bg-[#d4af37] dark:bg-[#a67c00] text-[#191970] dark:text-[#0f0f45] rounded-lg font-bold hover:bg-[#e8d9a8] dark:hover:bg-[#c9a236] transition-colors text-xs hidden sm:flex items-center gap-1"
           >
             ↓ <span className="hidden md:inline">Download</span>
           </button>
           <button
             onClick={onClose}
-            className="text-white hover:text-red-400 text-lg font-bold w-7 h-7 flex items-center justify-center transition-colors rounded-lg hover:bg-red-900/30"
+            className="text-white dark:text-gray-300 hover:text-red-400 dark:hover:text-red-400 text-lg font-bold w-7 h-7 flex items-center justify-center transition-colors rounded-lg hover:bg-red-900/30 dark:hover:bg-red-900/50"
             title="Close (Esc)"
           >
             ✕
@@ -384,9 +384,9 @@ export function DocumentViewer({
 
       {/* ── Progress Bar ── */}
       {totalPages > 0 && (
-        <div className="h-0.5 bg-[#0f0f4d] flex-shrink-0">
+        <div className="h-0.5 bg-[#0f0f4d] dark:bg-[#2a2a3a] flex-shrink-0">
           <div
-            className="h-full bg-yellow-400 transition-all duration-300"
+            className="h-full bg-[#d4af37] dark:bg-[#a67c00] transition-all duration-300"
             style={{ width: `${progress}%` }}
           />
         </div>
@@ -397,7 +397,7 @@ export function DocumentViewer({
 
         {/* Thumbnail Sidebar */}
         {showThumbnails && PdfDocument && PdfPage && totalPages > 0 && (
-          <div className="w-36 flex-shrink-0 bg-[#111130] overflow-y-auto flex flex-col gap-2 py-2 px-1 border-r border-white/10">
+          <div className="w-36 flex-shrink-0 bg-[#111130] dark:bg-[#1a1a2a] overflow-y-auto flex flex-col gap-2 py-2 px-1 border-r border-white/10 dark:border-white/5">
             <PdfDocument file={pdfUrl} loading="">
               {Array.from({ length: totalPages }, (_, i) => i + 1).map(pageNum => (
                 <button
@@ -405,8 +405,8 @@ export function DocumentViewer({
                   onClick={() => goToPage(pageNum)}
                   className={`relative w-full rounded overflow-hidden border-2 transition-all flex-shrink-0 mb-1 ${
                     pageNum === currentPage || pageNum === secondPage
-                      ? 'border-yellow-400 shadow-lg shadow-yellow-400/20'
-                      : 'border-transparent hover:border-white/40'
+                      ? 'border-[#d4af37] dark:border-[#a67c00] shadow-lg shadow-[#d4af37]/20 dark:shadow-[#a67c00]/20'
+                      : 'border-transparent hover:border-white/40 dark:hover:border-white/20'
                   }`}
                   title={`Page ${pageNum}`}
                 >
@@ -428,7 +428,7 @@ export function DocumentViewer({
         {/* PDF Viewer Area */}
         <div
           ref={containerRef}
-          className="flex-1 overflow-auto bg-gray-700 flex flex-col items-center justify-start py-4 px-2 min-h-0 min-w-0"
+          className="flex-1 overflow-auto bg-gray-700 dark:bg-[#2a2a2a] flex flex-col items-center justify-start py-4 px-2 min-h-0 min-w-0"
         >
           {/* Error */}
           {error && (
@@ -437,7 +437,7 @@ export function DocumentViewer({
               <p className="text-red-400 font-semibold text-lg">{error}</p>
               <button
                 onClick={handleDownload}
-                className="px-6 py-2 bg-yellow-400 text-[#191970] rounded-lg font-bold hover:bg-yellow-300 transition-colors"
+                className="px-6 py-2 bg-[#d4af37] dark:bg-[#a67c00] text-[#191970] dark:text-[#0f0f45] rounded-lg font-bold hover:bg-[#e8d9a8] dark:hover:bg-[#c9a236] transition-colors"
               >
                 ↓ Download PDF Instead
               </button>
@@ -506,87 +506,87 @@ export function DocumentViewer({
       </div>
 
       {/* ── Bottom Nav Bar ── */}
-      <div className="flex items-center justify-between gap-2 px-3 py-2 bg-[#191970] flex-shrink-0">
+<div className="flex items-center justify-between gap-2 px-3 py-2 bg-[#191970] dark:bg-[#0a0a1a] border-t border-[#a67c00]/30 flex-shrink-0">
 
-        {/* Prev */}
+  {/* Prev */}
+  <button
+    onClick={goPrev}
+    disabled={currentPage <= 1}
+    className="px-3 py-1.5 bg-white dark:bg-[#2a2a3a] text-[#191970] dark:text-gray-200 rounded-lg font-bold disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-[#3a3a4a] transition-colors text-sm flex-shrink-0"
+  >
+    ← Prev
+  </button>
+
+  {/* Page indicator */}
+  <div className="flex items-center gap-2">
+    {showPageInput ? (
+      <div className="flex items-center gap-1">
+        <input
+          ref={pageInputRef}
+          type="number"
+          min={1}
+          max={totalPages}
+          value={inputPage}
+          onChange={e => setInputPage(e.target.value)}
+          onKeyDown={e => {
+            if (e.key === 'Enter') handlePageInputSubmit();
+            if (e.key === 'Escape') { setShowPageInput(false); setInputPage(''); }
+          }}
+          onBlur={handlePageInputSubmit}
+          autoFocus
+          className="w-14 text-center text-sm font-bold rounded px-2 py-1 text-[#191970] dark:text-[#191970] border-2 border-yellow-400 outline-none"
+          placeholder={String(currentPage)}
+        />
+        <span className="text-white dark:text-gray-300 text-sm">/ {totalPages}</span>
+      </div>
+    ) : (
+      <div className="flex flex-col items-center gap-0.5">
         <button
-          onClick={goPrev}
-          disabled={currentPage <= 1}
-          className="px-3 py-1.5 bg-white text-[#191970] rounded-lg font-bold disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-100 transition-colors text-sm flex-shrink-0"
+          onClick={() => { setShowPageInput(true); setInputPage(String(currentPage)); }}
+          className="text-white dark:text-gray-300 text-sm font-semibold hover:text-yellow-400 dark:hover:text-[#d4af37] transition-colors whitespace-nowrap"
+          title="Click to jump to page"
         >
-          ← Prev
+          {dualPage && secondPage
+            ? `${currentPage}–${secondPage} / ${totalPages}`
+            : `${currentPage} / ${totalPages || '—'}`
+          }
         </button>
-
-        {/* Page indicator */}
-        <div className="flex items-center gap-2">
-          {showPageInput ? (
-            <div className="flex items-center gap-1">
-              <input
-                ref={pageInputRef}
-                type="number"
-                min={1}
-                max={totalPages}
-                value={inputPage}
-                onChange={e => setInputPage(e.target.value)}
-                onKeyDown={e => {
-                  if (e.key === 'Enter') handlePageInputSubmit();
-                  if (e.key === 'Escape') { setShowPageInput(false); setInputPage(''); }
-                }}
-                onBlur={handlePageInputSubmit}
-                autoFocus
-                className="w-14 text-center text-sm font-bold rounded px-2 py-1 text-[#191970] border-2 border-yellow-400 outline-none"
-                placeholder={String(currentPage)}
-              />
-              <span className="text-white text-sm">/ {totalPages}</span>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center gap-0.5">
-              <button
-                onClick={() => { setShowPageInput(true); setInputPage(String(currentPage)); }}
-                className="text-white text-sm font-semibold hover:text-yellow-400 transition-colors whitespace-nowrap"
-                title="Click to jump to page"
-              >
-                {dualPage && secondPage
-                  ? `${currentPage}–${secondPage} / ${totalPages}`
-                  : `${currentPage} / ${totalPages || '—'}`
-                }
-              </button>
-              {totalPages > 0 && (
-                <div className="w-24 h-0.5 bg-white/20 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-yellow-400 rounded-full transition-all duration-300"
-                    style={{ width: `${progress}%` }}
-                  />
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Right: mobile download + next */}
-        <div className="flex items-center gap-1.5 flex-shrink-0">
-          <button
-            onClick={handleDownload}
-            className="px-2 py-1.5 bg-yellow-400 text-[#191970] rounded-lg font-bold hover:bg-yellow-300 transition-colors text-xs sm:hidden"
-          >
-            ↓
-          </button>
-          <button
-            onClick={goNext}
-            disabled={currentPage >= totalPages}
-            className="px-3 py-1.5 bg-white text-[#191970] rounded-lg font-bold disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-100 transition-colors text-sm"
-          >
-            Next →
-          </button>
-        </div>
+        {totalPages > 0 && (
+          <div className="w-24 h-0.5 bg-white/20 dark:bg-white/10 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-yellow-400 dark:bg-[#d4af37] rounded-full transition-all duration-300"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        )}
       </div>
+    )}
+  </div>
 
-      {/* ── Keyboard Hints — desktop only ── */}
-      <div className="hidden sm:block bg-[#0f0f4d] text-center py-0.5 flex-shrink-0">
-        <p className="text-gray-500 text-[10px]">
-          ←→ navigate &nbsp;·&nbsp; +/− zoom &nbsp;·&nbsp; 0 reset &nbsp;·&nbsp; R rotate &nbsp;·&nbsp; T thumbnails &nbsp;·&nbsp; F fullscreen &nbsp;·&nbsp; Home/End first/last &nbsp;·&nbsp; Esc close
-        </p>
-      </div>
+  {/* Right: mobile download + next */}
+  <div className="flex items-center gap-1.5 flex-shrink-0">
+    <button
+      onClick={handleDownload}
+      className="px-2 py-1.5 bg-yellow-400 dark:bg-[#a67c00] text-[#191970] dark:text-[#0f0f45] rounded-lg font-bold hover:bg-yellow-300 dark:hover:bg-[#c9a236] transition-colors text-xs sm:hidden"
+    >
+      ↓
+    </button>
+    <button
+      onClick={goNext}
+      disabled={currentPage >= totalPages}
+      className="px-3 py-1.5 bg-white dark:bg-[#2a2a3a] text-[#191970] dark:text-gray-200 rounded-lg font-bold disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-[#3a3a4a] transition-colors text-sm"
+    >
+      Next →
+    </button>
+  </div>
+</div>
+
+{/* ── Keyboard Hints ── */}
+<div className="hidden sm:block bg-[#0f0f4d] dark:bg-[#0a0a1a] text-center py-0.5 flex-shrink-0 border-t border-[#a67c00]/20">
+  <p className="text-gray-500 dark:text-gray-600 text-[10px]">
+    ←→ navigate &nbsp;·&nbsp; +/− zoom &nbsp;·&nbsp; 0 reset &nbsp;·&nbsp; R rotate &nbsp;·&nbsp; T thumbnails &nbsp;·&nbsp; F fullscreen &nbsp;·&nbsp; Home/End first/last &nbsp;·&nbsp; Esc close
+  </p>
+</div>
 
     </div>
   );

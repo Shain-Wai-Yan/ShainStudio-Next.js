@@ -25,7 +25,7 @@ const Footer = () => {
   ];
 
   return (
-    <footer style={{ backgroundColor: '#191970', borderTop: '4px solid #ffd700' }} className="text-white py-16 w-full">
+    <footer className="bg-[#191970] dark:bg-[#0f0f1e] border-t-4 border-[#ffd700] text-white py-16 w-full">
       <div className="px-4 sm:px-6 lg:px-8 max-w-full">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
           
@@ -38,18 +38,18 @@ const Footer = () => {
                 className="w-12 h-12 object-contain rounded group-hover:scale-110 transition-transform duration-300"
               />
               <div>
-                <span className="font-bold text-lg block" style={{ color: '#ffd700' }}>Shain's Studio</span>
-                <span className="text-xs" style={{ color: '#cccccc' }}>Digital Marketing</span>
+                <span className="font-bold text-lg block text-[#ffd700] dark:text-[#d4af37]">Shain's Studio</span>
+                <span className="text-xs text-[#cccccc] dark:text-[#999999]">Digital Marketing</span>
               </div>
             </Link>
-            <p style={{ color: '#cccccc' }} className="text-sm leading-relaxed max-w-xs mt-2">
+            <p className="text-sm leading-relaxed max-w-xs mt-2 text-[#cccccc] dark:text-[#999999]">
               Transforming brands through innovative marketing strategies and creative excellence.
             </p>
           </div>
 
           {/* Badges Section (Replaced Quick Links) */}
           <div>
-            <h3 style={{ color: '#ffd700', borderColor: '#ffd700' }} className="font-bold text-lg mb-6 pb-2 border-b-2">Certifications</h3>
+            <h3 className="font-bold text-lg mb-6 pb-2 border-b-2 text-[#ffd700] dark:text-[#d4af37] border-[#ffd700] dark:border-[#d4af37]">Certifications</h3>
             <div className="flex flex-wrap gap-2 justify-start items-center">
               {/* Badge 1 */}
               <div 
@@ -79,7 +79,7 @@ const Footer = () => {
 
           {/* Social Links Section */}
           <div>
-            <h3 style={{ color: '#ffd700', borderColor: '#ffd700' }} className="font-bold text-lg mb-6 pb-2 border-b-2">Connect With Me</h3>
+            <h3 className="font-bold text-lg mb-6 pb-2 border-b-2 text-[#ffd700] dark:text-[#d4af37] border-[#ffd700] dark:border-[#d4af37]">Connect With Me</h3>
             <div className="flex gap-4">
               {socialLinks.map((social) => {
                 const Icon = social.icon;
@@ -89,16 +89,7 @@ const Footer = () => {
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-12 h-12 flex items-center justify-center rounded-lg transition-all duration-300 transform hover:scale-125 font-bold text-white"
-                    style={{ backgroundColor: '#2a2a9a' }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = '#ffd700';
-                      e.currentTarget.style.color = '#191970';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = '#2a2a9a';
-                      e.currentTarget.style.color = '#ffffff';
-                    }}
+                    className="w-12 h-12 flex items-center justify-center rounded-lg transition-all duration-300 transform hover:scale-125 font-bold text-white bg-[#2a2a9a] dark:bg-[#3a3a4a] hover:bg-[#ffd700] dark:hover:bg-[#d4af37] hover:text-[#191970]"
                     aria-label={social.label}
                   >
                     <Icon size={22} />
@@ -109,17 +100,17 @@ const Footer = () => {
           </div>
         </div>
 
-        <div style={{ borderColor: '#2a2a9a' }} className="border-t my-12"></div>
+        <div className="border-t border-[#2a2a9a] dark:border-[#333333] my-12"></div>
 
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-sm">
-          <p style={{ color: '#e0e0e0' }}>
+          <p className="text-[#e0e0e0] dark:text-[#999999]">
             &copy; {currentYear} Shain Studio. All Rights Reserved.
           </p>
           <div className="flex gap-8">
-            <Link href="/privacy" style={{ color: '#cccccc' }} className="hover:text-[#ffd700] transition-colors duration-300 font-medium">
+            <Link href="/privacy" className="text-[#cccccc] dark:text-[#777777] hover:text-[#ffd700] dark:hover:text-[#d4af37] transition-colors duration-300 font-medium">
               Privacy Policy
             </Link>
-            <Link href="/terms" style={{ color: '#cccccc' }} className="hover:text-[#ffd700] transition-colors duration-300 font-medium">
+            <Link href="/terms" className="text-[#cccccc] dark:text-[#777777] hover:text-[#ffd700] dark:hover:text-[#d4af37] transition-colors duration-300 font-medium">
               Terms of Service
             </Link>
           </div>
