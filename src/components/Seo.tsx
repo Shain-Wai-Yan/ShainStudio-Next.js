@@ -1,6 +1,12 @@
 import Head from 'next/head';
+import { ReactNode } from 'react';
 
-const SEO = ({ title, description }) => {
+interface SeoProps {
+  title: string;
+  description: string;
+}
+
+const SEO = ({ title, description }: SeoProps): ReactNode => {
   const siteTitle = 'Shain Wai Yan Portfolio';
   return (
     <Head>
@@ -12,7 +18,7 @@ const SEO = ({ title, description }) => {
       <meta name="theme-color" content="#a67c00" media="(prefers-color-scheme: dark)" />
       <meta name="color-scheme" content="light dark" />
       <link rel="canonical" href="https://www.shainwaiyan.com/" />
-      <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossOrigin="true" />
+      <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossOrigin="anonymous" />
       <link rel="alternate" hrefLang="x-default" href="https://www.shainwaiyan.com/" />
       <link rel="alternate" hrefLang="en" href="https://www.shainwaiyan.com/" />
       <link rel="alternate" hrefLang="zh" href="https://www.shainwaiyan.com/zh/" />

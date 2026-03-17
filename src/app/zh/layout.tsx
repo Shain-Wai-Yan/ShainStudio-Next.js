@@ -34,10 +34,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    url: 'https://www.shainwaiyan.com/zh',
     title: '数字营销与品牌策略师 | Shain Wai Yan',
     description: '在Shain Wai Yan (xolbine)的作品集中探索AI驱动的营销活动、内容策略和市场分析。',
-    images: 'https://www.shainwaiyan.com/images/Shain Studio.png',
+    images: ['https://www.shainwaiyan.com/images/Shain Studio.png'],
   },
   icons: {
     icon: [

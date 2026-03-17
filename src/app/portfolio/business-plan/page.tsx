@@ -6,11 +6,20 @@ import { DocumentGrid } from '@/components/DocumentGrid';
 import { DocumentViewer } from '@/components/DocumentViewer';
 import { Breadcrumb } from '@/components/Breadcrumb';
 
-interface TransformedPlan extends Omit<BusinessPlan, 'DocumentFile' | 'CoverImage'> {
-  documentUrl: string;
+// Match the Document interface from DocumentGrid
+interface Document {
+  id: number;
+  Title: string;
+  Description: string;
+  formattedDate: string;
   coverImageUrl: string;
   fileType: string;
-  formattedDate: string;
+  documentUrl: string;
+}
+
+interface TransformedPlan extends Document {
+  // All Document properties are inherited: id, Title, Description, formattedDate, coverImageUrl, fileType, documentUrl
+  // Add any additional properties your transformed plan needs here
 }
 
 export default function BusinessPlanPage() {
@@ -41,8 +50,9 @@ export default function BusinessPlanPage() {
     setIsLoading(false);
   };
 
-  const handleDocumentClick = (document: TransformedPlan) => {
-    setSelectedDocument(document);
+  const handleDocumentClick = (document: Document) => {
+    // Document type is already compatible with TransformedPlan
+    setSelectedDocument(document as TransformedPlan);
     setIsViewerOpen(true);
   };
 
@@ -70,7 +80,7 @@ export default function BusinessPlanPage() {
               Business Plans
             </h1>
             <p className="text-xl text-gray-600 dark:text-[#b0b0b0] max-w-2xl">
-              Comprehensive strategy planning solutions to help brands elevate their market position and achieve sustainable business growth.
+              Strategic business plans designed to drive growth and market success with comprehensive planning and analysis.
             </p>
           </div>
 
