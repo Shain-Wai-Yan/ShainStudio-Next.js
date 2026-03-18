@@ -1,0 +1,39 @@
+{
+  "redirects": [
+    {
+      "source": "/marketing-plan",
+      "destination": "/portfolio/marketing-plans",
+      "permanent": true
+    },
+    {
+      "source": "/business-plan",
+      "destination": "/portfolio/business-plans",
+      "permanent": true
+    },
+    {
+      "source": "/marketing-in-motion",
+      "destination": "/portfolio/marketing-in-motion",
+      "permanent": true
+    },
+    {
+      "source": "/marketing-in-motion/:slug",
+      "destination": "/portfolio/marketing-in-motion/:slug",
+      "permanent": true
+    },
+    {
+      "source": "/coding-projects",
+      "destination": "/portfolio/coding-projects",
+      "permanent": true
+    },
+    {
+      "source": "/photography",
+      "destination": "/portfolio/photography",
+      "permanent": true
+    },
+    {
+      "source": "/amv-editing",
+      "destination": "/portfolio/amv-editing",
+      "permanent": true
+    }
+  ]
+}
