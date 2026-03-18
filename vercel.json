@@ -41,10 +41,10 @@
         {
           "type": "query",
           "key": "slug",
-          "value": "(?<slug>.*)"
+          "value": "(?<captured_slug>.*)"
         }
       ],
-      "destination": "/blog/:slug",
+      "destination": "/blog/:captured_slug",
       "permanent": true
     },
     {
