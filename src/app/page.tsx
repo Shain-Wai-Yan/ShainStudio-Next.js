@@ -317,6 +317,14 @@ const Hero = () => (
         50%  { transform: translate(15px, 15px) rotate(4deg); }
         100% { transform: translate(0, 0) rotate(0deg); }
       }
+        @media (max-width: 768px) {
+    @keyframes cubeFaceShift {
+      0%, 100% { background-position: 0% 0%; }
+    }
+    @keyframes cubeSweep {
+      0%, 100% { background-position: -150% 0%; }
+    }
+  }
     `}</style>
   </section>
 );
