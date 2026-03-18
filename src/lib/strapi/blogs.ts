@@ -22,10 +22,28 @@ export interface BlogPost {
   publishedAt?: string;
   createdAt: string;
   updatedAt: string;
+  // ── SEO fields from Strapi Seo component ─────────────────────────────────
+  Seo?: {
+    metaTitle?: string;
+    metaDescription?: string;
+    ogImageUrl?: string | null;   // already resolved to absolute URL by API route
+  };
 }
 
 // Maps camelCase API response → PascalCase BlogPost that components expect
 function mapPost(p: Record<string, unknown>): BlogPost {
+  // ── Resolve SEO fields ────────────────────────────────────────────────────
+  // The API route (route.ts) resolves ogImage to a flat ogImageUrl string.
+  // Here we just forward whatever the route already resolved.
+  const rawSeo = p.seo as Record<string, unknown> | undefined;
+  const seo: BlogPost['Seo'] = rawSeo
+    ? {
+        metaTitle:       rawSeo.metaTitle      as string | undefined,
+        metaDescription: rawSeo.metaDescription as string | undefined,
+        ogImageUrl:      rawSeo.ogImageUrl      as string | null | undefined,
+      }
+    : undefined;
+
   return {
     id:            p.id as number,
     Title:         String(p.title   ?? 'Untitled'),
@@ -41,6 +59,7 @@ function mapPost(p: Record<string, unknown>): BlogPost {
     PublishedDate: (p.publishDate as string)         ?? '',
     createdAt:     (p.publishDate as string)         ?? new Date().toISOString(),
     updatedAt:     (p.updatedAt   as string)         ?? new Date().toISOString(),
+    Seo:           seo,
   };
 }
 

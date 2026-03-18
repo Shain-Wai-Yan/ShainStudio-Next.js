@@ -6,6 +6,8 @@ import BlogPostHeader from '@/components/blog/BlogPostHeader';
 import BlogPostContent from '@/components/blog/BlogPostContent';
 import RelatedPosts from '@/components/blog/RelatedPosts';
 
+const SITE_URL = 'https://www.shainwaiyan.com';
+
 interface BlogPostPageProps {
   params: Promise<{ slug: string }>;
 }
@@ -15,22 +17,39 @@ export async function generateMetadata(props: BlogPostPageProps): Promise<Metada
   const { blog } = await fetchBlogBySlug(slug, 'en');
   if (!blog) return { title: 'Post Not Found' };
 
+  // ── Prefer SEO-specific fields, fall back to post fields ─────────────────
+  const metaTitle       = blog.Seo?.metaTitle       || blog.Title;
+  const metaDescription = blog.Seo?.metaDescription || blog.Description;
+  // ogImage: prefer dedicated SEO ogImage, then fall back to featuredImage
+  const ogImage         = blog.Seo?.ogImageUrl       || blog.FeaturedImage;
+
   return {
-    title: `${blog.Title} | Shain Studio`,
-    description: blog.Description,
+    title: `${metaTitle} | Shain Studio`,
+    description: metaDescription,
     authors: blog.Author ? [{ name: blog.Author }] : undefined,
     keywords: blog.Tags?.join(', '),
     alternates: {
-      canonical: `/blog/${blog.Slug}`,
-      languages: { en: `/blog/${blog.Slug}`, zh: `/zh/blog/${blog.Slug}` },
+      // ── Absolute URLs — fixes the "all posts share one canonical" Search Console warning
+      canonical: `${SITE_URL}/blog/${blog.Slug}`,
+      languages: {
+        en: `${SITE_URL}/blog/${blog.Slug}`,
+        zh: `${SITE_URL}/zh/blog/${blog.Slug}`,
+      },
     },
     openGraph: {
       type: 'article',
-      url: `https://www.shainwaiyan.com/blog/${blog.Slug}`,
-      title: blog.Title,
-      description: blog.Description,
-      images: blog.FeaturedImage ? [blog.FeaturedImage] : [],
+      url: `${SITE_URL}/blog/${blog.Slug}`,
+      title: metaTitle,
+      description: metaDescription,
+      images: ogImage ? [{ url: ogImage }] : [],
       authors: blog.Author ? [blog.Author] : undefined,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      // ── Per-post twitter title/description — fixes generic site-wide twitter tags
+      title: metaTitle,
+      description: metaDescription,
+      images: ogImage ? [ogImage] : [],
     },
   };
 }
@@ -77,8 +96,6 @@ export default async function BlogPostPage(props: BlogPostPageProps) {
           <BlogPostContent blog={blog} language="en" />
         </div>
       </section>
-
-     
 
       {/* ── Related posts ── */}
       {relatedBlogs.length > 0 && (

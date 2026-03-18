@@ -9,6 +9,29 @@ function calculateReadingTime(content: string): string {
 }
 
 /**
+ * Resolves a Strapi media object to a flat absolute URL string.
+ * Handles both Strapi v4 (.data.attributes.url) and v5 (.url) shapes,
+ * and falls back through format sizes if needed.
+ */
+function resolveMediaUrl(media: Record<string, unknown> | null | undefined): string | null {
+  if (!media) return null;
+  // Strapi v5 flat shape
+  if (media.url) return media.url as string;
+  // Strapi v4 nested shape
+  if (media.data && (media.data as Record<string, unknown>).attributes) {
+    return ((media.data as Record<string, unknown>).attributes as Record<string, unknown>).url as string;
+  }
+  // Fallback through format sizes
+  if (media.formats) {
+    const fmts = media.formats as Record<string, { url: string }>;
+    for (const fmt of ['large', 'medium', 'small', 'thumbnail']) {
+      if (fmts[fmt]?.url) return fmts[fmt].url;
+    }
+  }
+  return null;
+}
+
+/**
  * Direct port of vanilla JS transformPostData.
  * No abstractions — handles the image exactly as the working vanilla JS does.
  */
@@ -17,35 +40,42 @@ function transformPost(strapiPost: Record<string, unknown>) {
   try {
     const data = (strapiPost.attributes as Record<string, unknown>) || strapiPost;
 
-    const title      = (data.Title as string)       || (data.title as string)       || 'Untitled Post';
-    const slug       = (data.slug as string)         || `post-${strapiPost.id}`;
-    const excerpt    = (data.excerpt as string)      || '';
-    const publishDate = (data.publishDate as string) || (data.createdAt as string)  || '';
-    const updatedAt  = (data.updatedAt as string)    || '';
-    const author     = (data.author as string)       || 'Shain Wai Yan';
-    const content    = (data.content as string)      || '';
+    const title       = (data.Title as string)        || (data.title as string)       || 'Untitled Post';
+    const slug        = (data.slug as string)          || `post-${strapiPost.id}`;
+    const excerpt     = (data.excerpt as string)       || '';
+    const publishDate = (data.publishDate as string)   || (data.createdAt as string)   || '';
+    const updatedAt   = (data.updatedAt as string)     || '';
+    const author      = (data.author as string)        || 'Shain Wai Yan';
+    const content     = (data.content as string)       || '';
 
-    // ── Image — exact copy of vanilla JS ─────────────────────────────────
-    let featuredImage: string | null = null;
-    const fi = data.featuredImage as Record<string, unknown> | null | undefined;
-    if (fi) {
-      if (fi.url) {
-        featuredImage = fi.url as string;
-      } else if (fi.data && (fi.data as Record<string, unknown>).attributes) {
-        featuredImage = ((fi.data as Record<string, unknown>).attributes as Record<string, unknown>).url as string;
-      } else if (fi.formats) {
-        const fmts = fi.formats as Record<string, { url: string }>;
-        for (const fmt of ['large', 'medium', 'small', 'thumbnail']) {
-          if (fmts[fmt]?.url) { featuredImage = fmts[fmt].url; break; }
-        }
-      }
-    }
+    // ── Featured Image — exact copy of vanilla JS ─────────────────────────
+    const featuredImage = resolveMediaUrl(
+      data.featuredImage as Record<string, unknown> | null | undefined
+    );
 
     if (process.env.NODE_ENV === 'development') {
-      console.log(`[blogs] "${title}" image field:`, JSON.stringify(fi), '→', featuredImage);
+      console.log(`[blogs] "${title}" image field:`, JSON.stringify(data.featuredImage), '→', featuredImage);
     }
 
-    // ── Categories ────────────────────────────────────────────────────────
+    // ── SEO — resolve metaTitle, metaDescription, ogImage ─────────────────
+    const rawSeo = (data.Seo || data.seo) as Record<string, unknown> | null | undefined;
+    const seoOgImageUrl = resolveMediaUrl(
+      rawSeo?.ogImage as Record<string, unknown> | null | undefined
+    );
+
+    const seo = rawSeo
+      ? {
+          metaTitle:       (rawSeo.metaTitle       as string | undefined) ?? undefined,
+          metaDescription: (rawSeo.metaDescription as string | undefined) ?? undefined,
+          ogImageUrl:      seoOgImageUrl,
+        }
+      : {};
+
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[blogs] "${title}" seo ogImage:`, JSON.stringify(rawSeo?.ogImage), '→', seoOgImageUrl);
+    }
+
+    // ── Categories ─────────────────────────────────────────────────────────
     const postCategories: string[] = [];
     const cats = data.categories as Record<string, unknown> | unknown[] | undefined;
     const cat  = data.category  as Record<string, unknown> | string | undefined;
@@ -66,7 +96,7 @@ function transformPost(strapiPost: Record<string, unknown>) {
       });
     }
 
-    // ── Tags ──────────────────────────────────────────────────────────────
+    // ── Tags ───────────────────────────────────────────────────────────────
     const postTags: string[] = [];
     const tags = data.tags as Record<string, unknown> | unknown[] | undefined;
 
@@ -91,7 +121,7 @@ function transformPost(strapiPost: Record<string, unknown>) {
       tags: postTags.filter(Boolean),
       readingTime: calculateReadingTime(content),
       language: (slug.includes('zh-') ? 'zh' : 'en') as 'en' | 'zh',
-      seo: ((data.seo || data.Seo || {}) as Record<string, unknown>),
+      seo,
     };
   } catch (err) {
     console.error('[blogs] Transform error:', err);
