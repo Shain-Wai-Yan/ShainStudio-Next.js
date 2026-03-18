@@ -1,0 +1,178 @@
+import { MetadataRoute } from 'next';
+
+const SITE_URL = 'https://www.shainwaiyan.com';
+const STRAPI_API = 'https://api.shainwaiyan.com/api';
+
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+interface BlogPost {
+  slug: string;
+  updatedAt?: string;
+  publishDate?: string;
+}
+
+interface MarketingProject {
+  slug: string;
+  updatedAt?: string;
+  projectDate?: string;
+}
+
+// ─── Static Routes Configuration ──────────────────────────────────────────────
+// IMPORTANT: Only include pages that are genuinely translated/unique.
+// Pages that just serve the same Strapi content with no translation
+// are excluded to avoid duplicate content penalties.
+
+const staticRoutes = {
+  // English main pages
+  main: [
+    { path: '/',            priority: 1.0, changeFrequency: 'weekly'  as const },
+    { path: '/about',       priority: 0.9, changeFrequency: 'monthly' as const },
+    { path: '/blog',        priority: 0.9, changeFrequency: 'daily'   as const },
+    { path: '/certificate', priority: 0.7, changeFrequency: 'monthly' as const },
+    { path: '/contact',     priority: 0.8, changeFrequency: 'yearly'  as const },
+  ],
+  // English portfolio pages
+  portfolio: [
+    { path: '/portfolio',                     priority: 0.9, changeFrequency: 'weekly'  as const },
+    { path: '/portfolio/amv-editing',         priority: 0.7, changeFrequency: 'monthly' as const },
+    { path: '/portfolio/business-plans',      priority: 0.7, changeFrequency: 'monthly' as const },
+    { path: '/portfolio/coding-projects',     priority: 0.8, changeFrequency: 'weekly'  as const },
+    { path: '/portfolio/marketing-in-motion', priority: 0.8, changeFrequency: 'weekly'  as const },
+    { path: '/portfolio/marketing-plans',     priority: 0.7, changeFrequency: 'monthly' as const },
+    { path: '/portfolio/photography',         priority: 0.7, changeFrequency: 'monthly' as const },
+  ],
+  // Chinese STATIC pages only — pages with genuine translations
+  // Excluded: /zh/blog, /zh/blog/[slug], /zh/portfolio/*, /zh/certificate
+  // Reason: those pages serve identical Strapi/GitHub/YouTube content with no translation
+  zhMain: [
+    { path: '/zh',           priority: 0.9, changeFrequency: 'weekly'  as const },
+    { path: '/zh/about',     priority: 0.8, changeFrequency: 'monthly' as const },
+    { path: '/zh/portfolio', priority: 0.8, changeFrequency: 'weekly'  as const },
+    { path: '/zh/contact',   priority: 0.7, changeFrequency: 'yearly'  as const },
+  ],
+};
+
+// ─── Dynamic Content Fetchers ─────────────────────────────────────────────────
+// Using direct Strapi API calls instead of fetchFromStrapi wrapper
+// to ensure reliability in sitemap generation context
+
+async function fetchAllBlogSlugs(): Promise<BlogPost[]> {
+  try {
+    const res = await fetch(
+      `${STRAPI_API}/blogs?pagination[pageSize]=100&fields[0]=slug&fields[1]=updatedAt&fields[2]=publishDate&sort=publishDate:desc`,
+      { next: { revalidate: 3600 } }
+    );
+
+    if (!res.ok) {
+      console.error('[Sitemap] Strapi blogs error:', res.status, res.statusText);
+      return [];
+    }
+
+    const data = await res.json();
+    const posts = data.data ?? [];
+    console.log(`[Sitemap] Fetched ${posts.length} blog posts from Strapi`);
+    return posts;
+  } catch (error) {
+    console.error('[Sitemap] Failed to fetch blog slugs:', error);
+    return [];
+  }
+}
+
+async function fetchAllMarketingProjectSlugs(): Promise<MarketingProject[]> {
+  try {
+    const res = await fetch(
+      `${STRAPI_API}/marketing-projects?pagination[pageSize]=100&fields[0]=slug&fields[1]=updatedAt&fields[2]=projectDate&sort=projectDate:desc`,
+      { next: { revalidate: 3600 } }
+    );
+
+    if (!res.ok) {
+      console.error('[Sitemap] Strapi marketing-projects error:', res.status, res.statusText);
+      return [];
+    }
+
+    const data = await res.json();
+    const projects = data.data ?? [];
+    console.log(`[Sitemap] Fetched ${projects.length} marketing projects from Strapi`);
+    return projects;
+  } catch (error) {
+    console.error('[Sitemap] Failed to fetch marketing project slugs:', error);
+    return [];
+  }
+}
+
+// ─── Sitemap Generator ────────────────────────────────────────────────────────
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const now = new Date().toISOString();
+
+  // ── Static pages ──────────────────────────────────────────────────────────
+  const staticPages: MetadataRoute.Sitemap = [
+    ...staticRoutes.main,
+    ...staticRoutes.portfolio,
+    ...staticRoutes.zhMain,
+  ].map((route) => ({
+    url: `${SITE_URL}${route.path}`,
+    lastModified: now,
+    changeFrequency: route.changeFrequency,
+    priority: route.priority,
+    alternates: {
+      languages: route.path.startsWith('/zh')
+        ? {
+            zh: `${SITE_URL}${route.path}`,
+            en: `${SITE_URL}${route.path.replace('/zh', '') || '/'}`,
+          }
+        : {
+            en: `${SITE_URL}${route.path}`,
+            zh: `${SITE_URL}/zh${route.path === '/' ? '' : route.path}`,
+          },
+    },
+  }));
+
+  // ── English blog posts ONLY ───────────────────────────────────────────────
+  // zh/blog/[slug] pages are NOT included — same Strapi content, not translated
+  // No language filter — all posts in Strapi are English by default
+  const blogPosts = await fetchAllBlogSlugs();
+
+  const blogPages: MetadataRoute.Sitemap = blogPosts.map((post) => ({
+    url: `${SITE_URL}/blog/${post.slug}`,
+    lastModified: post.updatedAt || post.publishDate || now,
+    changeFrequency: 'weekly' as const,
+    priority: 0.8,
+    alternates: {
+      languages: {
+        en: `${SITE_URL}/blog/${post.slug}`,
+        // hreflang zh kept so Google knows zh version exists
+        // but /zh/blog/[slug] is blocked in robots.ts
+        zh: `${SITE_URL}/zh/blog/${post.slug}`,
+      },
+    },
+  }));
+
+  // ── English marketing projects ONLY ──────────────────────────────────────
+  // zh/portfolio/marketing-in-motion/[slug] pages are NOT included
+  // Same content as English, fetched from same Strapi source
+  const marketingProjects = await fetchAllMarketingProjectSlugs();
+
+  const marketingPages: MetadataRoute.Sitemap = marketingProjects.map((project) => ({
+    url: `${SITE_URL}/portfolio/marketing-in-motion/${project.slug}`,
+    lastModified: project.updatedAt || project.projectDate || now,
+    changeFrequency: 'monthly' as const,
+    priority: 0.7,
+    alternates: {
+      languages: {
+        en: `${SITE_URL}/portfolio/marketing-in-motion/${project.slug}`,
+        zh: `${SITE_URL}/zh/portfolio/marketing-in-motion/${project.slug}`,
+      },
+    },
+  }));
+
+  // ── Combine all pages ─────────────────────────────────────────────────────
+  const allPages = [...staticPages, ...blogPages, ...marketingPages];
+
+  console.log(`[Sitemap] Generated sitemap with ${allPages.length} URLs:`);
+  console.log(`  - Static pages: ${staticPages.length}`);
+  console.log(`  - Blog posts (EN only): ${blogPages.length}`);
+  console.log(`  - Marketing projects (EN only): ${marketingPages.length}`);
+
+  return allPages;
+}
