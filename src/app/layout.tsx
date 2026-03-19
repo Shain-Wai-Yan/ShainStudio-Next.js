@@ -4,6 +4,8 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { GoogleAnalytics } from "@next/third-parties/google";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/next";
 
 // Font Awesome CSS
 import { config } from '@fortawesome/fontawesome-svg-core'
@@ -87,6 +89,8 @@ export default function RootLayout({
         <main id="main-content">{children}</main>
         <Footer />
         {gaId && <GoogleAnalytics gaId={gaId} />}
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
