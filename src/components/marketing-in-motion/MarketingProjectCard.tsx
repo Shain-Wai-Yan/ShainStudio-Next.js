@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { optimizeCloudinaryUrl } from '@/lib/utils/cloudinary-optimizer';
 import type { MarketingProject } from '@/lib/strapi/marketing-in-motion';
 import { formatProjectDate } from '@/lib/strapi/marketing-in-motion';
 
@@ -56,7 +57,7 @@ export function MarketingProjectCard({
         {/* Cover image */}
         <div className="relative w-full aspect-video overflow-hidden bg-gray-100 dark:bg-gray-800">
           <Image
-            src={project.coverImage}
+            src={optimizeCloudinaryUrl(project.coverImage)}
             alt={project.title}
             fill
             className="object-cover transition-transform duration-500 group-hover:scale-105"

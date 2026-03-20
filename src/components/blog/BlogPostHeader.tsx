@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import { optimizeCloudinaryUrl } from '@/lib/utils/cloudinary-optimizer';
 import { BlogPost, transformBlog } from '@/lib/strapi/blogs';
 
 interface BlogPostHeaderProps {
@@ -17,7 +18,7 @@ export default function BlogPostHeader({ blog, language }: BlogPostHeaderProps) 
       {transformed.featuredImageUrl && (
         <div className="relative w-full h-96 md:h-[500px] overflow-hidden">
           <Image
-            src={transformed.featuredImageUrl}
+            src={optimizeCloudinaryUrl(transformed.featuredImageUrl)}
             alt={blog.Title}
             fill
             priority

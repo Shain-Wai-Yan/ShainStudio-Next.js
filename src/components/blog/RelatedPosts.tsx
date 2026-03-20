@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import { optimizeCloudinaryUrl } from '@/lib/utils/cloudinary-optimizer';
 import Link from 'next/link';
 import { BlogPost, transformBlog } from '@/lib/strapi/blogs';
 
@@ -25,7 +26,7 @@ function RelatedCard({ post, language, featured = false }: { post: BlogPost; lan
         <div className="relative w-full h-56 overflow-hidden bg-[#f8f9fa] dark:bg-[#1e1e1e] flex-shrink-0">
           {transformed.featuredImageUrl ? (
             <Image
-              src={transformed.featuredImageUrl}
+              src={optimizeCloudinaryUrl(transformed.featuredImageUrl)}
               alt={post.Title}
               fill
               className="object-cover group-hover:scale-[1.04] transition-transform duration-500"
@@ -80,7 +81,7 @@ function RelatedCard({ post, language, featured = false }: { post: BlogPost; lan
       <div className="relative w-20 h-16 flex-shrink-0 overflow-hidden rounded-sm bg-[#f8f9fa] dark:bg-[#1e1e1e]">
         {transformed.featuredImageUrl ? (
           <Image
-            src={transformed.featuredImageUrl}
+            src={optimizeCloudinaryUrl(transformed.featuredImageUrl)}
             alt={post.Title}
             fill
             className="object-cover group-hover:scale-[1.06] transition-transform duration-300"

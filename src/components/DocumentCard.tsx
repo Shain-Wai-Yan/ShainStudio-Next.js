@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { optimizeCloudinaryUrl } from '@/lib/utils/cloudinary-optimizer';
 import Image from 'next/image';
 
 const PLACEHOLDER_IMAGE = '/images/shain studio.png';
@@ -83,13 +84,12 @@ export function DocumentCard({
         <div className="relative w-full sm:w-56 md:w-80 lg:w-96 flex-shrink-0 bg-gray-100 dark:bg-[#3a3a3a]">
           <div className="relative w-full aspect-[16/9] sm:aspect-auto sm:h-full sm:min-h-[200px]">
             <Image
-              src={displayImage}
+              src={optimizeCloudinaryUrl(displayImage)}
               alt={title}
               fill
               className="object-cover"
               onError={() => setImageError(true)}
               priority={false}
-              unoptimized={displayImage.startsWith('https://')}
             />
             {fileType && (
               <div className="absolute top-2 right-2 bg-[#191970] dark:bg-[#a67c00] text-white dark:text-[#0f0f45] px-2 py-0.5 rounded text-xs font-bold">

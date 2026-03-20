@@ -167,6 +167,7 @@ export default function VideoGrid({
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-500 brightness-90 group-hover:brightness-100"
                       loading="lazy"
+                      unoptimized
                     />
                     {/* Duration Badge */}
                     <div className="absolute bottom-2.5 right-2.5 bg-black/80 dark:bg-[#191970]/90 text-white dark:text-[#d4af37] px-2 py-0.5 rounded text-[11px] font-bold tracking-wide">

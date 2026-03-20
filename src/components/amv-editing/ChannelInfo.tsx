@@ -44,6 +44,7 @@ export default function ChannelInfo({ data, isLoading }: ChannelInfoProps) {
             alt="Channel Banner"
             fill
             className="object-cover opacity-80"
+            unoptimized
           />
         )}
         {/* Gradient overlay for readability */}
@@ -61,6 +62,7 @@ export default function ChannelInfo({ data, isLoading }: ChannelInfoProps) {
                 alt={data.title}
                 fill
                 className="object-cover"
+                unoptimized 
               />
             </div>
           </div>

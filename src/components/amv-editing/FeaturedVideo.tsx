@@ -73,6 +73,7 @@ export default function FeaturedVideo({
                 fill
                 className="object-cover brightness-75 group-hover:brightness-90 transition-all duration-500 scale-105 group-hover:scale-100"
                 priority
+                unoptimized
               />
               {/* Play button */}
               <span className="absolute inset-0 flex items-center justify-center">

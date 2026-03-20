@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import { optimizeCloudinaryUrl } from '@/lib/utils/cloudinary-optimizer';
 import Link from 'next/link';
 import { BlogPost, transformBlog } from '@/lib/strapi/blogs';
 
@@ -21,7 +22,7 @@ export default function BlogCard({ blog, language, variant = 'grid' }: BlogCardP
           {transformed.featuredImageUrl && (
             <div className="relative w-36 h-28 flex-shrink-0 overflow-hidden rounded-sm">
               <Image
-                src={transformed.featuredImageUrl}
+                src={optimizeCloudinaryUrl(transformed.featuredImageUrl)}
                 alt={blog.Title}
                 fill
                 className="object-cover group-hover:scale-[1.08] transition-transform duration-300"
@@ -73,7 +74,7 @@ export default function BlogCard({ blog, language, variant = 'grid' }: BlogCardP
         <div className="relative w-full h-40 overflow-hidden bg-[#f8f9fa] dark:bg-[#1e1e1e] flex-shrink-0">
           {transformed.featuredImageUrl ? (
             <Image
-              src={transformed.featuredImageUrl}
+              src={optimizeCloudinaryUrl(transformed.featuredImageUrl)}
               alt={blog.Title}
               fill
               className="object-cover group-hover:scale-[1.08] transition-transform duration-300"

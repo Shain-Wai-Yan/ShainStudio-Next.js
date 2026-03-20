@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import { optimizeCloudinaryUrl } from '@/lib/utils/cloudinary-optimizer';
 import { useState } from 'react';
 
 interface CertificateCardProps {
@@ -45,13 +46,12 @@ export function CertificateCard({
       <div className="relative w-full h-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
         {displayImage ? (
           <Image
-            src={displayImage}
+            src={optimizeCloudinaryUrl(displayImage)}
             alt={title}
             fill
             sizes="(max-width: 768px) 288px, 320px"
             className="object-cover transition-all duration-500 group-hover:scale-[1.08] group-hover:brightness-[1.05] group-hover:saturate-[1.2]"
             onError={() => setImageError(true)}
-            unoptimized
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-300 to-gray-400 dark:from-gray-600 dark:to-gray-700">

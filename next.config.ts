@@ -3,6 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   turbopack: {},
   images: {
+    unoptimized: true, // Disables Vercel Image Optimization to save bandwidth
     remotePatterns: [
       {
         protocol: 'https',
@@ -39,7 +40,7 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'via.placeholder.com',
-     },
+      },
     ],
   },
 };
