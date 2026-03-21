@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { fetchMarketingPlans, transformMarketingPlan } from '@/lib/strapi/marketing-plans';
+import { transformMarketingPlan, type MarketingPlan } from '@/lib/strapi/marketing-plans';
 import { DocumentGrid } from '@/components/DocumentGrid';
 import { DocumentViewer } from '@/components/DocumentViewer';
 import { Breadcrumb } from '@/components/Breadcrumb';
@@ -17,14 +17,13 @@ interface Document {
   documentUrl: string;
 }
 
-interface TransformedPlan extends Document {
-  // All Document properties are inherited: id, Title, Description, formattedDate, coverImageUrl, fileType, documentUrl
-  // Add any additional properties your transformed plan needs here
-}
+type TransformedPlan = Document;
+
+import { type Dictionary } from '@/lib/getDictionary';
 
 interface MarketingPlanClientProps {
   locale: string;
-  dict: any;
+  dict: Dictionary;
 }
 
 export function MarketingPlanClient({ locale, dict }: MarketingPlanClientProps) {
@@ -42,14 +41,16 @@ export function MarketingPlanClient({ locale, dict }: MarketingPlanClientProps) 
     setIsLoading(true);
     setError(null);
 
-    const { plans: fetchedPlans, error: fetchError } = await fetchMarketingPlans();
-
-    if (fetchError) {
-      setError(fetchError);
-      setPlans([]);
-    } else {
-      const transformedPlans = fetchedPlans.map(transformMarketingPlan) as TransformedPlan[];
+    try {
+      const res = await fetch('/api/marketing-plans');
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      const rawPlans: MarketingPlan[] = json?.data || [];
+      const transformedPlans = rawPlans.map(transformMarketingPlan) as TransformedPlan[];
       setPlans(transformedPlans);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load plans');
+      setPlans([]);
     }
 
     setIsLoading(false);

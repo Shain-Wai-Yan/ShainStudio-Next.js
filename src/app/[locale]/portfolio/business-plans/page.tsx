@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { fetchBusinessPlans, transformBusinessPlan, type BusinessPlan } from '@/lib/strapi/business-plans';
+import { transformBusinessPlan, type BusinessPlan } from '@/lib/strapi/business-plans';
 import { DocumentGrid } from '@/components/DocumentGrid';
 import { DocumentViewer } from '@/components/DocumentViewer';
 import { Breadcrumb } from '@/components/Breadcrumb';
@@ -19,10 +19,7 @@ interface Document {
   documentUrl: string;
 }
 
-interface TransformedPlan extends Document {
-  // All Document properties are inherited: id, Title, Description, formattedDate, coverImageUrl, fileType, documentUrl
-  // Add any additional properties your transformed plan needs here
-}
+type TransformedPlan = Document;
 
 export default function BusinessPlanPage() {
   const params = useParams();
@@ -43,18 +40,21 @@ export default function BusinessPlanPage() {
     setIsLoading(true);
     setError(null);
 
-    const { plans: fetchedPlans, error: fetchError } = await fetchBusinessPlans();
-
-    if (fetchError) {
-      setError(fetchError);
-      setPlans([]);
-    } else {
-      const transformedPlans = fetchedPlans.map(transformBusinessPlan) as TransformedPlan[];
+    try {
+      const res = await fetch('/api/business-plans');
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      const rawPlans: BusinessPlan[] = json?.data || [];
+      const transformedPlans = rawPlans.map(transformBusinessPlan) as TransformedPlan[];
       setPlans(transformedPlans);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load plans');
+      setPlans([]);
     }
 
     setIsLoading(false);
   };
+
 
   const handleDocumentClick = (document: Document) => {
     // Document type is already compatible with TransformedPlan
