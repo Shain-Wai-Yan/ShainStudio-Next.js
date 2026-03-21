@@ -2,10 +2,15 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { useParams } from 'next/navigation';
 import { FaGlobe, FaLaptopCode, FaLightbulb } from 'react-icons/fa';
+import { getDictionarySync } from '@/lib/getDictionary';
 import MarTechStack from '@/components/MarTechStack';
 
 export default function AboutPage() {
+  const params = useParams();
+  const locale = (params.locale as "en" | "zh") || 'en';
+  const t = getDictionarySync(locale);
   const [isScrolling, setIsScrolling] = useState(false);
 
   useEffect(() => {
@@ -43,10 +48,10 @@ export default function AboutPage() {
       <section className="relative py-32 md:py-40 text-center overflow-hidden bg-gradient-to-b from-[#191970] to-[#2a2a9a] dark:from-[#a67c00] dark:to-[#704700]">
         <div className="max-w-4xl mx-auto px-4 md:px-8">
           <h1 className="text-5xl md:text-6xl font-bold text-white mb-4">
-            About <span className="text-[#ffd700] dark:text-[#f9df85]">Me</span>
+            {t.aboutPage.heroTitle} <span className="text-[#ffd700] dark:text-[#f9df85]">{t.aboutPage.heroTitleHighlight}</span>
           </h1>
           <p className="text-xl md:text-2xl text-gray-100">
-            Marketing Specialist & Digital Storyteller
+            {t.aboutPage.heroSubtitle}
           </p>
         </div>
       </section>
@@ -69,7 +74,7 @@ export default function AboutPage() {
                 <div className="relative w-full h-full">
                   <Image
                     src="/images/profile.jpeg"
-                    alt="Shain Wai Yan - Marketing Specialist"
+                    alt={t.aboutPage.profileAltText}
                     fill
                     className="rounded-full object-cover border-4 border-background shadow-lg
                       transition-transform duration-500 group-hover:scale-105"
@@ -86,10 +91,10 @@ export default function AboutPage() {
               after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px]
               after:bg-accent after:transition-all after:duration-400
               hover:after:w-full hover:text-accent transition-colors duration-300">
-              Shain Wai Yan
+              {t.aboutPage.myName}
             </h2>
             <p className="text-lg text-muted mb-6 font-primary transition-colors duration-300 hover:text-primary dark:hover:text-accent">
-              also known as Xolbine | 明元易
+              {t.aboutPage.alsoKnownAs}
             </p>
 
             {/* Motto */}
@@ -98,10 +103,10 @@ export default function AboutPage() {
               transition-all duration-400 hover:scale-[1.02] hover:shadow-lg
               hover:border-primary dark:hover:border-accent">
               <p className="text-2xl font-bold text-primary dark:text-white mb-2 font-secondary" lang="zh">
-                有志者事竟成
+                {t.aboutPage.motto}
               </p>
               <p className="text-base md:text-lg text-muted italic font-primary">
-                "Where there is a Will, there is a Way"
+                {t.aboutPage.mottoTranslation}
               </p>
             </div>
           </div>
@@ -123,22 +128,11 @@ export default function AboutPage() {
                 after:w-16 after:h-1 after:bg-accent after:rounded
                 after:transition-all after:duration-400
                 hover:after:w-full">
-                My Story
+                {t.aboutPage.myStoryHeading}
               </h2>
 
               <p className="text-base md:text-lg text-text dark:text-gray-300 leading-relaxed mb-6 text-justify font-primary animate-on-scroll">
-                Curious by nature and relentless in pursuit, I'm someone who turned limited resources into limitless
-                possibilities. From rural classrooms to building advanced web architecture powered by Strapi,
-                Cloudflare Workers, and custom logic—all without a CS degree—I've taught myself to think beyond
-                conventional path. I bridge cultures as well as systems. My passion lies at the intersection of
-                marketing, storytelling, and technology—crafting digital experiences that speak to both people and
-                machines. With a foundation in marketing and a track record of solo-building structured, scalable,
-                and SEO-conscious platforms, I thrive where creativity meets execution. I am a marketer who
-                understands the technology that powers modern marketing. I don't just know how to use the tools;
-                I know how to build them. I can bridge the gap between the marketing team's vision and the
-                engineering team's execution. Always learning, always creating. I thrive at the intersection of
-                data and storytelling. Whether it's crafting campaigns, decoding SEO, or brainstorming viral ideas,
-                I'm obsessed with how brands connect with people globally.
+                {t.aboutPage.myStoryText}
               </p>
 
               {/* Divider */}
@@ -153,7 +147,7 @@ export default function AboutPage() {
                 after:w-16 after:h-1 after:bg-accent after:rounded
                 after:transition-all after:duration-400
                 hover:after:w-full">
-                What I Bring to the Table
+                {t.aboutPage.whatIBringHeading}
               </h3>
 
               {/* Skills list */}
@@ -170,10 +164,10 @@ export default function AboutPage() {
                   <div className="border-b border-transparent group-hover:border-accent/30 transition-colors duration-300 pb-1 w-full">
                     <h4 className="text-lg font-bold text-primary dark:text-white mb-1 font-secondary
                       transition-colors duration-300 group-hover:text-accent dark:group-hover:text-accent">
-                      Trilingual Fluency
+                      {t.aboutPage.trilingualTitle}
                     </h4>
                     <p className="text-muted dark:text-gray-400 font-primary transition-colors duration-300 group-hover:text-text dark:group-hover:text-gray-200">
-                      Myanmar (Native), English, and Chinese – bridging cultures through communication.
+                      {t.aboutPage.trilingualDesc}
                     </p>
                   </div>
                 </li>
@@ -189,10 +183,10 @@ export default function AboutPage() {
                   <div className="border-b border-transparent group-hover:border-accent/30 transition-colors duration-300 pb-1 w-full">
                     <h4 className="text-lg font-bold text-primary dark:text-white mb-1 font-secondary
                       transition-colors duration-300 group-hover:text-accent dark:group-hover:text-accent">
-                      Digital-First Skills
+                      {t.aboutPage.digitalSkillsTitle}
                     </h4>
                     <p className="text-muted dark:text-gray-400 font-primary transition-colors duration-300 group-hover:text-text dark:group-hover:text-gray-200">
-                      SEO, social strategy, analytics, and content creation.
+                      {t.aboutPage.digitalSkillsDesc}
                     </p>
                   </div>
                 </li>
@@ -208,10 +202,10 @@ export default function AboutPage() {
                   <div className="border-b border-transparent group-hover:border-accent/30 transition-colors duration-300 pb-1 w-full">
                     <h4 className="text-lg font-bold text-primary dark:text-white mb-1 font-secondary
                       transition-colors duration-300 group-hover:text-accent dark:group-hover:text-accent">
-                      Relentless Curiosity
+                      {t.aboutPage.curiosityTitle}
                     </h4>
                     <p className="text-muted dark:text-gray-400 font-primary transition-colors duration-300 group-hover:text-text dark:group-hover:text-gray-200">
-                      A fresh perspective and hunger to learn from every project.
+                      {t.aboutPage.curiosityDesc}
                     </p>
                   </div>
                 </li>
@@ -237,49 +231,48 @@ export default function AboutPage() {
                   after:w-10 after:h-1 after:bg-accent after:rounded
                   after:transition-all after:duration-400
                   group-hover:after:w-full">
-                  Personal Info
+                  {t.aboutPage.personalInfoHeading}
                 </h3>
 
                 <ul className="space-y-3 font-primary text-sm">
                   <li className="pb-3 border-b border-gray-200 dark:border-gray-700
                     transition-all duration-300 hover:translate-x-2 hover:border-accent/40 cursor-default">
                     <span className="font-bold text-primary dark:text-white block mb-0.5
-                      transition-colors duration-300 hover:text-accent">Age</span>
-                    <span className="text-muted">{calculateAge()} years old</span>
+                      transition-colors duration-300 hover:text-accent">{t.aboutPage.ageLabel}</span>
+                    <span className="text-muted">{calculateAge()} {t.aboutPage.ageValueSuffix}</span>
                   </li>
                   <li className="pb-3 border-b border-gray-200 dark:border-gray-700
                     transition-all duration-300 hover:translate-x-2 hover:border-accent/40 cursor-default">
 
                   <span className="font-bold text-primary dark:text-white block mb-0.5
                     transition-colors duration-300 hover:text-accent">
-                    Education
+                    {t.aboutPage.educationLabel}
                  </span>
 
                  <div className="text-muted flex flex-col">
-                  <span>Bachelor of Arts in English, Taunggyi University</span>
-                 <span>B.S. in Business Administration (In Progress), University of the People</span>
+                  <span>{t.aboutPage.educationValue1}</span>
+                 <span>{t.aboutPage.educationValue2}</span>
                 </div>
                  </li>
                   <li className="pb-3 border-b border-gray-200 dark:border-gray-700
                     transition-all duration-300 hover:translate-x-2 hover:border-accent/40 cursor-default">
                     <span className="font-bold text-primary dark:text-white block mb-0.5
-                      transition-colors duration-300 hover:text-accent">Completed</span>
+                      transition-colors duration-300 hover:text-accent">{t.aboutPage.completedLabel}</span>
                     <span className="text-muted">
-                      Professional Diploma in Marketing & Brand Management,
-                      Strategy First University (Awarded with Distinction)
+                      {t.aboutPage.completedValue}
                     </span>
                   </li>
                   <li className="transition-all duration-300 hover:translate-x-2 cursor-default">
                     <span className="font-bold text-primary dark:text-white block mb-1
-                      transition-colors duration-300 hover:text-accent">Certificates</span>
+                      transition-colors duration-300 hover:text-accent">{t.aboutPage.certificatesLabel}</span>
                     <div className="text-muted space-y-1">
                       <p className="flex items-start gap-1.5">
                         <span className="text-accent mt-0.5 flex-shrink-0">•</span>
-                        Google Professional Certificate in Digital Marketing and E-Commerce
+                        {t.aboutPage.certificate1}
                       </p>
                       <p className="flex items-start gap-1.5">
                         <span className="text-accent mt-0.5 flex-shrink-0">•</span>
-                        Meta Social Media Marketing Professional Certificate
+                        {t.aboutPage.certificate2}
                       </p>
                     </div>
                   </li>
@@ -303,11 +296,11 @@ export default function AboutPage() {
                   </span>
                   <p className="pl-6 text-base md:text-lg italic text-text font-primary leading-relaxed
                     transition-colors duration-300 group-hover:text-primary dark:group-hover:text-white">
-                    Marketing is no longer about the stuff that you make, but about the stories you tell.
+                    {t.aboutPage.quoteText}
                   </p>
                   <cite className="block text-right font-bold text-primary dark:text-white mt-4 not-italic
                     transition-all duration-300 group-hover:text-accent group-hover:translate-x-[-4px]">
-                    – Seth Godin
+                    {t.aboutPage.quoteAuthor}
                   </cite>
                 </blockquote>
               </div>
@@ -323,7 +316,7 @@ export default function AboutPage() {
 
           <h2 className="animate-on-scroll text-3xl md:text-4xl font-bold text-primary dark:text-white
             text-center mb-12 font-secondary relative pb-4 inline-block w-full cursor-default">
-            My Journey
+            {t.aboutPage.myJourneyHeading}
             <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-20 h-1 bg-accent rounded" />
           </h2>
 
@@ -347,15 +340,15 @@ export default function AboutPage() {
                     transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
                     <h3 className="text-xl font-bold text-primary dark:text-white mb-2 font-secondary
                       transition-all duration-300 group-hover:text-accent group-hover:translate-x-1">
-                      Started University
+                      {t.aboutPage.timeline1Title}
                     </h3>
                     <span className="inline-block px-3 py-1 bg-primary/10 dark:bg-accent/10
                       text-primary dark:text-accent rounded-full text-sm font-bold mb-3
                       transition-all duration-300 group-hover:bg-accent group-hover:text-white">
-                      2019
+                      {t.aboutPage.timeline1Year}
                     </span>
                     <p className="text-muted dark:text-gray-400 font-primary transition-colors duration-300 group-hover:text-text dark:group-hover:text-gray-200">
-                      Began my academic journey at Taunggyi University, specializing in English.
+                      {t.aboutPage.timeline1Desc}
                     </p>
                   </div>
                 </div>
@@ -382,15 +375,15 @@ export default function AboutPage() {
                     transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
                     <h3 className="text-xl font-bold text-primary dark:text-white mb-2 font-secondary
                       transition-all duration-300 group-hover:text-accent group-hover:translate-x-1">
-                      Started Learning Chinese
+                      {t.aboutPage.timeline2Title}
                     </h3>
                     <span className="inline-block px-3 py-1 bg-primary/10 dark:bg-accent/10
                       text-primary dark:text-accent rounded-full text-sm font-bold mb-3
                       transition-all duration-300 group-hover:bg-accent group-hover:text-white">
-                      2023
+                      {t.aboutPage.timeline2Year}
                     </span>
                     <p className="text-muted dark:text-gray-400 font-primary transition-colors duration-300 group-hover:text-text dark:group-hover:text-gray-200">
-                      Expanded my language skills by beginning to learn Chinese, adding to my trilingual abilities.
+                      {t.aboutPage.timeline2Desc}
                     </p>
                   </div>
                 </div>
@@ -403,15 +396,15 @@ export default function AboutPage() {
                     transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
                     <h3 className="text-xl font-bold text-primary dark:text-white mb-2 font-secondary
                       transition-all duration-300 group-hover:text-accent group-hover:translate-x-1">
-                      Business Studies
+                      {t.aboutPage.timeline3Title}
                     </h3>
                     <span className="inline-block px-3 py-1 bg-primary/10 dark:bg-accent/10
                       text-primary dark:text-accent rounded-full text-sm font-bold mb-3
                       transition-all duration-300 group-hover:bg-accent group-hover:text-white">
-                      2024
+                      {t.aboutPage.timeline3Year}
                     </span>
                     <p className="text-muted dark:text-gray-400 font-primary transition-colors duration-300 group-hover:text-text dark:group-hover:text-gray-200">
-                      Started learning about business at Strategy First University, focusing on marketing fundamentals.
+                      {t.aboutPage.timeline3Desc}
                     </p>
                   </div>
                 </div>
@@ -438,16 +431,15 @@ export default function AboutPage() {
                     transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
                     <h3 className="text-xl font-bold text-primary dark:text-white mb-2 font-secondary
                       transition-all duration-300 group-hover:text-accent group-hover:translate-x-1">
-                      Digital Marketing Certificate
+                      {t.aboutPage.timeline4Title}
                     </h3>
                     <span className="inline-block px-3 py-1 bg-primary/10 dark:bg-accent/10
                       text-primary dark:text-accent rounded-full text-sm font-bold mb-3
                       transition-all duration-300 group-hover:bg-accent group-hover:text-white">
-                      2025
+                      {t.aboutPage.timeline4Year}
                     </span>
                     <p className="text-muted dark:text-gray-400 font-primary transition-colors duration-300 group-hover:text-text dark:group-hover:text-gray-200">
-                      Began the Google Professional Certificate in Digital Marketing and E-Commerce
-                      through Coursera to enhance my digital skills.
+                      {t.aboutPage.timeline4Desc}
                     </p>
                   </div>
                 </div>
@@ -460,16 +452,15 @@ export default function AboutPage() {
                     transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
                     <h3 className="text-xl font-bold text-primary dark:text-white mb-2 font-secondary
                       transition-all duration-300 group-hover:text-accent group-hover:translate-x-1">
-                      Meta Social Media Marketing Certificate
+                      {t.aboutPage.timeline5Title}
                     </h3>
                     <span className="inline-block px-3 py-1 bg-primary/10 dark:bg-accent/10
                       text-primary dark:text-accent rounded-full text-sm font-bold mb-3
                       transition-all duration-300 group-hover:bg-accent group-hover:text-white">
-                      2025
+                      {t.aboutPage.timeline5Year}
                     </span>
                     <p className="text-muted dark:text-gray-400 font-primary transition-colors duration-300 group-hover:text-text dark:group-hover:text-gray-200">
-                      Began the Meta Professional Certificate in Social Media Marketing through
-                      Coursera to enhance my social media marketing skills.
+                      {t.aboutPage.timeline5Desc}
                     </p>
                   </div>
                 </div>
@@ -496,18 +487,15 @@ export default function AboutPage() {
                     transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
                     <h3 className="text-xl font-bold text-primary dark:text-white mb-2 font-secondary
                       transition-all duration-300 group-hover:text-accent group-hover:translate-x-1">
-                      Started BSBA at University of the People
+                      {t.aboutPage.timeline6Title}
                     </h3>
                     <span className="inline-block px-3 py-1 bg-primary/10 dark:bg-accent/10
                       text-primary dark:text-accent rounded-full text-sm font-bold mb-3
                       transition-all duration-300 group-hover:bg-accent group-hover:text-white">
-                      2026
+                      {t.aboutPage.timeline6Year}
                     </span>
                     <p className="text-muted dark:text-gray-400 font-primary transition-colors duration-300 group-hover:text-text dark:group-hover:text-gray-200">
-                      Enrolled in the Bachelor of Science in Business Administration program at
-                      University of the People — a tuition-free, accredited online university.
-                      Pursuing this degree to deepen my foundation in business strategy, management,
-                      and entrepreneurship while continuing to grow as a marketing professional.
+                      {t.aboutPage.timeline6Desc}
                     </p>
                   </div>
                 </div>
@@ -519,7 +507,7 @@ export default function AboutPage() {
       </section>
 
       {/* ── Mar-Tech Stack ── */}
-      <MarTechStack language="en" />
+      <MarTechStack language={locale} />
 
       {/* ── CTA ── */}
       <section
@@ -534,22 +522,22 @@ export default function AboutPage() {
         />
         <div className="relative z-10 max-w-3xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-6 font-secondary animate-fade-in-up">
-            Ready to Work Together?
+            {t.aboutPage.ctaTitle}
           </h2>
           <p
             className="text-lg md:text-xl text-white opacity-90 mb-8 font-primary animate-fade-in-up"
             style={{ animationDelay: '0.2s' }}
           >
-            Let's create something extraordinary together. Get in touch and let's discuss how we can collaborate.
+            {t.aboutPage.ctaDesc}
           </p>
           <a
-            href="/contact"
+            href={`/${locale}/contact`}
             className="inline-flex items-center justify-center gap-2 bg-white text-primary font-bold
               py-3 px-8 rounded hover:shadow-lg hover:scale-105 transition-all duration-300
               relative overflow-hidden group animate-fade-in-up font-secondary"
             style={{ animationDelay: '0.4s' }}
           >
-            <span className="relative z-10">Contact Me</span>
+            <span className="relative z-10">{t.aboutPage.ctaButton}</span>
             <svg
               className="w-5 h-5 relative z-10 group-hover:translate-x-1 transition-transform"
               fill="none" stroke="currentColor" viewBox="0 0 24 24"

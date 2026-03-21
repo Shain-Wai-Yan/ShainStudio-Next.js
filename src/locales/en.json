@@ -19,7 +19,15 @@
     "subtitle": "Where creativity meets results.",
     "description": "Explore my journey through marketing excellence, professional achievements, and creative solutions.",
     "viewPortfolio": "View My Portfolio",
-    "contactMe": "Contact Me"
+    "contactMe": "Contact Me",
+    "cube": {
+      "marketing": "Marketing",
+      "strategy": "Strategy",
+      "creativity": "Creativity",
+      "results": "Results",
+      "innovation": "Innovation",
+      "excellence": "Excellence"
+    }
   },
   "expertise": {
     "title": "My Expertise",
@@ -48,18 +56,21 @@
     "subtitle": "Leveraging artificial intelligence to transform your marketing strategy",
     "items": [
       {
-        "title": "Predictive Analytics",
-        "description": "Using AI to forecast market trends and customer behavior patterns"
+        "label": "AI-Powered Content"
       },
       {
-        "title": "Content Generation",
-        "description": "AI-assisted creation of personalized, engaging marketing content"
+        "label": "Predictive Analytics"
       },
       {
-        "title": "Customer Segmentation",
-        "description": "Advanced algorithms to identify and target high-value customer segments"
+        "label": "Audience Insights"
+      },
+      {
+        "label": "Prompt Engineering"
       }
-    ]
+    ],
+    "heading": "The Future of Marketing is Here",
+    "body": "I combine traditional marketing expertise with cutting-edge AI tools to create innovative, data-driven strategies that deliver exceptional results.",
+    "cta": "See AI Marketing in Action"
   },
   "footer": {
     "quickLinks": "Quick Links",
@@ -69,7 +80,8 @@
   },
   "common": {
     "learnMore": "Learn More",
-    "scrollToExplore": "Scroll to explore"
+    "scrollToExplore": "Scroll to explore",
+    "scrollHint": "Scroll to explore"
   },
   "marketingInMotion": {
     "title": "Marketing In Motion",
@@ -130,5 +142,212 @@
     "noActivityDesc": "This user has not had any public activity recently.",
     "errorLoading": "Error loading GitHub data. Please try again later.",
     "backToPortfolio": "Back to Portfolio"
+  },
+  "businessPlans": {
+    "title": "Business Plans",
+    "subtitle": "Strategic Business Blueprints",
+    "description": "Comprehensive business plans designed to provide clear direction, identify growth opportunities, and establish actionable strategies for sustainable business success."
+  },
+  "marketingPlans": {
+    "title": "Marketing Plans",
+    "subtitle": "Strategic Marketing Campaigns",
+    "description": "Innovative marketing strategies and campaigns engineered to drive brand awareness, customer acquisition, and revenue growth across multiple channels."
+  },
+  "photography": {
+    "title": "Photography",
+    "subtitle": "Visual Storytelling Through the Lens",
+    "description": "A curated collection of photography exploring composition, light, and emotion. Each shot captures a decisive moment with intentional storytelling."
+  },
+  "amvEditing": {
+    "title": "AMV Editing",
+    "subtitle": "Motion Graphics & Video Editing",
+    "description": "Creative video edits and motion graphics where every frame is crafted with precision. Combining music, visuals, and timing to tell compelling stories."
+  },
+  "about": {
+    "title": "About Me",
+    "subtitle": "Digital Marketing & Brand Strategist",
+    "description": "Learn more about my journey, expertise, and approach to digital marketing and brand strategy."
+  },
+  "contact": {
+    "title": "Contact Me",
+    "subtitle": "Let's Connect",
+    "description": "Get in touch to discuss your project, ask questions, or explore collaboration opportunities.",
+    "formTitle": "Send Me a Message",
+    "formDescription": "I'll get back to you as soon as possible.",
+    "namePlaceholder": "Your Name",
+    "emailPlaceholder": "Your Email",
+    "messagePlaceholder": "Your Message",
+    "sendButton": "Send Message",
+    "successMessage": "Message sent successfully!",
+    "errorMessage": "Failed to send message. Please try again."
+  },
+  "blog": {
+    "title": "Blog",
+    "subtitle": "Digital Marketing Insights",
+    "description": "Explore in-depth articles on digital marketing, brand strategy, AI-powered campaigns, and industry insights.",
+    "noPosts": "No blog posts found",
+    "noPostsDesc": "Check back soon for new articles and insights.",
+    "readMore": "Read More",
+    "publishedOn": "Published on",
+    "byAuthor": "By",
+    "categories": "Categories",
+    "tags": "Tags",
+    "backToBlog": "Back to Blog",
+    "previousPost": "Previous Post",
+    "nextPost": "Next Post",
+    "postNotFound": "Post Not Found"
+  },
+  "certificate": {
+    "title": "Certificates & Credentials",
+    "subtitle": "Professional Certifications",
+    "description": "A collection of my professional certifications, credentials, and achievements."
+  },
+  "aboutPage": {
+    "heroTitle": "About",
+    "heroTitleHighlight": "Me",
+    "heroSubtitle": "Marketing Specialist & Digital Storyteller",
+    "profileAltText": "Shain Wai Yan - Marketing Specialist",
+    "myName": "Shain Wai Yan",
+    "alsoKnownAs": "also known as Xolbine | 明元易",
+    "motto": "有志者事竟成",
+    "mottoTranslation": "\"Where there is a Will, there is a Way\"",
+    "myStoryHeading": "My Story",
+    "myStoryText": "Curious by nature and relentless in pursuit, I'm someone who turned limited resources into limitless possibilities. From rural classrooms to building advanced web architecture powered by Strapi, Cloudflare Workers, and custom logic—all without a CS degree—I've taught myself to think beyond conventional path. I bridge cultures as well as systems. My passion lies at the intersection of marketing, storytelling, and technology—crafting digital experiences that speak to both people and machines. With a foundation in marketing and a track record of solo-building structured, scalable, and SEO-conscious platforms, I thrive where creativity meets execution. I am a marketer who understands the technology that powers modern marketing. I don't just know how to use the tools; I know how to build them. I can bridge the gap between the marketing team's vision and the engineering team's execution. Always learning, always creating. I thrive at the intersection of data and storytelling. Whether it's crafting campaigns, decoding SEO, or brainstorming viral ideas, I'm obsessed with how brands connect with people globally.",
+    "whatIBringHeading": "What I Bring to the Table",
+    "trilingualTitle": "Trilingual Fluency",
+    "trilingualDesc": "Myanmar (Native), English, and Chinese – bridging cultures through communication.",
+    "digitalSkillsTitle": "Digital-First Skills",
+    "digitalSkillsDesc": "SEO, social strategy, analytics, and content creation.",
+    "curiosityTitle": "Relentless Curiosity",
+    "curiosityDesc": "A fresh perspective and hunger to learn from every project.",
+    "personalInfoHeading": "Personal Info",
+    "ageLabel": "Age",
+    "ageValueSuffix": "years old",
+    "educationLabel": "Education",
+    "educationValue1": "Bachelor of Arts in English, Taunggyi University",
+    "educationValue2": "B.S. in Business Administration (In Progress), University of the People",
+    "completedLabel": "Completed",
+    "completedValue": "Professional Diploma in Marketing & Brand Management, Strategy First University (Awarded with Distinction)",
+    "certificatesLabel": "Certificates",
+    "certificate1": "Google Professional Certificate in Digital Marketing and E-Commerce",
+    "certificate2": "Meta Social Media Marketing Professional Certificate",
+    "quoteText": "Marketing is no longer about the stuff that you make, but about the stories you tell.",
+    "quoteAuthor": "– Seth Godin",
+    "myJourneyHeading": "My Journey",
+    "timeline1Title": "Started University",
+    "timeline1Year": "2019",
+    "timeline1Desc": "Began my academic journey at Taunggyi University, specializing in English.",
+    "timeline2Title": "Marketing Diploma",
+    "timeline2Year": "2021",
+    "timeline2Desc": "Completed professional diploma in Marketing & Brand Management with distinction.",
+    "timeline3Title": "Business Studies",
+    "timeline3Year": "2024",
+    "timeline3Desc": "Started learning about business at Strategy First University, focusing on marketing fundamentals.",
+    "timeline4Title": "Digital Marketing Certificate",
+    "timeline4Year": "2025",
+    "timeline4Desc": "Began the Google Professional Certificate in Digital Marketing and E-Commerce through Coursera to enhance my digital skills.",
+    "timeline5Title": "Meta Social Media Marketing Certificate",
+    "timeline5Year": "2025",
+    "timeline5Desc": "Began the Meta Professional Certificate in Social Media Marketing through Coursera to enhance my social media marketing skills.",
+    "timeline6Title": "Started BSBA at University of the People",
+    "timeline6Year": "2026",
+    "timeline6Desc": "Enrolled in the Bachelor of Science in Business Administration program at University of the People — a tuition-free, accredited online university. Pursuing this degree to deepen my foundation in business strategy, management, and entrepreneurship while continuing to grow as a marketing professional.",
+    "timeline2Title_Alt": "Started Learning Chinese",
+    "timeline2Year_Alt": "2023",
+    "timeline2Desc_Alt": "Expanded my language skills by beginning to learn Chinese, adding to my trilingual abilities.",
+    "ctaTitle": "Ready to Work Together?",
+    "ctaDesc": "Let's create something extraordinary together. Get in touch and let's discuss how we can collaborate.",
+    "ctaButton": "Contact Me"
+  },
+  "homePage": {
+    "badge": "Marketing · Strategy · Innovation",
+    "title": "Welcome to",
+    "titleHighlight": "Shain's Studio",
+    "subtitle": "Where creativity meets results.",
+    "description": "Explore my journey through marketing excellence, professional achievements, and creative solutions.",
+    "viewPortfolio": "View My Portfolio",
+    "getInTouch": "Get In Touch"
+  },
+  "contactPage": {
+    "heroTitle": "Contact",
+    "heroTitleHighlight": "Me",
+    "heroSubtitle": "I'm passionate about marketing, storytelling, and technology. Let's collaborate and create digital experiences that matter.",
+    "getInTouchHeading": "Get In Touch",
+    "formDescription": "I'm always excited to hear about new projects, collaboration opportunities, or just to chat about marketing and technology. Feel free to reach out!",
+    "emailLabel": "Email Address",
+    "emailPlaceholder": "your.email@example.com",
+    "firstNameLabel": "First Name",
+    "firstNamePlaceholder": "Your First Name",
+    "lastNameLabel": "Last Name",
+    "lastNamePlaceholder": "Your Last Name",
+    "messageLabel": "Message",
+    "messagePlaceholder": "How can I help you today?",
+    "charactersRemaining": "characters remaining",
+    "sendMessage": "Send Message",
+    "submitSuccess": "Thank you! Your message has been sent successfully. I'll get back to you soon!",
+    "submitError": "Oops! Something went wrong. Please try again.",
+    "socialLinksHeading": "Find Me Online",
+    "linkedinLabel": "LinkedIn",
+    "githubLabel": "GitHub",
+    "emailLabel2": "Email"
+  },
+  "skills": {
+    "title": "Professional Skills",
+    "subtitle": "Tools and techniques I've mastered",
+    "marketingHeading": "Marketing",
+    "creativeHeading": "Creative",
+    "marketingSkills": [
+      {
+        "name": "Traditional Marketing",
+        "level": 98
+      },
+      {
+        "name": "Digital Marketing",
+        "level": 95
+      },
+      {
+        "name": "Analytics",
+        "level": 85
+      }
+    ],
+    "creativeSkills": [
+      {
+        "name": "Branding & Strategy",
+        "level": 92
+      },
+      {
+        "name": "Social Media Design",
+        "level": 85
+      },
+      {
+        "name": "Content Writing",
+        "level": 60
+      }
+    ]
+  },
+  "certificatePreview": {
+    "title": "Professional Certifications",
+    "subtitle": "Credentials that validate my expertise",
+    "items": [
+      {
+        "title": "Digital Marketing",
+        "description": "Certified Digital Marketing Professional"
+      },
+      {
+        "title": "Analytics",
+        "description": "Advanced Analytics Certification"
+      },
+      {
+        "title": "Business Management",
+        "description": "ICM Business Management and Administration Course"
+      }
+    ],
+    "viewCertHover": "View Certificate →",
+    "viewAll": "View All Certificates"
+  },
+  "cta": {
+    "title": "Ready to Transform Your Marketing?",
+    "subtitle": "Let's discuss how my expertise can help achieve your business goals.",
+    "button": "Get In Touch"
   }
 }

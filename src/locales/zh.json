@@ -19,7 +19,15 @@
     "subtitle": "创意与成果完美结合。",
     "description": "探索我通过营销卓越、专业成就和创意解决方案的历程。",
     "viewPortfolio": "查看我的作品集",
-    "contactMe": "联系我"
+    "contactMe": "联系我",
+    "cube": {
+      "marketing": "营销",
+      "strategy": "策略",
+      "creativity": "创意",
+      "results": "成果",
+      "innovation": "创新",
+      "excellence": "卓越"
+    }
   },
   "expertise": {
     "title": "我的专长",
@@ -48,18 +56,21 @@
     "subtitle": "利用人工智能转变您的营销策略",
     "items": [
       {
-        "title": "预测分析",
-        "description": "使用AI预测市场趋势和客户行为模式"
+        "label": "AI 内容创作"
       },
       {
-        "title": "内容生成",
-        "description": "AI辅助创建个性化、引人入胜的营销内容"
+        "label": "预测分析"
       },
       {
-        "title": "客户细分",
-        "description": "先进的算法识别和定位高价值客户群"
+        "label": "受众洞察"
+      },
+      {
+        "label": "提示词工程"
       }
-    ]
+    ],
+    "heading": "营销的未来已经到来",
+    "body": "我将传统营销专业知识与前沿 AI 工具相结合，创造创新的、数据驱动的策略，带来卓越成果。",
+    "cta": "查看 AI 营销实例"
   },
   "footer": {
     "quickLinks": "快速链接",
@@ -69,7 +80,8 @@
   },
   "common": {
     "learnMore": "了解更多",
-    "scrollToExplore": "向下滚动以浏览"
+    "scrollToExplore": "向下滚动以浏览",
+    "scrollHint": "向下滚动"
   },
   "marketingInMotion": {
     "title": "营销实战",
@@ -130,5 +142,212 @@
     "noActivityDesc": "该用户最近没有任何公开活动。",
     "errorLoading": "加载 GitHub 数据出错。请稍后重试。",
     "backToPortfolio": "返回作品集"
+  },
+  "businessPlans": {
+    "title": "商业计划",
+    "subtitle": "战略商业蓝图",
+    "description": "为企业提供清晰的方向、识别增长机会，以及建立可持续成功的可行战略的综合商业计划。"
+  },
+  "marketingPlans": {
+    "title": "营销计划",
+    "subtitle": "战略营销活动",
+    "description": "创新的营销战略和活动，旨在通过多个渠道推动品牌知名度、客户获取和收入增长。"
+  },
+  "photography": {
+    "title": "摄影",
+    "subtitle": "通过镜头讲述视觉故事",
+    "description": "精选的摄影作品集，探索构图、光线和情感。每一张照片都捕捉了一个决定性时刻与有意的叙事。"
+  },
+  "amvEditing": {
+    "title": "AMV编辑",
+    "subtitle": "动画图形与视频编辑",
+    "description": "创意视频编辑和动画图形，每一帧都精心制作。结合音乐、视觉和时机讲述引人入胜的故事。"
+  },
+  "about": {
+    "title": "关于我",
+    "subtitle": "数字营销与品牌策略专家",
+    "description": "了解我的职业历程、专业知识和数字营销及品牌策略的方法论。"
+  },
+  "contact": {
+    "title": "联系我",
+    "subtitle": "让我们保持联系",
+    "description": "如有任何问题或合作机会，欢迎与我联系。",
+    "formTitle": "发送消息给我",
+    "formDescription": "我将尽快回复您的消息。",
+    "namePlaceholder": "您的名字",
+    "emailPlaceholder": "您的电子邮件",
+    "messagePlaceholder": "您的消息",
+    "sendButton": "发送消息",
+    "successMessage": "消息发送成功！",
+    "errorMessage": "发送消息失败。请重试。"
+  },
+  "blog": {
+    "title": "博客",
+    "subtitle": "数字营销洞察",
+    "description": "探索数字营销、品牌战略、AI驱动的营销活动和行业洞察的深度文章。",
+    "noPosts": "未找到博客文章",
+    "noPostsDesc": "请稍后回来查看新的文章和见解。",
+    "readMore": "阅读更多",
+    "publishedOn": "发布于",
+    "byAuthor": "作者",
+    "categories": "分类",
+    "tags": "标签",
+    "backToBlog": "返回博客",
+    "previousPost": "上一篇",
+    "nextPost": "下一篇",
+    "postNotFound": "文章未找到"
+  },
+  "certificate": {
+    "title": "证书与资质",
+    "subtitle": "专业认证",
+    "description": "我的专业证书、资质和成就的集合。"
+  },
+  "aboutPage": {
+    "heroTitle": "关于",
+    "heroTitleHighlight": "我",
+    "heroSubtitle": "营销专家与数字叙事者",
+    "profileAltText": "Shain Wai Yan - 营销专家",
+    "myName": "Shain Wai Yan",
+    "alsoKnownAs": "又名 Xolbine | 明元易",
+    "motto": "有志者事竟成",
+    "mottoTranslation": "\"有志者事竟成\"",
+    "myStoryHeading": "我的故事",
+    "myStoryText": "天生好奇，不懈追求，我是一个用有限的资源创造无限可能的人。从农村教室到使用Strapi、Cloudflare Workers和自定义逻辑构建高级网络架构——这一切都在没有计算机科学学位的情况下完成——我教会了自己超越传统路径思考。我不仅桥接文化，还桥接系统。我的热情在于营销、叙事和技术的交汇处——为人和机器创造数字体验。凭借营销基础和独自构建结构化、可扩展、SEO友好平台的成功记录，我在创意与执行相遇的地方茁壮成长。我是一个理解驱动现代营销的技术的营销人员。我不仅知道如何使用工具，我知道如何构建工具。我可以弥合营销团队的愿景与工程团队执行之间的差距。始终学习，始终创造。我在数据与叙事的交汇处蓬勃发展。无论是制作活动、破译SEO还是头脑风暴病毒式创意，我都对品牌如何在全球与人们联系着迷。",
+    "whatIBringHeading": "我的优势",
+    "trilingualTitle": "三语流利",
+    "trilingualDesc": "缅甸语（母语）、英语和中文——通过交流桥接文化。",
+    "digitalSkillsTitle": "数字优先技能",
+    "digitalSkillsDesc": "SEO、社媒策略、数据分析和内容创作。",
+    "curiosityTitle": "不懈的求知欲",
+    "curiosityDesc": "新鲜视角和对每个项目的学习热情。",
+    "personalInfoHeading": "个人信息",
+    "ageLabel": "年龄",
+    "ageValueSuffix": "岁",
+    "educationLabel": "教育背景",
+    "educationValue1": "Taunggyi大学英文学士学位",
+    "educationValue2": "人民大学工商管理学士学位（进行中）",
+    "completedLabel": "已完成",
+    "completedValue": "策略优先大学营销与品牌管理专业文凭（优异奖）",
+    "certificatesLabel": "证书",
+    "certificate1": "谷歌数字营销和电子商务专业证书",
+    "certificate2": "Meta社媒营销专业证书",
+    "quoteText": "营销不再是关于你制造什么，而是你讲述什么故事。",
+    "quoteAuthor": "– Seth Godin",
+    "myJourneyHeading": "我的历程",
+    "timeline1Title": "开始大学生涯",
+    "timeline1Year": "2019",
+    "timeline1Desc": "在Taunggyi大学开始学术之旅，专业为英文。",
+    "timeline2Title": "营销文凭",
+    "timeline2Year": "2021",
+    "timeline2Desc": "以优异成绩完成营销与品牌管理专业文凭。",
+    "timeline3Title": "商业研究",
+    "timeline3Year": "2024",
+    "timeline3Desc": "开始在策略优先大学学习商业，专注于营销基础。",
+    "timeline4Title": "数字营销认证",
+    "timeline4Year": "2025",
+    "timeline4Desc": "开始通过Coursera学习Google数字营销和电子商务专业认证，以提升我的数字技能。",
+    "timeline5Title": "Meta社媒营销认证",
+    "timeline5Year": "2025",
+    "timeline5Desc": "开始通过Coursera学习Meta社媒营销专业认证，以提升我的社媒营销技能。",
+    "timeline6Title": "在人民大学开始BSBA课程",
+    "timeline6Year": "2026",
+    "timeline6Desc": "在人民大学（一所免学费的认证在线大学）注册工商管理理学学士课程。追求这个学位以加深我在商业战略、管理和创业方面的基础，同时继续以营销专业人士身份成长。",
+    "timeline2Title_Alt": "开始学习中文",
+    "timeline2Year_Alt": "2023",
+    "timeline2Desc_Alt": "通过开始学习中文扩展我的语言技能，增加我的三语能力。",
+    "ctaTitle": "准备好一起合作了吗？",
+    "ctaDesc": "让我们创造一些了不起的东西。联系我，讨论我们如何合作。",
+    "ctaButton": "联系我"
+  },
+  "homePage": {
+    "badge": "营销 · 策略 · 创新",
+    "title": "欢迎来到",
+    "titleHighlight": "Shain的工作室",
+    "subtitle": "创意与成果完美结合。",
+    "description": "探索我通过营销卓越、专业成就和创意解决方案的历程。",
+    "viewPortfolio": "查看我的作品集",
+    "getInTouch": "联系我"
+  },
+  "contactPage": {
+    "heroTitle": "联系",
+    "heroTitleHighlight": "我",
+    "heroSubtitle": "我热衷于营销、叙事和技术。让我们合作并创建重要的数字体验。",
+    "getInTouchHeading": "联系我",
+    "formDescription": "我总是很高兴听到新项目、协作机会，或者讨论营销和技术。随时与我联系！",
+    "emailLabel": "电子邮箱",
+    "emailPlaceholder": "your.email@example.com",
+    "firstNameLabel": "名字",
+    "firstNamePlaceholder": "您的名字",
+    "lastNameLabel": "姓氏",
+    "lastNamePlaceholder": "您的姓氏",
+    "messageLabel": "消息",
+    "messagePlaceholder": "我如何帮助您？",
+    "charactersRemaining": "个字符剩余",
+    "sendMessage": "发送消息",
+    "submitSuccess": "谢谢！您的消息已成功发送。我会尽快回复！",
+    "submitError": "哎呀！出错了。请重试。",
+    "socialLinksHeading": "社交媒体与专业平台",
+    "linkedinLabel": "LinkedIn",
+    "githubLabel": "GitHub",
+    "emailLabel2": "电子邮件"
+  },
+  "skills": {
+    "title": "专业技能",
+    "subtitle": "我已掌握的工具与技术",
+    "marketingHeading": "营销",
+    "creativeHeading": "创意",
+    "marketingSkills": [
+      {
+        "name": "传统营销",
+        "level": 98
+      },
+      {
+        "name": "数字营销",
+        "level": 95
+      },
+      {
+        "name": "数据分析",
+        "level": 85
+      }
+    ],
+    "creativeSkills": [
+      {
+        "name": "品牌与策略",
+        "level": 92
+      },
+      {
+        "name": "社交媒体设计",
+        "level": 85
+      },
+      {
+        "name": "内容写作",
+        "level": 60
+      }
+    ]
+  },
+  "certificatePreview": {
+    "title": "专业认证",
+    "subtitle": "验证我专业能力的资质证书",
+    "items": [
+      {
+        "title": "数字营销",
+        "description": "认证数字营销专业人士"
+      },
+      {
+        "title": "数据分析",
+        "description": "高级分析认证"
+      },
+      {
+        "title": "商业管理",
+        "description": "ICM 商业管理与行政课程"
+      }
+    ],
+    "viewCertHover": "查看证书 →",
+    "viewAll": "查看所有证书"
+  },
+  "cta": {
+    "title": "准备好升级您的营销了吗？",
+    "subtitle": "让我们探讨如何用我的专业知识帮助实现您的业务目标。",
+    "button": "立即联系"
   }
 }

@@ -1,9 +1,27 @@
 'use client';
 import React, { useEffect } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { FaLinkedin, FaGithub, FaEnvelope } from 'react-icons/fa';
+import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
 
 const Footer = () => {
+  const pathname = usePathname();
+  
+  // Extract locale from pathname /[locale]/... or fallback to legacy /zh pattern
+  const pathSegments = pathname.split('/').filter(Boolean);
+  let locale: 'en' | 'zh' = DEFAULT_LOCALE as 'en' | 'zh';
+  
+  if (pathSegments.length > 0) {
+    if (isSupportedLocale(pathSegments[0])) {
+      locale = pathSegments[0] as 'en' | 'zh';
+    } else if (pathname.startsWith('/zh')) {
+      // Legacy /zh routes support
+      locale = 'zh';
+    }
+  }
+  
+  const basePath = locale === 'en' ? '' : `/${locale}`;
   const currentYear = new Date().getFullYear();
 
   // Load the Credly script after the component mounts
@@ -31,7 +49,7 @@ const Footer = () => {
           
           {/* Brand Section */}
           <div className="flex flex-col gap-4">
-            <Link href="/" className="flex items-center gap-3 hover:opacity-90 transition-opacity duration-300 w-fit group">
+            <Link href={locale === 'en' ? '/' : basePath} className="flex items-center gap-3 hover:opacity-90 transition-opacity duration-300 w-fit group">
               <img
                 src="/images/Shain Studio.png"
                 alt="Shain Studio Logo"
@@ -107,10 +125,10 @@ const Footer = () => {
             &copy; {currentYear} Shain Studio. All Rights Reserved.
           </p>
           <div className="flex gap-8">
-            <Link href="/privacy" className="text-[#cccccc] dark:text-[#777777] hover:text-[#ffd700] dark:hover:text-[#d4af37] transition-colors duration-300 font-medium">
+            <Link href={`${basePath}/privacy`} className="text-[#cccccc] dark:text-[#777777] hover:text-[#ffd700] dark:hover:text-[#d4af37] transition-colors duration-300 font-medium">
               Privacy Policy
             </Link>
-            <Link href="/terms" className="text-[#cccccc] dark:text-[#777777] hover:text-[#ffd700] dark:hover:text-[#d4af37] transition-colors duration-300 font-medium">
+            <Link href={`${basePath}/terms`} className="text-[#cccccc] dark:text-[#777777] hover:text-[#ffd700] dark:hover:text-[#d4af37] transition-colors duration-300 font-medium">
               Terms of Service
             </Link>
           </div>

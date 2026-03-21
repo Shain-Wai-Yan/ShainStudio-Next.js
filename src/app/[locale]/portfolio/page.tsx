@@ -8,7 +8,7 @@ import Link from 'next/link';
 const ITEMS = [
   {
     id: 'business-plans',
-    href: '/portfolio/business-plans',
+    href: './business-plans',
     number: '01',
     title: 'Business Plans',
     subtitle: 'Strategy & Vision',
@@ -23,7 +23,7 @@ const ITEMS = [
   },
   {
     id: 'marketing-plans',
-    href: '/portfolio/marketing-plans',
+    href: './marketing-plans',
     number: '02',
     title: 'Marketing Plans',
     subtitle: 'Campaigns & Tactics',
@@ -39,7 +39,7 @@ const ITEMS = [
   },
   {
     id: 'marketing-in-motion',
-    href: '/portfolio/marketing-in-motion',
+    href: './marketing-in-motion',
     number: '03',
     title: 'Marketing in Motion',
     subtitle: 'Live Case Studies',
@@ -54,7 +54,7 @@ const ITEMS = [
   },
   {
     id: 'coding-projects',
-    href: '/portfolio/coding-projects',
+    href: './coding-projects',
     number: '04',
     title: 'Coding Projects',
     subtitle: 'Build & Engineer',
@@ -69,7 +69,7 @@ const ITEMS = [
   },
   {
     id: 'photography',
-    href: '/portfolio/photography',
+    href: './photography',
     number: '05',
     title: 'Photography',
     subtitle: 'Lens & Light',
@@ -85,7 +85,7 @@ const ITEMS = [
   },
   {
     id: 'amv-editing',
-    href: '/portfolio/amv-editing',
+    href: './amv-editing',
     number: '06',
     title: 'AMV Editing',
     subtitle: 'Motion & Story',

@@ -2,6 +2,18 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   turbopack: {},
+  async rewrites() {
+    return [
+      {
+        source: '/:path((?!en$|en/|zh$|zh/|api/|_next/|images/|favicon.ico)[^/]+.*)',
+        destination: '/en/:path',
+      },
+      {
+        source: '/',
+        destination: '/en',
+      },
+    ];
+  },
   images: {
     unoptimized: true, // Disables Vercel Image Optimization to save bandwidth
     remotePatterns: [
