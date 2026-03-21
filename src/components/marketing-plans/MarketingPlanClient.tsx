@@ -1,12 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { fetchBusinessPlans, transformBusinessPlan, type BusinessPlan } from '@/lib/strapi/business-plans';
+import { fetchMarketingPlans, transformMarketingPlan } from '@/lib/strapi/marketing-plans';
 import { DocumentGrid } from '@/components/DocumentGrid';
 import { DocumentViewer } from '@/components/DocumentViewer';
 import { Breadcrumb } from '@/components/Breadcrumb';
-import { useParams } from 'next/navigation';
-import { getDictionarySync } from '@/lib/getDictionary';
 
 // Match the Document interface from DocumentGrid
 interface Document {
@@ -24,11 +22,12 @@ interface TransformedPlan extends Document {
   // Add any additional properties your transformed plan needs here
 }
 
-export default function BusinessPlanPage() {
-  const params = useParams();
-  const locale = (params.locale as "en" | "zh") || 'en';
-  const t = getDictionarySync(locale);
+interface MarketingPlanClientProps {
+  locale: string;
+  dict: any;
+}
 
+export function MarketingPlanClient({ locale, dict }: MarketingPlanClientProps) {
   const [plans, setPlans] = useState<TransformedPlan[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -36,20 +35,20 @@ export default function BusinessPlanPage() {
   const [isViewerOpen, setIsViewerOpen] = useState(false);
 
   useEffect(() => {
-    loadBusinessPlans();
+    loadMarketingPlans();
   }, []);
 
-  const loadBusinessPlans = async () => {
+  const loadMarketingPlans = async () => {
     setIsLoading(true);
     setError(null);
 
-    const { plans: fetchedPlans, error: fetchError } = await fetchBusinessPlans();
+    const { plans: fetchedPlans, error: fetchError } = await fetchMarketingPlans();
 
     if (fetchError) {
       setError(fetchError);
       setPlans([]);
     } else {
-      const transformedPlans = fetchedPlans.map(transformBusinessPlan) as TransformedPlan[];
+      const transformedPlans = fetchedPlans.map(transformMarketingPlan) as TransformedPlan[];
       setPlans(transformedPlans);
     }
 
@@ -67,10 +66,11 @@ export default function BusinessPlanPage() {
     setSelectedDocument(null);
   };
 
+  // Fixed the breadcrumb href to match folder 'marketing-plans' instead of singular
   const breadcrumbItems = [
-    { label: t.nav.home, href: `/${locale}` },
-    { label: t.nav.portfolio, href: `/${locale}/portfolio` },
-    { label: t.businessPlans.title, href: `/${locale}/portfolio/business-plans` },
+    { label: dict.nav.home, href: `/${locale}` },
+    { label: dict.nav.portfolio, href: `/${locale}/portfolio` },
+    { label: dict.marketingPlans.title, href: `/${locale}/portfolio/marketing-plans` },
   ];
 
   return (
@@ -83,25 +83,25 @@ export default function BusinessPlanPage() {
           {/* Page Header */}
           <div className="mb-12">
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-[#d4af37] mb-4">
-              {t.businessPlans.title}
+              {dict.marketingPlans.title}
             </h1>
             <p className="text-xl text-gray-600 dark:text-[#b0b0b0] max-w-2xl">
-              {t.businessPlans.description}
+              {dict.marketingPlans.description}
             </p>
           </div>
 
           {/* Document Grid */}
           <section aria-labelledby="documents-heading">
             <h2 id="documents-heading" className="sr-only">
-              {t.businessPlans.title} Documents
+              {dict.marketingPlans.documentsHeading}
             </h2>
             <DocumentGrid
               documents={plans}
               isLoading={isLoading}
               error={error}
               onDocumentClick={handleDocumentClick}
-              onRetry={loadBusinessPlans}
-              emptyMessage={t.businessPlans.emptyMessage}
+              onRetry={loadMarketingPlans}
+              emptyMessage={dict.marketingPlans.emptyMessage}
             />
           </section>
         </div>

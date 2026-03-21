@@ -76,7 +76,14 @@
     "quickLinks": "Quick Links",
     "getInTouch": "Get In Touch",
     "followMe": "Follow Me",
-    "rights": "All rights reserved."
+    "rights": "All rights reserved.",
+    "tagline": "Digital Marketing",
+    "description": "Transforming brands through innovative marketing strategies and creative excellence.",
+    "certifications": "Certifications",
+    "connectWithMe": "Connect With Me",
+    "allRightsReserved": "All Rights Reserved.",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service"
   },
   "common": {
     "learnMore": "Learn More",
@@ -84,33 +91,45 @@
     "scrollHint": "Scroll to explore"
   },
   "marketingInMotion": {
-    "title": "Marketing In Motion",
-    "description": "Real-world marketing showcase featuring live projects and campaigns that drive tangible results.",
-    "allProjects": "All Projects",
-    "featured": "Featured",
-    "businessGrowth": "Business Growth",
-    "brandAwareness": "Brand Awareness",
-    "engagement": "Engagement",
-    "noProjects": "No projects found",
-    "noProjectsDesc": "No marketing projects match your filters.",
-    "viewProject": "View Project",
-    "loading": "Loading projects...",
-    "error": "Error loading projects",
-    "errorDesc": "Failed to load marketing projects. Please try again later.",
-    "retry": "Retry",
-    "filterBy": "Filter by Category",
-    "viewMore": "View More",
-    "projectCount": "projects",
-    "toolsUsed": "Tools Used",
-    "tags": "Tags",
-    "projectGallery": "Project Gallery",
-    "moreInsights": "More Marketing Insights",
-    "readMore": "Read More",
-    "backToAll": "Back to All Projects",
-    "clickToClose": "Click anywhere to close",
-    "imageViewer": "Image viewer",
-    "close": "Close",
-    "notFound": "Project Not Found"
+    "seo": {
+      "title": "Marketing in Motion | Shain Studio - Strategies & Campaigns",
+      "description": "Explore Shain Studio's marketing strategies, campaigns, and case studies. From coursework to self-initiated experiments, see how I think, plan, and execute as a modern marketer.",
+      "keywords": "marketing campaigns, marketing strategy, case studies, digital marketing, brand strategy, Shain Wai Yan, Shain Studio",
+      "projectNotFoundTitle": "Project Not Found | Shain Studio",
+      "siteName": "Shain Wai Yan Portfolio",
+      "twitterTitle": "Marketing in Motion | Shain Studio",
+      "twitterDescription": "Explore marketing strategies, campaigns, and case studies by Shain Wai Yan."
+    },
+    "labels": {
+      "heroTitle": "Marketing Strategies, Campaigns, & Case Studies I've Created",
+      "heroDescription": "From coursework to self-initiated experiments — each one reflects how I think, plan, and execute as a modern marketer.",
+      "featuredTitle": "Featured Projects",
+      "searchPlaceholder": "Search projects...",
+      "allCategories": "All Categories",
+      "allTools": "All Tools",
+      "allTags": "All Tags",
+      "allTypes": "All Types",
+      "refresh": "Refresh projects",
+      "showing": "Showing",
+      "of": "of",
+      "projects": "projects",
+      "viewDetails": "View Details",
+      "loadMore": "Load More Projects",
+      "loadingText": "Loading marketing projects...",
+      "errorText": "Oops! Something went wrong",
+      "retryText": "Try Again",
+      "noProjects": "No projects found",
+      "noProjectsHint": "Try adjusting your search or filter criteria.",
+      "loading": "Loading..."
+    },
+    "breadcrumbs": {
+      "home": "Home",
+      "portfolio": "Portfolio",
+      "marketingInMotion": "Marketing in Motion"
+    },
+    "fallback": {
+      "loading": "Loading..."
+    }
   },
   "codingProjects": {
     "title": "Coding Projects",
@@ -125,8 +144,9 @@
     "followers": "Followers",
     "following": "Following",
     "contributions": "Contributions",
-    "contributionsYear": "contributions in the last year",
+    "contributionsYear": "{count} contributions in the last year",
     "languages": "Programming Languages",
+    "languageCount": "{count} languages",
     "pinnedRepositories": "Pinned Repositories",
     "recentActivity": "Recent Activity",
     "viewFiles": "View Files",
@@ -141,27 +161,111 @@
     "noActivity": "No recent activity",
     "noActivityDesc": "This user has not had any public activity recently.",
     "errorLoading": "Error loading GitHub data. Please try again later.",
-    "backToPortfolio": "Back to Portfolio"
+    "backToPortfolio": "Back to Portfolio",
+    "repositoriesShort": "Repositories",
+    "viewProfile": "View Profile on GitHub",
+    "less": "Less",
+    "more": "More",
+    "contribution": "contribution",
+    "contributionsPlural": "contributions",
+    "contributionActivity": "Contribution Activity",
+    "total": "total",
+    "acrossRepos": "across {count} repositories",
+    "acrossReposSingle": "across {count} repository",
+    "noActivityLabel": "No {label} activity in the past year.",
+    "commits": "Commits",
+    "pullRequests": "Pull Requests",
+    "issues": "Issues",
+    "retry": "Retry",
+    "updated": "Updated {date}",
+    "github": "GitHub",
+    "seo": {
+      "title": "Coding Projects - GitHub Profile Viewer | Shain Wai Yan",
+      "description": "Explore coding projects by Shain Wai Yan (xolbine) including a GitHub profile viewer and other hobby programming projects."
+    }
   },
   "businessPlans": {
     "title": "Business Plans",
     "subtitle": "Strategic Business Blueprints",
-    "description": "Comprehensive business plans designed to provide clear direction, identify growth opportunities, and establish actionable strategies for sustainable business success."
+    "description": "Strategic business plans designed to drive growth and market success with comprehensive planning and analysis.",
+    "emptyMessage": "No business plans available at this time."
   },
   "marketingPlans": {
     "title": "Marketing Plans",
     "subtitle": "Strategic Marketing Campaigns",
-    "description": "Innovative marketing strategies and campaigns engineered to drive brand awareness, customer acquisition, and revenue growth across multiple channels."
+    "description": "Innovative tactics designed to engage audiences and boost brand visibility with comprehensive marketing strategies.",
+    "documentsHeading": "Marketing Plan Documents",
+    "emptyMessage": "No marketing plans available at this time.",
+    "seo": {
+      "title": "Marketing Plans | Shain Wai Yan",
+      "description": "Explore innovative marketing tactics designed to engage audiences and boost brand visibility with comprehensive marketing strategies."
+    }
   },
   "photography": {
     "title": "Photography",
     "subtitle": "Visual Storytelling Through the Lens",
-    "description": "A curated collection of photography exploring composition, light, and emotion. Each shot captures a decisive moment with intentional storytelling."
+    "description": "A curated collection of photography exploring composition, light, and emotion. Each shot captures a decisive moment with intentional storytelling.",
+    "seo": {
+      "title": "Photography Portfolio | Shain Wai Yan",
+      "description": "Explore Shain Wai Yan's photography portfolio featuring stunning images of landscapes, architecture, and more.",
+      "openGraphTitle": "Photography Portfolio | Shain Wai Yan",
+      "openGraphDesc": "Stunning photography showcasing landscapes, architecture, and beautiful moments."
+    },
+    "labels": {
+      "heroTitle": "Photography Gallery",
+      "heroDescription": "Capturing moments and memories through the art of photography. Explore my collection of images featuring landscapes, architecture, and beautiful moments from around the world.",
+      "errorText": "Unable to load photos. Please try again later.",
+      "noPhotos": "No photos available at the moment."
+    },
+    "breadcrumbs": {
+      "home": "Home",
+      "portfolio": "Portfolio",
+      "photography": "Photography"
+    }
   },
   "amvEditing": {
     "title": "AMV Editing",
     "subtitle": "Motion Graphics & Video Editing",
-    "description": "Creative video edits and motion graphics where every frame is crafted with precision. Combining music, visuals, and timing to tell compelling stories."
+    "description": "Creative video edits and motion graphics where every frame is crafted with precision. Combining music, visuals, and timing to tell compelling stories.",
+    "seo": {
+      "title": "AMV Editing Portfolio | Shain Wai Yan (xolbine)",
+      "description": "Explore Shain Wai Yan's (xolbine, 明元易) AMV (Anime Music Video) editing portfolio featuring dynamic video edits that blend storytelling with impactful visuals.",
+      "keywords": "Shain Wai Yan, xolbine, 明元易, AMV, anime music video, video editing, portfolio, animation, music videos",
+      "openGraphTitle": "AMV Editing Portfolio | Shain Wai Yan",
+      "openGraphDesc": "Dynamic video edits that blend storytelling with impactful visuals.",
+      "siteName": "Shain Wai Yan Portfolio"
+    },
+    "labels": {
+      "headerTitle": "AMV Editing",
+      "headerDescription": "Dynamic video edits that blend storytelling with impactful visuals",
+      "errorText": "Failed to load videos — showing demo content.",
+      "retry": "Retry"
+    },
+    "breadcrumbs": {
+      "home": "Home",
+      "portfolio": "Portfolio",
+      "amvEditing": "AMV Editing"
+    },
+    "mockChannel": {
+      "title": "Shain Studio AMV",
+      "description": "Welcome to my AMV editing channel! Creating dynamic anime music videos that blend storytelling with impactful visuals.",
+      "subscriberCount": "1.2K",
+      "videoCount": "25"
+    },
+    "mockVideos": [
+      {
+        "title": "The death from Puss in boots: the last wish edited",
+        "description": "A powerful AMV featuring the emotional scenes from Puss in Boots: The Last Wish."
+      },
+      {
+        "title": "Best waifu in anime (who your favourite)",
+        "description": "A compilation showcasing the most beloved female characters."
+      },
+      {
+        "title": "Levi Ackerman (a side character who steal the show) AMV/edit",
+        "description": "An epic tribute to Levi Ackerman from Attack on Titan."
+      }
+    ]
   },
   "about": {
     "title": "About Me",
@@ -200,7 +304,21 @@
   "certificate": {
     "title": "Certificates & Credentials",
     "subtitle": "Professional Certifications",
-    "description": "A collection of my professional certifications, credentials, and achievements."
+    "description": "A collection of my professional certifications, credentials, and achievements.",
+    "seo": {
+      "title": "Professional Certificates & Achievements | Shain Wai Yan",
+      "description": "View my professional certifications and achievements from leading institutions and platforms in digital marketing, business strategy, and professional development."
+    },
+    "labels": {
+      "heroTitle": "Professional Certificates & Achievements",
+      "heroDescription": "A collection of professional certifications and achievements from leading institutions and platforms in digital marketing, business strategy, and professional development.",
+      "errorTitle": "Unable to Load Certificates",
+      "noData": "No certificates available at the moment."
+    },
+    "breadcrumbs": {
+      "home": "Home",
+      "certificate": "Certificate"
+    }
   },
   "aboutPage": {
     "heroTitle": "About",
@@ -349,5 +467,142 @@
     "title": "Ready to Transform Your Marketing?",
     "subtitle": "Let's discuss how my expertise can help achieve your business goals.",
     "button": "Get In Touch"
+  },
+  "portfolioPage": {
+    "hero": {
+      "eyebrow": "Shain Wai Yan · Portfolio",
+      "headline": [
+        "THE WORK",
+        "SPEAKS FOR",
+        "ITSELF"
+      ],
+      "subtitlePrefix": "Six disciplines. One obsession: making things that ",
+      "subtitleHighlight": "work beautifully",
+      "subtitleSuffix": " and leave an impression.",
+      "stats": [
+        {
+          "number": "6+",
+          "label": "Disciplines"
+        },
+        {
+          "number": "50+",
+          "label": "Projects"
+        },
+        {
+          "number": "3",
+          "label": "Languages"
+        }
+      ],
+      "browseAll": "Browse All Work",
+      "featured": "Featured Work",
+      "scroll": "Scroll"
+    },
+    "marquee": [
+      "Business Strategy",
+      "✦",
+      "Digital Marketing",
+      "✦",
+      "Case Studies",
+      "✦",
+      "Full-Stack Code",
+      "✦",
+      "Photography",
+      "✦",
+      "Motion Editing",
+      "✦",
+      "Brand Identity",
+      "✦",
+      "Data-Driven",
+      "✦"
+    ],
+    "cards": {
+      "eyebrow": "The Disciplines",
+      "headline": "ALL WORK",
+      "sub": "Hover any card. Click to go deep.",
+      "explore": "Explore"
+    },
+    "cta": {
+      "eyebrow": "Ready to collaborate?",
+      "headline": [
+        "LET'S BUILD",
+        "SOMETHING",
+        "REMARKABLE"
+      ],
+      "p": "Whether you need a marketing strategy, a coded solution, or a creative vision — let's make it happen.",
+      "btnContact": "Contact Me",
+      "btnAbout": "About Me"
+    },
+    "footer": {
+      "signature": "Shain Studio",
+      "copyright": "© {year} Shain Wai Yan"
+    },
+    "items": {
+      "business-plans": {
+        "title": "Business Plans",
+        "subtitle": "Strategy & Vision",
+        "description": "Comprehensive go-to-market strategies that elevate brand positioning and engineer sustainable market growth.",
+        "tags": [
+          "Strategy",
+          "Branding",
+          "Growth"
+        ],
+        "stat": "6+ Plans"
+      },
+      "marketing-plans": {
+        "title": "Marketing Plans",
+        "subtitle": "Campaigns & Tactics",
+        "description": "Innovative multi-channel campaigns engineered to capture attention, shift perception, and compound brand value.",
+        "tags": [
+          "Digital",
+          "Campaigns",
+          "Analytics"
+        ],
+        "stat": "10+ Plans"
+      },
+      "marketing-in-motion": {
+        "title": "Marketing in Motion",
+        "subtitle": "Live Case Studies",
+        "description": "Real campaigns, real results. A living archive of executed strategies, experiments, and documented outcomes.",
+        "tags": [
+          "Case Studies",
+          "Data",
+          "Results"
+        ],
+        "stat": "17+ Cases"
+      },
+      "coding-projects": {
+        "title": "Coding Projects",
+        "subtitle": "Build & Engineer",
+        "description": "Full-stack apps, clever automations, and interactive tools built with modern frameworks and relentless curiosity.",
+        "tags": [
+          "Next.js",
+          "TypeScript",
+          "APIs"
+        ],
+        "stat": "8+ Projects"
+      },
+      "photography": {
+        "title": "Photography",
+        "subtitle": "Lens & Light",
+        "description": "Visually arresting frames holding tension between a decisive moment and the story behind the shutter.",
+        "tags": [
+          "Composition",
+          "Light",
+          "Story"
+        ],
+        "stat": "200+ Shots"
+      },
+      "amv-editing": {
+        "title": "AMV Editing",
+        "subtitle": "Motion & Story",
+        "description": "Kinetic video edits where every cut is intentional, every transition earns its place, and emotion drives the timeline.",
+        "tags": [
+          "Motion",
+          "Timing",
+          "Emotion"
+        ],
+        "stat": "30+ Videos"
+      }
+    }
   }
 }

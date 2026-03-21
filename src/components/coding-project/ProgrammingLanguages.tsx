@@ -18,7 +18,13 @@ function pct(lang: Language): number {
   return parseFloat(lang.percentage) || 0;
 }
 
+import { useParams } from 'next/navigation';
+import { getDictionarySync } from '@/lib/getDictionary';
+
 export function ProgrammingLanguages({ languages, isLoading }: ProgrammingLanguagesProps) {
+  const params = useParams();
+  const locale = (params?.locale as string) || 'en';
+  const t = getDictionarySync(locale).codingProjects;
   const canvasRef               = useRef<HTMLCanvasElement>(null);
   const chartRef                = useRef<any>(null);
   const [active, setActive]     = useState(0);
@@ -70,7 +76,7 @@ export function ProgrammingLanguages({ languages, isLoading }: ProgrammingLangua
     return (
       <section className="mb-12">
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-xl font-bold text-[#191970] dark:text-[#d4af37]">Programming Languages</h2>
+          <h2 className="text-xl font-bold text-[#191970] dark:text-[#d4af37]">{t.languages}</h2>
         </div>
         <div className="bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-gray-700 rounded-xl p-6 animate-pulse">
           <div className="flex items-center gap-8">
@@ -99,7 +105,7 @@ export function ProgrammingLanguages({ languages, isLoading }: ProgrammingLangua
     <section className="mb-12">
       <div className="flex items-center justify-between mb-5">
         <h2 className="text-xl font-bold text-[#191970] dark:text-[#d4af37]">Programming Languages</h2>
-        <span className="text-sm text-gray-400 dark:text-gray-500">{languages.length} languages</span>
+        <span className="text-sm text-gray-400 dark:text-gray-500">{t.languageCount.replace('{count}', String(languages.length))}</span>
       </div>
 
       <div className="bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-gray-700 rounded-xl p-5 sm:p-6">

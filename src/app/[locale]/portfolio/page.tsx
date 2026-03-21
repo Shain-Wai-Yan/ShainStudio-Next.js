@@ -2,114 +2,8 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import Link from 'next/link';
-
-// ─── Data ─────────────────────────────────────────────────────────────────────
-
-const ITEMS = [
-  {
-    id: 'business-plans',
-    href: './business-plans',
-    number: '01',
-    title: 'Business Plans',
-    subtitle: 'Strategy & Vision',
-    description: 'Comprehensive go-to-market strategies that elevate brand positioning and engineer sustainable market growth.',
-    tags: ['Strategy', 'Branding', 'Growth'],
-    stat: '6+ Plans',
-    icon: (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-        <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-      </svg>
-    ),
-  },
-  {
-    id: 'marketing-plans',
-    href: './marketing-plans',
-    number: '02',
-    title: 'Marketing Plans',
-    subtitle: 'Campaigns & Tactics',
-    description: 'Innovative multi-channel campaigns engineered to capture attention, shift perception, and compound brand value.',
-    tags: ['Digital', 'Campaigns', 'Analytics'],
-    stat: '10+ Plans',
-    icon: (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-        <path d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/>
-        <path d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"/>
-      </svg>
-    ),
-  },
-  {
-    id: 'marketing-in-motion',
-    href: './marketing-in-motion',
-    number: '03',
-    title: 'Marketing in Motion',
-    subtitle: 'Live Case Studies',
-    description: 'Real campaigns, real results. A living archive of executed strategies, experiments, and documented outcomes.',
-    tags: ['Case Studies', 'Data', 'Results'],
-    stat: '17+ Cases',
-    icon: (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-        <polygon points="5 3 19 12 5 21 5 3"/>
-      </svg>
-    ),
-  },
-  {
-    id: 'coding-projects',
-    href: './coding-projects',
-    number: '04',
-    title: 'Coding Projects',
-    subtitle: 'Build & Engineer',
-    description: 'Full-stack apps, clever automations, and interactive tools built with modern frameworks and relentless curiosity.',
-    tags: ['Next.js', 'TypeScript', 'APIs'],
-    stat: '8+ Projects',
-    icon: (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-        <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
-      </svg>
-    ),
-  },
-  {
-    id: 'photography',
-    href: './photography',
-    number: '05',
-    title: 'Photography',
-    subtitle: 'Lens & Light',
-    description: 'Visually arresting frames holding tension between a decisive moment and the story behind the shutter.',
-    tags: ['Composition', 'Light', 'Story'],
-    stat: '200+ Shots',
-    icon: (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-        <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
-        <circle cx="12" cy="13" r="4"/>
-      </svg>
-    ),
-  },
-  {
-    id: 'amv-editing',
-    href: './amv-editing',
-    number: '06',
-    title: 'AMV Editing',
-    subtitle: 'Motion & Story',
-    description: 'Kinetic video edits where every cut is intentional, every transition earns its place, and emotion drives the timeline.',
-    tags: ['Motion', 'Timing', 'Emotion'],
-    stat: '30+ Videos',
-    icon: (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-        <rect x="2" y="2" width="20" height="20" rx="2.18"/>
-        <line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/>
-        <line x1="2" y1="12" x2="22" y2="12"/>
-        <line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/>
-        <line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/>
-      </svg>
-    ),
-  },
-];
-
-const MARQUEE = [
-  'Business Strategy','✦','Digital Marketing','✦',
-  'Case Studies','✦','Full-Stack Code','✦',
-  'Photography','✦','Motion Editing','✦',
-  'Brand Identity','✦','Data-Driven','✦',
-];
+import { useParams } from 'next/navigation';
+import { getDictionarySync } from '@/lib/getDictionary';
 
 // ─── Particle canvas — gold in both modes, denser on dark ─────────────────────
 
@@ -124,8 +18,7 @@ function ParticleField({ dark }: { dark: boolean }) {
     const resize = () => { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; };
     resize();
     window.addEventListener('resize', resize);
-    // In light mode: gold particles on navy — same palette, just less alpha
-    // In dark mode: gold particles on near-black — more alpha for pop
+    
     const col = '212,175,55';
     const count = dark ? 75 : 65;
     const pts = Array.from({ length: count }, () => ({
@@ -173,7 +66,7 @@ function ParticleField({ dark }: { dark: boolean }) {
 
 // ─── Tilt card ────────────────────────────────────────────────────────────────
 
-function TiltCard({ item, index }: { item: typeof ITEMS[0]; index: number }) {
+function TiltCard({ item, index, exploreText, isZh }: { item: any; index: number; exploreText: string; isZh: boolean }) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const [glow, setGlow] = useState({ x: 50, y: 50 });
@@ -216,10 +109,8 @@ function TiltCard({ item, index }: { item: typeof ITEMS[0]; index: number }) {
           overflow-hidden
         "
       >
-        {/* Gold top accent bar — slides in on hover */}
         <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#d4af37] via-[#ffd700] to-[#d4af37] scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-400" />
 
-        {/* Mouse-follow glow — navy tint light, gold tint dark */}
         <div
           className="absolute inset-0 pointer-events-none transition-opacity duration-300 dark:hidden"
           style={{
@@ -236,55 +127,43 @@ function TiltCard({ item, index }: { item: typeof ITEMS[0]; index: number }) {
         />
 
         <div className="relative z-10 flex flex-col h-full p-6 gap-4">
-          {/* Top row: number + icon */}
           <div className="flex items-start justify-between">
             <span className="text-[10px] font-black tracking-[0.28em] uppercase tabular-nums text-[#191970]/25 dark:text-[#d4af37]/35 group-hover:text-[#191970]/50 dark:group-hover:text-[#d4af37]/60 transition-colors duration-200">
               {item.number}
             </span>
-            <div className="
-              p-2.5
-              bg-[#191970]/6 dark:bg-[#d4af37]/8
-              border border-[#191970]/10 dark:border-[#d4af37]/12
-              text-[#191970] dark:text-[#d4af37]
-              group-hover:bg-[#191970] dark:group-hover:bg-[#d4af37]
-              group-hover:text-white dark:group-hover:text-[#0a0a1a]
-              group-hover:border-[#191970] dark:group-hover:border-[#d4af37]
-              transition-all duration-250
-            ">
+            <div className={`p-2.5 bg-[#191970]/6 dark:bg-[#d4af37]/8 border border-[#191970]/10 dark:border-[#d4af37]/12 text-[#191970] dark:text-[#d4af37] group-hover:bg-[#191970] dark:group-hover:bg-[#d4af37] group-hover:text-white dark:group-hover:text-[#0a0a1a] group-hover:border-[#191970] dark:group-hover:border-[#d4af37] transition-all duration-250`}>
               {item.icon}
             </div>
           </div>
 
-          {/* Text block */}
           <div className="flex-1 min-w-0">
-            <p className="text-[9px] font-black uppercase tracking-[0.24em] mb-2 text-[#191970]/40 dark:text-[#d4af37]/50">
+            <p className={`text-[9px] ${isZh ? 'font-bold' : 'font-black uppercase'} tracking-[0.24em] mb-2 text-[#191970]/40 dark:text-[#d4af37]/50`} style={{ fontFamily: isZh ? 'ZCOOL QingKe HuangYou, sans-serif' : 'inherit' }}>
               {item.subtitle}
             </p>
-            <h2 className="text-[15px] font-black text-[#111111] dark:text-white leading-tight mb-3 group-hover:text-[#191970] dark:group-hover:text-[#ffd700] transition-colors duration-200">
+            <h2 className={`text-[15px] ${isZh ? 'font-bold' : 'font-black'} text-[#111111] dark:text-white leading-tight mb-3 group-hover:text-[#191970] dark:group-hover:text-[#ffd700] transition-colors duration-200`} style={{ fontFamily: isZh ? 'ZCOOL XiaoWei, sans-serif' : 'inherit' }}>
               {item.title}
             </h2>
-            <p className="text-xs text-[#555555] dark:text-white/40 leading-relaxed line-clamp-3 group-hover:text-[#333333] dark:group-hover:text-white/60 transition-colors duration-200">
+            <p className="text-xs text-[#555555] dark:text-white/40 leading-relaxed line-clamp-3 group-hover:text-[#333333] dark:group-hover:text-white/60 transition-colors duration-200" style={{ fontFamily: isZh ? 'ZCOOL QingKe HuangYou, sans-serif' : 'inherit' }}>
               {item.description}
             </p>
           </div>
 
-          {/* Tags */}
           <div className="flex flex-wrap gap-1.5">
-            {item.tags.map((tag) => (
+            {item.tags.map((tag: string) => (
               <span
                 key={tag}
-                className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 bg-[#191970]/5 dark:bg-[#d4af37]/8 text-[#191970] dark:text-[#d4af37] border border-[#191970]/10 dark:border-[#d4af37]/15 group-hover:bg-[#191970]/10 dark:group-hover:bg-[#d4af37]/15 transition-colors"
+                className={`text-[9px] ${isZh ? 'font-bold' : 'font-bold uppercase'} tracking-wider px-2 py-0.5 bg-[#191970]/5 dark:bg-[#d4af37]/8 text-[#191970] dark:text-[#d4af37] border border-[#191970]/10 dark:border-[#d4af37]/15 group-hover:bg-[#191970]/10 dark:group-hover:bg-[#d4af37]/15 transition-colors`}
+                style={{ fontFamily: isZh ? 'ZCOOL QingKe HuangYou, sans-serif' : 'inherit' }}
               >
                 {tag}
               </span>
             ))}
           </div>
 
-          {/* Footer */}
           <div className="flex items-center justify-between pt-4 border-t border-[#191970]/8 dark:border-white/6">
             <span className="text-xs font-black text-[#191970] dark:text-[#d4af37]">{item.stat}</span>
-            <span className="flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-[#191970] dark:text-[#d4af37] group-hover:gap-2.5 transition-all duration-200">
-              Explore
+            <span className={`flex items-center gap-1 text-[10px] ${isZh ? 'font-black' : 'font-black uppercase'} tracking-wider text-[#191970] dark:text-[#d4af37] group-hover:gap-2.5 transition-all duration-200`}>
+              {exploreText}
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <path d="M5 12h14M12 5l7 7-7 7"/>
               </svg>
@@ -298,11 +177,11 @@ function TiltCard({ item, index }: { item: typeof ITEMS[0]; index: number }) {
 
 // ─── Animated stat ────────────────────────────────────────────────────────────
 
-function Stat({ n, label, delay }: { n: string; label: string; delay: string }) {
+function Stat({ n, label, delay, isZh }: { n: string; label: string; delay: string; isZh: boolean }) {
   return (
     <div className="text-center" style={{ opacity: 0, animation: `fadeSlideUp 0.7s cubic-bezier(0.16,1,0.3,1) ${delay} forwards` }}>
-      <div className="font-display text-[2.8rem] text-[#ffd700] dark:text-[#d4af37] leading-none drop-shadow-[0_0_12px_rgba(255,215,0,0.4)]">{n}</div>
-      <div className="text-[9px] uppercase tracking-[0.22em] text-white/50 dark:text-white/35 mt-1.5 font-bold">{label}</div>
+      <div className="font-display text-[2.8rem] text-[#ffd700] dark:text-[#d4af37] leading-none drop-shadow-[0_0_12px_rgba(255,215,0,0.4)]" style={{ fontFamily: isZh ? 'ZCOOL QingKe HuangYou, sans-serif' : 'inherit' }}>{n}</div>
+      <div className={`text-[9px] ${isZh ? '' : 'uppercase'} tracking-[0.22em] text-white/50 dark:text-white/35 mt-1.5 font-bold`} style={{ fontFamily: isZh ? 'ZCOOL QingKe HuangYou, sans-serif' : 'inherit' }}>{label}</div>
     </div>
   );
 }
@@ -325,6 +204,11 @@ function ScrollObserver() {
 // ─── Main page ────────────────────────────────────────────────────────────────
 
 export default function PortfolioPage() {
+  const params = useParams();
+  const locale = (params?.locale as string) || 'en';
+  const translations = getDictionarySync(locale as any);
+  const t = translations.portfolioPage;
+
   const [dark, setDark] = useState(false);
   useEffect(() => {
     const mq = window.matchMedia('(prefers-color-scheme: dark)');
@@ -336,11 +220,117 @@ export default function PortfolioPage() {
     return () => { obs.disconnect(); mq.removeEventListener('change', check); };
   }, []);
 
+  const isZh = locale === 'zh';
+  const displayFont = isZh ? "'ZCOOL XiaoWei', sans-serif" : "'Bebas Neue', sans-serif";
+
+  // Data
+  const ITEMS = [
+    {
+      id: 'business-plans',
+      href: `/${locale}/portfolio/business-plans`,
+      number: '01',
+      title: t.items['business-plans'].title,
+      subtitle: t.items['business-plans'].subtitle,
+      description: t.items['business-plans'].description,
+      tags: t.items['business-plans'].tags,
+      stat: t.items['business-plans'].stat,
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+          <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012-2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+        </svg>
+      ),
+    },
+    {
+      id: 'marketing-plans',
+      href: `/${locale}/portfolio/marketing-plans`,
+      number: '02',
+      title: t.items['marketing-plans'].title,
+      subtitle: t.items['marketing-plans'].subtitle,
+      description: t.items['marketing-plans'].description,
+      tags: t.items['marketing-plans'].tags,
+      stat: t.items['marketing-plans'].stat,
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+          <path d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/>
+          <path d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"/>
+        </svg>
+      ),
+    },
+    {
+      id: 'marketing-in-motion',
+      href: `/${locale}/portfolio/marketing-in-motion`,
+      number: '03',
+      title: t.items['marketing-in-motion'].title,
+      subtitle: t.items['marketing-in-motion'].subtitle,
+      description: t.items['marketing-in-motion'].description,
+      tags: t.items['marketing-in-motion'].tags,
+      stat: t.items['marketing-in-motion'].stat,
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+          <polygon points="5 3 19 12 5 21 5 3"/>
+        </svg>
+      ),
+    },
+    {
+      id: 'coding-projects',
+      href: `/${locale}/portfolio/coding-projects`,
+      number: '04',
+      title: t.items['coding-projects'].title,
+      subtitle: t.items['coding-projects'].subtitle,
+      description: t.items['coding-projects'].description,
+      tags: t.items['coding-projects'].tags,
+      stat: t.items['coding-projects'].stat,
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+          <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
+        </svg>
+      ),
+    },
+    {
+      id: 'photography',
+      href: `/${locale}/portfolio/photography`,
+      number: '05',
+      title: t.items['photography'].title,
+      subtitle: t.items['photography'].subtitle,
+      description: t.items['photography'].description,
+      tags: t.items['photography'].tags,
+      stat: t.items['photography'].stat,
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+          <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
+          <circle cx="12" cy="13" r="4"/>
+        </svg>
+      ),
+    },
+    {
+      id: 'amv-editing',
+      href: `/${locale}/portfolio/amv-editing`,
+      number: '06',
+      title: t.items['amv-editing'].title,
+      subtitle: t.items['amv-editing'].subtitle,
+      description: t.items['amv-editing'].description,
+      tags: t.items['amv-editing'].tags,
+      stat: t.items['amv-editing'].stat,
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+          <rect x="2" y="2" width="20" height="20" rx="2.18"/>
+          <line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/>
+          <line x1="2" y1="12" x2="22" y2="12"/>
+          <line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/>
+          <line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/>
+        </svg>
+      ),
+    },
+  ];
+
+  const MARQUEE = t.marquee;
+
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
-        .font-display { font-family:'Bebas Neue',sans-serif; letter-spacing:0.02em; }
+        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=ZCOOL+QingKe+HuangYou&family=ZCOOL+XiaoWei&display=swap');
+        
+        .font-display { font-family: ${displayFont}; letter-spacing:0.02em; ${isZh ? 'font-weight:400;' : ''} }
 
         @keyframes fadeSlideUp {
           from { opacity:0; transform:translateY(28px); }
@@ -493,35 +483,34 @@ export default function PortfolioPage() {
             {/* Eyebrow */}
             <div className="anim-0 flex items-center gap-3 mb-7">
               <div className="h-px w-10 bg-[#ffd700]" />
-              <span className="text-[10px] font-black tracking-[0.3em] uppercase text-[#ffd700]">
-                Shain Wai Yan · Portfolio
+              <span className={`text-[10px] ${isZh ? 'font-bold' : 'font-black uppercase'} tracking-[0.3em] text-[#ffd700]`} style={{ fontFamily: isZh ? 'ZCOOL QingKe HuangYou, sans-serif' : 'inherit' }}>
+                {t.hero.eyebrow}
               </span>
             </div>
 
             {/* Giant headline */}
             <h1 className="anim-1 font-display leading-[0.88] mb-8" style={{ fontSize: 'clamp(3.8rem,11vw,9.5rem)' }}>
-              {/* Both modes: white on navy background */}
-              <span className="block text-white">THE WORK</span>
+              <span className="block text-white">{t.hero.headline[0]}</span>
               <span className="block outline-on-navy dark:outline-on-dark">
-                SPEAKS FOR
+                {t.hero.headline[1]}
               </span>
               <span className="block text-white relative">
-                ITSELF
+                {t.hero.headline[2]}
                 <span className="float-star ml-3 text-[#ffd700]" style={{ fontSize: '2.2rem' }} aria-hidden="true">✦</span>
               </span>
             </h1>
 
             {/* Sub + stats */}
             <div className="anim-2 flex flex-col sm:flex-row items-start sm:items-end gap-8 mb-12">
-              <p className="text-white/60 text-lg leading-relaxed max-w-md font-light">
-                Six disciplines. One obsession: making things that{' '}
-                <em className="not-italic font-semibold text-white/90">work beautifully</em>{' '}
-                and leave an impression.
+              <p className="text-white/60 text-lg leading-relaxed max-w-md font-light" style={{ fontFamily: isZh ? 'ZCOOL QingKe HuangYou, sans-serif' : 'inherit' }}>
+                {t.hero.subtitlePrefix}
+                <em className="not-italic font-semibold text-white/90">{t.hero.subtitleHighlight}</em>
+                {t.hero.subtitleSuffix}
               </p>
               <div className="flex gap-8 sm:ml-auto flex-shrink-0">
-                <Stat n="6+" label="Disciplines" delay="0.75s" />
-                <Stat n="50+" label="Projects" delay="0.87s" />
-                <Stat n="3" label="Languages" delay="0.99s" />
+                <Stat n={t.hero.stats[0].number} label={t.hero.stats[0].label} delay="0.75s" isZh={isZh} />
+                <Stat n={t.hero.stats[1].number} label={t.hero.stats[1].label} delay="0.87s" isZh={isZh} />
+                <Stat n={t.hero.stats[2].number} label={t.hero.stats[2].label} delay="0.99s" isZh={isZh} />
               </div>
             </div>
 
@@ -529,18 +518,20 @@ export default function PortfolioPage() {
             <div className="anim-3 flex flex-wrap items-center gap-4">
               <a
                 href="#work"
-                className="relative inline-flex items-center gap-2.5 px-8 py-3.5 font-black text-sm uppercase tracking-[0.1em] bg-[#ffd700] text-[#0f0f45] overflow-hidden cta-ring hover:bg-[#ffe347] transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ffd700]/50"
+                className={`relative inline-flex items-center gap-2.5 px-8 py-3.5 ${isZh ? 'font-bold' : 'font-black uppercase tracking-[0.1em]'} text-sm text-[#0f0f45] overflow-hidden cta-ring hover:bg-[#ffe347] transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ffd700]/50 bg-[#ffd700]`}
+                style={{ fontFamily: isZh ? 'ZCOOL QingKe HuangYou, sans-serif' : 'inherit' }}
               >
-                Browse All Work
+                {t.hero.browseAll}
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <path d="M12 5v14M5 12l7 7 7-7"/>
                 </svg>
               </a>
               <Link
-                href="/portfolio/marketing-in-motion"
-                className="inline-flex items-center gap-2.5 px-8 py-3.5 font-bold text-sm uppercase tracking-[0.1em] border border-[#ffd700]/40 text-[#ffd700]/85 hover:border-[#ffd700]/70 hover:text-[#ffd700] hover:bg-white/5 transition-all duration-200 focus:outline-none"
+                href={`/${locale}/portfolio/marketing-in-motion`}
+                className={`inline-flex items-center gap-2.5 px-8 py-3.5 ${isZh ? 'font-bold' : 'font-bold uppercase tracking-[0.1em]'} text-sm border border-[#ffd700]/40 text-[#ffd700]/85 hover:border-[#ffd700]/70 hover:text-[#ffd700] hover:bg-white/5 transition-all duration-200 focus:outline-none`}
+                style={{ fontFamily: isZh ? 'ZCOOL QingKe HuangYou, sans-serif' : 'inherit' }}
               >
-                Featured Work
+                {t.hero.featured}
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <path d="M5 12h14M12 5l7 7-7 7"/>
                 </svg>
@@ -551,7 +542,9 @@ export default function PortfolioPage() {
           {/* Scroll indicator */}
           <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 anim-2">
             <div className="w-px h-10 bg-gradient-to-b from-[#ffd700]/60 to-transparent" />
-            <span className="text-[8px] tracking-[0.32em] uppercase text-[#ffd700]/45 font-black">Scroll</span>
+            <span className={`text-[8px] tracking-[0.32em] ${isZh ? 'font-bold' : 'uppercase font-black'} text-[#ffd700]/45`} style={{ fontFamily: isZh ? 'ZCOOL QingKe HuangYou, sans-serif' : 'inherit' }}>
+              {t.hero.scroll}
+            </span>
           </div>
         </section>
 
@@ -560,14 +553,15 @@ export default function PortfolioPage() {
         ══════════════════════════════════════════════════════════════════ */}
         <div className="overflow-hidden border-y border-[#ffd700]/20 bg-[#0f0f45] dark:bg-[#0a0a1a] dark:border-[#d4af37]/10 py-3.5">
           <div className="flex whitespace-nowrap marquee-track select-none">
-            {[...MARQUEE, ...MARQUEE].map((t, i) => (
+            {[...MARQUEE, ...MARQUEE].map((tStr, i) => (
               <span
                 key={i}
-                className={`inline-flex items-center px-5 text-[10px] font-black uppercase tracking-[0.18em] ${
-                  t === '✦' ? 'text-[#ffd700]' : 'text-white/25 dark:text-white/20'
+                className={`inline-flex items-center px-5 text-[10px] ${isZh ? 'font-bold' : 'font-black uppercase'} tracking-[0.18em] ${
+                  tStr === '✦' ? 'text-[#ffd700]' : 'text-white/25 dark:text-white/20'
                 }`}
+                style={{ fontFamily: isZh ? 'ZCOOL QingKe HuangYou, sans-serif' : 'inherit' }}
               >
-                {t}
+                {tStr}
               </span>
             ))}
           </div>
@@ -587,23 +581,23 @@ export default function PortfolioPage() {
               <div>
                 <div className="flex items-center gap-3 mb-3">
                   <div className="h-px w-8 bg-[#191970] dark:bg-[#d4af37]" />
-                  <span className="text-[9px] font-black tracking-[0.3em] uppercase text-[#191970] dark:text-[#d4af37]">
-                    The Disciplines
+                  <span className={`text-[9px] ${isZh ? 'font-bold' : 'font-black uppercase'} tracking-[0.3em] text-[#191970] dark:text-[#d4af37]`} style={{ fontFamily: isZh ? 'ZCOOL QingKe HuangYou, sans-serif' : 'inherit' }}>
+                    {t.cards.eyebrow}
                   </span>
                 </div>
                 <h2 className="font-display text-[#191970] dark:text-black leading-none" style={{ fontSize: 'clamp(2.8rem,6vw,5rem)' }}>
-                  ALL WORK
+                  {t.cards.headline}
                 </h2>
               </div>
-              <p className="hidden sm:block text-xs text-[#555] dark:text-black max-w-[200px] text-right leading-relaxed">
-                Hover any card. Click to go deep.
+              <p className="hidden sm:block text-xs text-[#555] dark:text-black max-w-[200px] text-right leading-relaxed" style={{ fontFamily: isZh ? 'ZCOOL QingKe HuangYou, sans-serif' : 'inherit' }}>
+                {t.cards.sub}
               </p>
             </div>
 
             {/* Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {ITEMS.map((item, i) => (
-                <TiltCard key={item.id} item={item} index={i} />
+                <TiltCard key={item.id} item={item} index={i} exploreText={t.cards.explore} isZh={isZh} />
               ))}
             </div>
           </div>
@@ -629,32 +623,34 @@ export default function PortfolioPage() {
           />
 
           <div className="reveal relative z-10 max-w-3xl mx-auto px-6 text-center">
-            <p className="text-[9px] font-black tracking-[0.35em] uppercase text-[#ffd700]/65 mb-5">
-              Ready to collaborate?
+            <p className={`text-[9px] ${isZh ? 'font-bold' : 'font-black uppercase'} tracking-[0.35em] text-[#ffd700]/65 mb-5`} style={{ fontFamily: isZh ? 'ZCOOL QingKe HuangYou, sans-serif' : 'inherit' }}>
+               {t.cta.eyebrow}
             </p>
             <h2 className="font-display text-white leading-[0.9] mb-6" style={{ fontSize: 'clamp(2.8rem,8vw,7rem)' }}>
-              LET'S BUILD<br />
-              <span className="outline-on-navy">SOMETHING</span><br />
-              REMARKABLE
+              {t.cta.headline[0]}<br />
+              <span className="outline-on-navy">{t.cta.headline[1]}</span><br />
+              {t.cta.headline[2]}
             </h2>
-            <p className="text-white/45 text-sm leading-relaxed mb-10 max-w-md mx-auto">
-              Whether you need a marketing strategy, a coded solution, or a creative vision — let's make it happen.
+            <p className="text-white/45 text-sm leading-relaxed mb-10 max-w-md mx-auto" style={{ fontFamily: isZh ? 'ZCOOL QingKe HuangYou, sans-serif' : 'inherit' }}>
+              {t.cta.p}
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4">
               <Link
-                href="/contact"
-                className="relative inline-flex items-center gap-2.5 px-10 py-3.5 font-black text-sm uppercase tracking-[0.1em] bg-[#ffd700] text-[#0f0f45] overflow-hidden cta-ring hover:bg-[#ffe347] transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ffd700]/50"
+                href={`/${locale}/contact`}
+                className={`relative inline-flex items-center gap-2.5 px-10 py-3.5 ${isZh ? 'font-bold' : 'font-black uppercase tracking-[0.1em]'} text-sm text-[#0f0f45] overflow-hidden cta-ring hover:bg-[#ffe347] transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ffd700]/50 bg-[#ffd700]`}
+                style={{ fontFamily: isZh ? 'ZCOOL QingKe HuangYou, sans-serif' : 'inherit' }}
               >
-                Contact Me
+                {t.cta.btnContact}
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <path d="M5 12h14M12 5l7 7-7 7"/>
                 </svg>
               </Link>
               <Link
-                href="/about"
-                className="inline-flex items-center gap-2 px-10 py-3.5 font-bold text-sm uppercase tracking-[0.1em] border border-[#ffd700]/35 text-[#ffd700]/75 hover:bg-white/5 hover:border-[#ffd700]/60 hover:text-[#ffd700] transition-all duration-200 focus:outline-none"
+                href={`/${locale}/about`}
+                className={`inline-flex items-center gap-2 px-10 py-3.5 font-bold text-sm ${isZh ? '' : 'uppercase tracking-[0.1em]'} border border-[#ffd700]/35 text-[#ffd700]/75 hover:bg-white/5 hover:border-[#ffd700]/60 hover:text-[#ffd700] transition-all duration-200 focus:outline-none`}
+                style={{ fontFamily: isZh ? 'ZCOOL QingKe HuangYou, sans-serif' : 'inherit' }}
               >
-                About Me
+                {t.cta.btnAbout}
               </Link>
             </div>
           </div>
@@ -669,8 +665,8 @@ export default function PortfolioPage() {
               <div className="w-7 h-7 grid place-items-center border border-[#191970]/25 dark:border-[#d4af37]/25">
                 <span className="text-[9px] font-black text-[#191970] dark:text-[#d4af37]">S</span>
               </div>
-              <span className="text-[10px] font-black tracking-[0.22em] uppercase text-[#191970]/45 dark:text-white/30">
-                Shain Studio
+              <span className={`text-[10px] ${isZh ? 'font-bold' : 'font-black uppercase'} tracking-[0.22em] text-[#191970]/45 dark:text-white/30`} style={{ fontFamily: isZh ? 'ZCOOL QingKe HuangYou, sans-serif' : 'inherit' }}>
+                {t.footer.signature}
               </span>
             </div>
             <nav className="flex flex-wrap justify-center gap-5" aria-label="Portfolio sections">
@@ -678,14 +674,15 @@ export default function PortfolioPage() {
                 <Link
                   key={item.id}
                   href={item.href}
-                  className="text-[10px] font-semibold uppercase tracking-wider text-[#555555] dark:text-white/25 hover:text-[#191970] dark:hover:text-[#d4af37] transition-colors duration-200"
+                  className={`text-[10px] font-semibold ${isZh ? '' : 'uppercase'} tracking-wider text-[#555555] dark:text-white/25 hover:text-[#191970] dark:hover:text-[#d4af37] transition-colors duration-200`}
+                  style={{ fontFamily: isZh ? 'ZCOOL QingKe HuangYou, sans-serif' : 'inherit' }}
                 >
                   {item.title}
                 </Link>
               ))}
             </nav>
-            <span className="text-[10px] text-[#666666]/45 dark:text-white/15">
-              © {new Date().getFullYear()} Shain Wai Yan
+            <span className="text-[10px] text-[#666666]/45 dark:text-white/15" style={{ fontFamily: isZh ? 'ZCOOL QingKe HuangYou, sans-serif' : 'inherit' }}>
+               {t.footer.copyright.replace('{year}', new Date().getFullYear().toString())}
             </span>
           </div>
         </footer>

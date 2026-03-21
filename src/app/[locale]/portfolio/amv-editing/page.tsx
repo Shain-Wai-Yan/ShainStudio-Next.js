@@ -1,12 +1,14 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
+import { usePathname } from 'next/navigation';
 import { Breadcrumb } from '@/components/Breadcrumb';
 import AMVHeader from '@/components/amv-editing/AMVHeader';
 import ChannelInfo from '@/components/amv-editing/ChannelInfo';
 import FeaturedVideo from '@/components/amv-editing/FeaturedVideo';
 import VideoGrid from '@/components/amv-editing/VideoGrid';
 import { transformVideoData, type TransformedVideo } from '@/lib/youtube-utils';
+import { getDictionarySync } from '@/lib/getDictionary';
 
 interface ChannelData {
   title: string;
@@ -16,71 +18,6 @@ interface ChannelData {
   bannerUrl?: string;
   avatarUrl?: string;
 }
-
-const MOCK_CHANNEL_DATA: ChannelData = {
-  title: 'Shain Studio AMV',
-  description:
-    'Welcome to my AMV editing channel! Creating dynamic anime music videos that blend storytelling with impactful visuals.',
-  subscriberCount: '1.2K',
-  videoCount: '25',
-  avatarUrl: '/images/Shain Studio.png',
-};
-
-const MOCK_VIDEOS = [
-  {
-    id: 'video1',
-    snippet: {
-      resourceId: { videoId: '8aIsh6rfW4U' },
-      title: 'The death from Puss in boots: the last wish edited',
-      description:
-        'A powerful AMV featuring the emotional scenes from Puss in Boots: The Last Wish.',
-      thumbnails: {
-        high: {
-          url: 'https://via.placeholder.com/640x360/191970/ffffff?text=Puss+in+Boots',
-        },
-      },
-      publishedAt: '2022-01-01T00:00:00Z',
-      channelTitle: 'Shain Studio',
-    },
-    statistics: { viewCount: '6200' },
-    contentDetails: { duration: 'PT1M' },
-  },
-  {
-    id: 'video2',
-    snippet: {
-      resourceId: { videoId: 'dQw4w9WgXcQ' },
-      title: 'Best waifu in anime (who your favourite)',
-      description: 'A compilation showcasing the most beloved female characters.',
-      thumbnails: {
-        high: {
-          url: 'https://via.placeholder.com/640x360/191970/ffffff?text=Best+Waifu',
-        },
-      },
-      publishedAt: '2022-02-01T00:00:00Z',
-      channelTitle: 'Shain Studio',
-    },
-    statistics: { viewCount: '542' },
-    contentDetails: { duration: 'PT12S' },
-  },
-  {
-    id: 'video3',
-    snippet: {
-      resourceId: { videoId: 'LLdGSTceP8c' },
-      title: 'Levi Ackerman (a side character who steal the show) AMV/edit',
-      description:
-        'An epic tribute to Levi Ackerman from Attack on Titan.',
-      thumbnails: {
-        high: {
-          url: 'https://via.placeholder.com/640x360/191970/ffffff?text=Levi+Ackerman',
-        },
-      },
-      publishedAt: '2022-03-01T00:00:00Z',
-      channelTitle: 'Shain Studio',
-    },
-    statistics: { viewCount: '1200' },
-    contentDetails: { duration: 'PT8S' },
-  },
-];
 
 interface YouTubeApiResponse {
   items: Array<{
@@ -116,12 +53,66 @@ interface YouTubeApiResponse {
 }
 
 export default function AMVEditingPage() {
+  const pathname = usePathname();
+  const locale = pathname.startsWith('/zh') ? 'zh' : 'en';
+  const t = getDictionarySync(locale);
+
   const [channelData, setChannelData] = useState<ChannelData | null>(null);
   const [videos, setVideos] = useState<TransformedVideo[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // ─── FIX: fetch ALL pages from the paginated YouTube API ───────────────────
+  const mockChannelData: ChannelData = useMemo(() => ({
+    title: t.amvEditing.mockChannel.title,
+    description: t.amvEditing.mockChannel.description,
+    subscriberCount: t.amvEditing.mockChannel.subscriberCount,
+    videoCount: t.amvEditing.mockChannel.videoCount,
+    avatarUrl: '/images/Shain Studio.png',
+  }), [t]);
+
+  const mockVideos = useMemo(() => [
+    {
+      id: 'video1',
+      snippet: {
+        resourceId: { videoId: '8aIsh6rfW4U' },
+        title: t.amvEditing.mockVideos[0].title,
+        description: t.amvEditing.mockVideos[0].description,
+        thumbnails: { high: { url: 'https://via.placeholder.com/640x360/191970/ffffff?text=Puss+in+Boots' } },
+        publishedAt: '2022-01-01T00:00:00Z',
+        channelTitle: t.amvEditing.mockChannel.title,
+      },
+      statistics: { viewCount: '6200' },
+      contentDetails: { duration: 'PT1M' },
+    },
+    {
+      id: 'video2',
+      snippet: {
+        resourceId: { videoId: 'dQw4w9WgXcQ' },
+        title: t.amvEditing.mockVideos[1].title,
+        description: t.amvEditing.mockVideos[1].description,
+        thumbnails: { high: { url: 'https://via.placeholder.com/640x360/191970/ffffff?text=Best+Waifu' } },
+        publishedAt: '2022-02-01T00:00:00Z',
+        channelTitle: t.amvEditing.mockChannel.title,
+      },
+      statistics: { viewCount: '542' },
+      contentDetails: { duration: 'PT12S' },
+    },
+    {
+      id: 'video3',
+      snippet: {
+        resourceId: { videoId: 'LLdGSTceP8c' },
+        title: t.amvEditing.mockVideos[2].title,
+        description: t.amvEditing.mockVideos[2].description,
+        thumbnails: { high: { url: 'https://via.placeholder.com/640x360/191970/ffffff?text=Levi+Ackerman' } },
+        publishedAt: '2022-03-01T00:00:00Z',
+        channelTitle: t.amvEditing.mockChannel.title,
+      },
+      statistics: { viewCount: '1200' },
+      contentDetails: { duration: 'PT8S' },
+    },
+  ], [t]);
+
+  // ─── Fetch ALL pages from the paginated YouTube API
   const fetchAllVideos = useCallback(async (): Promise<YouTubeApiResponse['items']> => {
     const allItems: YouTubeApiResponse['items'] = [];
     let pageToken: string | null = null;
@@ -140,7 +131,6 @@ export default function AMVEditingPage() {
         allItems.push(...data.items);
       }
 
-      // YouTube returns nextPageToken when more pages exist
       pageToken = data.nextPageToken ?? null;
     } while (pageToken);
 
@@ -165,48 +155,44 @@ export default function AMVEditingPage() {
       if (channelRawData.items && channelRawData.items.length > 0) {
         const channelItem = channelRawData.items[0];
         setChannelData({
-          title: channelItem.snippet?.title || MOCK_CHANNEL_DATA.title,
-          description:
-            channelItem.snippet?.description || MOCK_CHANNEL_DATA.description,
-          subscriberCount:
-            channelItem.statistics?.subscriberCount ||
-            MOCK_CHANNEL_DATA.subscriberCount,
-          videoCount:
-            channelItem.statistics?.videoCount || MOCK_CHANNEL_DATA.videoCount,
-          avatarUrl:
-            channelItem.snippet?.thumbnails?.high?.url ||
-            MOCK_CHANNEL_DATA.avatarUrl,
+          title: channelItem.snippet?.title || mockChannelData.title,
+          description: channelItem.snippet?.description || mockChannelData.description,
+          subscriberCount: channelItem.statistics?.subscriberCount || mockChannelData.subscriberCount,
+          videoCount: channelItem.statistics?.videoCount || mockChannelData.videoCount,
+          avatarUrl: channelItem.snippet?.thumbnails?.high?.url || mockChannelData.avatarUrl,
           bannerUrl: channelItem.brandingSettings?.image?.bannerExternalUrl,
         });
       } else {
-        setChannelData(MOCK_CHANNEL_DATA);
+        setChannelData(mockChannelData);
       }
 
-      // Transform ALL video data (no slice — show everything)
+      // Transform ALL video data
       if (allVideoItems.length > 0) {
         const transformedVideos = allVideoItems.map(transformVideoData);
         setVideos(transformedVideos);
       } else {
-        setVideos(MOCK_VIDEOS.map(transformVideoData));
+        setVideos(mockVideos.map(transformVideoData));
       }
     } catch (err) {
       console.error('Failed to load data:', err);
-      setError('Failed to load videos — showing demo content.');
-      setChannelData(MOCK_CHANNEL_DATA);
-      setVideos(MOCK_VIDEOS.map(transformVideoData));
+      setError(t.amvEditing.labels.errorText);
+      setChannelData(mockChannelData);
+      setVideos(mockVideos.map(transformVideoData));
     } finally {
       setIsLoading(false);
     }
-  }, [fetchAllVideos]);
+  }, [fetchAllVideos, mockChannelData, mockVideos, t.amvEditing.labels.errorText]);
 
   useEffect(() => {
     loadData();
   }, [loadData]);
 
+  const basePath = locale === 'en' ? '' : `/${locale}`;
+
   const breadcrumbItems = [
-    { label: 'Home', href: '/' },
-    { label: 'Portfolio', href: '/portfolio' },
-    { label: 'AMV Editing', href: '/portfolio/amv-editing' },
+    { label: t.amvEditing.breadcrumbs.home, href: basePath || '/' },
+    { label: t.amvEditing.breadcrumbs.portfolio, href: `${basePath}/portfolio` },
+    { label: t.amvEditing.breadcrumbs.amvEditing, href: `${basePath}/portfolio/amv-editing` },
   ];
 
   const featuredVideo = videos[0];
@@ -219,8 +205,8 @@ export default function AMVEditingPage() {
 
         {/* Header */}
         <AMVHeader
-          title="AMV Editing"
-          description="Dynamic video edits that blend storytelling with impactful visuals"
+          title={t.amvEditing.labels.headerTitle}
+          description={t.amvEditing.labels.headerDescription}
           totalVideos={videos.length}
         />
 
@@ -232,7 +218,7 @@ export default function AMVEditingPage() {
               onClick={loadData}
               className="mt-2 px-5 py-2 bg-[#191970] dark:bg-[#a67c00] text-white dark:text-[#0f0f45] text-sm rounded-full hover:bg-[#0f0f4d] dark:hover:bg-[#c9a236] transition-colors"
             >
-              Retry
+              {t.amvEditing.labels.retry}
             </button>
           </div>
         )}

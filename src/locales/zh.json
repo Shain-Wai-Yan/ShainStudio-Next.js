@@ -76,7 +76,14 @@
     "quickLinks": "快速链接",
     "getInTouch": "联系我",
     "followMe": "关注我",
-    "rights": "版权所有。"
+    "rights": "版权所有。",
+    "tagline": "数字营销",
+    "description": "通过创新营销策略和创意卓越，助力品牌转型。",
+    "certifications": "专业证书",
+    "connectWithMe": "联系我",
+    "allRightsReserved": "版权所有。",
+    "privacyPolicy": "隐私政策",
+    "termsOfService": "服务条款"
   },
   "common": {
     "learnMore": "了解更多",
@@ -84,33 +91,45 @@
     "scrollHint": "向下滚动"
   },
   "marketingInMotion": {
-    "title": "营销实战",
-    "description": "真实营销案例展示，展现推动切实成果的实战项目和活动。",
-    "allProjects": "所有项目",
-    "featured": "精选",
-    "businessGrowth": "业务增长",
-    "brandAwareness": "品牌知名度",
-    "engagement": "互动参与",
-    "noProjects": "未找到项目",
-    "noProjectsDesc": "没有匹配您筛选条件的营销项目。",
-    "viewProject": "查看项目",
-    "loading": "加载项目中...",
-    "error": "加载项目出错",
-    "errorDesc": "未能加载营销项目。请稍后重试。",
-    "retry": "重试",
-    "filterBy": "按类别筛选",
-    "viewMore": "查看更多",
-    "projectCount": "个项目",
-    "toolsUsed": "使用工具",
-    "tags": "标签",
-    "projectGallery": "项目图库",
-    "moreInsights": "更多营销案例",
-    "readMore": "阅读更多",
-    "backToAll": "返回所有项目",
-    "clickToClose": "点击任意处关闭",
-    "imageViewer": "图片查看器",
-    "close": "关闭",
-    "notFound": "项目未找到"
+    "seo": {
+      "title": "营销实战 | Shain Studio — 策略与案例研究",
+      "description": "探索 Shain Studio 的营销策略、活动与案例研究。从课程作业到自主实验，了解我作为现代营销人如何思考、规划和执行。",
+      "keywords": "营销活动, 营销策略, 案例研究, 数字营销, 品牌策略, Shain Wai Yan, Shain Studio",
+      "projectNotFoundTitle": "项目未找到 | Shain Studio",
+      "siteName": "Shain Wai Yan 作品集",
+      "twitterTitle": "营销实战 | Shain Studio",
+      "twitterDescription": "探索 Shain Wai Yan 的营销策略、活动与案例研究。"
+    },
+    "labels": {
+      "heroTitle": "我创作的营销策略、活动与案例研究",
+      "heroDescription": "从课程作业到自主实验——每一个项目都体现了我作为现代营销人的思考、规划与执行方式。",
+      "featuredTitle": "精选项目",
+      "searchPlaceholder": "搜索项目...",
+      "allCategories": "全部分类",
+      "allTools": "全部工具",
+      "allTags": "全部标签",
+      "allTypes": "全部类型",
+      "refresh": "刷新项目",
+      "showing": "显示",
+      "of": "共",
+      "projects": "个项目",
+      "viewDetails": "查看详情",
+      "loadMore": "加载更多项目",
+      "loadingText": "正在加载营销项目...",
+      "errorText": "哎呀！出现了问题",
+      "retryText": "重试",
+      "noProjects": "未找到项目",
+      "noProjectsHint": "请尝试调整您的搜索或筛选条件。",
+      "loading": "加载中..."
+    },
+    "breadcrumbs": {
+      "home": "主页",
+      "portfolio": "作品集",
+      "marketingInMotion": "营销实战"
+    },
+    "fallback": {
+      "loading": "加载中..."
+    }
   },
   "codingProjects": {
     "title": "编程项目",
@@ -125,8 +144,9 @@
     "followers": "关注者",
     "following": "正在关注",
     "contributions": "贡献活动",
-    "contributionsYear": "次过去一年的贡献",
+    "contributionsYear": "过去一年内 {count} 次贡献",
     "languages": "编程语言",
+    "languageCount": "{count} 种语言",
     "pinnedRepositories": "精选仓库",
     "recentActivity": "最近活动",
     "viewFiles": "查看文件",
@@ -141,27 +161,111 @@
     "noActivity": "无最近活动",
     "noActivityDesc": "该用户最近没有任何公开活动。",
     "errorLoading": "加载 GitHub 数据出错。请稍后重试。",
-    "backToPortfolio": "返回作品集"
+    "backToPortfolio": "返回作品集",
+    "repositoriesShort": "代码仓库",
+    "viewProfile": "在 GitHub 上查看个人资料",
+    "less": "较少",
+    "more": "较多",
+    "contribution": "次贡献",
+    "contributionsPlural": "次贡献",
+    "contributionActivity": "贡献详情",
+    "total": "次",
+    "acrossRepos": "共 {count} 个仓库",
+    "acrossReposSingle": "共 {count} 个仓库",
+    "noActivityLabel": "过去一年内没有{label}活动。",
+    "commits": "提交",
+    "pullRequests": "拉取请求",
+    "issues": "议题",
+    "retry": "重试",
+    "updated": "{date}",
+    "github": "GitHub",
+    "seo": {
+      "title": "编程项目 – GitHub 资料展示器 | 明元易",
+      "description": "探索明元易（Shain Wai Yan、xolbine）的编程项目，包括 GitHub 资料展示器及其他个人开发作品。"
+    }
   },
   "businessPlans": {
-    "title": "商业计划",
+    "title": "商业战略规划",
     "subtitle": "战略商业蓝图",
-    "description": "为企业提供清晰的方向、识别增长机会，以及建立可持续成功的可行战略的综合商业计划。"
+    "description": "系统化的战略规划方案，助力品牌提升市场定位，实现业务持续增长。",
+    "emptyMessage": "暂无可用的商业战略文档。"
   },
   "marketingPlans": {
-    "title": "营销计划",
+    "title": "营销方案",
     "subtitle": "战略营销活动",
-    "description": "创新的营销战略和活动，旨在通过多个渠道推动品牌知名度、客户获取和收入增长。"
+    "description": "创新的营销策略，专为提升品牌知名度和市场影响力而设计。",
+    "documentsHeading": "营销方案文档",
+    "emptyMessage": "暂无可用的营销方案文档。",
+    "seo": {
+      "title": "营销方案 | 明元易",
+      "description": "探索创新的营销策略与全面方案，旨在提升品牌知名度与市场影响力。"
+    }
   },
   "photography": {
     "title": "摄影",
     "subtitle": "通过镜头讲述视觉故事",
-    "description": "精选的摄影作品集，探索构图、光线和情感。每一张照片都捕捉了一个决定性时刻与有意的叙事。"
+    "description": "精选的摄影作品集，探索构图、光线和情感。每一张照片都捕捉了一个决定性时刻与有意的叙事。",
+    "seo": {
+      "title": "摄影作品集 | Shain Wai Yan",
+      "description": "探索 Shain Wai Yan 的摄影作品集，包含风景、建筑等精彩影像。",
+      "openGraphTitle": "摄影作品集 | Shain Wai Yan",
+      "openGraphDesc": "探索我的摄影作品集，包含风景、人像、建筑等多种风格的摄影作品。"
+    },
+    "labels": {
+      "heroTitle": "摄影作品集",
+      "heroDescription": "通过镜头探索世界的美妙瞬间。每一张照片都讲述了一个独特的故事，捕捉了光线、色彩和情感的完美融合。",
+      "errorText": "加载失败，请稍后再试。",
+      "noPhotos": "暂无摄影作品。"
+    },
+    "breadcrumbs": {
+      "home": "首页",
+      "portfolio": "作品集",
+      "photography": "摄影"
+    }
   },
   "amvEditing": {
     "title": "AMV编辑",
     "subtitle": "动画图形与视频编辑",
-    "description": "创意视频编辑和动画图形，每一帧都精心制作。结合音乐、视觉和时机讲述引人入胜的故事。"
+    "description": "创意视频编辑和动画图形，每一帧都精心制作。结合音乐、视觉和时机讲述引人入胜的故事。",
+    "seo": {
+      "title": "动漫视频剪辑 | 明元易工作室 (xolbine)",
+      "description": "探索明元易（又名 xolbine，Shain Wai Yan）的 AMV（动画音乐视频）剪辑作品集，展示结合故事讲述与震撼视觉效果的动态视频剪辑。",
+      "keywords": "明元易, xolbine, Shain Wai Yan, AMV, 动画音乐视频, 视频剪辑, 作品集, 动画, 音乐视频",
+      "openGraphTitle": "动漫视频剪辑 | 明元易工作室",
+      "openGraphDesc": "动态视频剪辑，融合故事叙述与震撼视觉效果",
+      "siteName": "明元易工作室"
+    },
+    "labels": {
+      "headerTitle": "动漫视频剪辑",
+      "headerDescription": "动态视频剪辑，融合故事叙述与震撼视觉效果",
+      "errorText": "未能加载视频 — 正在显示示例内容。",
+      "retry": "重试"
+    },
+    "breadcrumbs": {
+      "home": "首页",
+      "portfolio": "作品集",
+      "amvEditing": "动漫视频剪辑"
+    },
+    "mockChannel": {
+      "title": "明元易工作室 AMV",
+      "description": "欢迎来到我的 AMV 剪辑频道！创作融合故事叙述与震撼视觉的动态动画音乐视频。",
+      "subscriberCount": "1.2千",
+      "videoCount": "25"
+    },
+    "mockVideos": [
+      {
+        "title": "长靴从猫：最后的愿望 - 死亡场景剪辑",
+        "description": "一部强大的 AMV，展现《长靴从猫：最后的愿望》中的感人场景。"
+      },
+      {
+        "title": "动画中最棒的老婆（你最喜欢的是谁）",
+        "description": "展示动画中最受欢迎的女性角色的合集。"
+      },
+      {
+        "title": "利威尔·阿克曼（偷走了风头的配角）AMV/剪辑",
+        "description": "对《进击的巨人》中利威尔·阿克曼的史诗致敬。"
+      }
+    ]
   },
   "about": {
     "title": "关于我",
@@ -200,7 +304,21 @@
   "certificate": {
     "title": "证书与资质",
     "subtitle": "专业认证",
-    "description": "我的专业证书、资质和成就的集合。"
+    "description": "我的专业证书、资质和成就的集合。",
+    "seo": {
+      "title": "专业证书与成就 | 闪怀晏",
+      "description": "查看我的专业证书和成就，来自数字营销、商业战略和专业发展领域的领先机构和平台。"
+    },
+    "labels": {
+      "heroTitle": "专业证书与成就",
+      "heroDescription": "来自数字营销、商业战略和专业发展领域的领先机构和平台的专业证书和成就的集合。",
+      "errorTitle": "无法加载证书",
+      "noData": "目前没有可用的证书。"
+    },
+    "breadcrumbs": {
+      "home": "首页",
+      "certificate": "证书"
+    }
   },
   "aboutPage": {
     "heroTitle": "关于",
@@ -349,5 +467,142 @@
     "title": "准备好升级您的营销了吗？",
     "subtitle": "让我们探讨如何用我的专业知识帮助实现您的业务目标。",
     "button": "立即联系"
+  },
+  "portfolioPage": {
+    "hero": {
+      "eyebrow": "韦燕 · 作品集",
+      "headline": [
+        "作品",
+        "自有",
+        "其声"
+      ],
+      "subtitlePrefix": "六个领域。一种执着：打造 ",
+      "subtitleHighlight": "美观高效",
+      "subtitleSuffix": " 的作品，留下深刻印象。",
+      "stats": [
+        {
+          "number": "6+",
+          "label": "专业领域"
+        },
+        {
+          "number": "50+",
+          "label": "项目数"
+        },
+        {
+          "number": "3",
+          "label": "语言"
+        }
+      ],
+      "browseAll": "浏览全部作品",
+      "featured": "推荐作品",
+      "scroll": "向下滚动"
+    },
+    "marquee": [
+      "商业战略",
+      "✦",
+      "数字营销",
+      "✦",
+      "案例研究",
+      "✦",
+      "全栈代码",
+      "✦",
+      "摄影作品",
+      "✦",
+      "视频编辑",
+      "✦",
+      "品牌标识",
+      "✦",
+      "数据驱动",
+      "✦"
+    ],
+    "cards": {
+      "eyebrow": "所有领域",
+      "headline": "全部作品",
+      "sub": "悬停任意卡片。点击了解更多。",
+      "explore": "浏览"
+    },
+    "cta": {
+      "eyebrow": "准备开始合作？",
+      "headline": [
+        "让我们",
+        "一起创作",
+        "非凡之作"
+      ],
+      "p": "无论你需要营销策略、编程解决方案还是创意愿景——让我们一起实现它。",
+      "btnContact": "联系我",
+      "btnAbout": "关于我"
+    },
+    "footer": {
+      "signature": "韦燕工作室",
+      "copyright": "© {year} 韦燕"
+    },
+    "items": {
+      "business-plans": {
+        "title": "商业规划",
+        "subtitle": "战略 & 愿景",
+        "description": "综合的市场进入策略，提升品牌定位，实现可持续的市场增长。",
+        "tags": [
+          "战略",
+          "品牌",
+          "增长"
+        ],
+        "stat": "6+ 方案"
+      },
+      "marketing-plans": {
+        "title": "营销规划",
+        "subtitle": "营销活动 & 策略",
+        "description": "创新的多渠道营销活动，吸引注意力，改变认知，提升品牌价值。",
+        "tags": [
+          "数字营销",
+          "活动",
+          "数据分析"
+        ],
+        "stat": "10+ 方案"
+      },
+      "marketing-in-motion": {
+        "title": "实战营销案例",
+        "subtitle": "真实案例分析",
+        "description": "真实的营销活动，真实的成果。记录执行策略、实验和可量化的结果。",
+        "tags": [
+          "案例研究",
+          "数据",
+          "成果"
+        ],
+        "stat": "17+ 案例"
+      },
+      "coding-projects": {
+        "title": "编程项目",
+        "subtitle": "构建 & 工程",
+        "description": "全栈应用、智能自动化和交互式工具，采用现代框架和执着的工程精神。",
+        "tags": [
+          "Next.js",
+          "TypeScript",
+          "APIs"
+        ],
+        "stat": "8+ 项目"
+      },
+      "photography": {
+        "title": "摄影作品",
+        "subtitle": "光影 & 故事",
+        "description": "充满张力的画面，捕捉决定性瞬间，讲述镜头后的故事。",
+        "tags": [
+          "构图",
+          "光影",
+          "故事"
+        ],
+        "stat": "200+ 作品"
+      },
+      "amv-editing": {
+        "title": "视频编辑",
+        "subtitle": "动感 & 叙事",
+        "description": "每一个切割都有目的，每一个过渡都恰到好处，情感驱动节奏。",
+        "tags": [
+          "动感",
+          "时序",
+          "情感"
+        ],
+        "stat": "30+ 视频"
+      }
+    }
   }
 }

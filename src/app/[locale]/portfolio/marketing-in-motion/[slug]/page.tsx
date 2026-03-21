@@ -10,41 +10,48 @@ import ProjectHeader from '@/components/marketing-in-motion/ProjectHeader';
 import ProjectContent from '@/components/marketing-in-motion/ProjectContent';
 import ProjectGallery from '@/components/marketing-in-motion/ProjectGallery';
 import RelatedProjects from '@/components/marketing-in-motion/RelatedProjects';
+import { getDictionarySync } from '@/lib/getDictionary';
 
 interface MarketingProjectPageProps {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 }
 
 export async function generateMetadata(
   props: MarketingProjectPageProps
 ): Promise<Metadata> {
-  const { slug } = await props.params;
-  const { project } = await fetchMarketingProjectBySlug(slug);
+  const { locale, slug } = await props.params;
+  const { project, error } = await fetchMarketingProjectBySlug(slug);
+  const t = getDictionarySync(locale as 'en' | 'zh');
 
-  if (!project) {
-    return { title: 'Project Not Found | Shain Studio' };
+  if (error || !project) {
+    return { title: t.marketingInMotion.seo.projectNotFoundTitle || 'Project Not Found | Shain Studio' };
   }
 
+  const suffix = locale === 'zh' ? '营销实战 | Shain Studio' : 'Marketing in Motion | Shain Studio';
+
   return {
-    title: `${project.seo.metaTitle} | Marketing in Motion | Shain Studio`,
+    title: `${project.seo.metaTitle} | ${suffix}`,
     description: project.seo.metaDescription,
-    keywords: [...project.tags, ...project.toolsUsed, project.category].join(', '),
+    keywords: project.tags && project.toolsUsed && project.category 
+      ? [...project.tags, ...project.toolsUsed, project.category].join(', ')
+      : t.marketingInMotion.seo.keywords,
     alternates: {
-      canonical: `/portfolio/marketing-in-motion/${project.slug}`,
+      canonical: locale === 'en' ? `https://www.shainwaiyan.com/portfolio/marketing-in-motion/${project.slug}` : `https://www.shainwaiyan.com/${locale}/portfolio/marketing-in-motion/${project.slug}`,
       languages: {
-        en: `/portfolio/marketing-in-motion/${project.slug}`,
-        zh: `/zh/portfolio/marketing-in-motion/${project.slug}`,
+        en: `https://www.shainwaiyan.com/portfolio/marketing-in-motion/${project.slug}`,
+        zh: `https://www.shainwaiyan.com/zh/portfolio/marketing-in-motion/${project.slug}`,
       },
     },
     openGraph: {
       type: 'article',
-      url: `https://www.shainwaiyan.com/portfolio/marketing-in-motion/${project.slug}`,
+      url: `https://www.shainwaiyan.com${locale === 'en' ? '' : `/${locale}`}/portfolio/marketing-in-motion/${project.slug}`,
       title: project.seo.metaTitle,
       description: project.seo.metaDescription,
       images: project.seo.ogImage ? [project.seo.ogImage] : [],
       authors: ['Shain Wai Yan'],
       publishedTime: project.projectDate,
       modifiedTime: project.updatedAt,
+      locale: locale === 'zh' ? 'zh_CN' : 'en_US',
     },
     twitter: {
       card: 'summary_large_image',
@@ -58,28 +65,28 @@ export async function generateMetadata(
 export default async function MarketingProjectPage(
   props: MarketingProjectPageProps
 ) {
-  const { slug } = await props.params;
+  const { locale, slug } = await props.params;
   const { project, error } = await fetchMarketingProjectBySlug(slug);
+  const t = getDictionarySync(locale as 'en' | 'zh');
 
   if (error || !project) {
     notFound();
   }
 
   // ── Fetch related projects client-side via the list endpoint and filter locally.
-  // Strapi's category field is a relation, so filtering by string via the API
-  // returns 503 intermittently. Fetching all and filtering in JS is more reliable.
   let relatedProjects: MarketingProject[] = [];
   try {
     const { projects: allProjects } = await fetchMarketingProjects(1, 100);
     relatedProjects = allProjects
       .filter(
-        (p) =>
-          p.category === project.category && p.slug !== project.slug
+        (p) => p.category === project.category && p.slug !== project.slug
       )
       .slice(0, 3);
   } catch {
     // silently degrade — related section just won't show
   }
+
+  const basePath = locale === 'en' ? '' : `/${locale}`;
 
   return (
     <main className="min-h-screen bg-white dark:bg-[#121212]">
@@ -88,28 +95,28 @@ export default async function MarketingProjectPage(
         <ol className="flex items-center gap-1.5 text-xs max-w-5xl mx-auto flex-wrap">
           <li>
             <Link
-              href="/"
+              href={basePath || '/'}
               className="text-[#191970] dark:text-[#ffd700] hover:underline transition-colors"
             >
-              Home
+              {t.marketingInMotion.breadcrumbs.home}
             </Link>
           </li>
           <li className="text-[#999]">›</li>
           <li>
             <Link
-              href="/portfolio"
+              href={`${basePath}/portfolio`}
               className="text-[#191970] dark:text-[#ffd700] hover:underline transition-colors"
             >
-              Portfolio
+              {t.marketingInMotion.breadcrumbs.portfolio}
             </Link>
           </li>
           <li className="text-[#999]">›</li>
           <li>
             <Link
-              href="/portfolio/marketing-in-motion"
+              href={`${basePath}/portfolio/marketing-in-motion`}
               className="text-[#191970] dark:text-[#ffd700] hover:underline transition-colors"
             >
-              Marketing in Motion
+              {t.marketingInMotion.breadcrumbs.marketingInMotion}
             </Link>
           </li>
           <li className="text-[#999]">›</li>
@@ -120,23 +127,23 @@ export default async function MarketingProjectPage(
       </nav>
 
       {/* Project Header with Cover Image */}
-      <ProjectHeader project={project} language="en" />
+      <ProjectHeader project={project} language={locale as 'en' | 'zh'} />
 
       {/* Project Content */}
-      <ProjectContent project={project} language="en" />
+      <ProjectContent project={project} language={locale as 'en' | 'zh'} />
 
       {/* Image Gallery */}
-      {project.imageGallery.length > 0 && (
+      {project.imageGallery && project.imageGallery.length > 0 && (
         <ProjectGallery
           images={project.imageGallery}
           title={project.title}
-          language="en"
+          language={locale as 'en' | 'zh'}
         />
       )}
 
       {/* Related Projects */}
-      {relatedProjects.length > 0 && (
-        <RelatedProjects projects={relatedProjects} language="en" />
+      {relatedProjects && relatedProjects.length > 0 && (
+        <RelatedProjects projects={relatedProjects} language={locale as 'en' | 'zh'} />
       )}
     </main>
   );

@@ -85,6 +85,9 @@ function RepoBar({
 
 // ── Tab panel ────────────────────────────────────────────────────────────────
 
+import { useParams } from 'next/navigation';
+import { getDictionarySync } from '@/lib/getDictionary';
+
 function ActivityPanel({
   items, color, emptyText,
 }: {
@@ -92,6 +95,9 @@ function ActivityPanel({
   color: string;
   emptyText: string;
 }) {
+  const params = useParams();
+  const locale = (params?.locale as string) || 'en';
+  const t = getDictionarySync(locale).codingProjects;
   if (items.length === 0) {
     return <p className="text-sm text-gray-400 dark:text-gray-500 py-4 text-center">{emptyText}</p>;
   }
@@ -107,10 +113,10 @@ function ActivityPanel({
           className="text-xs font-semibold px-2.5 py-1 rounded-full text-white"
           style={{ backgroundColor: color }}
         >
-          {total} total
+          {total} {t.total}
         </span>
         <span className="text-xs text-gray-400 dark:text-gray-500">
-          across {items.length} {items.length === 1 ? 'repository' : 'repositories'}
+          {items.length === 1 ? t.acrossReposSingle.replace('{count}', String(items.length)) : t.acrossRepos.replace('{count}', String(items.length))}
         </span>
       </div>
 
@@ -131,13 +137,16 @@ function ActivityPanel({
 // ── Main component ────────────────────────────────────────────────────────────
 
 export function DetailedActivity({ data, isLoading }: DetailedActivityProps) {
+  const params = useParams();
+  const locale = (params?.locale as string) || 'en';
+  const t = getDictionarySync(locale).codingProjects;
   const [activeTab, setActiveTab] = useState<'commits' | 'prs' | 'issues'>('commits');
 
   if (isLoading) {
     return (
       <section className="mb-12">
         <h2 className="text-xl font-bold mb-5 text-[#191970] dark:text-[#d4af37]">
-          Contribution Activity
+          {t.contributionActivity}
         </h2>
         <div className="bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-gray-700 rounded-xl p-6 animate-pulse space-y-4">
           <div className="flex gap-3">
@@ -166,9 +175,9 @@ export function DetailedActivity({ data, isLoading }: DetailedActivityProps) {
   if (commits.length === 0 && prs.length === 0 && issues.length === 0) return null;
 
   const tabs: { id: typeof activeTab; label: string; icon: React.ReactNode; items: RepoContribution[]; color: string }[] = [
-    { id: 'commits', label: 'Commits',      icon: <CommitIcon />,      items: commits, color: '#2ea44f' },
-    { id: 'prs',     label: 'Pull Requests', icon: <PullRequestIcon/>, items: prs,     color: '#6f42c1' },
-    { id: 'issues',  label: 'Issues',        icon: <IssueIcon />,      items: issues,  color: '#e36209' },
+    { id: 'commits', label: t.commits,      icon: <CommitIcon />,      items: commits, color: '#2ea44f' },
+    { id: 'prs',     label: t.pullRequests, icon: <PullRequestIcon/>, items: prs,     color: '#6f42c1' },
+    { id: 'issues',  label: t.issues,        icon: <IssueIcon />,      items: issues,  color: '#e36209' },
   ];
 
   const active = tabs.find(t => t.id === activeTab)!;
@@ -222,7 +231,7 @@ export function DetailedActivity({ data, isLoading }: DetailedActivityProps) {
           <ActivityPanel
             items={active.items}
             color={active.color}
-            emptyText={`No ${active.label.toLowerCase()} activity in the past year.`}
+            emptyText={t.noActivityLabel.replace('{label}', active.label)}
           />
         </div>
       </div>
