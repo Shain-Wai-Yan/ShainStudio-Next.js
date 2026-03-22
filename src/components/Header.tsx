@@ -4,14 +4,28 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { FaBars, FaTimes, FaChevronDown } from 'react-icons/fa';
 import LanguageSwitcher from './LanguageSwitcher';
-import { getTranslations } from '@/lib/i18n';
+import { getDictionarySync } from '@/lib/getDictionary';
+import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isPortfolioOpen, setIsPortfolioOpen] = useState(false);
   const pathname = usePathname();
-  const isChineseRoute = pathname.startsWith('/zh');
-  const translations = getTranslations(isChineseRoute ? 'zh' : 'en');
+  
+  // Extract locale from pathname /[locale]/... or fallback to legacy /zh pattern
+  const pathSegments = pathname.split('/').filter(Boolean);
+  let locale: 'en' | 'zh' = DEFAULT_LOCALE as 'en' | 'zh';
+  
+  if (pathSegments.length > 0) {
+    if (isSupportedLocale(pathSegments[0])) {
+      locale = pathSegments[0] as 'en' | 'zh';
+    } else if (pathname.startsWith('/zh')) {
+      // Legacy /zh routes support
+      locale = 'zh';
+    }
+  }
+  
+  const translations = getDictionarySync(locale);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const togglePortfolio = () => setIsPortfolioOpen(!isPortfolioOpen);
@@ -28,7 +42,7 @@ const Header = () => {
     };
   }, [isMenuOpen]);
 
-  const basePath = isChineseRoute ? '/zh' : '';
+  const basePath = locale === 'en' ? '' : `/${locale}`;
 
   const portfolioItems = [
     { href: `${basePath}/portfolio/business-plans`, label: translations.nav.businessPlans },
@@ -40,7 +54,7 @@ const Header = () => {
   ];
 
   const navLinks = [
-    { href: `${basePath}/`, label: translations.nav.home },
+    { href: locale === 'en' ? '/' : `${basePath}`, label: translations.nav.home },
     { href: `${basePath}/about`, label: translations.nav.about },
     { href: `${basePath}/portfolio`, label: translations.nav.portfolio, hasDropdown: true },
     { href: `${basePath}/certificate`, label: translations.nav.certificate },
@@ -49,8 +63,8 @@ const Header = () => {
   ];
 
   const isActiveRoute = (href: string): boolean => {
-    if (href === `${basePath}/`) {
-      return pathname === `${basePath}/` || pathname === '/';
+    if (href === basePath) {
+      return pathname === basePath;
     }
     return pathname === href || pathname.startsWith(href + '/');
   };
@@ -67,7 +81,7 @@ const Header = () => {
       <div className="flex justify-between items-center px-4 sm:px-6 lg:px-8 py-4 max-w-full">
         {/* Logo */}
         <div className="flex items-center gap-3 flex-shrink-0">
-          <Link href={basePath || '/'} className="flex items-center gap-3 hover:opacity-90 transition-opacity duration-300">
+          <Link href={basePath} className="flex items-center gap-3 hover:opacity-90 transition-opacity duration-300">
             <img
               src="/images/Shain Studio.png"
               alt="Shain Studio Logo"

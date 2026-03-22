@@ -1,0 +1,111 @@
+import type { Metadata } from "next";
+import { use } from "react";
+import "@/app/globals.css";
+import { getHtmlLang, isSupportedLocale, DEFAULT_LOCALE } from "@/lib/locales";
+import { getDictionary } from "@/lib/getDictionary";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import { GoogleAnalytics } from '@next/third-parties/google';
+
+interface LocaleLayoutProps {
+  children: React.ReactNode;
+  params: Promise<{
+    locale: string;
+  }>;
+}
+
+/**
+ * Generate metadata for the locale-specific layout
+ */
+export async function generateMetadata({ params }: Omit<LocaleLayoutProps, 'children'>): Promise<Metadata> {
+  // MUST await params here - it's a Promise
+  const { locale: rawLocale } = await params;
+  const locale = isSupportedLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
+  const dictionary = await getDictionary(locale);
+  
+  const isZh = locale === 'zh';
+  const baseUrl = `https://www.shainwaiyan.com/${locale === 'en' ? 'en' : 'zh'}`;
+
+  return {
+    title: {
+      default: isZh 
+        ? "数字营销与品牌策略师 | Shain Wai Yan (xolbine)"
+        : "Digital Marketing & Brand Strategist | Shain Wai Yan (xolbine)",
+      template: `%s | Shain Wai Yan (xolbine)`,
+    },
+    description: isZh
+      ? "Shain Wai Yan (xolbine、明元易) 的数字营销与品牌策略作品集。探索AI驱动的营销活动、内容策略和市场分析。"
+      : "Digital Marketing & Brand Strategy portfolio of Shain Wai Yan (aka xolbine, 明元易). Explore AI‑powered campaigns, content strategy, & market analysis.",
+    authors: [{ name: "Shain Wai Yan" }],
+    robots: "index, follow, max-image-preview:large",
+    metadataBase: new URL("https://www.shainwaiyan.com"),
+    alternates: {
+      canonical: baseUrl,
+      languages: {
+        'en': 'https://www.shainwaiyan.com/en',
+        'zh': 'https://www.shainwaiyan.com/zh',
+        'x-default': 'https://www.shainwaiyan.com/en',
+      },
+    },
+    openGraph: {
+      type: 'website',
+      url: baseUrl,
+      title: isZh
+        ? '数字营销与品牌策略师 | Shain Wai Yan'
+        : 'Digital Marketing & Brand Strategist | Shain Wai Yan',
+      description: isZh
+        ? '在Shain Wai Yan (xolbine)的作品集中探索AI驱动的营销活动、内容策略和市场分析。'
+        : 'Explore AI‑powered campaigns, content strategy, & market analysis in the portfolio of Shain Wai Yan (xolbine).',
+      images: 'https://www.shainwaiyan.com/images/Shain Studio.png',
+      siteName: isZh ? "Shain的作品集" : "Shain's Portfolio",
+      locale: isZh ? "zh_CN" : "en_US",
+      alternateLocale: isZh ? "en_US" : "zh_CN",
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: isZh
+        ? '数字营销与品牌策略师 | Shain Wai Yan'
+        : 'Digital Marketing & Brand Strategist | Shain Wai Yan',
+      description: isZh
+        ? '在Shain Wai Yan (xolbine)的作品集中探索AI驱动的营销活动、内容策略和市场分析。'
+        : 'Explore AI‑powered campaigns, content strategy, & market analysis in the portfolio of Shain Wai Yan (xolbine).',
+      images: ['https://www.shainwaiyan.com/images/Shain Studio.png'],
+    },
+    icons: {
+      icon: [
+        { url: '/images/Shain Studio.png', type: 'image/png' },
+        { url: '/images/Shain Studio.png', sizes: '32x32', type: 'image/png' },
+        { url: '/images/Shain Studio.png', sizes: '96x96', type: 'image/png' },
+        { url: '/images/Shain Studio.png', sizes: '192x192', type: 'image/png' },
+      ],
+      shortcut: '/images/Shain Studio.png',
+      apple: '/images/Shain Studio.png',
+    }
+  };
+}
+
+/**
+ * LocaleLayout component
+ * MUST use React.use() to unwrap the params Promise
+ */
+export default function LocaleLayout({ children, params }: LocaleLayoutProps) {
+  // MUST use React.use() to unwrap params in client components
+  const { locale: rawLocale } = use(params);
+  const locale = isSupportedLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
+  const htmlLang = getHtmlLang(locale);
+
+  return (
+    <html lang={htmlLang} suppressHydrationWarning dir="ltr">
+      <body>
+        <Header />
+        <main className="min-h-screen">
+          {children}
+        </main>
+        <Footer />
+        {process.env.NEXT_PUBLIC_GA_ID && (
+          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
+        )}
+      </body>
+    </html>
+  );
+}

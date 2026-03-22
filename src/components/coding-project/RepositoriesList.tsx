@@ -17,11 +17,17 @@ interface RepositoriesListProps {
   onViewFiles: (repoName: string) => void;
 }
 
+import { useParams } from 'next/navigation';
+import { getDictionarySync } from '@/lib/getDictionary';
+
 export function RepositoriesList({ repositories, isLoading, onViewFiles }: RepositoriesListProps) {
+  const params = useParams();
+  const locale = (params?.locale as string) || 'en';
+  const t = getDictionarySync(locale).codingProjects;
   if (isLoading) {
     return (
       <section className="mb-12">
-        <h2 className="text-xl font-bold mb-5 text-[#191970] dark:text-[#d4af37]">Public Repositories</h2>
+        <h2 className="text-xl font-bold mb-5 text-[#191970] dark:text-[#d4af37]">{t.repositories}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1,2,3,4,5,6].map(i => (
             <div key={i} className="bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-gray-700 rounded-xl p-5 animate-pulse space-y-3">
@@ -71,7 +77,7 @@ export function RepositoriesList({ repositories, isLoading, onViewFiles }: Repos
               </div>
 
               <p className="text-gray-500 dark:text-gray-400 text-xs mb-4 line-clamp-2 flex-1">
-                {repo.description || 'No description'}
+                {repo.description || t.noDescription}
               </p>
 
               <div className="flex flex-wrap gap-3 items-center text-xs text-gray-400 dark:text-gray-500 mb-3">
@@ -94,7 +100,7 @@ export function RepositoriesList({ repositories, isLoading, onViewFiles }: Repos
                   {repo.forkCount ?? 0}
                 </div>
                 {updatedDate && (
-                  <span className="ml-auto text-gray-400 dark:text-gray-500 hidden sm:block">{updatedDate}</span>
+                  <span className="ml-auto text-gray-400 dark:text-gray-500 hidden sm:block">{t.updated.replace('{date}', updatedDate)}</span>
                 )}
               </div>
 
@@ -108,7 +114,7 @@ export function RepositoriesList({ repositories, isLoading, onViewFiles }: Repos
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
                 </svg>
-                View Files
+                {t.viewFiles}
               </button>
             </div>
           );

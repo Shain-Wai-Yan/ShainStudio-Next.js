@@ -1,5 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { detectLocaleFromHeader, normalizeLocale } from '@/lib/i18n';
+import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
+
+/**
+ * Detect locale from Accept-Language header
+ */
+function detectLocaleFromHeader(acceptLanguage: string | null): string {
+  if (!acceptLanguage) return 'en';
+  
+  const languages = acceptLanguage.toLowerCase().split(',')
+    .map(lang => lang.split(';')[0].trim());
+  
+  for (const lang of languages) {
+    if (lang.startsWith('zh')) return 'zh';
+  }
+  
+  return 'en';
+}
+
+/**
+ * Extract locale from URL path (e.g., /zh/about → 'zh')
+ */
+function getLocaleFromPath(path: string): string {
+  if (!path) return 'en';
+  const match = path.match(/^\/(en|zh)\//);
+  return match ? match[1] : 'en';
+}
 
 export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
@@ -16,209 +41,193 @@ export function middleware(request: NextRequest) {
   }
 
   // ============================================
-  // BLOG REDIRECT: /blog-post?slug=xxx → /blog/xxx
+  // CLEAN ENGLISH LOCALE REDIRECTS
   // ============================================
+  if (pathname === '/en' || pathname.startsWith('/en/')) {
+    const newPath = pathname.replace(/^\/en/, '') || '/';
+    const url = request.nextUrl.clone();
+    url.pathname = newPath;
+    return NextResponse.redirect(url, { status: 301 });
+  }
+
+  // ============================================
+  // LOCALE-AWARE BLOG & MARKETING REDIRECTS
+  // ============================================
+
+  // /blog-post?slug=xxx → /[locale]/blog/xxx
   if (pathname === '/blog-post' && searchParams.has('slug')) {
     const slug = searchParams.get('slug');
+    const locale = request.cookies.get('NEXT_LOCALE')?.value === 'zh' ? 'zh' : 'en';
     const url = request.nextUrl.clone();
-    url.pathname = `/blog/${slug}`;
-    url.searchParams.delete('slug'); // Remove slug param, PRESERVE utm params
+    url.pathname = locale === 'zh' ? `/zh/blog/${slug}` : `/blog/${slug}`;
+    url.searchParams.delete('slug');
     return NextResponse.redirect(url, { status: 301 });
   }
 
-  // ============================================
-  // MARKETING PROJECT REDIRECT: /marketing-project?slug=xxx → /portfolio/marketing-in-motion/xxx
-  // ============================================
+  // /marketing-project?slug=xxx → /[locale]/portfolio/marketing-in-motion/xxx
   if (pathname === '/marketing-project' && searchParams.has('slug')) {
     const slug = searchParams.get('slug');
+    const locale = request.cookies.get('NEXT_LOCALE')?.value === 'zh' ? 'zh' : 'en';
     const url = request.nextUrl.clone();
-    url.pathname = `/portfolio/marketing-in-motion/${slug}`;
-    url.searchParams.delete('slug'); // Remove slug param, PRESERVE utm params
+    url.pathname = locale === 'zh' ? `/zh/portfolio/marketing-in-motion/${slug}` : `/portfolio/marketing-in-motion/${slug}`;
+    url.searchParams.delete('slug');
     return NextResponse.redirect(url, { status: 301 });
   }
 
-  // ============================================
-  // CHINESE BLOG REDIRECT: /zh/blog-post?slug=xxx → /zh/blog/xxx
-  // ============================================
+  // LEGACY: /zh/blog-post?slug=xxx → /zh/blog/xxx
   if (pathname === '/zh/blog-post' && searchParams.has('slug')) {
     const slug = searchParams.get('slug');
     const url = request.nextUrl.clone();
     url.pathname = `/zh/blog/${slug}`;
-    url.searchParams.delete('slug'); // Remove slug param, PRESERVE utm params
+    url.searchParams.delete('slug');
     return NextResponse.redirect(url, { status: 301 });
   }
 
-  // ============================================
-  // CHINESE MARKETING PROJECT REDIRECT: /zh/marketing-project?slug=xxx → /zh/portfolio/marketing-in-motion/xxx
-  // ============================================
+  // LEGACY: /zh/marketing-project?slug=xxx → /zh/portfolio/marketing-in-motion/xxx
   if (pathname === '/zh/marketing-project' && searchParams.has('slug')) {
     const slug = searchParams.get('slug');
     const url = request.nextUrl.clone();
     url.pathname = `/zh/portfolio/marketing-in-motion/${slug}`;
-    url.searchParams.delete('slug'); // Remove slug param, PRESERVE utm params
+    url.searchParams.delete('slug');
     return NextResponse.redirect(url, { status: 301 });
   }
 
   // ============================================
-  // STRIP ONLY PROBLEMATIC SLUG PARAM (Keep UTM tracking!)
+  // STRIP ONLY PROBLEMATIC SLUG PARAM
   // ============================================
-  // Only remove the "slug" query param that causes double-slug issue
-  // PRESERVE utm_source, utm_medium, utm_campaign, etc. for marketing tracking
-  if (searchParams.has('slug') && (pathname.startsWith('/blog') || pathname.startsWith('/portfolio') || pathname.startsWith('/zh/blog') || pathname.startsWith('/zh/portfolio'))) {
+  if (searchParams.has('slug') && (pathname.includes('/blog') || pathname.includes('/portfolio'))) {
     const url = request.nextUrl.clone();
-    url.searchParams.delete('slug'); // Only delete the problematic slug param
+    url.searchParams.delete('slug');
     return NextResponse.redirect(url, { status: 301 });
   }
 
   // ============================================
-  // LEGACY ROUTE REDIRECTS - ENGLISH (handled here instead of vercel.json)
+  // LEGACY ROUTE REDIRECTS - ENGLISH
   // ============================================
-  
-  // /marketing-plan → /portfolio/marketing-plans
+
   if (pathname === '/marketing-plan') {
     const url = request.nextUrl.clone();
     url.pathname = '/portfolio/marketing-plans';
-    // PRESERVE query params (utm_source, utm_medium, etc.)
     return NextResponse.redirect(url, { status: 301 });
   }
 
-  // /business-plan → /portfolio/business-plans
   if (pathname === '/business-plan') {
     const url = request.nextUrl.clone();
     url.pathname = '/portfolio/business-plans';
-    // PRESERVE query params (utm_source, utm_medium, etc.)
     return NextResponse.redirect(url, { status: 301 });
   }
 
-  // /coding-projects → /portfolio/coding-projects
   if (pathname === '/coding-projects') {
     const url = request.nextUrl.clone();
     url.pathname = '/portfolio/coding-projects';
     return NextResponse.redirect(url, { status: 301 });
   }
 
-  // /photography → /portfolio/photography
   if (pathname === '/photography') {
     const url = request.nextUrl.clone();
     url.pathname = '/portfolio/photography';
     return NextResponse.redirect(url, { status: 301 });
   }
 
-  // /amv-editing → /portfolio/amv-editing
   if (pathname === '/amv-editing') {
     const url = request.nextUrl.clone();
     url.pathname = '/portfolio/amv-editing';
     return NextResponse.redirect(url, { status: 301 });
   }
 
-  // /marketing-in-motion → /portfolio/marketing-in-motion
   if (pathname === '/marketing-in-motion') {
     const url = request.nextUrl.clone();
     url.pathname = '/portfolio/marketing-in-motion';
     return NextResponse.redirect(url, { status: 301 });
   }
 
-  // /marketing-in-motion/:slug → /portfolio/marketing-in-motion/:slug
   if (pathname.startsWith('/marketing-in-motion/')) {
     const slug = pathname.replace('/marketing-in-motion/', '');
     const url = request.nextUrl.clone();
     url.pathname = `/portfolio/marketing-in-motion/${slug}`;
-    // PRESERVE query params (utm_source, utm_medium, etc.)
     return NextResponse.redirect(url, { status: 301 });
   }
 
   // ============================================
-  // LEGACY ROUTE REDIRECTS - CHINESE /zh/ (handled here instead of vercel.json)
+  // LEGACY ROUTE REDIRECTS - CHINESE /zh/
   // ============================================
-  
-  // /zh/marketing-plan → /zh/portfolio/marketing-plans
+
   if (pathname === '/zh/marketing-plan') {
     const url = request.nextUrl.clone();
     url.pathname = '/zh/portfolio/marketing-plans';
-    // PRESERVE query params (utm_source, utm_medium, etc.)
     return NextResponse.redirect(url, { status: 301 });
   }
 
-  // /zh/business-plan → /zh/portfolio/business-plans
   if (pathname === '/zh/business-plan') {
     const url = request.nextUrl.clone();
     url.pathname = '/zh/portfolio/business-plans';
-    // PRESERVE query params (utm_source, utm_medium, etc.)
     return NextResponse.redirect(url, { status: 301 });
   }
 
-  // /zh/coding-projects → /zh/portfolio/coding-projects
   if (pathname === '/zh/coding-projects') {
     const url = request.nextUrl.clone();
     url.pathname = '/zh/portfolio/coding-projects';
     return NextResponse.redirect(url, { status: 301 });
   }
 
-  // /zh/photography → /zh/portfolio/photography
   if (pathname === '/zh/photography') {
     const url = request.nextUrl.clone();
     url.pathname = '/zh/portfolio/photography';
     return NextResponse.redirect(url, { status: 301 });
   }
 
-  // /zh/amv-editing → /zh/portfolio/amv-editing
   if (pathname === '/zh/amv-editing') {
     const url = request.nextUrl.clone();
     url.pathname = '/zh/portfolio/amv-editing';
     return NextResponse.redirect(url, { status: 301 });
   }
 
-  // /zh/marketing-in-motion → /zh/portfolio/marketing-in-motion
   if (pathname === '/zh/marketing-in-motion') {
     const url = request.nextUrl.clone();
     url.pathname = '/zh/portfolio/marketing-in-motion';
     return NextResponse.redirect(url, { status: 301 });
   }
 
-  // /zh/marketing-in-motion/:slug → /zh/portfolio/marketing-in-motion/:slug
   if (pathname.startsWith('/zh/marketing-in-motion/')) {
     const slug = pathname.replace('/zh/marketing-in-motion/', '');
     const url = request.nextUrl.clone();
     url.pathname = `/zh/portfolio/marketing-in-motion/${slug}`;
-    // PRESERVE query params (utm_source, utm_medium, etc.)
     return NextResponse.redirect(url, { status: 301 });
   }
 
   // ============================================
-  // CHINESE LOCALE ROUTING
+  // LOCALE ROUTING WITH /[locale]/ STRUCTURE
   // ============================================
-  
-  // If already has /zh in path, continue
+
   if (pathname.startsWith('/zh')) {
     return NextResponse.next();
   }
 
-  // For root path, check for language preference
+  // Root path: detect preferred locale
   if (pathname === '/') {
     const languageCookie = request.cookies.get('NEXT_LOCALE')?.value;
 
+    // User has saved preference
     if (languageCookie === 'zh') {
-      // User previously selected Chinese
       return NextResponse.redirect(new URL('/zh', request.url));
     }
 
-    // Auto-detect from Accept-Language header
+    // Try to detect from browser language
     const acceptLanguage = request.headers.get('accept-language');
     const detectedLocale = detectLocaleFromHeader(acceptLanguage);
 
     if (detectedLocale === 'zh') {
-      // Set cookie and redirect to Chinese version
       const response = NextResponse.redirect(new URL('/zh', request.url));
       response.cookies.set('NEXT_LOCALE', 'zh', {
-        maxAge: 365 * 24 * 60 * 60, // 1 year
+        maxAge: 365 * 24 * 60 * 60,
         path: '/',
         sameSite: 'lax',
       });
       return response;
     }
 
-    // Set English locale cookie
-    const response = NextResponse.next();
+    // Default to English
+    const response = NextResponse.rewrite(new URL('/en', request.url));
     response.cookies.set('NEXT_LOCALE', 'en', {
       maxAge: 365 * 24 * 60 * 60,
       path: '/',
@@ -227,17 +236,16 @@ export function middleware(request: NextRequest) {
     return response;
   }
 
+  // Handle any other non-locale paths
+  if (pathname !== '/' && !pathname.startsWith('/.')) {
+    return NextResponse.rewrite(new URL(`/en${pathname}`, request.url));
+  }
+
   return NextResponse.next();
 }
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     */
     '/((?!_next/static|_next/image|favicon.ico).*)',
   ],
 };

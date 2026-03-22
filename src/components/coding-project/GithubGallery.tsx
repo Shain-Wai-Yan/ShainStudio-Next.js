@@ -17,7 +17,13 @@ import { ProgrammingLanguages } from './ProgrammingLanguages';
 import { DetailedActivity }     from './Detailedactivity';   // ← fixed capital A
 import { RepoViewer }           from './RepoViewer';
 
+import { useParams } from 'next/navigation';
+import { getDictionarySync } from '@/lib/getDictionary';
+
 export function GithubGallery() {
+  const params = useParams();
+  const locale = (params?.locale as string) || 'en';
+  const t = getDictionarySync(locale).codingProjects;
   const [user, setUser]               = useState<any>(null);
   const [pinnedRepos, setPinnedRepos] = useState<any[]>([]);
   const [repositories, setRepositories] = useState<any[]>([]);
@@ -69,7 +75,7 @@ export function GithubGallery() {
             onClick={loadGithubData}
             className="ml-4 underline hover:no-underline font-medium"
           >
-            Retry
+            {t.retry}
           </button>
         </div>
       )}

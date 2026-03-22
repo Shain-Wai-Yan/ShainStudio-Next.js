@@ -16,11 +16,17 @@ interface PinnedRepositoriesProps {
   onViewFiles: (repoName: string) => void;
 }
 
+import { useParams } from 'next/navigation';
+import { getDictionarySync } from '@/lib/getDictionary';
+
 export function PinnedRepositories({ repos, isLoading, onViewFiles }: PinnedRepositoriesProps) {
+  const params = useParams();
+  const locale = (params?.locale as string) || 'en';
+  const t = getDictionarySync(locale).codingProjects;
   if (isLoading) {
     return (
       <section className="mb-12">
-        <h2 className="text-xl font-bold mb-5 text-[#191970] dark:text-[#d4af37]">Pinned Repositories</h2>
+        <h2 className="text-xl font-bold mb-5 text-[#191970] dark:text-[#d4af37]">{t.pinnedRepositories}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {[1,2,3].map(i => (
             <div key={i} className="bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-gray-700 rounded-xl p-5 animate-pulse space-y-3 h-48" />
@@ -34,7 +40,7 @@ export function PinnedRepositories({ repos, isLoading, onViewFiles }: PinnedRepo
 
   return (
     <section className="mb-12">
-      <h2 className="text-xl font-bold mb-5 text-[#191970] dark:text-[#d4af37]">Pinned Repositories</h2>
+      <h2 className="text-xl font-bold mb-5 text-[#191970] dark:text-[#d4af37]">{t.pinnedRepositories}</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {repos.map((repo) => {
           const updatedDate = new Date(repo.updatedAt).toLocaleDateString('en-US', {
@@ -63,7 +69,7 @@ export function PinnedRepositories({ repos, isLoading, onViewFiles }: PinnedRepo
               </div>
 
               <p className="text-gray-500 dark:text-gray-400 text-sm mb-4 line-clamp-2 flex-1">
-                {repo.description || 'No description'}
+                {repo.description || t.noDescription}
               </p>
 
               <div className="flex flex-wrap gap-3 items-center text-xs text-gray-500 dark:text-gray-400 mb-4">
@@ -85,7 +91,7 @@ export function PinnedRepositories({ repos, isLoading, onViewFiles }: PinnedRepo
                   </svg>
                   {repo.forkCount}
                 </div>
-                <span className="ml-auto text-gray-400 dark:text-gray-500">Updated {updatedDate}</span>
+                <span className="ml-auto text-gray-400 dark:text-gray-500">{t.updated.replace('{date}', updatedDate)}</span>
               </div>
 
               <div className="flex gap-2">
@@ -95,14 +101,14 @@ export function PinnedRepositories({ repos, isLoading, onViewFiles }: PinnedRepo
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
                   </svg>
-                  View Files
+                  {t.viewFiles}
                 </button>
                 <a href={repo.url} target="_blank" rel="noopener noreferrer"
                   className="flex items-center justify-center gap-1.5 text-sm font-medium py-2 px-3 rounded-lg
                     border border-gray-200 dark:border-gray-600
                     text-gray-600 dark:text-gray-300
                     hover:border-gray-400 dark:hover:border-gray-400 transition-colors">
-                  GitHub
+                  {t.github}
                 </a>
               </div>
             </div>

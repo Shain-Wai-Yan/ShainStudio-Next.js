@@ -17,7 +17,13 @@ interface ContributionsGraphProps {
 const DAYS   = ['', 'Mon', '', 'Wed', '', 'Fri', ''];
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
+import { useParams } from 'next/navigation';
+import { getDictionarySync } from '@/lib/getDictionary';
+
 export function ContributionsGraph({ totalContributions, contributions, isLoading }: ContributionsGraphProps) {
+  const params = useParams();
+  const locale = (params?.locale as string) || 'en';
+  const t = getDictionarySync(locale).codingProjects;
   const { weeks, monthLabels } = useMemo(() => {
     if (!contributions.length) return { weeks: [], monthLabels: [] };
 
@@ -48,7 +54,7 @@ export function ContributionsGraph({ totalContributions, contributions, isLoadin
   if (isLoading) {
     return (
       <section className="mb-12">
-        <h2 className="text-xl font-bold mb-5 text-[#191970] dark:text-[#d4af37]">Contributions</h2>
+        <h2 className="text-xl font-bold mb-5 text-[#191970] dark:text-[#d4af37]">{t.contributions}</h2>
         <div className="bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-gray-700 rounded-xl p-5 animate-pulse">
           <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-48 mb-5" />
           <div className="h-28 bg-gray-200 dark:bg-gray-700 rounded-lg" />
@@ -64,12 +70,8 @@ export function ContributionsGraph({ totalContributions, contributions, isLoadin
   return (
     <section className="mb-12">
       <div className="flex items-baseline justify-between mb-5">
-        <h2 className="text-xl font-bold text-[#191970] dark:text-[#d4af37]">Contributions</h2>
-        <span className="text-sm text-gray-500 dark:text-gray-400">
-          <strong className="font-semibold text-[#191970] dark:text-[#d4af37]">
-            {totalContributions.toLocaleString()}
-          </strong>{' '}contributions in the last year
-        </span>
+        <h2 className="text-xl font-bold text-[#191970] dark:text-[#d4af37]">{t.contributions}</h2>
+        <span className="text-sm text-gray-500 dark:text-gray-400" dangerouslySetInnerHTML={{ __html: t.contributionsYear.replace('{count}', `<strong class="font-semibold text-[#191970] dark:text-[#d4af37]">${totalContributions.toLocaleString()}</strong>`) }} />
       </div>
 
       <div className="bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-5">
@@ -117,7 +119,7 @@ export function ContributionsGraph({ totalContributions, contributions, isLoadin
                       key={`${wi}-${di}`}
                       className="rounded-sm cursor-default hover:opacity-75 transition-opacity"
                       style={{ backgroundColor: day.color || '#ebedf0' }}
-                      title={`${formattedDate}: ${day.count} contribution${day.count !== 1 ? 's' : ''}`}
+                      title={`${formattedDate}: ${day.count} ${day.count !== 1 ? t.contributionsPlural : t.contribution}`}
                     />
                   );
                 })
@@ -128,11 +130,11 @@ export function ContributionsGraph({ totalContributions, contributions, isLoadin
 
         {/* Legend */}
         <div className="flex items-center justify-end gap-2 mt-3">
-          <span className="text-gray-400 dark:text-gray-500" style={{ fontSize: 11 }}>Less</span>
+          <span className="text-gray-400 dark:text-gray-500" style={{ fontSize: 11 }}>{t.less}</span>
           {['#ebedf0','#c6e48b','#7bc96f','#239a3b','#196127'].map(color => (
             <div key={color} className="rounded-sm flex-shrink-0" style={{ width: 11, height: 11, backgroundColor: color }} />
           ))}
-          <span className="text-gray-400 dark:text-gray-500" style={{ fontSize: 11 }}>More</span>
+          <span className="text-gray-400 dark:text-gray-500" style={{ fontSize: 11 }}>{t.more}</span>
         </div>
       </div>
     </section>
