@@ -1,7 +1,8 @@
+import { Metadata } from 'next';
 import { Suspense } from 'react';
-import type { Metadata } from 'next';
 import { MarketingInMotionClient } from '@/components/marketing-in-motion/MarketingInMotionClient';
-import { getDictionarySync } from '@/lib/getDictionary';
+import { getDictionary } from '@/lib/getDictionary'; // ✅ CHANGE: async
+import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
 
 interface MarketingInMotionPageProps {
   params: Promise<{ locale: string }>;
@@ -10,15 +11,18 @@ interface MarketingInMotionPageProps {
 export async function generateMetadata(
   props: MarketingInMotionPageProps
 ): Promise<Metadata> {
-  const { locale } = await props.params;
-  const t = getDictionarySync(locale as 'en' | 'zh');
+  const { locale: rawLocale } = await props.params;
+  const locale = isSupportedLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
+  const t = await getDictionary(locale); // ✅ CHANGE: async
+
+  const basePath = locale === 'en' ? '' : `/${locale}`;
 
   return {
     title: t.marketingInMotion.seo.title,
     description: t.marketingInMotion.seo.description,
     keywords: t.marketingInMotion.seo.keywords,
     alternates: {
-      canonical: locale === 'en' ? 'https://www.shainwaiyan.com/portfolio/marketing-in-motion' : `https://www.shainwaiyan.com/${locale}/portfolio/marketing-in-motion`,
+      canonical: `https://www.shainwaiyan.com${basePath}/portfolio/marketing-in-motion`,
       languages: {
         en: 'https://www.shainwaiyan.com/portfolio/marketing-in-motion',
         zh: 'https://www.shainwaiyan.com/zh/portfolio/marketing-in-motion',
@@ -26,11 +30,13 @@ export async function generateMetadata(
     },
     openGraph: {
       type: 'website',
+      url: `https://www.shainwaiyan.com${basePath}/portfolio/marketing-in-motion`,
       title: t.marketingInMotion.seo.title,
       description: t.marketingInMotion.seo.description,
       images: [{ url: '/images/Shain Studio.png' }],
       siteName: t.marketingInMotion.seo.siteName || 'Shain Wai Yan Portfolio',
       locale: locale === 'zh' ? 'zh_CN' : 'en_US',
+      alternateLocale: locale === 'zh' ? 'en_US' : 'zh_CN',
     },
     twitter: {
       card: 'summary_large_image',
@@ -42,13 +48,16 @@ export async function generateMetadata(
 }
 
 export default async function MarketingInMotionPage(props: MarketingInMotionPageProps) {
-  const { locale } = await props.params;
-  const t = getDictionarySync(locale as 'en' | 'zh');
+  const { locale: rawLocale } = await props.params;
+  const locale = isSupportedLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
+  const t = await getDictionary(locale); // ✅ CHANGE: async
+
+  const basePath = locale === 'en' ? '' : `/${locale}`;
 
   const BREADCRUMBS = [
-    { label: t.marketingInMotion.breadcrumbs.home, href: locale === 'en' ? '/' : `/${locale}` },
-    { label: t.marketingInMotion.breadcrumbs.portfolio, href: locale === 'en' ? '/portfolio' : `/${locale}/portfolio` },
-    { label: t.marketingInMotion.breadcrumbs.marketingInMotion, href: locale === 'en' ? '/portfolio/marketing-in-motion' : `/${locale}/portfolio/marketing-in-motion` },
+    { label: t.marketingInMotion.breadcrumbs.home, href: basePath || '/' },
+    { label: t.marketingInMotion.breadcrumbs.portfolio, href: `${basePath}/portfolio` },
+    { label: t.marketingInMotion.breadcrumbs.marketingInMotion, href: `${basePath}/portfolio/marketing-in-motion` },
   ];
 
   return (

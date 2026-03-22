@@ -5,6 +5,7 @@ import { getHtmlLang, isSupportedLocale, DEFAULT_LOCALE } from "@/lib/locales";
 import { getDictionary } from "@/lib/getDictionary";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { GoogleAnalytics } from '@next/third-parties/google';
 
 interface LocaleLayoutProps {
   children: React.ReactNode;
@@ -94,13 +95,16 @@ export default function LocaleLayout({ children, params }: LocaleLayoutProps) {
   const htmlLang = getHtmlLang(locale);
 
   return (
-    <html lang={htmlLang} suppressHydrationWarning dir={(locale as string) === 'ar' ? 'rtl' : 'ltr'}>
+    <html lang={htmlLang} suppressHydrationWarning dir="ltr">
       <body>
         <Header />
         <main className="min-h-screen">
           {children}
         </main>
         <Footer />
+        {process.env.NEXT_PUBLIC_GA_ID && (
+          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
+        )}
       </body>
     </html>
   );

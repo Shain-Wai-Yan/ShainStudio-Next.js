@@ -1,34 +1,47 @@
-'use client';
-
-import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { useParams } from 'next/navigation';
+import { Metadata } from 'next';
 import { FaGlobe, FaLaptopCode, FaLightbulb } from 'react-icons/fa';
-import { getDictionarySync } from '@/lib/getDictionary';
+import { getDictionary } from '@/lib/getDictionary';
+import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
 import MarTechStack from '@/components/MarTechStack';
+import ScrollAnimator from '@/components/ScrollAnimator';
 
-export default function AboutPage() {
-  const params = useParams();
-  const locale = (params.locale as "en" | "zh") || 'en';
-  const t = getDictionarySync(locale);
-  const [isScrolling, setIsScrolling] = useState(false);
+interface AboutProps {
+  params: Promise<{ locale: string }>;
+}
 
-  useEffect(() => {
-    // Scroll-triggered fade-up animations
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('animated');
-          }
-        });
+export async function generateMetadata({ params }: AboutProps): Promise<Metadata> {
+  const { locale: rawLocale } = await params;
+  const locale = isSupportedLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
+  const t = await getDictionary(locale);
+
+  return {
+    title: `${t.aboutPage.myName} - ${t.aboutPage.heroSubtitle}`,
+    description: t.aboutPage.myStoryText.substring(0, 160),
+    alternates: {
+      languages: {
+        'en': 'https://www.shainwaiyan.com/about',
+        'zh': 'https://www.shainwaiyan.com/zh/about',
       },
-      { threshold: 0.15 }
-    );
-    const els = document.querySelectorAll('.animate-on-scroll');
-    els.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, []);
+    },
+  };
+}
+
+export const dynamic = 'force-static';
+export const revalidate = 3600;
+
+export async function generateStaticParams() {
+  return [
+    { locale: 'en' },
+    { locale: 'zh' }
+  ];
+}
+
+export default async function AboutPage({ params }: AboutProps) {
+  const { locale: rawLocale } = await params;
+  const locale = isSupportedLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
+  const t = await getDictionary(locale);
+  const basePath = locale === 'en' ? '' : `/${locale}`;
 
   const calculateAge = () => {
     const birthDate = new Date(2002, 5, 20);
@@ -43,6 +56,7 @@ export default function AboutPage() {
 
   return (
     <main className="bg-white dark:bg-slate-950">
+      <ScrollAnimator />
 
       {/* ── Hero ── */}
       <section className="relative py-32 md:py-40 text-center overflow-hidden bg-gradient-to-b from-[#191970] to-[#2a2a9a] dark:from-[#a67c00] dark:to-[#704700]">
@@ -531,7 +545,7 @@ export default function AboutPage() {
             {t.aboutPage.ctaDesc}
           </p>
           <a
-            href={`/${locale}/contact`}
+            href={`${basePath}/contact`}
             className="inline-flex items-center justify-center gap-2 bg-white text-primary font-bold
               py-3 px-8 rounded hover:shadow-lg hover:scale-105 transition-all duration-300
               relative overflow-hidden group animate-fade-in-up font-secondary"

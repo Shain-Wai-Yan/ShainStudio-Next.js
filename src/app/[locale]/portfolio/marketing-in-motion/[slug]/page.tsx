@@ -10,7 +10,8 @@ import ProjectHeader from '@/components/marketing-in-motion/ProjectHeader';
 import ProjectContent from '@/components/marketing-in-motion/ProjectContent';
 import ProjectGallery from '@/components/marketing-in-motion/ProjectGallery';
 import RelatedProjects from '@/components/marketing-in-motion/RelatedProjects';
-import { getDictionarySync } from '@/lib/getDictionary';
+import { getDictionary } from '@/lib/getDictionary'; // ✅ CHANGE: async
+import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
 
 interface MarketingProjectPageProps {
   params: Promise<{ locale: string; slug: string }>;
@@ -19,14 +20,16 @@ interface MarketingProjectPageProps {
 export async function generateMetadata(
   props: MarketingProjectPageProps
 ): Promise<Metadata> {
-  const { locale, slug } = await props.params;
+  const { locale: rawLocale, slug } = await props.params;
+  const locale = isSupportedLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
   const { project, error } = await fetchMarketingProjectBySlug(slug);
-  const t = getDictionarySync(locale as 'en' | 'zh');
+  const t = await getDictionary(locale); // ✅ CHANGE: async
 
   if (error || !project) {
     return { title: t.marketingInMotion.seo.projectNotFoundTitle || 'Project Not Found | Shain Studio' };
   }
 
+  const basePath = locale === 'en' ? '' : `/${locale}`;
   const suffix = locale === 'zh' ? '营销实战 | Shain Studio' : 'Marketing in Motion | Shain Studio';
 
   return {
@@ -36,7 +39,7 @@ export async function generateMetadata(
       ? [...project.tags, ...project.toolsUsed, project.category].join(', ')
       : t.marketingInMotion.seo.keywords,
     alternates: {
-      canonical: locale === 'en' ? `https://www.shainwaiyan.com/portfolio/marketing-in-motion/${project.slug}` : `https://www.shainwaiyan.com/${locale}/portfolio/marketing-in-motion/${project.slug}`,
+      canonical: `https://www.shainwaiyan.com${basePath}/portfolio/marketing-in-motion/${project.slug}`,
       languages: {
         en: `https://www.shainwaiyan.com/portfolio/marketing-in-motion/${project.slug}`,
         zh: `https://www.shainwaiyan.com/zh/portfolio/marketing-in-motion/${project.slug}`,
@@ -44,7 +47,7 @@ export async function generateMetadata(
     },
     openGraph: {
       type: 'article',
-      url: `https://www.shainwaiyan.com${locale === 'en' ? '' : `/${locale}`}/portfolio/marketing-in-motion/${project.slug}`,
+      url: `https://www.shainwaiyan.com${basePath}/portfolio/marketing-in-motion/${project.slug}`,
       title: project.seo.metaTitle,
       description: project.seo.metaDescription,
       images: project.seo.ogImage ? [project.seo.ogImage] : [],
@@ -52,6 +55,7 @@ export async function generateMetadata(
       publishedTime: project.projectDate,
       modifiedTime: project.updatedAt,
       locale: locale === 'zh' ? 'zh_CN' : 'en_US',
+      alternateLocale: locale === 'zh' ? 'en_US' : 'zh_CN',
     },
     twitter: {
       card: 'summary_large_image',
@@ -62,28 +66,28 @@ export async function generateMetadata(
   };
 }
 
+// ✅ KEEP DYNAMIC (no force-static)
+
 export default async function MarketingProjectPage(
   props: MarketingProjectPageProps
 ) {
-  const { locale, slug } = await props.params;
+  const { locale: rawLocale, slug } = await props.params;
+  const locale = isSupportedLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
   const { project, error } = await fetchMarketingProjectBySlug(slug);
-  const t = getDictionarySync(locale as 'en' | 'zh');
+  const t = await getDictionary(locale); // ✅ CHANGE: async
 
   if (error || !project) {
     notFound();
   }
 
-  // ── Fetch related projects client-side via the list endpoint and filter locally.
   let relatedProjects: MarketingProject[] = [];
   try {
     const { projects: allProjects } = await fetchMarketingProjects(1, 100);
     relatedProjects = allProjects
-      .filter(
-        (p) => p.category === project.category && p.slug !== project.slug
-      )
+      .filter((p) => p.category === project.category && p.slug !== project.slug)
       .slice(0, 3);
   } catch {
-    // silently degrade — related section just won't show
+    // silently degrade
   }
 
   const basePath = locale === 'en' ? '' : `/${locale}`;

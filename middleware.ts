@@ -1,5 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { detectLocaleFromHeader, normalizeLocale } from '@/lib/i18n';
+import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
+
+/**
+ * Detect locale from Accept-Language header
+ */
+function detectLocaleFromHeader(acceptLanguage: string | null): string {
+  if (!acceptLanguage) return 'en';
+  
+  const languages = acceptLanguage.toLowerCase().split(',')
+    .map(lang => lang.split(';')[0].trim());
+  
+  for (const lang of languages) {
+    if (lang.startsWith('zh')) return 'zh';
+  }
+  
+  return 'en';
+}
+
+/**
+ * Extract locale from URL path (e.g., /zh/about → 'zh')
+ */
+function getLocaleFromPath(path: string): string {
+  if (!path) return 'en';
+  const match = path.match(/^\/(en|zh)\//);
+  return match ? match[1] : 'en';
+}
 
 export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
@@ -16,9 +41,8 @@ export function middleware(request: NextRequest) {
   }
 
   // ============================================
-  // CLEAN ENGLISH LOCALE REDIRECTS (Force prefix-less)
+  // CLEAN ENGLISH LOCALE REDIRECTS
   // ============================================
-  // If user explicitly visits /en or /en/something, redirect to root or /something
   if (pathname === '/en' || pathname.startsWith('/en/')) {
     const newPath = pathname.replace(/^\/en/, '') || '/';
     const url = request.nextUrl.clone();
@@ -29,17 +53,11 @@ export function middleware(request: NextRequest) {
   // ============================================
   // LOCALE-AWARE BLOG & MARKETING REDIRECTS
   // ============================================
-  
-  // Helper to get locale from path (extract from /en/... or /zh/...)
-  const getLocaleFromPath = (path: string): string => {
-    const match = path.match(/^\/(en|zh)\//);
-    return match ? match[1] : 'en'; // Defaults to 'en'
-  };
 
-  // /blog-post?slug=xxx → /[locale]/blog/xxx (preserve locale in URL)
+  // /blog-post?slug=xxx → /[locale]/blog/xxx
   if (pathname === '/blog-post' && searchParams.has('slug')) {
     const slug = searchParams.get('slug');
-    const locale = getLocaleFromPath(request.referrer || '');
+    const locale = request.cookies.get('NEXT_LOCALE')?.value === 'zh' ? 'zh' : 'en';
     const url = request.nextUrl.clone();
     url.pathname = locale === 'zh' ? `/zh/blog/${slug}` : `/blog/${slug}`;
     url.searchParams.delete('slug');
@@ -49,14 +67,14 @@ export function middleware(request: NextRequest) {
   // /marketing-project?slug=xxx → /[locale]/portfolio/marketing-in-motion/xxx
   if (pathname === '/marketing-project' && searchParams.has('slug')) {
     const slug = searchParams.get('slug');
-    const locale = getLocaleFromPath(request.referrer || '');
+    const locale = request.cookies.get('NEXT_LOCALE')?.value === 'zh' ? 'zh' : 'en';
     const url = request.nextUrl.clone();
     url.pathname = locale === 'zh' ? `/zh/portfolio/marketing-in-motion/${slug}` : `/portfolio/marketing-in-motion/${slug}`;
     url.searchParams.delete('slug');
     return NextResponse.redirect(url, { status: 301 });
   }
 
-  // LEGACY: /zh/blog-post → /zh/blog (old Chinese redirects)
+  // LEGACY: /zh/blog-post?slug=xxx → /zh/blog/xxx
   if (pathname === '/zh/blog-post' && searchParams.has('slug')) {
     const slug = searchParams.get('slug');
     const url = request.nextUrl.clone();
@@ -65,7 +83,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(url, { status: 301 });
   }
 
-  // LEGACY: /zh/marketing-project → /zh/portfolio/marketing-in-motion
+  // LEGACY: /zh/marketing-project?slug=xxx → /zh/portfolio/marketing-in-motion/xxx
   if (pathname === '/zh/marketing-project' && searchParams.has('slug')) {
     const slug = searchParams.get('slug');
     const url = request.nextUrl.clone();
@@ -75,10 +93,8 @@ export function middleware(request: NextRequest) {
   }
 
   // ============================================
-  // STRIP ONLY PROBLEMATIC SLUG PARAM (Keep UTM tracking!)
+  // STRIP ONLY PROBLEMATIC SLUG PARAM
   // ============================================
-  // Only remove the "slug" query param that causes double-slug issue
-  // PRESERVE utm_source, utm_medium, utm_campaign, etc. for marketing tracking
   if (searchParams.has('slug') && (pathname.includes('/blog') || pathname.includes('/portfolio'))) {
     const url = request.nextUrl.clone();
     url.searchParams.delete('slug');
@@ -86,10 +102,9 @@ export function middleware(request: NextRequest) {
   }
 
   // ============================================
-  // LEGACY ROUTE REDIRECTS - ENGLISH (handled here instead of vercel.json)
-  // Now redirects to PREFIX-LESS locale-aware routes
+  // LEGACY ROUTE REDIRECTS - ENGLISH
   // ============================================
-  
+
   if (pathname === '/marketing-plan') {
     const url = request.nextUrl.clone();
     url.pathname = '/portfolio/marketing-plans';
@@ -134,13 +149,12 @@ export function middleware(request: NextRequest) {
   }
 
   // ============================================
-  // LEGACY ROUTE REDIRECTS - CHINESE /zh/ (handled here instead of vercel.json)
+  // LEGACY ROUTE REDIRECTS - CHINESE /zh/
   // ============================================
-  
+
   if (pathname === '/zh/marketing-plan') {
     const url = request.nextUrl.clone();
     url.pathname = '/zh/portfolio/marketing-plans';
-    // PRESERVE query params (utm_source, utm_medium, etc.)
     return NextResponse.redirect(url, { status: 301 });
   }
 
@@ -184,33 +198,35 @@ export function middleware(request: NextRequest) {
   // ============================================
   // LOCALE ROUTING WITH /[locale]/ STRUCTURE
   // ============================================
-  
+
   if (pathname.startsWith('/zh')) {
     return NextResponse.next();
   }
 
-  // For root path, detect preferred locale
+  // Root path: detect preferred locale
   if (pathname === '/') {
     const languageCookie = request.cookies.get('NEXT_LOCALE')?.value;
 
+    // User has saved preference
     if (languageCookie === 'zh') {
       return NextResponse.redirect(new URL('/zh', request.url));
     }
 
+    // Try to detect from browser language
     const acceptLanguage = request.headers.get('accept-language');
     const detectedLocale = detectLocaleFromHeader(acceptLanguage);
 
     if (detectedLocale === 'zh') {
       const response = NextResponse.redirect(new URL('/zh', request.url));
       response.cookies.set('NEXT_LOCALE', 'zh', {
-        maxAge: 365 * 24 * 60 * 60, // 1 year
+        maxAge: 365 * 24 * 60 * 60,
         path: '/',
         sameSite: 'lax',
       });
       return response;
     }
 
-    // Default to English: Provide a transparent REWRITE to /en
+    // Default to English
     const response = NextResponse.rewrite(new URL('/en', request.url));
     response.cookies.set('NEXT_LOCALE', 'en', {
       maxAge: 365 * 24 * 60 * 60,
@@ -220,7 +236,7 @@ export function middleware(request: NextRequest) {
     return response;
   }
 
-  // Handle any other non-locale paths by rewriting to /en (acts as prefix-less)
+  // Handle any other non-locale paths
   if (pathname !== '/' && !pathname.startsWith('/.')) {
     return NextResponse.rewrite(new URL(`/en${pathname}`, request.url));
   }

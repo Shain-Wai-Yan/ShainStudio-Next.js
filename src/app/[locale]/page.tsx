@@ -1,8 +1,7 @@
-'use client';
 import React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { getDictionarySync } from '@/lib/getDictionary';
+import { Metadata } from 'next';
+import { getDictionary } from '@/lib/getDictionary';
 import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
 import {
   FaBullhorn, FaChartLine, FaUsers, FaComments,
@@ -581,21 +580,42 @@ const Cta = ({ t, basePath }: { t: any, basePath: string }) => (
 );
 
 /* ── PAGE ────────────────────────────────────── */
-export default function Home() {
-  const pathname = usePathname();
-  const pathSegments = pathname.split('/').filter(Boolean);
-  let locale: 'en' | 'zh' = DEFAULT_LOCALE as 'en' | 'zh';
-  
-  if (pathSegments.length > 0) {
-    if (isSupportedLocale(pathSegments[0])) {
-      locale = pathSegments[0] as 'en' | 'zh';
-    } else if (pathname.startsWith('/zh')) {
-      locale = 'zh';
-    }
-  }
+interface HomeProps {
+  params: Promise<{ locale: string }>;
+}
 
+export async function generateMetadata({ params }: HomeProps): Promise<Metadata> {
+  const { locale: rawLocale } = await params;
+  const locale = isSupportedLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
+  const t = await getDictionary(locale);
+
+  return {
+    title: `${t.homePage.titleHighlight} | ${t.homePage.subtitle}`,
+    description: t.homePage.description,
+    alternates: {
+      languages: {
+        'en': 'https://www.shainwaiyan.com/',
+        'zh': 'https://www.shainwaiyan.com/zh',
+      },
+    },
+  };
+}
+
+export const dynamic = 'force-static';
+export const revalidate = 3600;
+
+export async function generateStaticParams() {
+  return [
+    { locale: 'en' },
+    { locale: 'zh' }
+  ];
+}
+
+export default async function Home({ params }: HomeProps) {
+  const { locale: rawLocale } = await params;
+  const locale = isSupportedLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
   const basePath = locale === 'en' ? '' : `/${locale}`;
-  const t = getDictionarySync(locale);
+  const t = await getDictionary(locale);
 
   return (
     <main className="overflow-x-hidden">

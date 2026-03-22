@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 import { Breadcrumb } from '@/components/Breadcrumb';
 import { PhotographyGallery } from '@/components/photography/PhotographyGallery';
 import { fetchAllPhotography } from '@/lib/strapi/photography';
-import { getDictionarySync } from '@/lib/getDictionary';
+import { getDictionary } from '@/lib/getDictionary'; // ✅ Use async
+import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
 
 interface PhotographyPageProps {
   params: Promise<{ locale: string }>;
@@ -11,32 +12,35 @@ interface PhotographyPageProps {
 export async function generateMetadata(
   props: PhotographyPageProps
 ): Promise<Metadata> {
-  const { locale } = await props.params;
-  const t = getDictionarySync(locale as 'en' | 'zh');
+  const { locale: rawLocale } = await props.params;
+  const locale = isSupportedLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
+  const t = await getDictionary(locale); // ✅ Use async
   const basePath = locale === 'en' ? '' : `/${locale}`;
 
   return {
     title: t.photography.seo.title,
     description: t.photography.seo.description,
     alternates: {
-      canonical: `${basePath}/portfolio/photography`,
+      canonical: `https://www.shainwaiyan.com${basePath}/portfolio/photography`,
       languages: {
-        en: '/portfolio/photography',
-        zh: '/zh/portfolio/photography',
+        en: 'https://www.shainwaiyan.com/portfolio/photography',
+        zh: 'https://www.shainwaiyan.com/zh/portfolio/photography',
       },
     },
     openGraph: {
       title: t.photography.seo.openGraphTitle,
       description: t.photography.seo.openGraphDesc,
-      url: `${basePath}/portfolio/photography`,
+      url: `https://www.shainwaiyan.com${basePath}/portfolio/photography`,
       locale: locale === 'zh' ? 'zh_CN' : 'en_US',
+      alternateLocale: locale === 'zh' ? 'en_US' : 'zh_CN',
     },
   };
 }
 
 export default async function PhotographyPage(props: PhotographyPageProps) {
-  const { locale } = await props.params;
-  const t = getDictionarySync(locale as 'en' | 'zh');
+  const { locale: rawLocale } = await props.params;
+  const locale = isSupportedLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
+  const t = await getDictionary(locale); // ✅ Use async
   const basePath = locale === 'en' ? '' : `/${locale}`;
 
   const { photos, error } = await fetchAllPhotography(locale as 'en' | 'zh', { pageSize: 100 });

@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { getDictionary } from '@/lib/getDictionary';
+import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
 import { MarketingPlanClient } from '@/components/marketing-plans/MarketingPlanClient';
 
 interface MarketingPlanPageProps {
@@ -8,33 +9,42 @@ interface MarketingPlanPageProps {
 
 export async function generateMetadata(props: MarketingPlanPageProps): Promise<Metadata> {
   const params = await props.params;
-  const locale = params?.locale || 'en';
-  
-  // Safely extract seo translations
+  const locale = isSupportedLocale(params?.locale) ? params.locale : DEFAULT_LOCALE;
   const dict = await getDictionary(locale as any);
   
+  const basePath = locale === 'en' ? '' : `/${locale}`;
+
   return {
     title: dict.marketingPlans.seo.title,
     description: dict.marketingPlans.seo.description,
     alternates: {
-      canonical: '/portfolio/marketing-plans',
+      canonical: `https://www.shainwaiyan.com${basePath}/portfolio/marketing-plans`,
       languages: {
-        'en': '/portfolio/marketing-plans',
-        'zh': '/zh/portfolio/marketing-plans',
+        'en': 'https://www.shainwaiyan.com/portfolio/marketing-plans',
+        'zh': 'https://www.shainwaiyan.com/zh/portfolio/marketing-plans',
       },
     },
     openGraph: {
       title: dict.marketingPlans.seo.title,
       description: dict.marketingPlans.seo.description,
-      url: '/portfolio/marketing-plans',
+      url: `https://www.shainwaiyan.com${basePath}/portfolio/marketing-plans`,
     },
   };
+}
+export const dynamic = 'force-static';
+export const revalidate = 3600;
+
+export async function generateStaticParams() {
+  return [
+    { locale: 'en' },
+    { locale: 'zh' }
+  ];
 }
 
 export default async function MarketingPlanPage(props: MarketingPlanPageProps) {
   const params = await props.params;
-  const locale = params?.locale || 'en';
+  const locale = isSupportedLocale(params?.locale) ? params.locale : DEFAULT_LOCALE;
   const dict = await getDictionary(locale as any);
 
-  return <MarketingPlanClient locale={locale} dict={dict} />;
+  return <MarketingPlanClient locale={locale as 'en' | 'zh'} dict={dict} />;
 }
