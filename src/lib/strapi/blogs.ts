@@ -73,7 +73,7 @@ export async function fetchAllBlogs(
     const { page = 1, pageSize = 12 } = options;
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
     const res = await fetch(
-      `${appUrl}/api/blogs?page=${page}&pageSize=${pageSize}&language=${language}`,
+      `${appUrl}/api/blogs?page=${page}&pageSize=${pageSize}&language=${language}&minimal=true`,
       { next: { revalidate: 300 }, headers: { 'Content-Type': 'application/json' } }
     );
     if (!res.ok) return { blogs: [], total: 0, pageCount: 0, error: `API Error: ${res.status}` };

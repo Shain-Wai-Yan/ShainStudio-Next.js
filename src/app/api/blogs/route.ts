@@ -134,8 +134,15 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const page     = searchParams.get('page')     ?? '1';
     const pageSize = searchParams.get('pageSize') ?? '100';
+    const minimal  = searchParams.get('minimal')  === 'true';
 
-    const url = `${STRAPI_API_URL}/blogs?pagination[page]=${page}&pagination[pageSize]=${pageSize}&populate=*&sort=publishDate:desc`;
+    // If minimal, we only fetch essential listing fields: Title, slug, excerpt, publishDate, updated_at, author, categories, tags, featuredImage, Seo
+    // Excludes: content
+    const fieldsParam = minimal 
+      ? '&fields[0]=Title&fields[1]=slug&fields[2]=excerpt&fields[3]=publishDate&fields[4]=updatedAt&fields[5]=author&fields[6]=language'
+      : '';
+
+    const url = `${STRAPI_API_URL}/blogs?pagination[page]=${page}&pagination[pageSize]=${pageSize}${fieldsParam}&populate=*&sort=publishDate:desc`;
     console.log('[blogs] Fetching:', url);
 
     const res = await fetch(url, {
@@ -149,9 +156,16 @@ export async function GET(request: NextRequest) {
     }
 
     const data = await res.json();
-    const posts = (data.data ?? []).map(transformPost).filter(Boolean);
+    const posts = (data.data ?? []).map(transformPost).filter(Boolean).map((p: any) => {
+      if (minimal) {
+        // Remove content and readingTime from the final response to save bytes
+        const { content, readingTime, ...minimalPost } = p;
+        return minimalPost;
+      }
+      return p;
+    });
 
-    console.log(`[blogs] Fetched ${posts.length} posts`);
+    console.log(`[blogs] Fetched ${posts.length} posts (minimal: ${minimal})`);
     return NextResponse.json({
       posts,
       total: data.meta?.pagination?.total ?? 0,
