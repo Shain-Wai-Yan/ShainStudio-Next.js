@@ -10,7 +10,7 @@ interface MarketingPlanPageProps {
 export async function generateMetadata(props: MarketingPlanPageProps): Promise<Metadata> {
   const params = await props.params;
   const locale = isSupportedLocale(params?.locale) ? params.locale : DEFAULT_LOCALE;
-  const dict = await getDictionary(locale as any);
+  const dict = await getDictionary(locale);
   
   const basePath = locale === 'en' ? '' : `/${locale}`;
 
@@ -44,7 +44,7 @@ export async function generateStaticParams() {
 export default async function MarketingPlanPage(props: MarketingPlanPageProps) {
   const params = await props.params;
   const locale = isSupportedLocale(params?.locale) ? params.locale : DEFAULT_LOCALE;
-  const dict = await getDictionary(locale as any);
+  const dict = await getDictionary(locale);
 
   return <MarketingPlanClient locale={locale as 'en' | 'zh'} dict={dict} />;
 }
