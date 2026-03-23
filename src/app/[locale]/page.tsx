@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { Metadata } from 'next';
 import { getDictionary } from '@/lib/getDictionary';
+import type { Dictionary } from '@/lib/getDictionary';
 import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
 import {
   FaBullhorn, FaChartLine, FaUsers, FaComments,
@@ -10,7 +11,7 @@ import {
 } from 'react-icons/fa';
 
 /* ── HERO ────────────────────────────────────── */
-const Hero = ({ t, basePath }: { t: any, basePath: string }) => (
+const Hero = ({ t, basePath }: { t: Dictionary, basePath: string }) => (
   <section
     className="relative min-h-screen flex items-center justify-center overflow-hidden mt-[80px] px-4 py-12 sm:p-8"
     style={{ backgroundColor: 'var(--background)' }}
@@ -277,62 +278,12 @@ const Hero = ({ t, basePath }: { t: any, basePath: string }) => (
       </svg>
     </div>
 
-    <style>{`
-      @keyframes heroGradient {
-        0%   { background-position: 0% 50%; }
-        50%  { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
-      }
-      @keyframes heroTextShimmer {
-        0%   { background-position: 200% center; }
-        100% { background-position: -200% center; }
-      }
-      @keyframes cubeRotate {
-        0%   { transform: rotateX(0deg)   rotateY(0deg)   rotateZ(0deg); }
-        100% { transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg); }
-      }
-      @keyframes cubeFaceShift {
-        0%   { background-position: 0%   0%;   }
-        25%  { background-position: 100% 0%;   }
-        50%  { background-position: 100% 100%; }
-        75%  { background-position: 0%   100%; }
-        100% { background-position: 0%   0%;   }
-      }
-      @keyframes cubeSweep {
-        0%   { background-position: -150% 0%; }
-        100% { background-position:  250% 0%; }
-      }
-      @keyframes shimmerLine {
-        0%, 100% { opacity: 0.2; transform: scaleX(0.3); }
-        50%       { opacity: 0.8; transform: scaleX(1);   }
-      }
-      @keyframes orbitSpin {
-        from { transform: rotate(0deg);   }
-        to   { transform: rotate(360deg); }
-      }
-      @keyframes glowPulse {
-        0%   { opacity: 0.2; transform: translateX(-50%) scaleX(0.8); }
-        100% { opacity: 0.45; transform: translateX(-50%) scaleX(1.2); }
-      }
-      @keyframes float {
-        0%   { transform: translate(0, 0) rotate(0deg); }
-        50%  { transform: translate(15px, 15px) rotate(4deg); }
-        100% { transform: translate(0, 0) rotate(0deg); }
-      }
-        @media (max-width: 768px) {
-    @keyframes cubeFaceShift {
-      0%, 100% { background-position: 0% 0%; }
-    }
-    @keyframes cubeSweep {
-      0%, 100% { background-position: -150% 0%; }
-    }
-  }
-    `}</style>
+
   </section>
 );
 
 /* ── EXPERTISE ───────────────────────────────── */
-const Expertise = ({ t, basePath }: { t: any, basePath: string }) => {
+const Expertise = ({ t, basePath }: { t: Dictionary, basePath: string }) => {
   const expertiseData = [
     {
       icon: <FaBullhorn size={48} className="text-[#ffd700] dark:text-[#d4af37]" />,
@@ -371,7 +322,13 @@ const Expertise = ({ t, basePath }: { t: any, basePath: string }) => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
           {expertiseData.map((item, index) => (
             <div key={index} style={{ height: '280px', perspective: '1000px' }} className="group">
-              <div className="relative w-full h-full transition-transform duration-700 group-hover:[transform:rotateY(180deg)]" style={{ transformStyle: 'preserve-3d' }}>
+              <div
+                className="relative w-full h-full transition-transform duration-700 group-hover:[transform:rotateY(180deg)] focus-within:[transform:rotateY(180deg)]"
+                style={{ transformStyle: 'preserve-3d' }}
+                tabIndex={0}
+                role="button"
+                aria-label={`${item.title} — click to see more`}
+              >
                 <div className="absolute w-full h-full rounded-lg flex flex-col items-center justify-center p-6 sm:p-8 shadow-md bg-white dark:bg-[#2a2a2a]" style={{ backfaceVisibility: 'hidden' }}>
                   <div className="mb-5 sm:mb-6">{item.icon}</div>
                   <h3 className="text-xl sm:text-2xl font-bold text-[#191970] dark:text-[#d4af37] text-center">{item.title}</h3>
@@ -392,7 +349,7 @@ const Expertise = ({ t, basePath }: { t: any, basePath: string }) => {
 };
 
 /* ── AI SHOWCASE ─────────────────────────────── */
-const AiShowcase = ({ t, basePath }: { t: any, basePath: string }) => (
+const AiShowcase = ({ t, basePath }: { t: Dictionary, basePath: string }) => (
   <section className="bg-[#f9f9f9] dark:bg-[#1e1e1e] py-16 sm:py-20 px-4 sm:px-8 relative overflow-hidden">
     <div className="absolute inset-0 z-0" style={{ backgroundImage: 'linear-gradient(to right, rgba(25,25,112,0.05) 1px, transparent 1px),linear-gradient(to bottom, rgba(25,25,112,0.05) 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
     <div className="absolute inset-0 z-0 hidden dark:block" style={{ backgroundImage: 'linear-gradient(to right, rgba(166,124,0,0.05) 1px, transparent 1px),linear-gradient(to bottom, rgba(166,124,0,0.05) 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
@@ -446,22 +403,12 @@ const AiShowcase = ({ t, basePath }: { t: any, basePath: string }) => (
         </div>
       </div>
     </div>
-    <style>{`
-      @keyframes aiPulse {
-        0%   { transform: scale(1);   box-shadow: 0 0 20px rgba(25,25,112,0.3); }
-        100% { transform: scale(1.1); box-shadow: 0 0 40px rgba(25,25,112,0.5); }
-      }
-      @keyframes brainPulse {
-        0%   { transform: scale(0.8); opacity: 0.8; }
-        100% { transform: scale(1.5); opacity: 0;   }
-      }
-    `}</style>
   </section>
 );
 
 /* ── SKILLS ──────────────────────────────────── */
 
-const Skills = ({ t }: { t: any }) => {
+const Skills = ({ t }: { t: Dictionary }) => {
   const marketingSkills = t.skills?.marketingSkills || [
     { name: 'Traditional Marketing', level: 98 },
     { name: 'Digital Marketing',     level: 95 },
@@ -498,7 +445,15 @@ const Skills = ({ t }: { t: any }) => {
                       <span className="text-xs sm:text-sm font-medium text-[#191970] dark:text-[#d4af37]">{skill.level}%</span>
                     </div>
                     <div className="w-full rounded-full h-2 sm:h-2.5 overflow-hidden bg-[#f9f9f9] dark:bg-[#333333]">
-                      <div className="h-full rounded-full bg-gradient-to-r from-[#191970] to-[#ffd700] dark:from-[#704700] dark:via-[#a67c00] dark:to-[#d4af37] transition-all duration-500" style={{ width: `${skill.level}%` }} />
+                      <div
+                        role="progressbar"
+                        aria-valuenow={skill.level}
+                        aria-valuemin={0}
+                        aria-valuemax={100}
+                        aria-label={`${skill.name}: ${skill.level}%`}
+                        className="h-full rounded-full bg-gradient-to-r from-[#191970] to-[#ffd700] dark:from-[#704700] dark:via-[#a67c00] dark:to-[#d4af37] transition-all duration-500"
+                        style={{ width: `${skill.level}%` }}
+                      />
                     </div>
                   </div>
                 ))}
@@ -512,7 +467,7 @@ const Skills = ({ t }: { t: any }) => {
 };
 
 /* ── CERTIFICATE PREVIEW ─────────────────────── */
-const CertificatePreview = ({ t, basePath }: { t: any, basePath: string }) => {
+const CertificatePreview = ({ t, basePath }: { t: Dictionary, basePath: string }) => {
   const certificates = [
     { icon: <FaAward size={40} className="text-[#ffd700] dark:text-[#d4af37]" />, title: t.certificatePreview?.items?.[0]?.title, description: t.certificatePreview?.items?.[0]?.description },
     { icon: <FaChartPie size={40} className="text-[#ffd700] dark:text-[#d4af37]" />, title: t.certificatePreview?.items?.[1]?.title, description: t.certificatePreview?.items?.[1]?.description },
@@ -552,18 +507,12 @@ const CertificatePreview = ({ t, basePath }: { t: any, basePath: string }) => {
           </Link>
         </div>
       </div>
-      <style>{`
-        @keyframes certificateFade {
-          from { opacity: 0; transform: translateY(20px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
     </section>
   );
 };
 
 /* ── CTA ─────────────────────────────────────── */
-const Cta = ({ t, basePath }: { t: any, basePath: string }) => (
+const Cta = ({ t, basePath }: { t: Dictionary, basePath: string }) => (
   <section className="relative py-16 sm:py-20 overflow-hidden bg-gradient-to-r from-[#191970] via-[#2a2a9a] to-[#ffd700] dark:from-[#191970] dark:via-[#704700] dark:to-[#d4af37]">
     <div className="absolute inset-0 opacity-10 dark:opacity-5 z-0 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,215,0,0.15) 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">

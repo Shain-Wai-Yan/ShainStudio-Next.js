@@ -1,6 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { FaBars, FaTimes, FaChevronDown } from 'react-icons/fa';
 import LanguageSwitcher from './LanguageSwitcher';
@@ -82,9 +83,12 @@ const Header = () => {
         {/* Logo */}
         <div className="flex items-center gap-3 flex-shrink-0">
           <Link href={basePath} className="flex items-center gap-3 hover:opacity-90 transition-opacity duration-300">
-            <img
+            <Image
               src="/images/Shain Studio.png"
               alt="Shain Studio Logo"
+              width={48}
+              height={48}
+              priority
               className="w-10 h-10 sm:w-12 sm:h-12 object-contain rounded"
             />
             <span className="font-bold text-lg sm:text-xl hidden sm:inline text-white">

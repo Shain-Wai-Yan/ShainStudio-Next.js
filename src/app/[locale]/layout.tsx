@@ -94,8 +94,58 @@ export default function LocaleLayout({ children, params }: LocaleLayoutProps) {
   const locale = isSupportedLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
   const htmlLang = getHtmlLang(locale);
 
+  const isZh = locale === 'zh';
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'Person',
+        '@id': 'https://www.shainwaiyan.com/#person',
+        name: 'Shain Wai Yan',
+        alternateName: ['xolbine', '明元易'],
+        url: 'https://www.shainwaiyan.com',
+        image: 'https://www.shainwaiyan.com/images/Shain Studio.png',
+        jobTitle: isZh ? '数字营销与品牌策略师' : 'Digital Marketing & Brand Strategist',
+        description: isZh
+          ? 'AI驱动的数字营销与品牌策略专家，专注于内容策略与市场分析。'
+          : 'AI-powered digital marketing & brand strategy expert specialising in content strategy and market analysis.',
+        knowsAbout: [
+          'Digital Marketing',
+          'Brand Strategy',
+          'AI Marketing',
+          'Content Strategy',
+          'Market Analysis',
+          'Social Media Marketing',
+          'SEO',
+        ],
+        sameAs: [
+          'https://www.linkedin.com/in/shainwaiyan/',
+          'https://github.com/Shain-Wai-Yan',
+        ],
+      },
+      {
+        '@type': 'WebSite',
+        '@id': 'https://www.shainwaiyan.com/#website',
+        url: 'https://www.shainwaiyan.com',
+        name: isZh ? 'Shain的作品集' : "Shain's Portfolio",
+        description: isZh
+          ? 'Shain Wai Yan (xolbine) 的数字营销与品牌策略作品集。'
+          : 'Digital Marketing & Brand Strategy portfolio of Shain Wai Yan (xolbine).',
+        inLanguage: [isZh ? 'zh-CN' : 'en-US'],
+        publisher: { '@id': 'https://www.shainwaiyan.com/#person' },
+      },
+    ],
+  };
+
   return (
     <html lang={htmlLang} suppressHydrationWarning dir="ltr">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body>
         <Header />
         <main className="min-h-screen">

@@ -1,6 +1,7 @@
 'use client';
 import React, { useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { FaLinkedin, FaGithub, FaEnvelope } from 'react-icons/fa';
 import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
@@ -51,9 +52,11 @@ const Footer = () => {
           {/* Brand Section */}
           <div className="flex flex-col gap-4">
             <Link href={locale === 'en' ? '/' : basePath} className="flex items-center gap-3 hover:opacity-90 transition-opacity duration-300 w-fit group">
-              <img
+              <Image
                 src="/images/Shain Studio.png"
                 alt="Shain Studio Logo"
+                width={48}
+                height={48}
                 className="w-12 h-12 object-contain rounded group-hover:scale-110 transition-transform duration-300"
               />
               <div>
