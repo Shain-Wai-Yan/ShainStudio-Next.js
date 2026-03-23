@@ -37,7 +37,7 @@ export default function BlogCard({ blog, language, variant = 'grid' }: BlogCardP
                 </span>
               )}
               <time className="text-xs text-[#666] dark:text-[#b0b0b0]">{transformed.formattedDate}</time>
-              {transformed.readingTime && (
+              {transformed.readingTime > 0 && (
                 <span className="text-xs text-[#666] dark:text-[#b0b0b0]">
                   {transformed.readingTime} {language === 'zh' ? '分钟阅读' : 'min read'}
                 </span>
@@ -99,7 +99,7 @@ export default function BlogCard({ blog, language, variant = 'grid' }: BlogCardP
           {/* Meta */}
           <div className="flex items-center justify-between text-[11px] text-[#666] dark:text-[#b0b0b0] mb-2">
             <time>{transformed.formattedDate}</time>
-            {transformed.readingTime && (
+            {transformed.readingTime > 0 && (
               <span>{transformed.readingTime} {language === 'zh' ? '分钟' : 'min read'}</span>
             )}
           </div>

@@ -13,33 +13,40 @@ export async function generateMetadata({ params }: ContactPageProps): Promise<Me
   const t = await getDictionary(locale);
 
   const isZh = locale === 'zh';
+  const domain = 'https://www.shainwaiyan.com';
+  const urlPath = isZh ? '/zh/contact' : '/contact';
+
+  const title = isZh
+    ? `${t.contactPage.heroTitle} ${t.contactPage.heroTitleHighlight} | 明元易 (Shain Wai Yan)`
+    : 'Contact | Shain Wai Yan - Digital Marketer & Brand Strategist';
 
   return {
-    title: isZh
-      ? `${t.contactPage.heroTitle} ${t.contactPage.heroTitleHighlight} | Shain Wai Yan (明元易)`
-      : 'Contact Me - Shain Wai Yan (xolbine) | Digital Marketer & Brand Strategist',
+    title,
     description: isZh
       ? t.contactPage.heroSubtitle
-      : 'Contact Shain Wai Yan (xolbine, 明元易), professional digital marketer and brand strategist. Get in touch for marketing consultations, brand strategy services, and digital marketing solutions.',
-    keywords: ['contact', 'marketing consultant', 'brand strategy', 'digital marketing', 'Shain Wai Yan'],
+      : 'Contact Shain Wai Yan (xolbine, 明元易), professional digital marketer and brand strategist. Get in touch for marketing consultations.',
     alternates: {
-      canonical: `https://www.shainwaiyan.com/contact`,
+      canonical: `${domain}${urlPath}`,
       languages: {
-        en: 'https://www.shainwaiyan.com/contact',
-        zh: 'https://www.shainwaiyan.com/zh/contact',
+        en: `${domain}/contact`,
+        zh: `${domain}/zh/contact`,
+        'x-default': `${domain}/contact`
       },
     },
     openGraph: {
-      title: isZh
-        ? `${t.contactPage.heroTitle} ${t.contactPage.heroTitleHighlight} | Shain Wai Yan`
-        : 'Contact Me - Shain Wai Yan',
-      description: isZh
-        ? t.contactPage.heroSubtitle
-        : 'Get in touch with Shain Wai Yan for marketing consultations and brand strategy services.',
-      url: `https://www.shainwaiyan.com/${isZh ? 'zh/' : ''}contact`,
+      title,
+      description: isZh ? t.contactPage.heroSubtitle : 'Get in touch with Shain Wai Yan for marketing consultations and brand strategy services.',
+      url: `${domain}${urlPath}`,
       type: 'website',
+      images: `${domain}/images/Shain Studio.png`,
       locale: isZh ? 'zh_CN' : 'en_US',
       alternateLocale: isZh ? 'en_US' : 'zh_CN',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description: isZh ? t.contactPage.heroSubtitle : 'Get in touch with Shain Wai Yan.',
+      images: [`${domain}/images/Shain Studio.png`],
     },
   };
 }

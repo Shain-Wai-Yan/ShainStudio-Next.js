@@ -13,6 +13,7 @@ export interface BlogPost {
   Slug: string;
   Description?: string;
   Content: string;
+  ReadingTime?: string;          // "5 min read" — pre-calculated server-side in route.ts
   FeaturedImage: string | null;  // absolute URL from Cloudinary/Strapi, or null
   Category?: string;
   Tags?: string[];
@@ -26,31 +27,30 @@ export interface BlogPost {
   Seo?: {
     metaTitle?: string;
     metaDescription?: string;
-    ogImageUrl?: string | null;   // already resolved to absolute URL by API route
+    ogImageUrl?: string | null;  // already resolved to absolute URL by API route
   };
 }
 
 // Maps camelCase API response → PascalCase BlogPost that components expect
 function mapPost(p: Record<string, unknown>): BlogPost {
   // ── Resolve SEO fields ────────────────────────────────────────────────────
-  // The API route (route.ts) resolves ogImage to a flat ogImageUrl string.
-  // Here we just forward whatever the route already resolved.
   const rawSeo = p.seo as Record<string, unknown> | undefined;
   const seo: BlogPost['Seo'] = rawSeo
     ? {
-        metaTitle:       rawSeo.metaTitle      as string | undefined,
+        metaTitle:       rawSeo.metaTitle       as string | undefined,
         metaDescription: rawSeo.metaDescription as string | undefined,
-        ogImageUrl:      rawSeo.ogImageUrl      as string | null | undefined,
+        ogImageUrl:      rawSeo.ogImageUrl       as string | null | undefined,
       }
     : undefined;
 
   return {
-    id:            p.id as number,
+    id:            p.id            as number,
     Title:         String(p.title   ?? 'Untitled'),
     Slug:          String(p.slug    ?? ''),
     Description:   String(p.excerpt ?? ''),
     Content:       String(p.content ?? ''),
-    // featuredImage comes from API route already resolved — use directly, no further processing
+    // FIX: map server-calculated readingTime so listing cards work without full content
+    ReadingTime:   (p.readingTime as string)    ?? undefined,
     FeaturedImage: (p.featuredImage as string | null) ?? null,
     Category:      (p.categories as string[])?.[0] ?? undefined,
     Tags:          (p.tags as string[])             ?? [],
@@ -112,7 +112,7 @@ export async function fetchRelatedBlogs(
 ): Promise<{ blogs: BlogPost[]; error: string | null }> {
   try {
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-    const res = await fetch(`${appUrl}/api/blogs?pageSize=100&language=${language}`, {
+    const res = await fetch(`${appUrl}/api/blogs?pageSize=100&language=${language}&minimal=true`, {
       next: { revalidate: 300 }, headers: { 'Content-Type': 'application/json' },
     });
     if (!res.ok) return { blogs: [], error: `API Error: ${res.status}` };
@@ -130,7 +130,7 @@ export async function fetchRelatedBlogs(
 export async function fetchBlogCategories(language: 'en' | 'zh' = 'en'): Promise<{ categories: string[]; error: string | null }> {
   try {
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-    const res = await fetch(`${appUrl}/api/blogs?pageSize=100&language=${language}`, {
+    const res = await fetch(`${appUrl}/api/blogs?pageSize=100&language=${language}&minimal=true`, {
       next: { revalidate: 300 }, headers: { 'Content-Type': 'application/json' },
     });
     if (!res.ok) return { categories: [], error: `API Error: ${res.status}` };
@@ -148,7 +148,7 @@ export async function fetchBlogCategories(language: 'en' | 'zh' = 'en'): Promise
 export async function fetchBlogTags(language: 'en' | 'zh' = 'en'): Promise<{ tags: string[]; error: string | null }> {
   try {
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-    const res = await fetch(`${appUrl}/api/blogs?pageSize=100&language=${language}`, {
+    const res = await fetch(`${appUrl}/api/blogs?pageSize=100&language=${language}&minimal=true`, {
       next: { revalidate: 300 }, headers: { 'Content-Type': 'application/json' },
     });
     if (!res.ok) return { tags: [], error: `API Error: ${res.status}` };
@@ -174,7 +174,12 @@ export function transformBlog(blog: BlogPost) {
   // Pass through directly — never process it again.
   const featuredImageUrl = blog.FeaturedImage ?? undefined;
 
-  const readingTime   = calculateReadingTime(blog.Content || '');
+  // FIX: prefer server-calculated ReadingTime (available in minimal/listing mode)
+  // Fall back to client-side calculation for full post pages where Content is present
+  const readingTime = blog.ReadingTime
+    ? parseInt(blog.ReadingTime)              // "5 min read" → 5
+    : calculateReadingTime(blog.Content || ''); // fallback for slug route (full content)
+
   const publishDate   = blog.PublishedDate || blog.publishedAt || blog.createdAt;
   const formattedDate = new Date(publishDate).toLocaleDateString(
     blog.Language === 'zh' ? 'zh-CN' : 'en-US',
@@ -209,8 +214,7 @@ export async function searchBlogs(query: string, language: 'en' | 'zh' = 'en') {
   return {
     blogs: blogs.filter(
       (b) => b.Title.toLowerCase().includes(q) ||
-             b.Description?.toLowerCase().includes(q) ||
-             b.Content?.toLowerCase().includes(q)
+             b.Description?.toLowerCase().includes(q)
     ),
     error: null,
   };
