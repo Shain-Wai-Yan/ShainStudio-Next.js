@@ -29,7 +29,8 @@ export async function generateMetadata(props: BlogPageProps): Promise<Metadata> 
       canonical: `${domain}${urlPath}`,
       languages: {
         en: `${domain}/blog`,
-        zh: `${domain}/zh/blog`
+        zh: `${domain}/zh/blog`,
+        'x-default': `${domain}/blog`
       },
     },
     openGraph: {

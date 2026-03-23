@@ -119,7 +119,7 @@ function transformPost(strapiPost: Record<string, unknown>) {
       publishDate, updatedAt, author,
       categories: postCategories.filter(Boolean),
       tags: postTags.filter(Boolean),
-      readingTime: calculateReadingTime(content),
+      readingTime: calculateReadingTime(content), // always calculated server-side from full content
       language: (slug.includes('zh-') ? 'zh' : 'en') as 'en' | 'zh',
       seo,
     };
@@ -134,7 +134,10 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const page     = searchParams.get('page')     ?? '1';
     const pageSize = searchParams.get('pageSize') ?? '100';
+    const minimal  = searchParams.get('minimal')  === 'true';
 
+    // We fetch all fields from Strapi to ensure readingTime is calculated correctly,
+    // then strip 'content' in the response if 'minimal' is true.
     const url = `${STRAPI_API_URL}/blogs?pagination[page]=${page}&pagination[pageSize]=${pageSize}&populate=*&sort=publishDate:desc`;
     console.log('[blogs] Fetching:', url);
 
@@ -149,9 +152,16 @@ export async function GET(request: NextRequest) {
     }
 
     const data = await res.json();
-    const posts = (data.data ?? []).map(transformPost).filter(Boolean);
+    const posts = (data.data ?? []).map(transformPost).filter(Boolean).map((p: any) => {
+      if (minimal) {
+        // Strip content but keep readingTime (which was calculated during transformPost)
+        const { content, ...minimalPost } = p;
+        return minimalPost;
+      }
+      return p;
+    });
 
-    console.log(`[blogs] Fetched ${posts.length} posts`);
+    console.log(`[blogs] Fetched ${posts.length} posts (minimal: ${minimal})`);
     return NextResponse.json({
       posts,
       total: data.meta?.pagination?.total ?? 0,
