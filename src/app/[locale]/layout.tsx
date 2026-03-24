@@ -143,7 +143,6 @@ export default function LocaleLayout({ children, params }: LocaleLayoutProps) {
       <head>
         <script
           type="application/ld+json"
-          id="json-ld-main"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>

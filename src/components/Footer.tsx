@@ -99,6 +99,10 @@ const Footer = () => {
                 data-share-badge-host="https://www.credly.com"
               ></div>
             </div>
+            {/* SEO context for iframes */}
+            <span className="sr-only">
+              Certified by Google in Digital Marketing & E-Commerce. Certified by Meta in Social Media Marketing.
+            </span>
           </div>
 
           {/* Social Links Section */}

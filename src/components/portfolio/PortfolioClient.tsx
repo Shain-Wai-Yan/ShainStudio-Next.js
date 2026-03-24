@@ -221,12 +221,13 @@ export default function PortfolioClient({ locale, t }: Props) {
 
   const isZh = locale === 'zh';
   const displayFont = isZh ? "'ZCOOL XiaoWei', sans-serif" : "'Bebas Neue', sans-serif";
+  const basePath = locale === 'en' ? '' : `/${locale}`;
 
   // Data
   const ITEMS = [
     {
       id: 'business-plans',
-      href: `/${locale}/portfolio/business-plans`,
+      href: `${basePath}/portfolio/business-plans`,
       number: '01',
       title: t.items['business-plans'].title,
       subtitle: t.items['business-plans'].subtitle,
@@ -241,7 +242,7 @@ export default function PortfolioClient({ locale, t }: Props) {
     },
     {
       id: 'marketing-plans',
-      href: `/${locale}/portfolio/marketing-plans`,
+      href: `${basePath}/portfolio/marketing-plans`,
       number: '02',
       title: t.items['marketing-plans'].title,
       subtitle: t.items['marketing-plans'].subtitle,
@@ -257,7 +258,7 @@ export default function PortfolioClient({ locale, t }: Props) {
     },
     {
       id: 'marketing-in-motion',
-      href: `/${locale}/portfolio/marketing-in-motion`,
+      href: `${basePath}/portfolio/marketing-in-motion`,
       number: '03',
       title: t.items['marketing-in-motion'].title,
       subtitle: t.items['marketing-in-motion'].subtitle,
@@ -272,7 +273,7 @@ export default function PortfolioClient({ locale, t }: Props) {
     },
     {
       id: 'coding-projects',
-      href: `/${locale}/portfolio/coding-projects`,
+      href: `${basePath}/portfolio/coding-projects`,
       number: '04',
       title: t.items['coding-projects'].title,
       subtitle: t.items['coding-projects'].subtitle,
@@ -287,7 +288,7 @@ export default function PortfolioClient({ locale, t }: Props) {
     },
     {
       id: 'photography',
-      href: `/${locale}/portfolio/photography`,
+      href: `${basePath}/portfolio/photography`,
       number: '05',
       title: t.items['photography'].title,
       subtitle: t.items['photography'].subtitle,
@@ -303,7 +304,7 @@ export default function PortfolioClient({ locale, t }: Props) {
     },
     {
       id: 'amv-editing',
-      href: `/${locale}/portfolio/amv-editing`,
+      href: `${basePath}/portfolio/amv-editing`,
       number: '06',
       title: t.items['amv-editing'].title,
       subtitle: t.items['amv-editing'].subtitle,
@@ -526,7 +527,7 @@ export default function PortfolioClient({ locale, t }: Props) {
                 </svg>
               </a>
               <Link
-                href={`/${locale}/portfolio/marketing-in-motion`}
+                href={`${basePath}/portfolio/marketing-in-motion`}
                 className={`inline-flex items-center gap-2.5 px-8 py-3.5 ${isZh ? 'font-bold' : 'font-bold uppercase tracking-[0.1em]'} text-sm border border-[#ffd700]/40 text-[#ffd700]/85 hover:border-[#ffd700]/70 hover:text-[#ffd700] hover:bg-white/5 transition-all duration-200 focus:outline-none`}
                 style={{ fontFamily: isZh ? 'ZCOOL QingKe HuangYou, sans-serif' : 'inherit' }}
               >
@@ -635,7 +636,7 @@ export default function PortfolioClient({ locale, t }: Props) {
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4">
               <Link
-                href={`/${locale}/contact`}
+                href={`${basePath}/contact`}
                 className={`relative inline-flex items-center gap-2.5 px-10 py-3.5 ${isZh ? 'font-bold' : 'font-black uppercase tracking-[0.1em]'} text-sm text-[#0f0f45] overflow-hidden cta-ring hover:bg-[#ffe347] transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ffd700]/50 bg-[#ffd700]`}
                 style={{ fontFamily: isZh ? 'ZCOOL QingKe HuangYou, sans-serif' : 'inherit' }}
               >
@@ -645,7 +646,7 @@ export default function PortfolioClient({ locale, t }: Props) {
                 </svg>
               </Link>
               <Link
-                href={`/${locale}/about`}
+                href={`${basePath}/about`}
                 className={`inline-flex items-center gap-2 px-10 py-3.5 font-bold text-sm ${isZh ? '' : 'uppercase tracking-[0.1em]'} border border-[#ffd700]/35 text-[#ffd700]/75 hover:bg-white/5 hover:border-[#ffd700]/60 hover:text-[#ffd700] transition-all duration-200 focus:outline-none`}
                 style={{ fontFamily: isZh ? 'ZCOOL QingKe HuangYou, sans-serif' : 'inherit' }}
               >

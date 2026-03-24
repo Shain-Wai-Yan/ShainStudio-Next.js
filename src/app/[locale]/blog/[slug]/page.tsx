@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import Script from 'next/script';
 import { notFound } from 'next/navigation';
 import { fetchBlogBySlug, fetchRelatedBlogs } from '@/lib/strapi/blogs';
 import BlogPostHeader from '@/components/blog/BlogPostHeader';
@@ -38,6 +39,7 @@ export async function generateMetadata(props: BlogPostPageProps): Promise<Metada
       languages: {
         en: `${SITE_URL}/blog/${blog.Slug}`,
         zh: `${SITE_URL}/zh/blog/${blog.Slug}`,
+        'x-default': `${SITE_URL}/blog/${blog.Slug}`,
       },
     },
     openGraph: {
@@ -68,9 +70,77 @@ export default async function BlogPostPage(props: BlogPostPageProps) {
 
   const { blogs: relatedBlogs } = await fetchRelatedBlogs(blog.Category, blog.Slug, lang, 3);
   const basePath = locale === 'en' ? '' : `/${locale}`;
+  const urlPath = locale === 'en' ? `/blog/${blog.Slug}` : `/${locale}/blog/${blog.Slug}`;
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    '@id': `${SITE_URL}${urlPath}#article`,
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': `${SITE_URL}${urlPath}`
+    },
+    headline: blog.Seo?.metaTitle || blog.Title,
+    image: (blog.Seo?.ogImageUrl || blog.FeaturedImage) ? [{
+      '@type': 'ImageObject',
+      url: blog.Seo?.ogImageUrl || blog.FeaturedImage
+    }] : [],
+    datePublished: blog.PublishedDate || blog.createdAt || new Date().toISOString(),
+    dateModified: blog.updatedAt || new Date().toISOString(),
+    author: [{
+        '@type': 'Person',
+        name: blog.Author || 'Shain Wai Yan',
+        url: `${SITE_URL}${locale === 'zh' ? '/zh' : ''}/about`
+    }],
+    publisher: {
+        '@type': 'Organization',
+        name: 'Shain Studio',
+        logo: {
+          '@type': 'ImageObject',
+          url: 'https://www.shainwaiyan.com/images/Shain Studio.png'
+        }
+    },
+    description: blog.Seo?.metaDescription || blog.Description || blog.Title,
+    isPartOf: {
+      '@type': 'CollectionPage',
+      '@id': `${SITE_URL}${basePath}/blog`,
+      name: lang === 'zh' ? '数字营销博客 | 明元易' : 'Digital Marketing Blog | Shain Studio',
+      url: `${SITE_URL}${basePath}/blog`
+    },
+  };
+  
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": t.nav.home,
+        "item": `${SITE_URL}${basePath}/`
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": t.nav.blog,
+        "item": `${SITE_URL}${basePath}/blog`
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": blog.Title,
+        "item": `${SITE_URL}${urlPath}`
+      }
+    ]
+  };
 
   return (
     <main className="min-h-screen bg-white dark:bg-[#121212]">
+      <Script
+        id="schema-org"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify([jsonLd, breadcrumbLd]) }}
+      />
 
       {/* ── Breadcrumb — matches vanilla .breadcrumb ── */}
       <nav className="bg-[#f8f9fa] dark:bg-[#1e1e1e] px-4 sm:px-6 lg:px-8 py-3 border-b border-[#d0d0d0] dark:border-[#444]">

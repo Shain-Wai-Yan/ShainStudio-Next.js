@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import Image from 'next/image';
 import { Metadata } from 'next';
 import { FaGlobe, FaLaptopCode, FaLightbulb } from 'react-icons/fa';
@@ -14,15 +15,42 @@ export async function generateMetadata({ params }: AboutProps): Promise<Metadata
   const { locale: rawLocale } = await params;
   const locale = isSupportedLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
   const t = await getDictionary(locale);
+  const domain = 'https://www.shainwaiyan.com';
+  const urlPath = locale === 'zh' ? '/zh/about' : '/about';
+  const baseUrl = `${domain}${urlPath}`;
+
+  // Smart truncation: cut at the last full word under 155 characters
+  const fullText = t.aboutPage.myStoryText;
+  const description = fullText.length > 155 
+    ? fullText.substring(0, 155).replace(/\s+\S*$/, '') + '...' 
+    : fullText;
+
+  const title = `${t.aboutPage.myName} - ${t.aboutPage.heroSubtitle}`;
 
   return {
-    title: `${t.aboutPage.myName} - ${t.aboutPage.heroSubtitle}`,
-    description: t.aboutPage.myStoryText.substring(0, 160),
+    title,
+    description,
     alternates: {
+      canonical: baseUrl,
       languages: {
-        'en': 'https://www.shainwaiyan.com/about',
-        'zh': 'https://www.shainwaiyan.com/zh/about',
+        en: `${domain}/about`,
+        zh: `${domain}/zh/about`,
+        'x-default': `${domain}/about`,
       },
+    },
+    openGraph: {
+      title,
+      description,
+      url: baseUrl,
+      type: 'profile',
+      firstName: 'Shain',
+      lastName: 'Wai Yan',
+      username: 'xolbine',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
     },
   };
 }
@@ -90,6 +118,7 @@ export default async function AboutPage({ params }: AboutProps) {
                     src="/images/profile.jpeg"
                     alt={t.aboutPage.profileAltText}
                     fill
+                    sizes="(max-width: 768px) 208px, 224px"
                     className="rounded-full object-cover border-4 border-background shadow-lg
                       transition-transform duration-500 group-hover:scale-105"
                     priority
@@ -544,7 +573,7 @@ export default async function AboutPage({ params }: AboutProps) {
           >
             {t.aboutPage.ctaDesc}
           </p>
-          <a
+          <Link
             href={`${basePath}/contact`}
             className="inline-flex items-center justify-center gap-2 bg-white text-primary font-bold
               py-3 px-8 rounded hover:shadow-lg hover:scale-105 transition-all duration-300
@@ -560,7 +589,7 @@ export default async function AboutPage({ params }: AboutProps) {
             </svg>
             <div className="absolute inset-0 bg-gradient-to-r from-primary to-accent opacity-0
               group-hover:opacity-100 transition-opacity duration-300 -z-10 rounded" />
-          </a>
+          </Link>
         </div>
       </section>
 

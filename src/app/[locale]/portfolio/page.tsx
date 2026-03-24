@@ -12,15 +12,35 @@ export async function generateMetadata({ params }: PortfolioProps): Promise<Meta
   const locale = isSupportedLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
   const translations = await getDictionary(locale);
   const t = translations.portfolioPage;
+  
+  const domain = 'https://www.shainwaiyan.com';
+  const urlPath = locale === 'zh' ? '/zh/portfolio' : '/portfolio';
+  const baseUrl = `${domain}${urlPath}`;
+
+  const title = `${t.cards.headline} | Shain Wai Yan (xolbine)`;
+  const description = t.cta.p;
 
   return {
-    title: `${t.cards.headline} | Shain Wai Yan`,
-    description: t.cta.p.substring(0, 160),
+    title,
+    description,
     alternates: {
+      canonical: baseUrl,
       languages: {
-        'en': 'https://www.shainwaiyan.com/portfolio',
-        'zh': 'https://www.shainwaiyan.com/zh/portfolio',
+        en: `${domain}/portfolio`,
+        zh: `${domain}/zh/portfolio`,
+        'x-default': `${domain}/portfolio`,
       },
+    },
+    openGraph: {
+      title,
+      description,
+      url: baseUrl,
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
     },
   };
 }

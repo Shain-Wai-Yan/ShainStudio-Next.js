@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { fetchCertificates } from '@/lib/strapi/certificates';
 import { CertificateMarquee } from '@/components/certificates/CertificateMarquee';
 import { Breadcrumb } from '@/components/Breadcrumb';
-import { getDictionarySync } from '@/lib/getDictionary';
+import { getDictionary } from '@/lib/getDictionary';
 
 interface CertificatePageProps {
   params: Promise<{ locale: string }>;
@@ -11,19 +11,38 @@ interface CertificatePageProps {
 export async function generateMetadata(
   props: CertificatePageProps
 ): Promise<Metadata> {
-  const { locale } = await props.params;
-  const t = getDictionarySync(locale as 'en' | 'zh');
-  const basePath = locale === 'en' ? '' : `/${locale}`;
+  const { locale: rawLocale } = await props.params;
+  const locale = rawLocale as 'en' | 'zh';
+  const t = await getDictionary(locale);
+  
+  const domain = 'https://www.shainwaiyan.com';
+  const urlPath = locale === 'zh' ? '/zh/certificate' : '/certificate';
+  const baseUrl = `${domain}${urlPath}`;
+
+  const title = t.certificate.seo.title;
+  const description = t.certificate.seo.description;
 
   return {
-    title: t.certificate.seo.title,
-    description: t.certificate.seo.description,
+    title,
+    description,
     alternates: {
-      canonical: `${basePath}/certificate`,
+      canonical: baseUrl,
       languages: {
-        en: '/certificate',
-        zh: '/zh/certificate',
+        en: `${domain}/certificate`,
+        zh: `${domain}/zh/certificate`,
+        'x-default': `${domain}/certificate`,
       },
+    },
+    openGraph: {
+      title,
+      description,
+      url: baseUrl,
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
     },
   };
 }
@@ -33,9 +52,19 @@ export const viewport: Viewport = {
   colorScheme: 'light dark',
 };
 
+export const dynamic = 'force-static';
+export const revalidate = 3600;
+
+export async function generateStaticParams() {
+  return [
+    { locale: 'en' },
+    { locale: 'zh' }
+  ];
+}
+
 export default async function CertificatePage(props: CertificatePageProps) {
   const { locale } = await props.params;
-  const t = getDictionarySync(locale as 'en' | 'zh');
+  const t = await getDictionary(locale as 'en' | 'zh');
   const basePath = locale === 'en' ? '' : `/${locale}`;
 
   const { certificates, error } = await fetchCertificates();

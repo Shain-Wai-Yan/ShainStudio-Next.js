@@ -537,15 +537,22 @@ export async function generateMetadata({ params }: HomeProps): Promise<Metadata>
   const { locale: rawLocale } = await params;
   const locale = isSupportedLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
   const t = await getDictionary(locale);
+  
+  const baseUrl = locale === 'en' ? 'https://www.shainwaiyan.com' : `https://www.shainwaiyan.com/${locale}`;
 
   return {
     title: `${t.homePage.titleHighlight} | ${t.homePage.subtitle}`,
     description: t.homePage.description,
     alternates: {
+      canonical: baseUrl,
       languages: {
-        'en': 'https://www.shainwaiyan.com/',
+        'en': 'https://www.shainwaiyan.com',
         'zh': 'https://www.shainwaiyan.com/zh',
+        'x-default': 'https://www.shainwaiyan.com',
       },
+    },
+    openGraph: {
+      url: baseUrl,
     },
   };
 }

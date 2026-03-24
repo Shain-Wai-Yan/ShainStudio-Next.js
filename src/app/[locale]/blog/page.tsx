@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import Script from 'next/script';
 import { fetchAllBlogs, fetchBlogCategories, fetchBlogTags } from '@/lib/strapi/blogs';
 import BlogHero from '@/components/blog/BlogHero';
 import BlogListingClient from '@/components/blog/BlogListingClient';
@@ -64,33 +65,38 @@ export default async function BlogPage(props: BlogPageProps) {
   const isZh = locale === 'zh';
   const domain = 'https://www.shainwaiyan.com';
 
-  // Dynamic JSON-LD matching Strapi casing (Title, Slug)
+  // Dynamic JSON-LD structured as CollectionPage -> ItemList
   const jsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'Blog',
+    '@type': 'CollectionPage',
+    '@id': `${domain}${isZh ? '/zh/blog' : '/blog'}#collection`,
     name: isZh ? '数字营销博客' : 'Digital Marketing Blog',
     description: t.blog.description,
     url: `${domain}${isZh ? '/zh/blog' : '/blog'}`,
     publisher: {
-      '@type': 'Person',
-      name: isZh ? '明元易' : 'Shain Wai Yan',
-      url: domain,
+      '@type': 'Organization',
+      name: 'Shain Studio',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://www.shainwaiyan.com/images/Shain Studio.png'
+      }
     },
-    mainEntityOfPage: {
-      '@type': 'CollectionPage',
-      '@id': `${domain}${isZh ? '/zh/blog' : '/blog'}`,
-    },
-    itemListElement: blogs.map((blog, index) => ({
-      '@type': 'ListItem',
-      position: index + 1,
-      url: `${domain}${isZh ? '/zh' : ''}/blog/${blog.Slug}`,
-      name: blog.Title,
-    })),
+    mainEntity: {
+      '@type': 'ItemList',
+      '@id': `${domain}${isZh ? '/zh/blog' : '/blog'}#itemlist`,
+      itemListElement: blogs.map((blog, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        url: `${domain}${isZh ? '/zh' : ''}/blog/${blog.Slug}`,
+        name: blog.Title,
+      }))
+    }
   };
 
   return (
     <main className="min-h-screen bg-white dark:bg-[#121212]">
-      <script
+      <Script
+        id="schema-org-blog-index"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
