@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
+import Image from 'next/image';
+import Link from 'next/link';
 import { optimizeCloudinaryUrl } from '@/lib/utils/cloudinary-optimizer';
 import { MarketingHero } from './MarketingHero';
 import { MarketingControls } from './MarketingControls';
@@ -9,7 +11,7 @@ import { MarketingProjectGrid } from './MarketingProjectGrid';
 import { MarketingProjectCard } from './MarketingProjectCard';
 import { Breadcrumb } from '@/components/Breadcrumb';
 import type { MarketingProject, FilterOptions } from '@/lib/strapi/marketing-in-motion';
-import { filterProjects, extractFilterOptions } from '@/lib/strapi/marketing-in-motion';
+import { filterProjects, extractFilterOptions, formatProjectDate } from '@/lib/strapi/marketing-in-motion';
 
 interface BreadcrumbItem {
   label: string;
@@ -40,6 +42,7 @@ export interface MarketingInMotionClientProps {
     noProjects: string;
     noProjectsHint: string;
   };
+  initialProjects?: MarketingProject[];
 }
 
 type SortOption = 'date-desc' | 'date-asc' | 'title-asc' | 'title-desc';
@@ -51,14 +54,15 @@ export function MarketingInMotionClient({
   locale = 'en',
   breadcrumbItems,
   labels,
+  initialProjects = [],
 }: MarketingInMotionClientProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
   // ─── Data state ───────────────────────────────────────────────────────────
-  const [allProjects, setAllProjects] = useState<MarketingProject[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [allProjects, setAllProjects] = useState<MarketingProject[]>(initialProjects);
+  const [isLoading, setIsLoading] = useState(initialProjects.length === 0);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [displayCount, setDisplayCount] = useState(PAGE_SIZE);
@@ -119,8 +123,8 @@ export function MarketingInMotionClient({
   const hasMore = displayCount < filteredProjects.length;
 
   // ─── Load data ────────────────────────────────────────────────────────────
-  const loadProjects = useCallback(async () => {
-    setIsLoading(true);
+  const loadProjects = useCallback(async (isInitial = false) => {
+    if (isInitial) setIsLoading(true);
     setError(null);
     try {
       const res = await fetch('/api/marketing-in-motion?pageSize=100');
@@ -133,18 +137,21 @@ export function MarketingInMotionClient({
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Unknown error');
     } finally {
-      setIsLoading(false);
+      if (isInitial) setIsLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    loadProjects();
-  }, [loadProjects]);
+    // Only fetch client-side on initial load if SSR didn't pass anything
+    if (initialProjects.length === 0) {
+      loadProjects(true);
+    }
+  }, [loadProjects, initialProjects]);
 
   // ─── Refresh ──────────────────────────────────────────────────────────────
   const handleRefresh = useCallback(async () => {
     setIsRefreshing(true);
-    await loadProjects();
+    await loadProjects(false);
     setSearch('');
     setFilters({ category: '', tools: '', tag: '', type: '' });
     setDisplayCount(PAGE_SIZE);
@@ -418,10 +425,6 @@ export function MarketingInMotionClient({
 }
 
 // ─── List Row (for list view mode) ───────────────────────────────────────────
-
-import Image from 'next/image';
-import Link from 'next/link';
-import { formatProjectDate } from '@/lib/strapi/marketing-in-motion';
 
 function ListRow({
   project,
