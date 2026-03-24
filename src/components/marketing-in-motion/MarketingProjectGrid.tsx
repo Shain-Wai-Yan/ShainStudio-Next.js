@@ -132,12 +132,13 @@ export function MarketingProjectGrid({
       className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
       aria-live="polite"
     >
-      {projects.map((project) => (
+      {projects.map((project, index) => (
         <MarketingProjectCard
           key={project.id}
           project={project}
           locale={locale}
           viewDetailsLabel={viewDetailsLabel}
+          priority={index === 0}
         />
       ))}
     </div>

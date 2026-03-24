@@ -11,6 +11,7 @@ interface MarketingProjectCardProps {
   locale?: 'en' | 'zh';
   isFeatured?: boolean;
   viewDetailsLabel?: string;
+  priority?: boolean;
 }
 
 const MAX_SUMMARY = 140;
@@ -20,6 +21,7 @@ export function MarketingProjectCard({
   locale = 'en',
   isFeatured = false,
   viewDetailsLabel = 'View Details',
+  priority = false,
 }: MarketingProjectCardProps) {
   const href =
     locale === 'zh'
@@ -60,6 +62,7 @@ export function MarketingProjectCard({
             src={optimizeCloudinaryUrl(project.coverImage)}
             alt={project.title}
             fill
+            priority={priority}
             className="object-cover transition-transform duration-500 group-hover:scale-105"
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             onError={(e) => {

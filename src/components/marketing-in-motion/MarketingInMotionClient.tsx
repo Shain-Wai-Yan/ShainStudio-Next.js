@@ -250,13 +250,14 @@ export function MarketingInMotionClient({
               </h2>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {featuredProjects.map((project) => (
+              {featuredProjects.map((project, index) => (
                 <MarketingProjectCard
                   key={project.id}
                   project={project}
                   locale={locale}
                   isFeatured
                   viewDetailsLabel={labels.viewDetails}
+                  priority={index === 0}
                 />
               ))}
             </div>

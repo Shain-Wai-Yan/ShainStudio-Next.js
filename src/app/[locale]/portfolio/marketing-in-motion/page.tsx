@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import Script from 'next/script';
+
 import { MarketingInMotionClient } from '@/components/marketing-in-motion/MarketingInMotionClient';
 import { getDictionary } from '@/lib/getDictionary';
 import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
@@ -27,6 +27,7 @@ export async function generateMetadata(
       languages: {
         en: 'https://www.shainwaiyan.com/portfolio/marketing-in-motion',
         zh: 'https://www.shainwaiyan.com/zh/portfolio/marketing-in-motion',
+        'x-default': 'https://www.shainwaiyan.com/portfolio/marketing-in-motion',
       },
     },
     openGraph: {
@@ -97,8 +98,7 @@ export default async function MarketingInMotionPage(props: MarketingInMotionPage
 
   return (
     <div className="min-h-screen bg-white dark:bg-[#121212] transition-colors duration-300">
-      <Script
-        id="schema-marketing-in-motion-index"
+      <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
