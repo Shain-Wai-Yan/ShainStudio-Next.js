@@ -10,7 +10,6 @@ import ProjectHeader from '@/components/marketing-in-motion/ProjectHeader';
 import ProjectContent from '@/components/marketing-in-motion/ProjectContent';
 import ProjectGallery from '@/components/marketing-in-motion/ProjectGallery';
 import RelatedProjects from '@/components/marketing-in-motion/RelatedProjects';
-import Script from 'next/script';
 import { getDictionary } from '@/lib/getDictionary';
 import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
 
@@ -31,10 +30,9 @@ export async function generateMetadata(
   }
 
   const basePath = locale === 'en' ? '' : `/${locale}`;
-  const suffix = locale === 'zh' ? '营销实战 | Shain Studio' : 'Marketing in Motion | Shain Studio';
 
   return {
-    title: `${project.seo.metaTitle} | ${suffix}`,
+    title: project.seo.metaTitle,
     description: project.seo.metaDescription,
     keywords: project.tags && project.toolsUsed && project.category 
       ? [...project.tags, ...project.toolsUsed, project.category].join(', ')
@@ -44,6 +42,7 @@ export async function generateMetadata(
       languages: {
         en: `https://www.shainwaiyan.com/portfolio/marketing-in-motion/${project.slug}`,
         zh: `https://www.shainwaiyan.com/zh/portfolio/marketing-in-motion/${project.slug}`,
+        'x-default': `https://www.shainwaiyan.com/portfolio/marketing-in-motion/${project.slug}`,
       },
     },
     openGraph: {
@@ -166,15 +165,9 @@ export default async function MarketingProjectPage(
 
   return (
     <main className="min-h-screen bg-white dark:bg-[#121212]">
-      <Script
-        id={`schema-article-${project.slug}`}
+      <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdArticle) }}
-      />
-      <Script
-        id={`schema-breadcrumb-${project.slug}`}
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdBreadcrumb) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify([jsonLdArticle, jsonLdBreadcrumb]) }}
       />
       {/* Breadcrumb */}
       <nav className="bg-[#f8f9fa] dark:bg-[#1e1e1e] px-4 sm:px-6 lg:px-8 py-3 border-b border-[#d0d0d0] dark:border-[#444]">
