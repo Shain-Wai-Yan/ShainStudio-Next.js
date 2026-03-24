@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { use } from "react";
-import Script from "next/script";
 import "@/app/globals.css";
 import { getHtmlLang, isSupportedLocale, DEFAULT_LOCALE } from "@/lib/locales";
 import { getDictionary } from "@/lib/getDictionary";
@@ -143,8 +142,7 @@ export default function LocaleLayout({ children, params }: LocaleLayoutProps) {
       <head>
       </head>
       <body>
-        <Script
-          id="global-schema-person-website"
+        <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
