@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { use } from "react";
+import Script from "next/script";
 import "@/app/globals.css";
 import { getHtmlLang, isSupportedLocale, DEFAULT_LOCALE } from "@/lib/locales";
 import { getDictionary } from "@/lib/getDictionary";
@@ -18,13 +19,13 @@ interface LocaleLayoutProps {
  * Generate metadata for the locale-specific layout
  */
 export async function generateMetadata({ params }: Omit<LocaleLayoutProps, 'children'>): Promise<Metadata> {
-  // MUST await params here - it's a Promise
   const { locale: rawLocale } = await params;
   const locale = isSupportedLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
-  const dictionary = await getDictionary(locale);
-  
   const isZh = locale === 'zh';
-  const baseUrl = `https://www.shainwaiyan.com/${locale === 'en' ? 'en' : 'zh'}`;
+  
+  // ── FIX 1 & 2: Strict root routing, NO /en/ directory ──
+  const urlPath = locale === 'en' ? '' : `/${locale}`;
+  const baseUrl = `https://www.shainwaiyan.com${urlPath}`;
 
   return {
     title: {
@@ -42,9 +43,9 @@ export async function generateMetadata({ params }: Omit<LocaleLayoutProps, 'chil
     alternates: {
       canonical: baseUrl,
       languages: {
-        'en': 'https://www.shainwaiyan.com/en',
+        'en': 'https://www.shainwaiyan.com',
         'zh': 'https://www.shainwaiyan.com/zh',
-        'x-default': 'https://www.shainwaiyan.com/en',
+        'x-default': 'https://www.shainwaiyan.com',
       },
     },
     openGraph: {
@@ -86,10 +87,8 @@ export async function generateMetadata({ params }: Omit<LocaleLayoutProps, 'chil
 
 /**
  * LocaleLayout component
- * MUST use React.use() to unwrap the params Promise
  */
 export default function LocaleLayout({ children, params }: LocaleLayoutProps) {
-  // MUST use React.use() to unwrap params in client components
   const { locale: rawLocale } = use(params);
   const locale = isSupportedLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
   const htmlLang = getHtmlLang(locale);
@@ -132,7 +131,8 @@ export default function LocaleLayout({ children, params }: LocaleLayoutProps) {
         description: isZh
           ? 'Shain Wai Yan (xolbine) 的数字营销与品牌策略作品集。'
           : 'Digital Marketing & Brand Strategy portfolio of Shain Wai Yan (xolbine).',
-        inLanguage: [isZh ? 'zh-CN' : 'en-US'],
+        // ── FIX 3: String instead of Array ──
+        inLanguage: isZh ? 'zh-CN' : 'en-US',
         publisher: { '@id': 'https://www.shainwaiyan.com/#person' },
       },
     ],
@@ -141,12 +141,13 @@ export default function LocaleLayout({ children, params }: LocaleLayoutProps) {
   return (
     <html lang={htmlLang} suppressHydrationWarning dir="ltr">
       <head>
-        <script
+      </head>
+      <body>
+        <Script
+          id="global-schema-person-website"
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-      </head>
-      <body>
         <Header />
         <main className="min-h-screen">
           {children}

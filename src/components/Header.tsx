@@ -82,7 +82,7 @@ const Header = () => {
       <div className="flex justify-between items-center px-4 sm:px-6 lg:px-8 py-4 max-w-full">
         {/* Logo */}
         <div className="flex items-center gap-3 flex-shrink-0">
-          <Link href={basePath} className="flex items-center gap-3 hover:opacity-90 transition-opacity duration-300">
+          <Link href={basePath || '/'} className="flex items-center gap-3 hover:opacity-90 transition-opacity duration-300">
             <Image
               src="/images/Shain Studio.png"
               alt="Shain Studio Logo"

@@ -20,8 +20,8 @@ export async function generateMetadata(props: BlogPageProps): Promise<Metadata> 
   const domain = 'https://www.shainwaiyan.com';
 
   const title = isZh
-    ? '数字营销博客与案例分析 | 明元易'
-    : 'Digital Marketing Blog & Case Studies | Shain Wai Yan';
+    ? '数字营销博客与案例分析'
+    : 'Digital Marketing Blog & Case Studies';
 
   return {
     title,

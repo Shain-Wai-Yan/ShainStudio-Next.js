@@ -9,9 +9,10 @@ interface BlogCardProps {
   blog: BlogPost;
   language: 'en' | 'zh';
   variant?: 'grid' | 'list';
+  priority?: boolean;
 }
 
-export default function BlogCard({ blog, language, variant = 'grid' }: BlogCardProps) {
+export default function BlogCard({ blog, language, variant = 'grid', priority = false }: BlogCardProps) {
   const transformed = transformBlog(blog);
   const baseUrl = language === 'zh' ? '/zh/blog' : '/blog';
 
@@ -25,6 +26,7 @@ export default function BlogCard({ blog, language, variant = 'grid' }: BlogCardP
                 src={optimizeCloudinaryUrl(transformed.featuredImageUrl)}
                 alt={blog.Title}
                 fill
+                priority={priority}
                 className="object-cover group-hover:scale-[1.08] transition-transform duration-300"
               />
             </div>
@@ -77,6 +79,7 @@ export default function BlogCard({ blog, language, variant = 'grid' }: BlogCardP
               src={optimizeCloudinaryUrl(transformed.featuredImageUrl)}
               alt={blog.Title}
               fill
+              priority={priority}
               className="object-cover group-hover:scale-[1.08] transition-transform duration-300"
             />
           ) : (

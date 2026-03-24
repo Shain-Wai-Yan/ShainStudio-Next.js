@@ -43,8 +43,8 @@ export default function BlogGrid({
   if (variant === 'list') {
     return (
       <div>
-        {blogs.map((blog) => (
-          <BlogCard key={blog.id} blog={blog} language={language} variant="list" />
+        {blogs.map((blog, index) => (
+          <BlogCard key={blog.id} blog={blog} language={language} variant="list" priority={index === 0} />
         ))}
       </div>
     );
@@ -53,8 +53,8 @@ export default function BlogGrid({
   return (
     /* 4 columns on large screens, 2 on md, 1 on mobile — matches vanilla auto-fill 300px */
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-      {blogs.map((blog) => (
-        <BlogCard key={blog.id} blog={blog} language={language} variant="grid" />
+      {blogs.map((blog, index) => (
+        <BlogCard key={blog.id} blog={blog} language={language} variant="grid" priority={index === 0} />
       ))}
     </div>
   );
