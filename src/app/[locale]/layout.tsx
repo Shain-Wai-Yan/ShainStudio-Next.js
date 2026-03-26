@@ -6,6 +6,7 @@ import { getDictionary } from "@/lib/getDictionary";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { GoogleAnalytics } from '@next/third-parties/google';
+import SyntaxWidget from "@/components/syntax ai/SyntaxWidget";
 
 interface LocaleLayoutProps {
   children: React.ReactNode;
@@ -151,6 +152,7 @@ export default function LocaleLayout({ children, params }: LocaleLayoutProps) {
           {children}
         </main>
         <Footer />
+        <SyntaxWidget />
         {process.env.NEXT_PUBLIC_GA_ID && (
           <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
         )}

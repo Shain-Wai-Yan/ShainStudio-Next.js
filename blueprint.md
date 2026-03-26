@@ -99,4 +99,18 @@ This file serves as the single source of truth for the Next.js Portfolio app, co
   2. Engineered a robust Server Component layout (`src/app/[locale]/portfolio/marketing-plans/page.tsx`) utilizing `generateMetadata()` for dynamic perfect SEO resolution.
   3. Decoupled the reactivity and API interaction logic into a new `MarketingPlanClient.tsx` component that efficiently consumes the localized dictionaries.
 
+### Additional Fixes (Syntax AI Widget Responsiveness & Styling)
+- **Problem:** The `SyntaxWidget.tsx` was unresponsive and used generic colors, failing to match the brand's luxury aesthetic.
+- **Resolution:**
+  1. **Responsive Design:** Updated iframe and button classes to scale perfectly between mobile (`w-[calc(100vw-2rem)]`) and desktop (`md:w-[400px]`).
+  2. **Luxury Styling:** Transformed the button into a "Minimalist Luxury" component using the brand's `Midnight Blue` and `Gold` palette.
+  3. **Visual Effects:** Implemented `bg-luxury-midnight` gradients, `border-gold/30` accents, and `shadow-luxury` with glowing `shadow-gold-lg` on hover.
+  4. **Animations:** Added `animate-gold-pulse` for the icon and `animate-fade-in-up` for the chat window to create a premium, interactive feel.
+  5. **Component Structure:** Wrapped the iframe in a `bg-luxury-gold` gradient border to make it stand out against any background.
+  6. **Instant Performance:** Refactored the widget to stay mounted in the DOM at all times. Instead of conditional rendering, it uses CSS (`opacity`, `scale`, `pointer-events`) for transitions. This ensures the chat loads instantly after the first render and preserves all message history even when the UI is hidden.
+  7. **Keyboard Compatibility:** Employed `dvh` (Dynamic Viewport Height) units for the mobile chat window. This ensures the interface resizes automatically when the on-screen keyboard appears, preventing the bottom of the chat from being cut off or overlapped on iOS/Android devices.
+  8. **Security & Privacy:** Hardened the iframe with a strict `sandbox` (limiting to `allow-scripts allow-forms allow-popups`) and a `strict-origin-when-cross-origin` referrer policy to protect user data.
+  9. **Resilience & Perceived Performance:** Integrated an `isLoading` state with a premium pulsed overlay ("Initializing AI") for smooth perceived performance.
+  10. **Reliable Recovery:** Implemented a forced-remount mechanism using a React `key` state. This ensures the "Reconnect AI" button truly requests a fresh iframe instance if a connection error occurs.
+
 *The app is now fully compiling, properly routing without loops, cleanly handling English prefix-less URLs, and displaying the globally fixed headers, footers, and dynamically localized Contact page components.*
