@@ -2,13 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 
-interface RepoFile {
-  name: string;
-  path: string;
-  type: 'file' | 'dir';
-  size?: number;
-  download_url?: string;
-}
+import { RepoFile } from '@/lib/github-api';
 
 interface RepoViewerProps {
   repoName: string;
@@ -63,7 +57,7 @@ function decodeBase64UTF8(b64: string): string {
 function loadScript(src: string): Promise<void> {
   return new Promise((resolve, reject) => {
     if (document.querySelector(`script[src="${src}"]`)) {
-      const check = () => { if ((window as any).marked) resolve(); else setTimeout(check, 50); };
+      const check = () => { if ((window as unknown as { marked?: unknown }).marked) resolve(); else setTimeout(check, 50); };
       check(); return;
     }
     const s = document.createElement('script');
@@ -128,6 +122,30 @@ export function RepoViewer({ repoName, defaultBranch = 'main', onClose }: RepoVi
     ]).catch(() => {});
   }, []);
 
+  // ── Open a file ───────────────────────────────────────────────────────────
+  const openFile = useCallback(async (file: RepoFile) => {
+    setSelectedFile(file); setRenderedHTML(''); setFileError(null);
+    if (isBinary(file.name)) return;
+    setLoadingContent(true);
+    try {
+      const p = new URLSearchParams({ username: 'Shain-Wai-Yan', type: 'file', repo: repoName, path: file.path, branch });
+      const res = await fetch(`/api/github?${p}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      const text = data.content ? decodeBase64UTF8(data.content) : '';
+      if (isMD(file.name)) {
+        await renderMarkdown(text);
+      } else {
+        renderCode(text, file.name);
+      }
+    } catch (e) {
+      setFileError(`Could not load: ${e instanceof Error ? e.message : 'Unknown error'}`);
+    } finally {
+      setLoadingContent(false);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [repoName, branch]);
+
   // ── Load directory ────────────────────────────────────────────────────────
   const fetchDir = useCallback(async (path: string) => {
     setLoadingFiles(true); setDirError(null);
@@ -152,8 +170,7 @@ export function RepoViewer({ repoName, defaultBranch = 'main', onClose }: RepoVi
     } finally {
       setLoadingFiles(false);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [repoName, branch]);
+  }, [repoName, branch, openFile]);
 
   useEffect(() => { fetchDir(''); }, [fetchDir]);
 
@@ -164,31 +181,14 @@ export function RepoViewer({ repoName, defaultBranch = 'main', onClose }: RepoVi
     return () => window.removeEventListener('keydown', h);
   }, [onClose]);
 
-  // ── Open a file ───────────────────────────────────────────────────────────
-  const openFile = async (file: RepoFile) => {
-    setSelectedFile(file); setRenderedHTML(''); setFileError(null);
-    if (isBinary(file.name)) return;
-    setLoadingContent(true);
-    try {
-      const p = new URLSearchParams({ username: 'Shain-Wai-Yan', type: 'file', repo: repoName, path: file.path, branch });
-      const res = await fetch(`/api/github?${p}`);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-      const text = data.content ? decodeBase64UTF8(data.content) : '';
-      if (isMD(file.name)) {
-        await renderMarkdown(text);
-      } else {
-        renderCode(text, file.name);
-      }
-    } catch (e) {
-      setFileError(`Could not load: ${e instanceof Error ? e.message : 'Unknown error'}`);
-    } finally {
-      setLoadingContent(false);
-    }
-  };
-
   const renderMarkdown = async (text: string) => {
-    const win = window as any;
+    const win = window as unknown as {
+      marked?: {
+        use: (o: { gfm?: boolean; breaks?: boolean }) => void;
+        parse: (s: string) => Promise<string>;
+      };
+      hljs?: { highlightElement: (el: HTMLElement) => void };
+    };
     if (!win.marked) {
       try { await loadScript('https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js'); } catch {}
     }
@@ -198,8 +198,9 @@ export function RepoViewer({ repoName, defaultBranch = 'main', onClose }: RepoVi
       setRenderedHTML(html);
       setTimeout(() => {
         if (win.hljs && contentRef.current) {
-          contentRef.current.querySelectorAll('pre code').forEach((block: any) => {
-            if (!block.dataset.highlighted) win.hljs.highlightElement(block);
+          contentRef.current.querySelectorAll('pre code').forEach((block) => {
+            const el = block as HTMLElement;
+            if (!el.dataset.highlighted) win.hljs!.highlightElement(el);
           });
         }
       }, 80);
@@ -209,7 +210,9 @@ export function RepoViewer({ repoName, defaultBranch = 'main', onClose }: RepoVi
   };
 
   const renderCode = (text: string, filename: string) => {
-    const win = window as any;
+    const win = window as unknown as {
+      hljs?: { highlight: (s: string, o: { language: string; ignoreIllegals?: boolean }) => { value: string } };
+    };
     if (win.hljs) {
       try {
         const result = win.hljs.highlight(text, { language: getLang(filename), ignoreIllegals: true });

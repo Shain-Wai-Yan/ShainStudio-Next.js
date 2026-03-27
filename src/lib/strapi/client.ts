@@ -114,34 +114,55 @@ export async function fetchFromStrapi<T>(
   }
 }
 
+import { StrapiFile } from '@/types/strapi';
+
 /**
  * Extracts URL from various Strapi data structures
  * Handles both v5 flat structure and v4 nested structure
  */
 export function extractUrl(
-  fileObject: any,
+  fileObject: StrapiFile | StrapiFile[] | null | undefined,
   fallbackUrl: string = ''
 ): string {
   if (!fileObject) return fallbackUrl;
 
+  // Handle variety of array shapes from Strapi
+  if (Array.isArray(fileObject)) {
+    if (fileObject.length === 0) return fallbackUrl;
+    // Recursively extract the first item if it's an array
+    return extractUrl(fileObject[0], fallbackUrl);
+  }
+
   let url = '';
 
-  // Handle Strapi v5 flat structure (direct object with url)
-  if (fileObject.url) {
-    url = fileObject.url;
+  // Handle direct string URL
+  if (typeof fileObject === 'string') {
+    url = fileObject;
   }
   // Handle Strapi v4 nested structure (data.attributes.url)
-  else if (fileObject.data?.attributes?.url) {
-    url = fileObject.data.attributes.url;
+  else if (fileObject && typeof fileObject === 'object' && 'data' in fileObject) {
+    const v4 = fileObject as { data?: { attributes?: { url?: string } } };
+    if (v4.data?.attributes?.url) {
+      url = v4.data.attributes.url;
+    }
   }
   // Handle array format
   else if (Array.isArray(fileObject) && fileObject.length > 0) {
     const file = fileObject[0];
-    url = file?.url || file?.data?.attributes?.url || '';
+    if (typeof file === 'string') {
+      url = file;
+    } else if (file && typeof file === 'object' && 'url' in file) {
+      url = (file as { url: string }).url;
+    } else if (file && typeof file === 'object' && 'data' in file) {
+      const v4File = file as { data?: { attributes?: { url?: string } } };
+      if (v4File.data?.attributes?.url) {
+        url = v4File.data.attributes.url;
+      }
+    }
   }
-  // Handle direct string URL
-  else if (typeof fileObject === 'string') {
-    url = fileObject;
+  // Handle Strapi v5 flat structure (direct object with url)
+  else if (fileObject && typeof fileObject === 'object' && 'url' in fileObject && (fileObject as { url: string }).url) {
+    url = (fileObject as { url: string }).url;
   }
 
   // Ensure URL is absolute

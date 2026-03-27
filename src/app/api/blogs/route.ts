@@ -152,13 +152,15 @@ export async function GET(request: NextRequest) {
     }
 
     const data = await res.json();
-    const posts = (data.data ?? []).map(transformPost).filter(Boolean).map((p: any) => {
+    const posts = (data.data ?? []).map(transformPost).filter(Boolean).map((p: unknown) => {
+      const post = p as { id: number; content?: string };
       if (minimal) {
         // Strip content but keep readingTime (which was calculated during transformPost)
-        const { content, ...minimalPost } = p;
+        const minimalPost = { ...post };
+        delete (minimalPost as { content?: string }).content;
         return minimalPost;
       }
-      return p;
+      return post;
     });
 
     console.log(`[blogs] Fetched ${posts.length} posts (minimal: ${minimal})`);

@@ -97,6 +97,12 @@ async function handlePinnedRepos(username: string) {
   return NextResponse.json(repos);
 }
 
+interface GitHubContribution {
+  date: string;
+  count: number;
+  color: string;
+}
+
 async function handleContributions(username: string) {
   const cacheKey = getCacheKey('contributions', username);
   const cached = getFromCache(cacheKey);
@@ -107,14 +113,14 @@ async function handleContributions(username: string) {
       totalContributions
       weeks { contributionDays { date contributionCount color } }
     }}
-  }}`);
+  }}`) as { data?: { user?: { contributionsCollection?: { contributionCalendar?: { totalContributions: number; weeks: Array<{ contributionDays: Array<{ date: string; contributionCount: number; color: string }> }> } } } }; errors?: unknown[] };
 
   if (data.errors) return NextResponse.json(data, { status: 400 });
   const calendar = data.data?.user?.contributionsCollection?.contributionCalendar;
-  const contributions: any[] = [];
+  const contributions: GitHubContribution[] = [];
   if (calendar) {
-    calendar.weeks.forEach((week: any) => {
-      week.contributionDays.forEach((day: any) => {
+    calendar.weeks.forEach((week) => {
+      week.contributionDays.forEach((day) => {
         contributions.push({ date: day.date, count: day.contributionCount, color: day.color });
       });
     });
@@ -135,13 +141,13 @@ async function handleTopLanguages(username: string) {
         edges { size node { name color } }
       }}
     }
-  }}`);
+  }}`) as { data?: { user?: { repositories?: { nodes?: Array<{ languages?: { edges?: Array<{ size: number; node: { name: string; color: string } }> } }> } } }; errors?: unknown[] };
 
   if (data.errors) return NextResponse.json(data, { status: 400 });
-  const languages: Record<string, any> = {};
+  const languages: Record<string, { size: number; color: string }> = {};
   let totalSize = 0;
-  data.data?.user?.repositories?.nodes?.forEach((repo: any) => {
-    repo.languages?.edges?.forEach((edge: any) => {
+  data.data?.user?.repositories?.nodes?.forEach((repo) => {
+    repo.languages?.edges?.forEach((edge) => {
       const { name, color } = edge.node;
       if (!languages[name]) languages[name] = { size: 0, color };
       languages[name].size += edge.size;

@@ -19,9 +19,18 @@ interface Document {
 
 type TransformedPlan = Document;
 
+interface BusinessPlanDictionary {
+  nav: { home: string; portfolio: string };
+  businessPlans: {
+    title: string;
+    description: string;
+    emptyMessage: string;
+  };
+}
+
 interface Props {
   locale: 'en' | 'zh';
-  t: any;
+  t: BusinessPlanDictionary;
 }
 
 export default function BusinessPlanClient({ locale, t }: Props) {

@@ -9,6 +9,7 @@ import FeaturedVideo from '@/components/amv-editing/FeaturedVideo';
 import VideoGrid from '@/components/amv-editing/VideoGrid';
 import { transformVideoData, type TransformedVideo } from '@/lib/youtube-utils';
 import { getDictionarySync } from '@/lib/getDictionary';
+import { YouTubeVideo } from '@/types/youtube';
 
 interface ChannelData {
   title: string;
@@ -20,35 +21,7 @@ interface ChannelData {
 }
 
 interface YouTubeApiResponse {
-  items: Array<{
-    snippet?: {
-      title?: string;
-      description?: string;
-      thumbnails?: {
-        high?: {
-          url?: string;
-        };
-      };
-      resourceId?: {
-        videoId?: string;
-      };
-      publishedAt?: string;
-      channelTitle?: string;
-    };
-    statistics?: {
-      subscriberCount?: string;
-      videoCount?: string;
-      viewCount?: string;
-    };
-    contentDetails?: {
-      duration?: string;
-    };
-    brandingSettings?: {
-      image?: {
-        bannerExternalUrl?: string;
-      };
-    };
-  }>;
+  items: Array<YouTubeVideo>;
   nextPageToken?: string;
 }
 
@@ -70,42 +43,51 @@ export default function AMVEditingPage() {
     avatarUrl: '/images/Shain Studio.png',
   }), [t]);
 
-  const mockVideos = useMemo(() => [
+  const mockVideos = useMemo<YouTubeVideo[]>(() => [
     {
+      kind: 'youtube#video',
+      etag: '',
       id: 'video1',
       snippet: {
-        resourceId: { videoId: '8aIsh6rfW4U' },
+        publishedAt: '2022-01-01T00:00:00Z',
+        channelId: '',
         title: t.amvEditing.mockVideos[0].title,
         description: t.amvEditing.mockVideos[0].description,
-        thumbnails: { high: { url: 'https://via.placeholder.com/640x360/191970/ffffff?text=Puss+in+Boots' } },
-        publishedAt: '2022-01-01T00:00:00Z',
+        thumbnails: { high: { url: 'https://via.placeholder.com/640x360/191970/ffffff?text=Puss+in+Boots', width: 640, height: 360 } },
         channelTitle: t.amvEditing.mockChannel.title,
+        resourceId: { kind: 'youtube#video', videoId: '8aIsh6rfW4U' },
       },
       statistics: { viewCount: '6200' },
       contentDetails: { duration: 'PT1M' },
     },
     {
+      kind: 'youtube#video',
+      etag: '',
       id: 'video2',
       snippet: {
-        resourceId: { videoId: 'dQw4w9WgXcQ' },
+        publishedAt: '2022-02-01T00:00:00Z',
+        channelId: '',
         title: t.amvEditing.mockVideos[1].title,
         description: t.amvEditing.mockVideos[1].description,
-        thumbnails: { high: { url: 'https://via.placeholder.com/640x360/191970/ffffff?text=Best+Waifu' } },
-        publishedAt: '2022-02-01T00:00:00Z',
+        thumbnails: { high: { url: 'https://via.placeholder.com/640x360/191970/ffffff?text=Best+Waifu', width: 640, height: 360 } },
         channelTitle: t.amvEditing.mockChannel.title,
+        resourceId: { kind: 'youtube#video', videoId: 'dQw4w9WgXcQ' },
       },
       statistics: { viewCount: '542' },
       contentDetails: { duration: 'PT12S' },
     },
     {
+      kind: 'youtube#video',
+      etag: '',
       id: 'video3',
       snippet: {
-        resourceId: { videoId: 'LLdGSTceP8c' },
+        publishedAt: '2022-03-01T00:00:00Z',
+        channelId: '',
         title: t.amvEditing.mockVideos[2].title,
         description: t.amvEditing.mockVideos[2].description,
-        thumbnails: { high: { url: 'https://via.placeholder.com/640x360/191970/ffffff?text=Levi+Ackerman' } },
-        publishedAt: '2022-03-01T00:00:00Z',
+        thumbnails: { high: { url: 'https://via.placeholder.com/640x360/191970/ffffff?text=Levi+Ackerman', width: 640, height: 360 } },
         channelTitle: t.amvEditing.mockChannel.title,
+        resourceId: { kind: 'youtube#video', videoId: 'LLdGSTceP8c' },
       },
       statistics: { viewCount: '1200' },
       contentDetails: { duration: 'PT8S' },
@@ -154,13 +136,15 @@ export default function AMVEditingPage() {
       // Transform channel data
       if (channelRawData.items && channelRawData.items.length > 0) {
         const channelItem = channelRawData.items[0];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const branding = (channelItem as any).brandingSettings;
         setChannelData({
           title: channelItem.snippet?.title || mockChannelData.title,
           description: channelItem.snippet?.description || mockChannelData.description,
           subscriberCount: channelItem.statistics?.subscriberCount || mockChannelData.subscriberCount,
           videoCount: channelItem.statistics?.videoCount || mockChannelData.videoCount,
           avatarUrl: channelItem.snippet?.thumbnails?.high?.url || mockChannelData.avatarUrl,
-          bannerUrl: channelItem.brandingSettings?.image?.bannerExternalUrl,
+          bannerUrl: branding?.image?.bannerExternalUrl,
         });
       } else {
         setChannelData(mockChannelData);

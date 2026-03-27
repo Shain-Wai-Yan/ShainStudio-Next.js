@@ -445,7 +445,7 @@ const Skills = ({ t }: { t: Dictionary }) => {
                 <span className="absolute bottom-[-8px] left-0 w-10 h-[3px] bg-[#ffd700] dark:bg-gradient-to-r dark:from-[#704700] dark:to-[#d4af37] rounded-full" />
               </h3>
               <div className="space-y-5 sm:space-y-6 mt-2">
-                {skills.map((skill: any) => (
+                {skills.map((skill: { name: string; level: number }) => (
                   <div key={skill.name}>
                     <div className="flex justify-between items-center mb-2">
                       <span className="text-sm sm:text-base font-medium text-[#333333] dark:text-[#e0e0e0]">{skill.name}</span>

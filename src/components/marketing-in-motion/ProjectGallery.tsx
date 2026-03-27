@@ -34,22 +34,22 @@ export default function ProjectGallery({ images, title, language }: ProjectGalle
   const openLightbox = useCallback((idx: number) => {
     setSelectedIndex(idx);
     setIsZoomed(false);
-  }, []);
+  }, [setSelectedIndex, setIsZoomed]);
 
   const closeLightbox = useCallback(() => {
     setSelectedIndex(null);
     setIsZoomed(false);
-  }, []);
+  }, [setSelectedIndex, setIsZoomed]);
 
   const goPrev = useCallback(() => {
     setSelectedIndex((i) => (i !== null ? (i - 1 + images.length) % images.length : null));
     setIsZoomed(false);
-  }, [images.length]);
+  }, [images.length, setSelectedIndex, setIsZoomed]);
 
   const goNext = useCallback(() => {
     setSelectedIndex((i) => (i !== null ? (i + 1) % images.length : null));
     setIsZoomed(false);
-  }, [images.length]);
+  }, [images.length, setSelectedIndex, setIsZoomed]);
 
   // ── Keyboard ────────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -85,7 +85,10 @@ export default function ProjectGallery({ images, title, language }: ProjectGalle
   const handleTouchEnd = (e: React.TouchEvent) => {
     if (touchStartX === null) return;
     const dx = e.changedTouches[0].clientX - touchStartX;
-    if (Math.abs(dx) > 50) dx < 0 ? goNext() : goPrev();
+    if (Math.abs(dx) > 50) {
+      if (dx < 0) goNext();
+      else goPrev();
+    }
     setTouchStartX(null);
   };
 

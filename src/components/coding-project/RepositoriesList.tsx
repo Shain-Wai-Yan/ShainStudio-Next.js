@@ -4,7 +4,7 @@ interface Repository {
   name: string;
   description: string | null;
   url: string;
-  primaryLanguage?: { name: string; color: string } | null;
+  primaryLanguage: { name: string; color: string } | null;
   forkCount: number;
   stargazerCount: number;
   updatedAt: string;

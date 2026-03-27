@@ -18,7 +18,7 @@ export async function generateMetadata(props: BlogPostPageProps): Promise<Metada
   const params = await props.params;
   const { slug, locale = 'en' } = params;
   const t = await getDictionary(locale);
-  const { blog } = await fetchBlogBySlug(slug, locale as 'en' | 'zh');
+  const { blog } = await fetchBlogBySlug(slug);
   if (!blog) return { title: t.blog.postNotFound || 'Post Not Found' };
 
   // ── Prefer SEO-specific fields, fall back to post fields ─────────────────
@@ -64,7 +64,7 @@ export default async function BlogPostPage(props: BlogPostPageProps) {
   const { slug, locale = 'en' } = params;
   const lang = locale as 'en' | 'zh';
   const t = await getDictionary(locale);
-  const { blog, error } = await fetchBlogBySlug(slug, lang);
+  const { blog, error } = await fetchBlogBySlug(slug);
 
   if (error || !blog) notFound();
 

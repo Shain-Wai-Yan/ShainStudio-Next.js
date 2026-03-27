@@ -4,7 +4,7 @@
  * This file just fetches from the route and maps field names for components.
  */
 
-import { fetchFromStrapi } from './client';
+// Removed unused fetchFromStrapi import
 
 export interface BlogPost {
   id: number;
@@ -87,8 +87,7 @@ export async function fetchAllBlogs(
 }
 
 export async function fetchBlogBySlug(
-  slug: string,
-  language: 'en' | 'zh' = 'en'
+  slug: string
 ): Promise<{ blog: BlogPost | null; error: string | null }> {
   try {
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';

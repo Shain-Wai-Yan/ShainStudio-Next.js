@@ -40,7 +40,7 @@ function fixYouTubeIframes(container: HTMLElement) {
       if (!url.searchParams.has('controls')) url.searchParams.set('controls', '1');
       if (!url.searchParams.has('modestbranding')) url.searchParams.set('modestbranding', '1');
       src = url.toString();
-    } catch (_) { /* malformed URL */ }
+    } catch { /* malformed URL */ }
 
     iframe.setAttribute('src', src);
     if (!iframe.hasAttribute('allowfullscreen')) iframe.setAttribute('allowfullscreen', '');

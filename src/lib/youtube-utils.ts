@@ -1,3 +1,5 @@
+import { YouTubeVideo, YouTubeThumbnails } from '@/types/youtube';
+
 /**
  * YouTube API utility functions
  * Handles data formatting and transformation
@@ -31,7 +33,7 @@ export function formatViewCount(viewCount: string | number): string {
     return viewCount;
   }
 
-  const num = Number.parseInt(viewCount as any);
+  const num = typeof viewCount === 'string' ? Number.parseInt(viewCount, 10) : viewCount;
   if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
   if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
   return num.toString();
@@ -53,14 +55,15 @@ export function formatPublishedDate(publishedAt: string): string {
   return `${Math.floor(diffDays / 365)} years ago`;
 }
 
-export function getThumbnailUrl(thumbnails: any): string {
+export function getThumbnailUrl(thumbnails: YouTubeThumbnails | string | undefined): string {
+  if (!thumbnails) return 'https://via.placeholder.com/640x360/191970/ffffff?text=Video+Thumbnail';
   if (typeof thumbnails === 'string') return thumbnails;
 
   return (
-    thumbnails?.maxres?.url ||
-    thumbnails?.high?.url ||
-    thumbnails?.medium?.url ||
-    thumbnails?.default?.url ||
+    thumbnails.maxres?.url ||
+    thumbnails.high?.url ||
+    thumbnails.medium?.url ||
+    thumbnails.default?.url ||
     'https://via.placeholder.com/640x360/191970/ffffff?text=Video+Thumbnail'
   );
 }
@@ -104,20 +107,21 @@ export interface TransformedVideo {
 }
 
 export function transformVideoData(
-  video: any
+  video: YouTubeVideo
 ): TransformedVideo {
-  const videoId = video.snippet?.resourceId?.videoId || video.id;
+  const videoId = typeof video.id === 'string' ? video.id : video.id?.videoId || '';
+  const actualVideoId = video.snippet?.resourceId?.videoId || videoId;
   const { snippet, statistics, contentDetails } = video;
 
   return {
-    id: videoId,
+    id: actualVideoId,
     title: snippet?.title || 'Untitled',
     description: snippet?.description || '',
     thumbnailUrl: getThumbnailUrl(snippet?.thumbnails),
     duration: formatDuration(contentDetails?.duration || ''),
     viewCount: formatViewCount(statistics?.viewCount || '0'),
     publishedAt: formatPublishedDate(snippet?.publishedAt || ''),
-    videoId: videoId,
+    videoId: actualVideoId,
     channel: snippet?.channelTitle || 'Unknown Channel',
     tags: ['AMV', 'Anime', 'Music Video'],
   };

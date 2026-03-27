@@ -14,6 +14,7 @@ export default function LanguageSwitcher() {
   const currentLocale = isChineseRoute ? 'zh' : 'en';
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 

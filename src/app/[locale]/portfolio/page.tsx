@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { getDictionary } from '@/lib/getDictionary';
 import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
-import PortfolioClient from '@/components/portfolio/PortfolioClient';
+import PortfolioClient, { PortfolioDictionary } from '@/components/portfolio/PortfolioClient';
 
 interface PortfolioProps {
   params: Promise<{ locale: string }>;
@@ -62,6 +62,6 @@ export default async function PortfolioPage({ params }: PortfolioProps) {
   const t = translations.portfolioPage;
 
   return (
-    <PortfolioClient locale={locale as 'en' | 'zh'} t={t} />
+    <PortfolioClient locale={locale as 'en' | 'zh'} t={t as unknown as PortfolioDictionary} />
   );
 }

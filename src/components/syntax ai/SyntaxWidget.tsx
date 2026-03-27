@@ -74,7 +74,7 @@ export default function SyntaxWidget() {
                 <BsXLg size={24} className="text-gold animate-gold-pulse" />
               </div>
               <h3 className="text-gold font-bold text-lg text-balance">Connection Interrupted</h3>
-              <p className="text-sm text-gray-400">Syntax AI is temporarily unavailable. Let's try reconnecting.</p>
+              <p className="text-sm text-gray-400">Syntax AI is temporarily unavailable. Let&apos;s try reconnecting.</p>
               <button 
                 onClick={() => {
                   setIframeError(false);

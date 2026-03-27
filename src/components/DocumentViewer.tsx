@@ -3,6 +3,13 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { getFilenameFromUrl, transformCloudinaryPdfUrl } from '@/lib/pdf-utils';
 
+interface PdfComponentsType {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  Document: React.ComponentType<any>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  Page: React.ComponentType<any>;
+}
+
 interface DocumentViewerProps {
   isOpen: boolean;
   documentUrl: string;
@@ -20,7 +27,7 @@ export function DocumentViewer({
   const [totalPages, setTotalPages] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [PdfComponents, setPdfComponents] = useState<any>(null);
+  const [PdfComponents, setPdfComponents] = useState<PdfComponentsType | null>(null);
   const [pageWidth, setPageWidth] = useState(800);
   const [zoom, setZoom] = useState(1);
   const [isPortrait, setIsPortrait] = useState(true);
@@ -96,7 +103,7 @@ export function DocumentViewer({
     const observer = new ResizeObserver(recalcWidth);
     if (containerRef.current) observer.observe(containerRef.current);
     return () => observer.disconnect();
-  }, [isOpen, recalcWidth]);
+  }, [isOpen, recalcWidth, PdfComponents]);
 
   // Auto dual page on wide screens
   useEffect(() => {
@@ -204,7 +211,7 @@ export function DocumentViewer({
     setIsLoading(false);
   }, []);
 
-  const onPageLoadSuccess = useCallback((page: any) => {
+  const onPageLoadSuccess = useCallback((page: { height: number; width: number }) => {
     const portrait = page.height > page.width;
     setIsPortrait(portrait);
     setPageRendering(false);
@@ -254,8 +261,6 @@ export function DocumentViewer({
 
   if (!isOpen) return null;
 
-  const PdfDocument = PdfComponents?.Document;
-  const PdfPage = PdfComponents?.Page;
 
   return (
     <div ref={viewerRef} className="fixed inset-0 z-[9999] flex flex-col bg-[#1a1a2e] dark:bg-[#0f0f0f]">
@@ -396,9 +401,9 @@ export function DocumentViewer({
       <div className="flex flex-1 min-h-0 overflow-hidden">
 
         {/* Thumbnail Sidebar */}
-        {showThumbnails && PdfDocument && PdfPage && totalPages > 0 && (
+        {showThumbnails && PdfComponents && totalPages > 0 && (
           <div className="w-36 flex-shrink-0 bg-[#111130] dark:bg-[#1a1a2a] overflow-y-auto flex flex-col gap-2 py-2 px-1 border-r border-white/10 dark:border-white/5">
-            <PdfDocument file={pdfUrl} loading="">
+            <PdfComponents.Document file={pdfUrl} loading="">
               {Array.from({ length: totalPages }, (_, i) => i + 1).map(pageNum => (
                 <button
                   key={pageNum}
@@ -410,7 +415,7 @@ export function DocumentViewer({
                   }`}
                   title={`Page ${pageNum}`}
                 >
-                  <PdfPage
+                  <PdfComponents.Page
                     pageNumber={pageNum}
                     width={112}
                     renderTextLayer={false}
@@ -421,7 +426,7 @@ export function DocumentViewer({
                   </div>
                 </button>
               ))}
-            </PdfDocument>
+            </PdfComponents.Document>
           </div>
         )}
 
@@ -445,7 +450,7 @@ export function DocumentViewer({
           )}
 
           {/* Initializing */}
-          {!error && !PdfDocument && (
+          {!error && !PdfComponents && (
             <div className="flex flex-col items-center justify-center h-full gap-4">
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-400" />
               <p className="text-gray-300 text-sm">Initializing viewer...</p>
@@ -453,7 +458,7 @@ export function DocumentViewer({
           )}
 
           {/* Loading */}
-          {!error && PdfDocument && isLoading && (
+          {!error && PdfComponents && isLoading && (
             <div className="flex flex-col items-center justify-center h-full gap-3">
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-400" />
               <p className="text-gray-300 text-sm">Loading document...</p>
@@ -461,8 +466,8 @@ export function DocumentViewer({
           )}
 
           {/* PDF Pages */}
-          {!error && PdfDocument && (
-            <PdfDocument
+          {!error && PdfComponents && (
+            <PdfComponents.Document
               file={pdfUrl}
               onLoadSuccess={onDocumentLoadSuccess}
               onLoadError={onDocumentLoadError}
@@ -471,10 +476,9 @@ export function DocumentViewer({
               <div className={`flex gap-3 items-start justify-center transition-opacity duration-150 ${
                 pageRendering ? 'opacity-60' : 'opacity-100'
               }`}>
-
                 {/* Page 1 */}
                 <div className="shadow-2xl bg-white">
-                  <PdfPage
+                  <PdfComponents.Page
                     pageNumber={currentPage}
                     renderTextLayer={false}
                     renderAnnotationLayer={false}
@@ -488,7 +492,7 @@ export function DocumentViewer({
                 {/* Page 2 — dual mode only */}
                 {dualPage && secondPage && (
                   <div className="shadow-2xl bg-white">
-                    <PdfPage
+                    <PdfComponents.Page
                       pageNumber={secondPage}
                       renderTextLayer={false}
                       renderAnnotationLayer={false}
@@ -498,9 +502,8 @@ export function DocumentViewer({
                     />
                   </div>
                 )}
-
               </div>
-            </PdfDocument>
+            </PdfComponents.Document>
           )}
         </div>
       </div>

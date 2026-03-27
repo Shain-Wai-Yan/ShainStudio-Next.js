@@ -49,7 +49,6 @@ export default function RelatedProjects({ projects, language }: RelatedProjectsP
               project={project}
               href={`${basePath}/${project.slug}`}
               index={idx + 1}
-              language={language}
               dateLocale={dateLocale}
             />
           ))}
@@ -66,13 +65,11 @@ function RelatedRow({
   project,
   href,
   index,
-  language,
   dateLocale,
 }: {
   project: MarketingProject;
   href: string;
   index: number;
-  language: 'en' | 'zh';
   dateLocale: string;
 }) {
   const formattedDate = project.projectDate

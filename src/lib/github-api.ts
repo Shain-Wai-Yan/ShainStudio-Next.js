@@ -1,3 +1,11 @@
+import { 
+  GitHubUser, 
+  GitHubRepository, 
+  GitHubContributions, 
+  GitHubLanguage, 
+  GitHubDetailedActivity 
+} from '@/types/github';
+
 const GITHUB_API = '/api/github';
 const GITHUB_USERNAME = 'Shain-Wai-Yan';
 
@@ -29,7 +37,7 @@ async function fetchFromAPI(params?: Record<string, string>) {
   return data;
 }
 
-export async function fetchGithubUser() {
+export async function fetchGithubUser(): Promise<GitHubUser> {
   try {
     const data = await fetchFromAPI({ username: GITHUB_USERNAME, type: 'user' });
     return {
@@ -47,7 +55,7 @@ export async function fetchGithubUser() {
   }
 }
 
-export async function fetchRepositories() {
+export async function fetchRepositories(): Promise<GitHubRepository[]> {
   try {
     const data = await fetchFromAPI({ username: GITHUB_USERNAME, type: 'repositories' });
     // API returns GraphQL shape: name, description, url, primaryLanguage, forkCount, stargazerCount, updatedAt
@@ -58,7 +66,7 @@ export async function fetchRepositories() {
   }
 }
 
-export async function fetchPinnedRepos() {
+export async function fetchPinnedRepos(): Promise<GitHubRepository[]> {
   try {
     const data = await fetchFromAPI({ username: GITHUB_USERNAME, type: 'pinned' });
     return Array.isArray(data) ? data : [];
@@ -68,9 +76,9 @@ export async function fetchPinnedRepos() {
   }
 }
 
-export async function fetchContributions() {
+export async function fetchContributions(): Promise<GitHubContributions> {
   try {
-    const data = await fetchFromAPI({ username: GITHUB_USERNAME, type: 'contributions' });
+    const data = (await fetchFromAPI({ username: GITHUB_USERNAME, type: 'contributions' })) as GitHubContributions;
     return data || { totalContributions: 0, contributions: [] };
   } catch (error) {
     console.error('[github-api] Error fetching contributions:', error);
@@ -78,7 +86,7 @@ export async function fetchContributions() {
   }
 }
 
-export async function fetchTopLanguages() {
+export async function fetchTopLanguages(): Promise<GitHubLanguage[]> {
   try {
     const data = await fetchFromAPI({ username: GITHUB_USERNAME, type: 'languages' });
     return Array.isArray(data) ? data : [];
@@ -134,9 +142,9 @@ export async function fetchFileContent(
   return '';
 }
 
-export async function fetchDetailedActivity() {
+export async function fetchDetailedActivity(): Promise<GitHubDetailedActivity> {
   try {
-    const data = await fetchFromAPI({ username: GITHUB_USERNAME, type: 'detailed-activity' });
+    const data = (await fetchFromAPI({ username: GITHUB_USERNAME, type: 'detailed-activity' })) as GitHubDetailedActivity;
     return data || {
       commitContributionsByRepository: [],
       pullRequestContributionsByRepository: [],

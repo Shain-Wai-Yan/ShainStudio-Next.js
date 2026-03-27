@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
+
 
 /**
  * Detect locale from Accept-Language header
@@ -17,14 +17,7 @@ function detectLocaleFromHeader(acceptLanguage: string | null): string {
   return 'en';
 }
 
-/**
- * Extract locale from URL path (e.g., /zh/about → 'zh')
- */
-function getLocaleFromPath(path: string): string {
-  if (!path) return 'en';
-  const match = path.match(/^\/(en|zh)\//);
-  return match ? match[1] : 'en';
-}
+
 
 export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;

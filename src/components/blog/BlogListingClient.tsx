@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo } from 'react';
 import { BlogPost } from '@/lib/strapi/blogs';
 import BlogGrid from './BlogGrid';
 

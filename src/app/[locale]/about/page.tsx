@@ -335,7 +335,7 @@ export default async function AboutPage({ params }: AboutProps) {
                 <blockquote className="relative">
                   <span className="text-5xl text-accent/20 absolute -top-4 -left-2 font-serif
                     transition-all duration-300 group-hover:text-accent/40 group-hover:-top-6 group-hover:-left-3">
-                    "
+                    &quot;
                   </span>
                   <p className="pl-6 text-base md:text-lg italic text-text font-primary leading-relaxed
                     transition-colors duration-300 group-hover:text-primary dark:group-hover:text-white">

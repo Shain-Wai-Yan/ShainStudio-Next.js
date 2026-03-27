@@ -20,16 +20,24 @@ import { RepoViewer }           from './RepoViewer';
 import { useParams } from 'next/navigation';
 import { getDictionarySync } from '@/lib/getDictionary';
 
+import { 
+  GitHubUser, 
+  GitHubRepository, 
+  GitHubContributions, 
+  GitHubLanguage, 
+  GitHubDetailedActivity 
+} from '@/types/github';
+
 export function GithubGallery() {
   const params = useParams();
   const locale = (params?.locale as string) || 'en';
   const t = getDictionarySync(locale).codingProjects;
-  const [user, setUser]               = useState<any>(null);
-  const [pinnedRepos, setPinnedRepos] = useState<any[]>([]);
-  const [repositories, setRepositories] = useState<any[]>([]);
-  const [languages, setLanguages]     = useState<any[]>([]);
-  const [contributions, setContributions] = useState({ totalContributions: 0, contributions: [] });
-  const [detailedActivity, setDetailedActivity] = useState<any>(null);
+  const [user, setUser]               = useState<GitHubUser | null>(null);
+  const [pinnedRepos, setPinnedRepos] = useState<GitHubRepository[]>([]);
+  const [repositories, setRepositories] = useState<GitHubRepository[]>([]);
+  const [languages, setLanguages]     = useState<GitHubLanguage[]>([]);
+  const [contributions, setContributions] = useState<GitHubContributions>({ totalContributions: 0, contributions: [] });
+  const [detailedActivity, setDetailedActivity] = useState<GitHubDetailedActivity | null>(null);
   const [isLoading, setIsLoading]     = useState(true);
   const [error, setError]             = useState<string | null>(null);
   const [viewerRepo, setViewerRepo]   = useState<string | null>(null);

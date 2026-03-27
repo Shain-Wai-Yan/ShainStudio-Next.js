@@ -1,17 +1,18 @@
 'use client';
 
-interface PinnedRepo {
+interface Repository {
   name: string;
   description: string | null;
   url: string;
-  stargazerCount: number;
+  primaryLanguage: { name: string; color: string } | null;
   forkCount: number;
-  primaryLanguage?: { name: string; color: string };
+  stargazerCount: number;
   updatedAt: string;
+  isPrivate?: boolean;
 }
 
 interface PinnedRepositoriesProps {
-  repos: PinnedRepo[];
+  repos: Repository[];
   isLoading: boolean;
   onViewFiles: (repoName: string) => void;
 }

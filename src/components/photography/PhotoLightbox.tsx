@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useMemo, useState, useCallback, useRef } from 'react';
-import Image from 'next/image';
 import { Photo } from '@/lib/strapi/photography';
 
 interface PhotoLightboxProps {
@@ -58,13 +57,17 @@ type Stage = 0 | 1 | 2;
 
 function useProgressiveImage(photoId: number, imageUrl: string | null) {
   const [stage, setStage] = useState<Stage>(0);
+  const [prevId, setPrevId] = useState(photoId);
   const previewRef = useRef<HTMLImageElement | null>(null);
   const fullRef    = useRef<HTMLImageElement | null>(null);
 
-  useEffect(() => {
-    // Reset to blurred thumb immediately on photo change
+  // Reset stage during render if photoId changes — faster and avoids effect cascading
+  if (photoId !== prevId) {
+    setPrevId(photoId);
     setStage(0);
+  }
 
+  useEffect(() => {
     if (!imageUrl) return;
 
     // Step 1: load medium preview

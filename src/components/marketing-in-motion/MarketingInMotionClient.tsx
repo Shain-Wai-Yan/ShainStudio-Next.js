@@ -11,7 +11,7 @@ import { MarketingProjectGrid } from './MarketingProjectGrid';
 import { MarketingProjectCard } from './MarketingProjectCard';
 import { Breadcrumb } from '@/components/Breadcrumb';
 import type { MarketingProject, FilterOptions } from '@/lib/strapi/marketing-in-motion';
-import { filterProjects, extractFilterOptions, formatProjectDate } from '@/lib/strapi/marketing-in-motion';
+import { filterProjects, extractFilterOptions } from '@/lib/strapi/marketing-in-motion';
 
 interface BreadcrumbItem {
   label: string;

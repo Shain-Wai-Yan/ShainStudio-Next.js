@@ -4,32 +4,16 @@
  */
 
 import { fetchFromStrapi, extractUrl } from './client';
+import { StrapiFile } from '@/types/strapi';
 
-export interface DocumentFile {
-  url?: string;
-  data?: {
-    attributes?: {
-      url: string;
-    };
-  };
-}
-
-export interface CoverImage {
-  url?: string;
-  data?: {
-    attributes?: {
-      url: string;
-    };
-  };
-}
 
 export interface BusinessPlan {
   id: number;
   Title: string;
   Description: string;
   Slug: string;
-  DocumentFile: DocumentFile | DocumentFile[] | string;
-  CoverImage: CoverImage | CoverImage[] | string;
+  DocumentFile: StrapiFile | StrapiFile[] | string;
+  CoverImage: StrapiFile | StrapiFile[] | string;
   createdAt: string;
   updatedAt: string;
 }

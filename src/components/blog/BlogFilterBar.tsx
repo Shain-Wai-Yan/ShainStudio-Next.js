@@ -21,7 +21,11 @@ export default function BlogFilterBar({ categories, tags, language, onCategoryCh
 
   const handleTag = (tag: string) => {
     const next = new Set(selectedTags);
-    next.has(tag) ? next.delete(tag) : next.add(tag);
+    if (next.has(tag)) {
+      next.delete(tag);
+    } else {
+      next.add(tag);
+    }
     setSelectedTags(next);
     onTagChange?.(Array.from(next).join(','));
   };

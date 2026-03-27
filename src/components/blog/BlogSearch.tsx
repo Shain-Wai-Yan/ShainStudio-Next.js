@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useMemo } from 'react';
 import { debounce } from '@/lib/utils/debounce';
 
 interface BlogSearchProps {
@@ -12,8 +12,8 @@ interface BlogSearchProps {
 export default function BlogSearch({ onSearch, placeholder, language }: BlogSearchProps) {
   const [query, setQuery] = useState('');
 
-  const debouncedSearch = useCallback(
-    debounce((q: string) => onSearch(q), 300),
+  const debouncedSearch = useMemo(
+    () => debounce((q: string) => onSearch(q), 300),
     [onSearch]
   );
 

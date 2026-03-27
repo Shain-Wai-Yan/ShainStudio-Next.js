@@ -26,20 +26,23 @@ export function ProgrammingLanguages({ languages, isLoading }: ProgrammingLangua
   const locale = (params?.locale as string) || 'en';
   const t = getDictionarySync(locale).codingProjects;
   const canvasRef               = useRef<HTMLCanvasElement>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const chartRef                = useRef<any>(null);
   const [active, setActive]     = useState(0);
-  const [libReady, setLibReady] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [libReady, setLibReady] = useState(() => typeof window !== 'undefined' && !!(window as any).Chart);
 
   useEffect(() => {
-    if ((window as any).Chart) { setLibReady(true); return; }
+    if (libReady) return;
     const s = document.createElement('script');
     s.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js';
     s.onload = () => setLibReady(true);
     document.head.appendChild(s);
-  }, []);
+  }, [libReady]);
 
   useEffect(() => {
     if (!libReady || !canvasRef.current || !languages.length) return;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const Chart = (window as any).Chart;
     if (chartRef.current) { chartRef.current.destroy(); chartRef.current = null; }
 
@@ -63,7 +66,7 @@ export function ProgrammingLanguages({ languages, isLoading }: ProgrammingLangua
         cutout: '68%',
         animation: { duration: 700, easing: 'easeInOutQuart' },
         plugins: { legend: { display: false }, tooltip: { enabled: false } },
-        onHover: (_: any, els: any[]) => {
+        onHover: (_: unknown, els: Array<{ index: number }>) => {
           if (els.length) setActive(els[0].index);
         },
       },

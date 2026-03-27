@@ -4,21 +4,14 @@
  */
 
 import { fetchFromStrapi, extractUrl } from './client';
+import { StrapiFile } from '@/types/strapi';
 
-export interface CertificateImage {
-  url?: string;
-  data?: {
-    attributes?: {
-      url: string;
-    };
-  };
-}
 
 export interface Certificate {
   id: number;
   Title: string;
   Description: string;
-  Image: CertificateImage | CertificateImage[] | string; // Fixed: was CertificateImage
+  Image: StrapiFile | StrapiFile[] | string; // Fixed: was CertificateImage
   Issuer: string; // Fixed: was IssuedBy
   Date: string;
   createdAt: string;

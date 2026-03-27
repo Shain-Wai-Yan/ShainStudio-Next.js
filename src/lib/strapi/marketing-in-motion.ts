@@ -4,6 +4,7 @@
  */
 
 import { fetchFromStrapi, extractUrl } from './client';
+import { StrapiFile } from '@/types/strapi';
 
 // ─── Raw Strapi Shapes ────────────────────────────────────────────────────────
 
@@ -33,8 +34,8 @@ export interface StrapiMarketingProject {
   slug: string;
   summary?: string;
   fullText?: unknown;
-  coverImage?: unknown;
-  imageGallery?: unknown[];
+  coverImage?: StrapiFile;
+  imageGallery?: StrapiFile[];
   category?: string | { name?: string; data?: { attributes?: { name: string } } };
   tools_useds?: StrapiToolsUsed[];
   tags?: string[] | Array<{ name?: string }> | { data?: Array<{ attributes: { name: string } }> };

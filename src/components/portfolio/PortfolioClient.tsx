@@ -64,7 +64,19 @@ function ParticleField({ dark }: { dark: boolean }) {
 
 // ─── Tilt card ────────────────────────────────────────────────────────────────
 
-function TiltCard({ item, index, exploreText, isZh }: { item: any; index: number; exploreText: string; isZh: boolean }) {
+interface PortfolioItem {
+  id: string;
+  href: string;
+  number: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  tags: string[];
+  stat: string;
+  icon: React.ReactNode;
+}
+
+function TiltCard({ item, index, exploreText, isZh }: { item: PortfolioItem; index: number; exploreText: string; isZh: boolean }) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const [glow, setGlow] = useState({ x: 50, y: 50 });
@@ -201,9 +213,48 @@ function ScrollObserver() {
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 
+export interface PortfolioDictionary {
+  hero: {
+    eyebrow: string;
+    headline: [string, string, string];
+    subtitlePrefix: string;
+    subtitleHighlight: string;
+    subtitleSuffix: string;
+    stats: Array<{ number: string; label: string }>;
+    browseAll: string;
+    featured: string;
+    scroll: string;
+  };
+  marquee: string[];
+  cards: {
+    eyebrow: string;
+    headline: string;
+    sub: string;
+    explore: string;
+  };
+  items: Record<string, {
+    title: string;
+    subtitle: string;
+    description: string;
+    tags: string[];
+    stat: string;
+  }>;
+  cta: {
+    eyebrow: string;
+    headline: [string, string, string];
+    p: string;
+    btnContact: string;
+    btnAbout: string;
+  };
+  footer: {
+    signature: string;
+    copyright: string;
+  };
+}
+
 interface Props {
   locale: 'en' | 'zh';
-  t: any;
+  t: PortfolioDictionary;
 }
 
 export default function PortfolioClient({ locale, t }: Props) {

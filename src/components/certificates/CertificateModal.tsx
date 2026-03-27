@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 
 interface Certificate {
@@ -35,12 +35,14 @@ export function CertificateModal({
   const [isFullView, setIsFullView] = useState(false);
   const [zoom, setZoom] = useState(1);
   const [shareSuccess, setShareSuccess] = useState(false);
+  const prevIdRef = useRef<number | undefined>(certificate?.id);
 
-  useEffect(() => {
+  if (prevIdRef.current !== certificate?.id) {
     setImageError(false);
     setIsFullView(false);
     setZoom(1);
-  }, [certificate?.id]);
+    prevIdRef.current = certificate?.id;
+  }
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
