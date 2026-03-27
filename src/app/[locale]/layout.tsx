@@ -2,11 +2,11 @@ import type { Metadata } from "next";
 import { use } from "react";
 import "@/app/globals.css";
 import { getHtmlLang, isSupportedLocale, DEFAULT_LOCALE } from "@/lib/locales";
-import { getDictionary } from "@/lib/getDictionary";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { GoogleAnalytics } from '@next/third-parties/google';
 import SyntaxWidget from "@/components/syntax ai/SyntaxWidget";
+import ClarityAnalytics from "@/components/analytics/ClarityAnalytics";
 
 interface LocaleLayoutProps {
   children: React.ReactNode;
@@ -140,8 +140,6 @@ export default function LocaleLayout({ children, params }: LocaleLayoutProps) {
 
   return (
     <html lang={htmlLang} suppressHydrationWarning dir="ltr">
-      <head>
-      </head>
       <body>
         <script
           type="application/ld+json"
@@ -153,6 +151,7 @@ export default function LocaleLayout({ children, params }: LocaleLayoutProps) {
         </main>
         <Footer />
         <SyntaxWidget />
+        <ClarityAnalytics />
         {process.env.NEXT_PUBLIC_GA_ID && (
           <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
         )}

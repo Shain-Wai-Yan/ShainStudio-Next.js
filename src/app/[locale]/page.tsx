@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import TrackedLink from '@/components/analytics/TrackedLink';
 import { Metadata } from 'next';
 import { getDictionary } from '@/lib/getDictionary';
 import type { Dictionary } from '@/lib/getDictionary';
@@ -94,8 +95,9 @@ const Hero = ({ t, basePath }: { t: Dictionary, basePath: string }) => (
 
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start">
             {/* Primary CTA */}
-            <Link
+            <TrackedLink
               href={`${basePath}/portfolio`}
+              eventName="view_portfolio_hero"
               className="group relative inline-flex items-center justify-center font-bold py-3 px-6 sm:px-8 rounded-lg overflow-hidden transition-transform duration-300 hover:scale-105 shadow-lg text-sm sm:text-base"
             >
               <span
@@ -107,11 +109,12 @@ const Hero = ({ t, basePath }: { t: Dictionary, basePath: string }) => (
                 }}
               />
               <span className="relative z-10 text-white">{t.homePage.viewPortfolio}</span>
-            </Link>
+            </TrackedLink>
 
             {/* Secondary CTA */}
-            <Link
+            <TrackedLink
               href={`${basePath}/contact`}
+              eventName="get_in_touch_hero"
               className="group relative inline-flex items-center justify-center font-bold py-3 px-6 sm:px-8 rounded-lg overflow-hidden transition-all duration-300 hover:scale-105 text-sm sm:text-base"
             >
               <span
@@ -139,7 +142,7 @@ const Hero = ({ t, basePath }: { t: Dictionary, basePath: string }) => (
               >
                 {t.homePage.getInTouch}
               </span>
-            </Link>
+            </TrackedLink>
           </div>
         </div>
 
@@ -397,9 +400,13 @@ const AiShowcase = ({ t, basePath }: { t: Dictionary, basePath: string }) => (
               </div>
             ))}
           </div>
-          <Link href={`${basePath}/portfolio`} className="inline-block py-2.5 sm:py-3 px-6 sm:px-8 bg-[#191970] dark:bg-gradient-to-r dark:from-[#704700] dark:via-[#a67c00] dark:to-[#d4af37] text-white dark:text-[#0f0f45] rounded font-bold transition-all duration-300 hover:brightness-110 hover:shadow-lg text-sm sm:text-base">
+          <TrackedLink
+            href={`${basePath}/portfolio`}
+            eventName="view_portfolio_ai_showcase"
+            className="inline-block py-2.5 sm:py-3 px-6 sm:px-8 bg-[#191970] dark:bg-gradient-to-r dark:from-[#704700] dark:via-[#a67c00] dark:to-[#d4af37] text-white dark:text-[#0f0f45] rounded font-bold transition-all duration-300 hover:brightness-110 hover:shadow-lg text-sm sm:text-base"
+          >
             {t.aiShowcase?.cta || "See AI Marketing in Action"}
-          </Link>
+          </TrackedLink>
         </div>
       </div>
     </div>
@@ -520,10 +527,14 @@ const Cta = ({ t, basePath }: { t: Dictionary, basePath: string }) => (
       <p className="mt-4 text-base sm:text-lg max-w-2xl mx-auto mb-8 leading-relaxed text-white/80">
         {t.cta?.subtitle || "Let's discuss how my expertise can help achieve your business goals."}
       </p>
-      <Link href={`${basePath}/contact`} className="inline-flex items-center gap-3 bg-[#191970] text-white font-bold py-3 sm:py-4 px-8 sm:px-10 rounded-lg transition-transform duration-300 hover:scale-105 shadow-lg hover:shadow-xl text-base sm:text-lg">
+      <TrackedLink
+        href={`${basePath}/contact`}
+        eventName="get_in_touch_cta"
+        className="inline-flex items-center gap-3 bg-[#191970] text-white font-bold py-3 sm:py-4 px-8 sm:px-10 rounded-lg transition-transform duration-300 hover:scale-105 shadow-lg hover:shadow-xl text-base sm:text-lg"
+      >
         <span>{t.cta?.button || "Get In Touch"}</span>
         <FaArrowRight />
-      </Link>
+      </TrackedLink>
     </div>
   </section>
 );

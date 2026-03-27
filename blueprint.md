@@ -113,4 +113,18 @@ This file serves as the single source of truth for the Next.js Portfolio app, co
   9. **Resilience & Perceived Performance:** Integrated an `isLoading` state with a premium pulsed overlay ("Initializing AI") for smooth perceived performance.
   10. **Reliable Recovery:** Implemented a forced-remount mechanism using a React `key` state. This ensures the "Reconnect AI" button truly requests a fresh iframe instance if a connection error occurs.
 
-*The app is now fully compiling, properly routing without loops, cleanly handling English prefix-less URLs, and displaying the globally fixed headers, footers, and dynamically localized Contact page components.*
+### Microsoft Clarity Analytics Integration
+- **Problem:** Needed a professional behavioral analytics solution to track user interactions and session replays without complex manual setup.
+- **Resolution:**
+  1. **NPM Integration:** Installed `@microsoft/clarity` and configured it using the "Over-Engineered" best practice for Next.js App Router (Client Component initialization within a Server Layout).
+  2. **Organized Architecture:** Created a dedicated `src/components/analytics` folder to house all tracking-related components.
+  3. **Clarity Component:** Engineered `ClarityAnalytics.tsx` to safely initialize Clarity in the browser using the `NEXT_PUBLIC_CLARITY_ID` environment variable.
+  4. **Custom Events:** Developed a reusable `TrackedLink.tsx` component to capture high-value user actions.
+  5. **Global Tracking:** Injected custom event triggers into key home page buttons:
+     - `view_portfolio_hero`: Tracks "View My Portfolio" clicks in the Hero section.
+     - `get_in_touch_hero`: Tracks "Get In Touch" clicks in the Hero section.
+     - `view_portfolio_ai_showcase`: Tracks "See AI Marketing in Action" clicks.
+     - `get_in_touch_cta`: Tracks "Get In Touch" clicks in the final CTA section.
+- **Result:** The application now provides deep behavioral insights (heatmaps, replays) and tracks key conversion metrics while maintaining a clean, scalable codebase.
+
+*The app is now fully compiling, properly routing without loops, cleanly handling English prefix-less URLs, and featuring a robust Microsoft Clarity behavioral analytics suite.*
