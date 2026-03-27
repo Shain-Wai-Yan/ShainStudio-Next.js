@@ -133,6 +133,13 @@ export async function GET(
     const { slug } = await params;
     if (!slug) return NextResponse.json({ error: 'Slug required' }, { status: 400 });
 
+    // Security: Validate slug format (alphanumeric and hyphens only)
+    const slugRegex = /^[a-z0-9-]+$/i;
+    if (!slugRegex.test(slug)) {
+      console.warn('[blogs/slug] Invalid slug format attempt:', slug);
+      return NextResponse.json({ error: 'Invalid slug format' }, { status: 400 });
+    }
+
     // Vanilla JS uses filters[slug][$eq] (lowercase) — match that
     const url = `${STRAPI_API_URL}/blogs?filters[slug][$eq]=${encodeURIComponent(slug)}&populate=*`;
     console.log('[blogs/slug] Fetching:', url);

@@ -25,11 +25,11 @@ const GQL_HEADERS = {
   'User-Agent': 'GitHub-Profile-Viewer',
 };
 
-async function gql(query: string) {
+async function gql(query: string, variables: Record<string, unknown> = {}) {
   const res = await fetch('https://api.github.com/graphql', {
     method: 'POST',
     headers: GQL_HEADERS,
-    body: JSON.stringify({ query }),
+    body: JSON.stringify({ query, variables }),
   });
   return res.json();
 }
@@ -66,12 +66,12 @@ async function handleUserProfile(username: string) {
   const cached = getFromCache(cacheKey);
   if (cached) return NextResponse.json(cached);
 
-  const data = await gql(`query { user(login: "${username}") {
+  const data = await gql(`query($login: String!) { user(login: $login) {
     name login bio avatarUrl
     followers { totalCount }
     following { totalCount }
     repositories { totalCount }
-  }}`);
+  }}`, { login: username });
 
   if (data.errors) return NextResponse.json(data, { status: 400 });
   setCache(cacheKey, data.data?.user);
@@ -83,13 +83,13 @@ async function handlePinnedRepos(username: string) {
   const cached = getFromCache(cacheKey);
   if (cached) return NextResponse.json(cached);
 
-  const data = await gql(`query { user(login: "${username}") {
+  const data = await gql(`query($login: String!) { user(login: $login) {
     pinnedItems(first: 6, types: REPOSITORY) { nodes {
       ... on Repository { name description url stargazerCount forkCount updatedAt
         primaryLanguage { name color }
       }
     }}
-  }}`);
+  }}`, { login: username });
 
   if (data.errors) return NextResponse.json(data, { status: 400 });
   const repos = data.data?.user?.pinnedItems?.nodes || [];
@@ -108,12 +108,12 @@ async function handleContributions(username: string) {
   const cached = getFromCache(cacheKey);
   if (cached) return NextResponse.json(cached);
 
-  const data = await gql(`query { user(login: "${username}") {
+  const data = await gql(`query($login: String!) { user(login: $login) {
     contributionsCollection { contributionCalendar {
       totalContributions
       weeks { contributionDays { date contributionCount color } }
     }}
-  }}`) as { data?: { user?: { contributionsCollection?: { contributionCalendar?: { totalContributions: number; weeks: Array<{ contributionDays: Array<{ date: string; contributionCount: number; color: string }> }> } } } }; errors?: unknown[] };
+  }}`, { login: username }) as { data?: { user?: { contributionsCollection?: { contributionCalendar?: { totalContributions: number; weeks: Array<{ contributionDays: Array<{ date: string; contributionCount: number; color: string }> }> } } } }; errors?: unknown[] };
 
   if (data.errors) return NextResponse.json(data, { status: 400 });
   const calendar = data.data?.user?.contributionsCollection?.contributionCalendar;
@@ -135,13 +135,13 @@ async function handleTopLanguages(username: string) {
   const cached = getFromCache(cacheKey);
   if (cached) return NextResponse.json(cached);
 
-  const data = await gql(`query { user(login: "${username}") {
+  const data = await gql(`query($login: String!) { user(login: $login) {
     repositories(first: 100, orderBy: {field: UPDATED_AT, direction: DESC}, isFork: false) {
       nodes { languages(first: 10, orderBy: {field: SIZE, direction: DESC}) {
         edges { size node { name color } }
       }}
     }
-  }}`) as { data?: { user?: { repositories?: { nodes?: Array<{ languages?: { edges?: Array<{ size: number; node: { name: string; color: string } }> } }> } } }; errors?: unknown[] };
+  }}`, { login: username }) as { data?: { user?: { repositories?: { nodes?: Array<{ languages?: { edges?: Array<{ size: number; node: { name: string; color: string } }> } }> } } }; errors?: unknown[] };
 
   if (data.errors) return NextResponse.json(data, { status: 400 });
   const languages: Record<string, { size: number; color: string }> = {};
@@ -167,13 +167,13 @@ async function handleRepositories(username: string) {
   const cached = getFromCache(cacheKey);
   if (cached) return NextResponse.json(cached);
 
-  const data = await gql(`query { user(login: "${username}") {
+  const data = await gql(`query($login: String!) { user(login: $login) {
     repositories(first: 30, orderBy: {field: UPDATED_AT, direction: DESC}) {
       nodes { name description url stargazerCount forkCount updatedAt isPrivate
         primaryLanguage { name color }
       }
     }
-  }}`);
+  }}`, { login: username });
 
   if (data.errors) return NextResponse.json(data, { status: 400 });
   const repos = data.data?.user?.repositories?.nodes || [];
@@ -229,8 +229,8 @@ async function handleDetailedActivity(username: string) {
   const cached = getFromCache(cacheKey);
   if (cached) return NextResponse.json(cached);
 
-  const data = await gql(`query {
-    user(login: "${username}") {
+  const data = await gql(`query($login: String!) {
+    user(login: $login) {
       contributionsCollection {
         commitContributionsByRepository(maxRepositories: 10) {
           repository { name url }
@@ -246,7 +246,7 @@ async function handleDetailedActivity(username: string) {
         }
       }
     }
-  }`);
+  }`, { login: username });
 
   if (data.errors) return NextResponse.json(data, { status: 400 });
   const result = data.data?.user?.contributionsCollection || {};

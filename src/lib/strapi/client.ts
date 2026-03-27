@@ -6,7 +6,7 @@
 
 const STRAPI_API_URL = (process.env.NEXT_PUBLIC_STRAPI_API_URL || 'https://api.shainwaiyan.com/api').replace(/\/$/, '');
 
-const STRAPI_API_TOKEN = process.env.NEXT_PUBLIC_STRAPI_API_TOKEN || 'ae2fdd66167465a3dbef4c71ed375a28a0530b41047111a65563c182950afbf1dd445255ffeea3dc2f00345ea264c007e16e09ff1682d8f887babff2d110226e6f4f20de5d17950106f91a6c46b58c7f9bd7c972e406a51a98d9c2804c491c8ba2b027f5a2ea81ef99d3bcf08b4cd4eea607f7f03cea136a766c1b26d44229b8';
+const STRAPI_API_TOKEN = process.env.STRAPI_API_TOKEN;
 
 const API_TIMEOUT = 10000; // 10 seconds
 
