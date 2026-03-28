@@ -39,7 +39,7 @@ export interface CodingProjectArchiveClientProps {
   initialProjects?: CodingProject[];
 }
 
-const PAGE_SIZE = 12;
+const PAGE_SIZE = 9;
 
 export function CodingProjectArchiveClient({
   locale = 'en',
@@ -183,15 +183,17 @@ export function CodingProjectArchiveClient({
       </div>
 
       {/* Hero Header for Archive */}
-      <section className="bg-white dark:bg-[#121212] py-16 md:py-24 border-b border-gray-100 dark:border-gray-800">
+      <section className="bg-white dark:bg-[#121212] py-12 md:py-24 border-b border-gray-100 dark:border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
-          <Breadcrumb items={breadcrumbItems} />
+          <div className="flex flex-col items-start gap-4">
+            <Breadcrumb items={breadcrumbItems} />
+          </div>
           
-          <div className="mt-8 max-w-3xl">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 tracking-tight text-[#191970] dark:text-[#d4af37]">
+          <div className="mt-4 md:mt-8 max-w-3xl">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-4 md:mb-6 tracking-tight text-[#191970] dark:text-[#d4af37]">
               {labels.heroTitle}
             </h1>
-            <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 leading-relaxed font-light">
+            <p className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-300 leading-relaxed font-light">
               {labels.heroDescription}
             </p>
           </div>
