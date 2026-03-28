@@ -1,70 +1,151 @@
 import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import { getDictionary } from '@/lib/getDictionary';
+import { isSupportedLocale } from '@/lib/locales';
 import { GithubGallery } from '@/components/coding-project/GithubGallery';
-import { Breadcrumb } from '@/components/Breadcrumb';
+import { fetchCodingProjects, type CodingProject } from '@/lib/strapi/coding-projects';
 
-interface CodingProjectPageProps {
+export const revalidate = 3600; // Revalidate every hour
+
+interface Props {
   params: Promise<{ locale: string }>;
 }
 
-export async function generateMetadata(props: CodingProjectPageProps): Promise<Metadata> {
-  const params = await props.params;
-  const locale = params?.locale || 'en';
-  const t = await getDictionary(locale);
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
+  if (!isSupportedLocale(locale)) return {};
 
-  const urlPath = locale === 'en' ? '/portfolio/coding-projects' : `/${locale}/portfolio/coding-projects`;
+  const dict = await getDictionary(locale);
+  const seo = dict.codingProjects.seo;
+
+  const basePath = locale === 'en' ? '' : `/${locale}`;
+  const url = `https://shainwaiyan.com${basePath}/portfolio/coding-projects`;
+  const defaultOgImage = 'https://shainwaiyan.com/images/Shain%20Studio.png'; 
 
   return {
-    title: t.codingProjects.seo.title,
-    description: t.codingProjects.seo.description,
+    title: seo.title,
+    description: seo.description,
+    robots: { index: true, follow: true },
     alternates: {
-      canonical: urlPath,
-      languages: { en: '/portfolio/coding-projects', zh: '/zh/portfolio/coding-projects' },
+      canonical: url,
+      languages: {
+        'en': `https://shainwaiyan.com/portfolio/coding-projects`,
+        'zh': `https://shainwaiyan.com/zh/portfolio/coding-projects`,
+        'x-default': `https://shainwaiyan.com/portfolio/coding-projects`,
+      },
     },
     openGraph: {
+      title: seo.title,
+      description: seo.description,
+      url,
+      siteName: 'Shain Studio',
+      images: [{ url: defaultOgImage, width: 1200, height: 630 }],
+      locale: locale === 'zh' ? 'zh_CN' : 'en_US',
       type: 'website',
-      url: `https://www.shainwaiyan.com${urlPath}`,
-      title: t.codingProjects.seo.title,
-      description: t.codingProjects.seo.description,
-      images: 'https://www.shainwaiyan.com/images/Shain Studio.png',
-      locale: locale === 'en' ? 'en_US' : 'zh_CN',
-      alternateLocale: locale === 'en' ? 'zh_CN' : 'en_US',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: seo.title,
+      description: seo.description,
+      images: [defaultOgImage],
     },
   };
 }
 
-export default async function CodingProjectPage(props: CodingProjectPageProps) {
-  const params = await props.params;
-  const locale = (params?.locale || 'en') as 'en' | 'zh';
-  const t = await getDictionary(locale);
+export default async function CodingProjectsPage({ params }: Props) {
+  const { locale } = await params;
+  const basePath = locale === 'en' ? '' : `/${locale}`;
+  const defaultOgImage = 'https://shainwaiyan.com/images/Shain%20Studio.png';
 
-  const breadcrumbItems = [
-    { label: t.nav.home, href: locale === 'en' ? '/' : `/${locale}` },
-    { label: t.nav.portfolio, href: locale === 'en' ? '/portfolio' : `/${locale}/portfolio` },
-    { label: t.nav.codingProjects, href: locale === 'en' ? '/portfolio/coding-projects' : `/${locale}/portfolio/coding-projects` },
-  ];
+  if (!isSupportedLocale(locale)) {
+    notFound();
+  }
+
+  const dict = await getDictionary(locale);
+  
+  // Fetch coding projects from Strapi
+  const { projects: strapiProjects } = await fetchCodingProjects();
+
+  // Prepare structured data
+  const topProjectsForSeo = strapiProjects.slice(0, 10);
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    'name': dict.codingProjects.seo.title,
+    'description': dict.codingProjects.seo.description,
+    'url': `https://shainwaiyan.com${basePath}/portfolio/coding-projects`,
+    'mainEntity': {
+      '@type': 'ItemList',
+      'itemListElement': topProjectsForSeo.map((project: CodingProject, index: number) => ({
+        '@type': 'ListItem',
+        'position': index + 1,
+        'item': {
+          '@type': 'SoftwareApplication',
+          'name': project.title,
+          'description': project.summary || project.seo?.metaDescription || dict.codingProjects.seo.description,
+          'image': project.coverImage || defaultOgImage,
+          'applicationCategory': 'DeveloperApplication',
+          'operatingSystem': 'Web, Cross-platform',
+          'url': `https://shainwaiyan.com${basePath}/portfolio/coding-projects/${project.slug}`
+        }
+      }))
+    }
+  };
+
+  const jsonLdBreadcrumb = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": dict.marketingInMotion.breadcrumbs.home,
+        "item": `https://shainwaiyan.com${basePath}/`
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": dict.marketingInMotion.breadcrumbs.portfolio,
+        "item": `https://shainwaiyan.com${basePath}/portfolio`
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": dict.codingProjects.title,
+        "item": `https://shainwaiyan.com${basePath}/portfolio/coding-projects`
+      }
+    ]
+  };
 
   return (
-    <main className="min-h-screen bg-white dark:bg-[#121212] transition-colors duration-300">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-        <Breadcrumb items={breadcrumbItems} />
-
-        <div className="mb-10">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-[#191970] dark:text-[#d4af37]">
-            {t.codingProjects.title}
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify([jsonLd, jsonLdBreadcrumb]) }}
+      />
+      
+      <main className="min-h-screen pt-24 pb-16 px-4 md:px-8 max-w-7xl mx-auto">
+        <header className="mb-12">
+          <h1 className="text-4xl md:text-5xl font-black mb-6 tracking-tight text-[#191970] dark:text-[#d4af37]">
+            {dict.codingProjects.title}
           </h1>
-          <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400 leading-relaxed">
-            {t.codingProjects.description}
-          </p>
-        </div>
+          <div className="max-w-3xl">
+            <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+              {dict.codingProjects.description}
+            </p>
+          </div>
+        </header>
 
-        <section aria-labelledby="github-heading" className="mb-12">
-          <h2 id="github-heading" className="text-xl font-bold mb-6 text-[#191970] dark:text-[#d4af37]">
-            {t.codingProjects.myGitHub}
-          </h2>
-          <GithubGallery />
+        <section id="projects" className="space-y-16">
+          <GithubGallery 
+            initialStrapiProjects={strapiProjects}
+            labels={{
+              shelf: dict.codingProjects.shelf
+            }}
+          />
         </section>
-      </div>
-    </main>
+      </main>
+    </>
   );
 }

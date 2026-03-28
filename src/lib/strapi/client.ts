@@ -38,7 +38,7 @@ export async function fetchFromStrapi<T>(
 
     const url = `${STRAPI_API_URL}/${endpoint}${queryString ? `?${queryString}` : ''}`;
 
-    console.log(`[Strapi Client] Fetching from: ${url}`);
+    // console.log(`[Strapi Client] Fetching from: ${url}`);
 
     // Prepare headers with authentication if token is available
     const headers: Record<string, string> = {
@@ -84,7 +84,7 @@ export async function fetchFromStrapi<T>(
       }
 
       const data = await response.json();
-      console.log('[Strapi Client] API Response:', data);
+      // console.log('[Strapi Client] API Response:', data);
       return { data: data as T, error: null };
     } catch (fetchError) {
       if (fetchError instanceof Error && fetchError.name === 'AbortError') {

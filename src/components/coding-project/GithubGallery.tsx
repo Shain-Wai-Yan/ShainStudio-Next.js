@@ -2,14 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import {
-  fetchGithubUser,
   fetchRepositories,
   fetchPinnedRepos,
   fetchContributions,
   fetchTopLanguages,
   fetchDetailedActivity,
 } from '@/lib/github-api';
-import { GithubProfileHeader }  from './GithubProfileHeader';
 import { PinnedRepositories }   from './PinnedRepositories';
 import { ContributionsGraph }   from './ContributionsGraph';
 import { RepositoriesList }     from './RepositoriesList';
@@ -21,18 +19,25 @@ import { useParams } from 'next/navigation';
 import { getDictionarySync } from '@/lib/getDictionary';
 
 import { 
-  GitHubUser, 
   GitHubRepository, 
   GitHubContributions, 
   GitHubLanguage, 
   GitHubDetailedActivity 
 } from '@/types/github';
+import { CodingProject } from '@/lib/strapi/coding-projects';
+import { CodingProjectShelf, ShelfLabels } from './CodingProjectShelf';
 
-export function GithubGallery() {
+interface GithubGalleryProps {
+  initialStrapiProjects?: CodingProject[];
+  labels: {
+    shelf: ShelfLabels;
+  };
+}
+
+export function GithubGallery({ initialStrapiProjects = [], labels }: GithubGalleryProps) {
   const params = useParams();
   const locale = (params?.locale as string) || 'en';
   const t = getDictionarySync(locale).codingProjects;
-  const [user, setUser]               = useState<GitHubUser | null>(null);
   const [pinnedRepos, setPinnedRepos] = useState<GitHubRepository[]>([]);
   const [repositories, setRepositories] = useState<GitHubRepository[]>([]);
   const [languages, setLanguages]     = useState<GitHubLanguage[]>([]);
@@ -48,16 +53,14 @@ export function GithubGallery() {
     setIsLoading(true);
     setError(null);
     try {
-      const [userData, reposData, pinnedData, contribData, languagesData, activityData] =
+      const [reposData, pinnedData, contribData, languagesData, activityData] =
         await Promise.all([
-          fetchGithubUser(),
           fetchRepositories(),
           fetchPinnedRepos(),
           fetchContributions(),
           fetchTopLanguages(),
           fetchDetailedActivity(),
         ]);
-      setUser(userData);
       setRepositories(reposData);
       setPinnedRepos(pinnedData);
       setContributions(contribData);
@@ -88,12 +91,18 @@ export function GithubGallery() {
         </div>
       )}
 
-      <GithubProfileHeader user={user} isLoading={isLoading} />
+      {/* Replaced CodingProjectSection with CodingProjectShelf */}
+      <CodingProjectShelf 
+        projects={initialStrapiProjects} 
+        locale={locale as 'en' | 'zh'}
+        labels={labels.shelf}
+        maxVisible={20}
+      />
 
       <PinnedRepositories
         repos={pinnedRepos}
         isLoading={isLoading}
-        onViewFiles={(name) => setViewerRepo(name)}
+        onViewFiles={(name: string) => setViewerRepo(name)}
       />
 
       <ContributionsGraph
@@ -110,7 +119,7 @@ export function GithubGallery() {
       <RepositoriesList
         repositories={repositories}
         isLoading={isLoading}
-        onViewFiles={(name) => setViewerRepo(name)}
+        onViewFiles={(name: string) => setViewerRepo(name)}
       />
 
       {viewerRepo && (
