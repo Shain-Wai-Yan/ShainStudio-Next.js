@@ -12,6 +12,8 @@ interface CodingProjectContentProps {
 export default function CodingProjectContent({ project, language }: CodingProjectContentProps) {
   const backHref =
     language === 'zh' ? '/zh/portfolio/coding-projects' : '/portfolio/coding-projects';
+  const archiveHref =
+    language === 'zh' ? '/zh/portfolio/coding-projects/archive' : '/portfolio/coding-projects/archive';
 
   const DOMPURIFY_CONFIG = {
     ADD_TAGS: ['iframe'],
@@ -98,26 +100,38 @@ export default function CodingProjectContent({ project, language }: CodingProjec
         dangerouslySetInnerHTML={{ __html: cleanContent }}
       />
 
-      {/* ── Low-profile back link ──────────────────────────────────────────── */}
-      <div className="mt-12 pt-6 border-t border-gray-100 dark:border-gray-800">
+      {/* ── Low-profile back links ──────────────────────────────────────────── */}
+      <div className="mt-12 pt-6 border-t border-gray-100 dark:border-gray-800 flex flex-col sm:flex-row gap-4 sm:gap-8">
         <Link
           href={backHref}
           className="
             inline-flex items-center gap-1.5
-            text-xs text-gray-400 dark:text-gray-500
+            text-xs font-medium text-gray-500 dark:text-gray-400
             hover:text-[#191970] dark:hover:text-[#d4af37]
             transition-colors duration-150
             group
           "
         >
-          <svg
-            width="12" height="12" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" strokeWidth="2"
-            className="transition-transform duration-150 group-hover:-translate-x-0.5"
-          >
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="transition-transform duration-150 group-hover:-translate-x-0.5">
             <path d="M19 12H5M12 5l-7 7 7 7"/>
           </svg>
           {language === 'zh' ? '返回编码项目' : 'Back to Coding Projects'}
+        </Link>
+
+        <Link
+          href={archiveHref}
+          className="
+            inline-flex items-center gap-1.5
+            text-xs font-medium text-gray-500 dark:text-gray-400
+            hover:text-[#191970] dark:hover:text-[#d4af37]
+            transition-colors duration-150
+            group
+          "
+        >
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="transition-transform duration-150 group-hover:-translate-x-0.5">
+            <path d="M19 12H5M12 5l-7 7 7 7"/>
+          </svg>
+          {language === 'zh' ? '返回项目存档' : 'Back to Project Archive'}
         </Link>
       </div>
     </article>
