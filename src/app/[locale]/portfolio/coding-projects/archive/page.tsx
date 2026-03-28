@@ -5,8 +5,6 @@ import { isSupportedLocale } from '@/lib/locales';
 import { CodingProjectArchiveClient } from '@/components/coding-project/CodingProjectArchiveClient';
 import { fetchCodingProjects, type CodingProject } from '@/lib/strapi/coding-projects';
 
-export const revalidate = 3600; // Revalidate every hour
-
 interface Props {
   params: Promise<{ locale: string }>;
 }
