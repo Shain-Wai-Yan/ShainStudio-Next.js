@@ -88,10 +88,12 @@ export function CodingProjectShelf({
   const trackRef = useRef<HTMLDivElement>(null);
   const [canPrev, setCanPrev] = useState(false);
   const [canNext, setCanNext] = useState(true);
-  const [activePage, setActivePage] = useState(0);
-  const [countLabel, setCountLabel] = useState("");
+  // scrollRatio: 0–1, drives the kinetic rail thumb position
+  const [scrollRatio, setScrollRatio] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
-  
+  // kinetic pulse: fires once on mobile to hint swipeability
+  const [pulse, setPulse] = useState(false);
+
   const startX = useRef(0);
   const scrollLeftRef = useRef(0);
 
@@ -102,7 +104,6 @@ export function CodingProjectShelf({
     );
   }, [projects, maxVisible]);
 
-  const totalPages = Math.ceil(sorted.length / PAGE_COLS);
 
   const updateState = useCallback(() => {
     const t = trackRef.current;
@@ -111,28 +112,36 @@ export function CodingProjectShelf({
     const maxSl = t.scrollWidth - t.clientWidth;
     setCanPrev(sl > 8);
     setCanNext(sl < maxSl - 8);
-    setActivePage(Math.round(sl / ((CARD_W + GAP) * PAGE_COLS)));
-    
-    // Using 4.5 columns visibility strategy (each scrolled column hides one)
-    const visible = Math.floor(sl / CARD_W);
-    // 4 full columns visible + potentially 0.5 bleed is roughly 4-5 items. Assuming 4 per page.
-    const onScreenOffset = 4; 
-    const remaining = Math.max(0, sorted.length - visible - onScreenOffset);
-    
-    if (sl < 8) setCountLabel(labels.explore);
-    else if (sl >= maxSl - 8) setCountLabel(labels.scrollLeft);
-    else setCountLabel(labels.moreRight.replace("{n}", String(remaining)));
-  }, [sorted.length, labels]);
+    // Clamp ratio to [0, 1] for the kinetic rail thumb
+    setScrollRatio(maxSl > 0 ? Math.min(1, Math.max(0, sl / maxSl)) : 0);
+  }, []);
 
   useEffect(() => {
     updateState();
-    
     const t = trackRef.current;
     if (t) {
       t.addEventListener('scroll', updateState, { passive: true });
-      return () => t.removeEventListener('scroll', updateState);
+      // Recalc on resize (orientation change on mobile)
+      const ro = new ResizeObserver(updateState);
+      ro.observe(t);
+      return () => {
+        t.removeEventListener('scroll', updateState);
+        ro.disconnect();
+      };
     }
   }, [updateState]);
+
+  // Mobile kinetic pulse: after 600ms signal swipeability once
+  useEffect(() => {
+    const isMobile = window.matchMedia('(pointer: coarse)').matches;
+    if (!isMobile || sorted.length <= 4) return;
+    const timer = setTimeout(() => {
+      setPulse(true);
+      // Reset after one cycle (animation-duration: 900ms)
+      setTimeout(() => setPulse(false), 900);
+    }, 600);
+    return () => clearTimeout(timer);
+  }, [sorted.length]);
 
   const scrollPage = useCallback((dir: 1 | -1) => {
     const reducedMotion = window.matchMedia(
@@ -185,8 +194,9 @@ export function CodingProjectShelf({
             <h2 className="text-xl sm:text-2xl font-black text-[#191970] dark:text-[#d4af37]">
               {labels.title}
             </h2>
-            <div className="text-xs text-gray-500 font-medium bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-full transition-all">
-              {sorted.length} projects &middot; {countLabel}
+            {/* Project count pill — clean, no scroll text */}
+            <div className="text-xs text-gray-500 font-medium bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-full">
+              {sorted.length}
             </div>
           </div>
         </div>
@@ -373,20 +383,64 @@ export function CodingProjectShelf({
         </div>
       </div>
 
-      {/* Progress dots */}
-      {totalPages > 1 && (
-        <div className="flex justify-center items-center gap-1.5 mb-8">
-          {Array.from({ length: totalPages }).map((_, i) => (
+      {/* ─── Kinetic Scroll Rail ──────────────────────────────────────────────
+           A continuous 2px track with a smooth animated thumb. The thumb
+           position maps 1:1 to horizontal scroll progress (0 → 100%).
+           On mobile, a one-shot CSS pulse fires after mount to communicate
+           scrollability without any text. Zero layout impact.
+      ─────────────────────────────────────────────────────────────────── */}
+      {sorted.length > 0 && (
+        <>
+          {/* Inline keyframes injected once — avoids a global CSS file dep */}
+          <style>{`
+            @keyframes kineticPulse {
+              0%   { transform: scaleX(1);   opacity: 1; }
+              35%  { transform: scaleX(1.18); opacity: 0.9; }
+              65%  { transform: scaleX(0.88); opacity: 0.8; }
+              100% { transform: scaleX(1);   opacity: 1; }
+            }
+            .kinetic-pulse {
+              animation: kineticPulse 900ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+            }
+          `}</style>
+
+          <div
+            role="progressbar"
+            aria-label="Scroll position"
+            aria-valuenow={Math.round(scrollRatio * 100)}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            className="relative mx-auto mb-6 mt-1"
+            style={{ width: 'min(180px, 40%)', height: '2px' }}
+          >
+            {/* Track rail */}
+            <div className="absolute inset-0 rounded-full bg-gray-200 dark:bg-gray-800" />
+
+            {/* Animated thumb — width = 30% of rail, travels the remaining 70% */}
             <div
-              key={i}
-              className={`transition-all duration-300 rounded-full ${
-                i === activePage 
-                  ? 'bg-gray-700 dark:bg-gray-300 w-5 h-1' 
-                  : 'bg-gray-300 dark:bg-gray-600 w-1 h-1'
+              className={`absolute top-0 bottom-0 rounded-full${
+                pulse ? ' kinetic-pulse' : ''
               }`}
+              style={{
+                width: '30%',
+                // thumb center travels from 0% → 70% of the track width
+                left: `${scrollRatio * 70}%`,
+                background:
+                  scrollRatio > 0.05 && scrollRatio < 0.95
+                    ? 'linear-gradient(90deg, #191970, #d4af37)'
+                    : scrollRatio <= 0.05
+                    ? '#d1d5db'
+                    : '#d4af37',
+                transition: 'left 120ms linear, background 400ms ease',
+                // Subtle glow only when mid-scroll
+                boxShadow:
+                  scrollRatio > 0.05 && scrollRatio < 0.95
+                    ? '0 0 6px 1px rgba(212,175,55,0.35)'
+                    : 'none',
+              }}
             />
-          ))}
-        </div>
+          </div>
+        </>
       )}
 
       {/* Section divider */}
