@@ -41,8 +41,12 @@ async function fetchWithTimeout(url: string, ms: number): Promise<Response> {
   const ctrl = new AbortController();
   const t = setTimeout(() => ctrl.abort(), ms);
   try {
+    const headers: Record<string, string> = { Accept: 'application/json' };
+    if (process.env.VIP_SECRET_KEY) {
+      headers['x-shain-secret'] = process.env.VIP_SECRET_KEY;
+    }
     return await fetch(url, {
-      headers: { Accept: 'application/json' },
+      headers,
       signal: ctrl.signal,
     });
   } finally {

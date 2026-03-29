@@ -8,7 +8,7 @@ const STRAPI_API_URL = (process.env.NEXT_PUBLIC_STRAPI_API_URL || 'https://api.s
 
 const STRAPI_API_TOKEN = process.env.STRAPI_API_TOKEN;
 
-const API_TIMEOUT = 10000; // 10 seconds
+const API_TIMEOUT = 3000; // 3 seconds
 
 interface FetchOptions {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
@@ -38,7 +38,7 @@ export async function fetchFromStrapi<T>(
 
     const url = `${STRAPI_API_URL}/${endpoint}${queryString ? `?${queryString}` : ''}`;
 
-    console.log(`[Strapi Client] Fetching from: ${url}`);
+    // console.log(`[Strapi Client] Fetching from: ${url}`);
 
     // Prepare headers with authentication if token is available
     const headers: Record<string, string> = {
@@ -47,6 +47,12 @@ export async function fetchFromStrapi<T>(
 
     if (STRAPI_API_TOKEN) {
       headers['Authorization'] = `Bearer ${STRAPI_API_TOKEN}`;
+    }
+
+    // VIP secret key for bypassing rate limit on Strapi backend and Cloudflare worker
+    const VIP_SECRET_KEY = process.env.VIP_SECRET_KEY;
+    if (VIP_SECRET_KEY) {
+      headers['x-shain-secret'] = VIP_SECRET_KEY;
     }
 
     // Add timeout to fetch to avoid long waits
@@ -58,6 +64,8 @@ export async function fetchFromStrapi<T>(
         method,
         headers,
         signal: controller.signal,
+        // Ensure Next.js caches bypass VIP requests correctly if needed,
+        // though typically Strapi fetch caching is handled elsewhere.
       });
 
       clearTimeout(timeoutId);
@@ -84,7 +92,7 @@ export async function fetchFromStrapi<T>(
       }
 
       const data = await response.json();
-      console.log('[Strapi Client] API Response:', data);
+      // console.log('[Strapi Client] API Response:', data);
       return { data: data as T, error: null };
     } catch (fetchError) {
       if (fetchError instanceof Error && fetchError.name === 'AbortError') {

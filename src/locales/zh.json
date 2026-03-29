@@ -179,6 +179,46 @@
     "retry": "重试",
     "updated": "{date}",
     "github": "GitHub",
+    "loadMore": "加载更多",
+    "labels": {
+      "heroTitle": "编程项目：连接战略与实施",
+      "heroDescription": "作为一名对技术充满热情的数字营销人员和品牌战略家，我掌握了编程技能，以增强我的营销能力并创建交互式工具。虽然我不是一名职业程序员或计算机专业毕业生，但编程已成为我业务和营销专长的宝贵补充，使我能够构建连接战略和实施的定制解决方案。",
+      "featuredTitle": "精选项目",
+      "searchPlaceholder": "搜索项目...",
+      "allCategories": "全部分类",
+      "allTools": "全部工具",
+      "allTags": "全部标签",
+      "allTypes": "全部类型",
+      "refresh": "Refresh项目",
+      "loadMore": "加载更多项目",
+      "viewDetails": "查看详情",
+      "noProjects": "未找到项目",
+      "noProjectsHint": "请尝试调整您的搜索或筛选条件。",
+      "loadingText": "正在加载编程项目...",
+      "errorText": "哎呀！出现了问题",
+      "retryText": "重试",
+      "loading": "加载中..."
+    },
+    "shelf": {
+      "eyebrow": "精选作品",
+      "title": "编程项目",
+      "viewAll": "查看全部",
+      "viewProject": "查看",
+      "featured": "精选",
+      "moreRight": "还有 {n} 个 →",
+      "scrollLeft": "向左滚动以查看较早项目",
+      "explore": "滚动以探索",
+      "githubLabel": "在 GitHub 上查看",
+      "demoLabel": "在线演示",
+      "sectionDivider": "GitHub 上的活动"
+    },
+    "archive": {
+      "title": "完整项目存档",
+      "description": "浏览我所有软件工程项目的完整数据库，可通过技术栈、分类或框架进行筛选。",
+      "showing": "显示",
+      "of": "/",
+      "projects": "个项目"
+    },
     "seo": {
       "title": "编程项目 – GitHub 资料展示器 | 明元易",
       "description": "探索明元易（Shain Wai Yan、xolbine）的编程项目，包括 GitHub 资料展示器及其他个人开发作品。"

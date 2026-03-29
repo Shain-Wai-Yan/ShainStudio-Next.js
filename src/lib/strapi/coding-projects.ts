@@ -1,10 +1,24 @@
 /**
- * Marketing in Motion Strapi Integration
- * Fetches and transforms marketing project data from Strapi CMS
+ * Coding Projects Strapi Integration
+ * Fetches and transforms coding project data from Strapi CMS
  */
 
 import { fetchFromStrapi, extractUrl } from './client';
 import { StrapiFile } from '@/types/strapi';
+
+const CODING_PROJECTS_ENDPOINT = 'coding-projects';
+
+export interface StrapiResponse<T> {
+  data: T;
+  meta?: {
+    pagination?: {
+      page: number;
+      pageSize: number;
+      pageCount: number;
+      total: number;
+    };
+  };
+}
 
 // ─── Raw Strapi Shapes ────────────────────────────────────────────────────────
 
@@ -26,14 +40,13 @@ export interface StrapiSeoBlock {
   structuredData?: unknown;
 }
 
-export interface StrapiMarketingProject {
+export interface StrapiCodingProject {
   id: number;
-  // Strapi v5 flat structure
   Title?: string;
   title?: string;
   slug: string;
   summary?: string;
-  fullText?: unknown;
+  content?: string; // CK Editor HTML is named 'content' in Strapi
   coverImage?: StrapiFile;
   imageGallery?: StrapiFile[];
   category?: string | { name?: string; data?: { attributes?: { name: string } } };
@@ -47,10 +60,12 @@ export interface StrapiMarketingProject {
   createdAt?: string;
   updatedAt?: string;
   seo?: StrapiSeoBlock | StrapiSeoBlock[];
+  githubUrl?: string;
+  liveDemoUrl?: string;
 }
 
-export interface StrapiMarketingProjectsResponse {
-  data: StrapiMarketingProject[];
+export interface StrapiCodingProjectsResponse {
+  data: StrapiCodingProject[];
   meta: {
     pagination: {
       page: number;
@@ -63,12 +78,12 @@ export interface StrapiMarketingProjectsResponse {
 
 // ─── Transformed Shape ────────────────────────────────────────────────────────
 
-export interface MarketingProject {
+export interface CodingProject {
   id: number;
   title: string;
   slug: string;
   summary: string;
-  fullText: string;
+  content: string;
   coverImage: string;
   imageGallery: string[];
   category: string;
@@ -79,6 +94,8 @@ export interface MarketingProject {
   projectDate: string;
   updatedAt?: string;
   readingTime: string;
+  githubUrl?: string;
+  liveDemoUrl?: string;
   seo: {
     metaTitle: string;
     metaDescription: string;
@@ -94,107 +111,35 @@ export interface FilterOptions {
   types: string[];
 }
 
-// ─── Rich-text ────────────────────────────────────────────────────────────────
-
-function convertInlineElement(el: Record<string, unknown>): string {
-  if (typeof el.text === 'string') {
-    let t = el.text
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
-    if (el.bold) t = `<strong>${t}</strong>`;
-    if (el.italic) t = `<em>${t}</em>`;
-    if (el.underline) t = `<u>${t}</u>`;
-    if (el.strikethrough) t = `<s>${t}</s>`;
-    if (el.code) t = `<code>${t}</code>`;
-    return t;
-  }
-  if (el.type === 'link' && typeof el.url === 'string') {
-    const children = Array.isArray(el.children)
-      ? (el.children as Record<string, unknown>[]).map(convertInlineElement).join('')
-      : '';
-    const target = el.url.toString().startsWith('http')
-      ? ' target="_blank" rel="noopener noreferrer"'
-      : '';
-    return `<a href="${el.url}"${target}>${children}</a>`;
-  }
-  if (Array.isArray(el.children)) {
-    return (el.children as Record<string, unknown>[]).map(convertInlineElement).join('');
-  }
-  return '';
-}
-
-function convertBlockToHtml(block: Record<string, unknown>): string {
-  if (!block?.type) return '';
-  const children = Array.isArray(block.children)
-    ? (block.children as Record<string, unknown>[]).map(convertInlineElement).join('')
-    : '';
-  switch (block.type) {
-    case 'paragraph':
-      return children.trim() ? `<p>${children}</p>` : '';
-    case 'heading': {
-      const level = Math.min(Math.max(Number(block.level) || 2, 1), 6);
-      return children.trim() ? `<h${level}>${children}</h${level}>` : '';
-    }
-    case 'list': {
-      const tag = block.format === 'ordered' ? 'ol' : 'ul';
-      const items = Array.isArray(block.children)
-        ? (block.children as Record<string, unknown>[])
-            .map((item) => {
-              if (item.type === 'list-item' && Array.isArray(item.children)) {
-                const content = (item.children as Record<string, unknown>[])
-                  .map(convertInlineElement)
-                  .join('');
-                return `<li>${content}</li>`;
-              }
-              return '';
-            })
-            .filter(Boolean)
-            .join('')
-        : '';
-      return items ? `<${tag}>${items}</${tag}>` : '';
-    }
-    case 'quote':
-      return children.trim() ? `<blockquote>${children}</blockquote>` : '';
-    case 'code': {
-      const text = Array.isArray(block.children)
-        ? (block.children as Record<string, unknown>[]).map((c) => c.text ?? '').join('')
-        : '';
-      const lang = block.language ? ` class="language-${block.language}"` : '';
-      return text.trim() ? `<pre><code${lang}>${text}</code></pre>` : '';
-    }
-    case 'image': {
-      const imgBlock = block as Record<string, unknown> & { image?: { url?: string; alternativeText?: string; caption?: string }; url?: string; alt?: string; caption?: string };
-      const src = imgBlock.image?.url || (imgBlock.url as string) || '';
-      const alt = imgBlock.image?.alternativeText || (imgBlock.alt as string) || '';
-      const caption = imgBlock.image?.caption || (imgBlock.caption as string) || '';
-      if (!src) return '';
-      const img = `<img src="${src}" alt="${alt}" loading="lazy">`;
-      return caption ? `<figure>${img}<figcaption>${caption}</figcaption></figure>` : img;
-    }
-    default:
-      return children.trim() ? `<p>${children}</p>` : '';
-  }
-}
-
-function convertRichTextToHtml(content: unknown): string {
-  if (!content) return '';
-  if (typeof content === 'string') return content;
-  if (!Array.isArray(content)) return '';
-  return content.map((b) => convertBlockToHtml(b as Record<string, unknown>)).join('');
-}
+// ─── Utils ───────────────────────────────────────────────────────────────────
 
 function calculateReadingTime(html: string): string {
-  const text = html.replace(/<[^>]*>/g, '');
+  if (!html) return '1 min read';
+  // Robust HTML stripping for server-side (DOMParser not available)
+  const text = html.replace(/<[^>]*>?/gm, '');
   const words = text.trim().split(/\s+/).length;
   const minutes = Math.ceil(words / 200);
   return `${minutes} min read`;
 }
 
+export function formatProjectDate(dateString: string, locale = 'en-US'): string {
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) throw new Error('Invalid date');
+    return date.toLocaleDateString(locale, {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  } catch (err) {
+    console.error(`[CodingProjects] Failed to format date "${dateString}":`, err);
+    return 'Date unavailable';
+  }
+}
+
 // ─── Transform ────────────────────────────────────────────────────────────────
 
-export function transformMarketingProject(raw: StrapiMarketingProject): MarketingProject | null {
+export function transformCodingProject(raw: StrapiCodingProject): CodingProject | null {
   if (!raw) return null;
 
   try {
@@ -202,12 +147,12 @@ export function transformMarketingProject(raw: StrapiMarketingProject): Marketin
     const slug = raw.slug || `project-${raw.id}`;
     const summary = raw.summary || '';
     const projectDate = raw.projectDate || raw.publishedAt || raw.createdAt || '';
-    const fullText = convertRichTextToHtml(raw.fullText);
+    const content = typeof raw.content === 'string' ? raw.content : '';
 
     // Cover image
     const coverImage =
       extractUrl(raw.coverImage) ||
-      '/placeholder.svg?height=400&width=600&text=Marketing+Project';
+      '/placeholder.svg?height=400&width=600&text=Coding+Project';
 
     // Gallery
     const imageGallery: string[] = [];
@@ -270,7 +215,7 @@ export function transformMarketingProject(raw: StrapiMarketingProject): Marketin
       title,
       slug,
       summary,
-      fullText,
+      content,
       coverImage,
       imageGallery,
       category,
@@ -280,24 +225,26 @@ export function transformMarketingProject(raw: StrapiMarketingProject): Marketin
       isFeatured: raw.isFeatured || false,
       projectDate,
       updatedAt: raw.updatedAt,
-      readingTime: calculateReadingTime(fullText),
+      readingTime: calculateReadingTime(content),
+      githubUrl: raw.githubUrl,
+      liveDemoUrl: raw.liveDemoUrl,
       seo,
     };
   } catch (err) {
-    console.error('[MarketingInMotion] transform error', err, raw);
+    console.error('[CodingProjects] transform error', err, raw);
     return null;
   }
 }
 
 // ─── API Calls ────────────────────────────────────────────────────────────────
 
-export async function fetchMarketingProjects(
+export async function fetchCodingProjects(
   page = 1,
-  pageSize = 36,
-): Promise<{ projects: MarketingProject[]; total: number; error: string | null }> {
+  pageSize = 100,
+): Promise<{ projects: CodingProject[]; total: number; error: string | null }> {
   try {
-    const response = await fetchFromStrapi<StrapiMarketingProjectsResponse>(
-      'marketing-projects',
+    const response = await fetchFromStrapi<StrapiResponse<StrapiCodingProject[]>>(
+      CODING_PROJECTS_ENDPOINT,
       {
         queryParams: {
           'pagination[page]': page,
@@ -312,12 +259,22 @@ export async function fetchMarketingProjects(
       return { projects: [], total: 0, error: response.error };
     }
 
-    const raw = response.data?.data ?? [];
-    const projects = raw
-      .map(transformMarketingProject)
-      .filter((p): p is MarketingProject => p !== null);
+    const responseData = response.data;
+    if (!responseData) return { projects: [], total: 0, error: 'No data received from Strapi' };
+    
+    const raw = responseData.data ?? [];
+    const meta = responseData.meta;
+    const total = meta?.pagination?.total ?? raw.length;
 
-    const total = response.data?.meta?.pagination?.total ?? projects.length;
+    // Pagination limit warning
+    if (meta?.pagination && meta.pagination.total > pageSize) {
+      console.warn(
+        `[CodingProjects] Only fetched ${pageSize} of ${meta.pagination.total} projects. Increase pageSize if needed.`
+      );
+    }
+    const projects = raw
+      .map(transformCodingProject)
+      .filter((p): p is CodingProject => !!p);
 
     return { projects, total, error: null };
   } catch (err) {
@@ -326,12 +283,12 @@ export async function fetchMarketingProjects(
   }
 }
 
-export async function fetchMarketingProjectBySlug(
+export async function fetchCodingProjectBySlug(
   slug: string,
-): Promise<{ project: MarketingProject | null; error: string | null }> {
+): Promise<{ project: CodingProject | null; error: string | null }> {
   try {
-    const response = await fetchFromStrapi<StrapiMarketingProjectsResponse>(
-      'marketing-projects',
+    const response = await fetchFromStrapi<StrapiCodingProjectsResponse>(
+      'coding-projects',
       {
         queryParams: {
           'filters[slug][$eq]': slug,
@@ -344,10 +301,18 @@ export async function fetchMarketingProjectBySlug(
       return { project: null, error: response.error };
     }
 
-    const raw = response.data?.data?.[0];
-    if (!raw) return { project: null, error: 'Project not found' };
+    const responseData = response.data;
+    if (!responseData) return { project: null, error: 'No data received from Strapi' };
+    
+    const raw = responseData.data;
+    if (!raw || raw.length === 0) return { project: null, error: 'Project not found' };
 
-    const project = transformMarketingProject(raw);
+    // Slug uniqueness guard
+    if (raw.length > 1) {
+      console.warn(`[CodingProjects] Multiple projects found for slug "${slug}". Using the first one.`);
+    }
+
+    const project = transformCodingProject(raw[0]);
     return { project, error: null };
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'Unknown error';
@@ -355,19 +320,19 @@ export async function fetchMarketingProjectBySlug(
   }
 }
 
-export async function fetchRelatedMarketingProjects(
+export async function fetchRelatedCodingProjects(
   category: string,
   currentSlug: string,
   limit = 3,
   timeout?: number
-): Promise<{ projects: MarketingProject[]; error: string | null }> {
+): Promise<{ projects: CodingProject[]; error: string | null }> {
   if (!category || category === 'Uncategorized') {
     return { projects: [], error: null };
   }
 
   try {
-    const response = await fetchFromStrapi<StrapiMarketingProjectsResponse>(
-      'marketing-projects',
+    const response = await fetchFromStrapi<StrapiCodingProjectsResponse>(
+      'coding-projects',
       {
         queryParams: {
           'filters[category][name][$eq]': category,
@@ -386,8 +351,8 @@ export async function fetchRelatedMarketingProjects(
 
     const raw = response.data?.data ?? [];
     const projects = raw
-      .map(transformMarketingProject)
-      .filter((p): p is MarketingProject => p !== null);
+      .map(transformCodingProject)
+      .filter((p): p is CodingProject => !!p);
 
     return { projects, error: null };
   } catch (err) {
@@ -398,7 +363,7 @@ export async function fetchRelatedMarketingProjects(
 
 // ─── Filter Helpers ───────────────────────────────────────────────────────────
 
-export function extractFilterOptions(projects: MarketingProject[]): FilterOptions {
+export function extractFilterOptions(projects: CodingProject[]): FilterOptions {
   const categories = new Set<string>();
   const tools = new Set<string>();
   const tags = new Set<string>();
@@ -419,24 +384,11 @@ export function extractFilterOptions(projects: MarketingProject[]): FilterOption
   };
 }
 
-export function formatProjectDate(dateString: string, locale = 'en-US'): string {
-  try {
-    const date = new Date(dateString);
-    return date.toLocaleDateString(locale, {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-  } catch {
-    return 'Date unavailable';
-  }
-}
-
 export function filterProjects(
-  projects: MarketingProject[],
+  projects: CodingProject[],
   search: string,
   filters: { category: string; tools: string; tag: string; type: string },
-): MarketingProject[] {
+): CodingProject[] {
   let result = [...projects];
 
   if (search) {

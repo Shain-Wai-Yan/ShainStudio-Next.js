@@ -179,6 +179,46 @@
     "retry": "Retry",
     "updated": "Updated {date}",
     "github": "GitHub",
+    "loadMore": "Load More",
+    "labels": {
+      "heroTitle": "Coding Projects: Bridging Strategy & Implementation",
+      "heroDescription": "As a digital marketer and brand strategist with a passion for technology, I've developed coding skills to enhance my marketing capabilities and create interactive tools. While I'm not a professional programmer or CS major graduate by trade, coding has become an invaluable complement to my business and marketing expertise, allowing me to build custom solutions that bridge strategy and implementation.",
+      "featuredTitle": "Featured Projects",
+      "searchPlaceholder": "Search projects...",
+      "allCategories": "All Categories",
+      "allTools": "All Tools",
+      "allTags": "All Tags",
+      "allTypes": "All Types",
+      "refresh": "Refresh projects",
+      "loadMore": "Load More Projects",
+      "viewDetails": "View Details",
+      "noProjects": "No projects found",
+      "noProjectsHint": "Try adjusting your search or filter criteria.",
+      "loadingText": "Loading coding projects...",
+      "errorText": "Oops! Something went wrong",
+      "retryText": "Try Again",
+      "loading": "Loading..."
+    },
+    "shelf": {
+      "eyebrow": "Selected work",
+      "title": "Coding projects",
+      "viewAll": "View all",
+      "viewProject": "View",
+      "featured": "Featured",
+      "moreRight": "{n} more →",
+      "scrollLeft": "scroll left to see earlier",
+      "explore": "scroll to explore",
+      "githubLabel": "View GitHub",
+      "demoLabel": "Live demo",
+      "sectionDivider": "GitHub activity"
+    },
+    "archive": {
+      "title": "Complete Project Archive",
+      "description": "Browse the complete database of my software engineering projects, filtered by tech stack, category, and framework.",
+      "showing": "Showing",
+      "of": "of",
+      "projects": "projects"
+    },
     "seo": {
       "title": "Coding Projects - GitHub Profile Viewer | Shain Wai Yan",
       "description": "Explore coding projects by Shain Wai Yan (xolbine) including a GitHub profile viewer and other hobby programming projects."

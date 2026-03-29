@@ -33,33 +33,41 @@ export interface MarketingPlansResponse {
 /**
  * Fetches marketing plans from Strapi
  */
-export async function fetchMarketingPlans(): Promise<{
+export async function fetchMarketingPlans(
+  page = 1,
+  pageSize = 36
+): Promise<{
   plans: MarketingPlan[];
+  total: number;
   error: string | null;
 }> {
   try {
     const response = await fetchFromStrapi<MarketingPlansResponse>('marketing-plans', {
       queryParams: {
+        'pagination[page]': page,
+        'pagination[pageSize]': pageSize,
         'populate': '*',
         'sort': 'createdAt:desc',
       },
     });
 
     if (response.error) {
-      return { plans: [], error: response.error };
+      return { plans: [], total: 0, error: response.error };
     }
 
     const plans = response.data?.data || [];
-    console.log('[Marketing Plans] Fetched:', plans.length, 'plans');
+    const total = response.data?.meta?.pagination?.total ?? plans.length;
+    console.log('[Marketing Plans] Fetched:', plans.length, 'plans, total:', total);
 
     return {
       plans,
+      total,
       error: null,
     };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     console.error('[Marketing Plans] Error fetching:', errorMessage);
-    return { plans: [], error: errorMessage };
+    return { plans: [], total: 0, error: errorMessage };
   }
 }
 

@@ -17,6 +17,7 @@ interface RepositoriesListProps {
   onViewFiles: (repoName: string) => void;
 }
 
+import { useState } from 'react';
 import { useParams } from 'next/navigation';
 import { getDictionarySync } from '@/lib/getDictionary';
 
@@ -24,12 +25,15 @@ export function RepositoriesList({ repositories, isLoading, onViewFiles }: Repos
   const params = useParams();
   const locale = (params?.locale as string) || 'en';
   const t = getDictionarySync(locale).codingProjects;
+  
+  const [displayCount, setDisplayCount] = useState(9);
+
   if (isLoading) {
     return (
       <section className="mb-12">
         <h2 className="text-xl font-bold mb-5 text-[#191970] dark:text-[#d4af37]">{t.repositories}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {[1,2,3,4,5,6].map(i => (
+          {[1,2,3,4,5,6,7,8,9].map(i => (
             <div key={i} className="bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-gray-700 rounded-xl p-5 animate-pulse space-y-3">
               <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-2/3" />
               <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-full" />
@@ -44,11 +48,14 @@ export function RepositoriesList({ repositories, isLoading, onViewFiles }: Repos
 
   if (!repositories || repositories.length === 0) return null;
 
+  const visibleRepos = repositories.slice(0, displayCount);
+  const hasMore = displayCount < repositories.length;
+
   return (
     <section className="mb-12">
       <h2 className="text-xl font-bold mb-5 text-[#191970] dark:text-[#d4af37]">Public Repositories</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {repositories.map((repo, index) => {
+        {visibleRepos.map((repo, index) => {
           const uniqueKey  = `${repo.url ?? repo.name}-${index}`;
           const updatedDate = repo.updatedAt
             ? new Date(repo.updatedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
@@ -120,6 +127,27 @@ export function RepositoriesList({ repositories, isLoading, onViewFiles }: Repos
           );
         })}
       </div>
+
+      {hasMore && (
+        <div className="flex justify-center mt-12">
+          <button
+            onClick={() => setDisplayCount(prev => prev + 9)}
+            className="
+              px-8 py-3 rounded-full font-bold text-sm tracking-wide
+              bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-gray-700
+              text-[#191970] dark:text-[#d4af37]
+              hover:bg-gray-50 dark:hover:bg-gray-800
+              transition-all duration-300 shadow-sm hover:shadow-md
+              flex items-center gap-2
+            "
+          >
+            {t.loadMore || 'Load More'}
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <path d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+        </div>
+      )}
     </section>
   );
 }

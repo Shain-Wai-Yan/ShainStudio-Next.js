@@ -141,8 +141,13 @@ export async function GET(request: NextRequest) {
     const url = `${STRAPI_API_URL}/blogs?pagination[page]=${page}&pagination[pageSize]=${pageSize}&populate=*&sort=publishDate:desc`;
     console.log('[blogs] Fetching:', url);
 
+    const headers: Record<string, string> = { Accept: 'application/json', 'Content-Type': 'application/json' };
+    if (process.env.VIP_SECRET_KEY) {
+      headers['x-shain-secret'] = process.env.VIP_SECRET_KEY;
+    }
+
     const res = await fetch(url, {
-      headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+      headers,
       next: { revalidate: 300 },
     });
 

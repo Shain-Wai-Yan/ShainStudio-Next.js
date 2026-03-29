@@ -33,33 +33,41 @@ export interface BusinessPlansResponse {
 /**
  * Fetches business plans from Strapi
  */
-export async function fetchBusinessPlans(): Promise<{
+export async function fetchBusinessPlans(
+  page = 1,
+  pageSize = 36
+): Promise<{
   plans: BusinessPlan[];
+  total: number;
   error: string | null;
 }> {
   try {
     const response = await fetchFromStrapi<BusinessPlansResponse>('business-plans', {
       queryParams: {
+        'pagination[page]': page,
+        'pagination[pageSize]': pageSize,
         'populate': '*',
         'sort': 'createdAt:desc',
       },
     });
 
     if (response.error) {
-      return { plans: [], error: response.error };
+      return { plans: [], total: 0, error: response.error };
     }
 
     const plans = response.data?.data || [];
-    console.log('[Business Plans] Fetched:', plans.length, 'plans');
+    const total = response.data?.meta?.pagination?.total ?? plans.length;
+    console.log('[Business Plans] Fetched:', plans.length, 'plans, total:', total);
 
     return {
       plans,
+      total,
       error: null,
     };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     console.error('[Business Plans] Error fetching:', errorMessage);
-    return { plans: [], error: errorMessage };
+    return { plans: [], total: 0, error: errorMessage };
   }
 }
 

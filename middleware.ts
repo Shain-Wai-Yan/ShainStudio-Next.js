@@ -116,6 +116,13 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(url, { status: 301 });
   }
 
+  if (pathname.startsWith('/coding-projects/')) {
+    const slug = pathname.replace('/coding-projects/', '');
+    const url = request.nextUrl.clone();
+    url.pathname = `/portfolio/coding-projects/${slug}`;
+    return NextResponse.redirect(url, { status: 301 });
+  }
+
   if (pathname === '/photography') {
     const url = request.nextUrl.clone();
     url.pathname = '/portfolio/photography';
@@ -160,6 +167,13 @@ export function middleware(request: NextRequest) {
   if (pathname === '/zh/coding-projects') {
     const url = request.nextUrl.clone();
     url.pathname = '/zh/portfolio/coding-projects';
+    return NextResponse.redirect(url, { status: 301 });
+  }
+
+  if (pathname.startsWith('/zh/coding-projects/')) {
+    const slug = pathname.replace('/zh/coding-projects/', '');
+    const url = request.nextUrl.clone();
+    url.pathname = `/zh/portfolio/coding-projects/${slug}`;
     return NextResponse.redirect(url, { status: 301 });
   }
 

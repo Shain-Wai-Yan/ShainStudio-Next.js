@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
+import { fetchFromStrapi } from '@/lib/strapi/client';
 
 const SITE_URL = 'https://www.shainwaiyan.com';
-const STRAPI_API = 'https://api.shainwaiyan.com/api';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -15,6 +15,21 @@ interface MarketingProject {
   slug: string;
   updatedAt?: string;
   projectDate?: string;
+}
+
+interface CodingProjectSlug {
+  slug: string;
+  updatedAt?: string;
+  projectDate?: string;
+}
+
+interface StrapiSitemapResponse<T> {
+  data: T[];
+  meta: {
+    pagination: {
+      total: number;
+    };
+  };
 }
 
 // ─── Static Routes Configuration ──────────────────────────────────────────────
@@ -58,18 +73,22 @@ const staticRoutes = {
 
 async function fetchAllBlogSlugs(): Promise<BlogPost[]> {
   try {
-    const res = await fetch(
-      `${STRAPI_API}/blogs?pagination[pageSize]=100&fields[0]=slug&fields[1]=updatedAt&fields[2]=publishDate&sort=publishDate:desc`,
-      { next: { revalidate: 3600 } }
-    );
+    const res = await fetchFromStrapi<StrapiSitemapResponse<BlogPost>>('blogs', {
+      queryParams: {
+        'pagination[pageSize]': 100,
+        'fields[0]': 'slug',
+        'fields[1]': 'updatedAt',
+        'fields[2]': 'publishDate',
+        'sort': 'publishDate:desc',
+      },
+    });
 
-    if (!res.ok) {
-      console.error('[Sitemap] Strapi blogs error:', res.status, res.statusText);
+    if (res.error) {
+      console.error('[Sitemap] Strapi blogs error:', res.error);
       return [];
     }
 
-    const data = await res.json();
-    const posts = data.data ?? [];
+    const posts = res.data?.data ?? [];
     console.log(`[Sitemap] Fetched ${posts.length} blog posts from Strapi`);
     return posts;
   } catch (error) {
@@ -80,22 +99,52 @@ async function fetchAllBlogSlugs(): Promise<BlogPost[]> {
 
 async function fetchAllMarketingProjectSlugs(): Promise<MarketingProject[]> {
   try {
-    const res = await fetch(
-      `${STRAPI_API}/marketing-projects?pagination[pageSize]=100&fields[0]=slug&fields[1]=updatedAt&fields[2]=projectDate&sort=projectDate:desc`,
-      { next: { revalidate: 3600 } }
-    );
+    const res = await fetchFromStrapi<StrapiSitemapResponse<MarketingProject>>('marketing-projects', {
+      queryParams: {
+        'pagination[pageSize]': 100,
+        'fields[0]': 'slug',
+        'fields[1]': 'updatedAt',
+        'fields[2]': 'projectDate',
+        'sort': 'projectDate:desc',
+      },
+    });
 
-    if (!res.ok) {
-      console.error('[Sitemap] Strapi marketing-projects error:', res.status, res.statusText);
+    if (res.error) {
+      console.error('[Sitemap] Strapi marketing-projects error:', res.error);
       return [];
     }
 
-    const data = await res.json();
-    const projects = data.data ?? [];
+    const projects = res.data?.data ?? [];
     console.log(`[Sitemap] Fetched ${projects.length} marketing projects from Strapi`);
     return projects;
   } catch (error) {
     console.error('[Sitemap] Failed to fetch marketing project slugs:', error);
+    return [];
+  }
+}
+
+async function fetchAllCodingProjectSlugs(): Promise<CodingProjectSlug[]> {
+  try {
+    const res = await fetchFromStrapi<StrapiSitemapResponse<CodingProjectSlug>>('coding-projects', {
+      queryParams: {
+        'pagination[pageSize]': 100,
+        'fields[0]': 'slug',
+        'fields[1]': 'updatedAt',
+        'fields[2]': 'projectDate',
+        'sort': 'projectDate:desc',
+      },
+    });
+
+    if (res.error) {
+      console.error('[Sitemap] Strapi coding-projects error:', res.error);
+      return [];
+    }
+
+    const projects = res.data?.data ?? [];
+    console.log(`[Sitemap] Fetched ${projects.length} coding projects from Strapi`);
+    return projects;
+  } catch (error) {
+    console.error('[Sitemap] Failed to fetch coding project slugs:', error);
     return [];
   }
 }
@@ -166,13 +215,36 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   }));
 
+  // ── English coding projects ONLY ─────────────────────────────────────────
+  // Same logic as above: EN URL with ZH alternate
+  const codingProjects = await fetchAllCodingProjectSlugs();
+
+  const codingPages: MetadataRoute.Sitemap = codingProjects.map((project) => ({
+    url: `${SITE_URL}/portfolio/coding-projects/${project.slug}`,
+    lastModified: project.updatedAt || project.projectDate || now,
+    changeFrequency: 'monthly' as const,
+    priority: 0.7,
+    alternates: {
+      languages: {
+        en: `${SITE_URL}/portfolio/coding-projects/${project.slug}`,
+        zh: `${SITE_URL}/zh/portfolio/coding-projects/${project.slug}`,
+      },
+    },
+  }));
+
   // ── Combine all pages ─────────────────────────────────────────────────────
-  const allPages = [...staticPages, ...blogPages, ...marketingPages];
+  const allPages = [
+    ...staticPages,
+    ...blogPages,
+    ...marketingPages,
+    ...codingPages,
+  ];
 
   console.log(`[Sitemap] Generated sitemap with ${allPages.length} URLs:`);
   console.log(`  - Static pages: ${staticPages.length}`);
   console.log(`  - Blog posts (EN only): ${blogPages.length}`);
   console.log(`  - Marketing projects (EN only): ${marketingPages.length}`);
+  console.log(`  - Coding projects (EN only): ${codingPages.length}`);
 
   return allPages;
 }
