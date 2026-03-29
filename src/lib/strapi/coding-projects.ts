@@ -324,18 +324,24 @@ export async function fetchRelatedCodingProjects(
   category: string,
   currentSlug: string,
   limit = 3,
+  timeout?: number
 ): Promise<{ projects: CodingProject[]; error: string | null }> {
+  if (!category || category === 'Uncategorized') {
+    return { projects: [], error: null };
+  }
+
   try {
     const response = await fetchFromStrapi<StrapiCodingProjectsResponse>(
       'coding-projects',
       {
         queryParams: {
-          'filters[category][$eq]': category,
+          'filters[category][name][$eq]': category,
           'filters[slug][$ne]': currentSlug,
           'pagination[pageSize]': limit,
           populate: '*',
           'sort': 'projectDate:desc',
         },
+        timeout,
       },
     );
 

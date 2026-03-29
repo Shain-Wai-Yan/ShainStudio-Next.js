@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import {
   fetchCodingProjectBySlug,
+  fetchCodingProjects,
   fetchRelatedCodingProjects,
   type CodingProject,
 } from '@/lib/strapi/coding-projects';
@@ -15,6 +16,19 @@ import { getDictionary } from '@/lib/getDictionary';
 import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
 
 export const revalidate = 3600; // Revalidate every hour
+export const dynamicParams = true; // Allow new projects to be fetched at runtime
+
+export async function generateStaticParams() {
+  const { projects } = await fetchCodingProjects(1, 100);
+  const locales = ['en', 'zh'];
+
+  return locales.flatMap((locale) =>
+    projects.map((project) => ({
+      locale,
+      slug: project.slug,
+    }))
+  );
+}
 
 interface CodingProjectPageProps {
   params: Promise<{ locale: string; slug: string }>;
@@ -74,8 +88,10 @@ export async function generateMetadata(
 export default async function CodingProjectDetailPage({ params }: CodingProjectPageProps) {
   const { locale: rawLocale, slug } = await params;
   const locale = isSupportedLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
-  const { project, error } = await fetchCodingProjectBySlug(slug);
-  const t = await getDictionary(locale);
+  const [ { project, error }, t ] = await Promise.all([
+    fetchCodingProjectBySlug(slug),
+    getDictionary(locale)
+  ]);
 
   if (error || !project) {
     notFound();
@@ -83,9 +99,17 @@ export default async function CodingProjectDetailPage({ params }: CodingProjectP
 
   let relatedProjects: CodingProject[] = [];
   try {
-    const { projects } = await fetchRelatedCodingProjects(project.category, project.slug, 3);
-    relatedProjects = projects;
-  } catch {
+    const { projects, error: relatedError } = await fetchRelatedCodingProjects(
+      project.category,
+      project.slug,
+      3,
+      1500 // 1.5s timeout for related content
+    );
+    if (!relatedError) {
+      relatedProjects = projects;
+    }
+  } catch (err) {
+    console.warn(`[CodingProjectDetailPage] Failed to fetch related projects for "${slug}":`, err);
     // silently degrade
   }
 

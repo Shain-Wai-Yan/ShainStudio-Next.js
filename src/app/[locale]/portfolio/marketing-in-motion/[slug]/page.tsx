@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import {
   fetchMarketingProjectBySlug,
   fetchMarketingProjects,
+  fetchRelatedMarketingProjects,
   type MarketingProject,
 } from '@/lib/strapi/marketing-in-motion';
 import ProjectHeader from '@/components/marketing-in-motion/ProjectHeader';
@@ -12,6 +13,21 @@ import ProjectGallery from '@/components/marketing-in-motion/ProjectGallery';
 import RelatedProjects from '@/components/marketing-in-motion/RelatedProjects';
 import { getDictionary } from '@/lib/getDictionary';
 import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
+
+export const revalidate = 3600; // Revalidate every hour
+export const dynamicParams = true; // Allow new projects to be fetched at runtime
+
+export async function generateStaticParams() {
+  const { projects } = await fetchMarketingProjects(1, 100);
+  const locales = ['en', 'zh'];
+
+  return locales.flatMap((locale) =>
+    projects.map((project) => ({
+      locale,
+      slug: project.slug,
+    }))
+  );
+}
 
 interface MarketingProjectPageProps {
   params: Promise<{ locale: string; slug: string }>;
@@ -73,8 +89,10 @@ export default async function MarketingProjectPage(
 ) {
   const { locale: rawLocale, slug } = await props.params;
   const locale = isSupportedLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
-  const { project, error } = await fetchMarketingProjectBySlug(slug);
-  const t = await getDictionary(locale); // ✅ CHANGE: async
+  const [ { project, error }, t ] = await Promise.all([
+    fetchMarketingProjectBySlug(slug),
+    getDictionary(locale)
+  ]);
 
   if (error || !project) {
     notFound();
@@ -82,11 +100,17 @@ export default async function MarketingProjectPage(
 
   let relatedProjects: MarketingProject[] = [];
   try {
-    const { projects: allProjects } = await fetchMarketingProjects(1, 100);
-    relatedProjects = allProjects
-      .filter((p) => p.category === project.category && p.slug !== project.slug)
-      .slice(0, 3);
-  } catch {
+    const { projects, error: relatedError } = await fetchRelatedMarketingProjects(
+      project.category,
+      project.slug,
+      3,
+      1500 // 1.5s timeout for related content
+    );
+    if (!relatedError) {
+      relatedProjects = projects;
+    }
+  } catch (err) {
+    console.warn(`[MarketingProjectPage] Failed to fetch related projects for "${slug}":`, err);
     // silently degrade
   }
 

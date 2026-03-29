@@ -8,7 +8,7 @@ const STRAPI_API_URL = (process.env.NEXT_PUBLIC_STRAPI_API_URL || 'https://api.s
 
 const STRAPI_API_TOKEN = process.env.STRAPI_API_TOKEN;
 
-const API_TIMEOUT = 10000; // 10 seconds
+const API_TIMEOUT = 3000; // 3 seconds
 
 interface FetchOptions {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
