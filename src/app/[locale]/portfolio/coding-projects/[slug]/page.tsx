@@ -54,8 +54,9 @@ export async function generateMetadata(
   ].filter(Boolean).join(', ');
 
   return {
-    title: project.seo?.metaTitle || `${project.title} | Shain Studio`,
+    title: project.seo?.metaTitle || `${project.title} | Software Architecture | Shain Studio`,
     description: project.seo?.metaDescription || project.summary,
+
     keywords: safeKeywords,
     alternates: {
       canonical: `https://shainwaiyan.com${basePath}/portfolio/coding-projects/${project.slug}`,

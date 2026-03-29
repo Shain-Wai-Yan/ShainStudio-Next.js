@@ -201,7 +201,7 @@
     },
     "shelf": {
       "eyebrow": "Selected work",
-      "title": "Coding projects",
+      "title": "Engineering Highlights",
       "viewAll": "View all",
       "viewProject": "View",
       "featured": "Featured",
@@ -220,8 +220,8 @@
       "projects": "projects"
     },
     "seo": {
-      "title": "Coding Projects - GitHub Profile Viewer | Shain Wai Yan",
-      "description": "Explore coding projects by Shain Wai Yan (xolbine) including a GitHub profile viewer and other hobby programming projects."
+      "title": "Coding Projects & Software Architecture | Shain Studio",
+      "description": "Explore full-stack development, AI microservices, and serverless architectures engineered by Shain Wai Yan (xolbine)."
     }
   },
   "businessPlans": {

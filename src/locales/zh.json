@@ -201,7 +201,7 @@
     },
     "shelf": {
       "eyebrow": "精选作品",
-      "title": "编程项目",
+      "title": "核心工程案例",
       "viewAll": "查看全部",
       "viewProject": "查看",
       "featured": "精选",
@@ -220,8 +220,8 @@
       "projects": "个项目"
     },
     "seo": {
-      "title": "编程项目 – GitHub 资料展示器 | 明元易",
-      "description": "探索明元易（Shain Wai Yan、xolbine）的编程项目，包括 GitHub 资料展示器及其他个人开发作品。"
+      "title": "编程项目与软件架构 | Shain Studio",
+      "description": "探索明元易（Shain Wai Yan）的全栈开发、AI微服务与无服务器架构工程案例。"
     }
   },
   "businessPlans": {
