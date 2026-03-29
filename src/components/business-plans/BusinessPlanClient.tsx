@@ -85,7 +85,7 @@ export default function BusinessPlanClient({ locale, t }: Props) {
   return (
     <>
       <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-[#121212] dark:to-[#1e1e1e]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-8 md:py-12">
           {/* Breadcrumb Navigation */}
           <Breadcrumb items={breadcrumbItems} />
 
