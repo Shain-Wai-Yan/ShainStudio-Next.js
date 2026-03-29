@@ -126,12 +126,12 @@ export default async function CodingProjectsPage({ params }: Props) {
       />
       
       <main className="min-h-screen pt-24 pb-16 px-4 md:px-8 max-w-7xl mx-auto">
-        <header className="mb-12">
-          <h1 className="text-4xl md:text-5xl font-black mb-6 tracking-tight text-[#191970] dark:text-[#d4af37]">
+        <header className="mb-8 md:mb-12">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black mb-4 md:mb-6 tracking-tight text-[#191970] dark:text-[#d4af37] leading-tight">
             {dict.codingProjects.title}
           </h1>
-          <div className="max-w-3xl">
-            <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+          <div className="w-full">
+            <p className="text-sm sm:text-base md:text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
               {dict.codingProjects.description}
             </p>
           </div>

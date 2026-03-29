@@ -57,11 +57,11 @@ export default async function PhotographyPage(props: PhotographyPageProps) {
         <Breadcrumb items={breadcrumbItems} />
 
         {/* Header */}
-        <div className="mb-10">
-          <h1 className="text-4xl md:text-5xl font-bold text-[#191970] dark:text-white mb-3">
+        <div className="mb-8 md:mb-10">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-[#191970] dark:text-white mb-2 md:mb-3 leading-tight">
             {t.photography.labels.heroTitle}
           </h1>
-          <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base max-w-2xl leading-relaxed">
+          <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400 max-w-2xl leading-relaxed">
             {t.photography.labels.heroDescription}
           </p>
         </div>

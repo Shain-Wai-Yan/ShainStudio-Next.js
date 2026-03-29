@@ -90,11 +90,11 @@ export default function BusinessPlanClient({ locale, t }: Props) {
           <Breadcrumb items={breadcrumbItems} />
 
           {/* Page Header */}
-          <div className="mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-[#d4af37] mb-4">
+          <div className="mb-8 md:mb-12">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-[#d4af37] mb-3 md:mb-4 leading-tight">
               {t.businessPlans.title}
             </h1>
-            <p className="text-xl text-gray-600 dark:text-[#b0b0b0] max-w-2xl">
+            <p className="text-sm sm:text-base md:text-xl text-gray-600 dark:text-[#b0b0b0] max-w-2xl leading-relaxed">
               {t.businessPlans.description}
             </p>
           </div>
