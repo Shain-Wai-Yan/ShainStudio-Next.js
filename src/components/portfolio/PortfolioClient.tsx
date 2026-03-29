@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import Link from 'next/link';
+import { PortfolioCounts } from '@/lib/getPortfolioCounts';
 
 // ─── Particle canvas — gold in both modes, denser on dark ─────────────────────
 
@@ -255,9 +256,10 @@ export interface PortfolioDictionary {
 interface Props {
   locale: 'en' | 'zh';
   t: PortfolioDictionary;
+  dynamicCounts: PortfolioCounts;
 }
 
-export default function PortfolioClient({ locale, t }: Props) {
+export default function PortfolioClient({ locale, t, dynamicCounts }: Props) {
 
   const [dark, setDark] = useState(false);
   useEffect(() => {
@@ -274,6 +276,14 @@ export default function PortfolioClient({ locale, t }: Props) {
   const displayFont = isZh ? "'ZCOOL XiaoWei', sans-serif" : "'Bebas Neue', sans-serif";
   const basePath = locale === 'en' ? '' : `/${locale}`;
 
+  // Helper to replace number in string like "6+ Projects" with actual count
+  const formatStat = (original: string, count: number | undefined | null) => {
+    if (count === undefined || count === null) return original;
+    // Replace the first number found in the string (even if it's 0)
+    return original.replace(/\d+/, count.toString());
+  };
+
+
   // Data
   const ITEMS = [
     {
@@ -284,7 +294,7 @@ export default function PortfolioClient({ locale, t }: Props) {
       subtitle: t.items['business-plans'].subtitle,
       description: t.items['business-plans'].description,
       tags: t.items['business-plans'].tags,
-      stat: t.items['business-plans'].stat,
+      stat: formatStat(t.items['business-plans'].stat, dynamicCounts.businessPlans),
       icon: (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
           <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012-2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
@@ -299,7 +309,7 @@ export default function PortfolioClient({ locale, t }: Props) {
       subtitle: t.items['marketing-plans'].subtitle,
       description: t.items['marketing-plans'].description,
       tags: t.items['marketing-plans'].tags,
-      stat: t.items['marketing-plans'].stat,
+      stat: formatStat(t.items['marketing-plans'].stat, dynamicCounts.marketingPlans),
       icon: (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
           <path d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/>
@@ -315,7 +325,7 @@ export default function PortfolioClient({ locale, t }: Props) {
       subtitle: t.items['marketing-in-motion'].subtitle,
       description: t.items['marketing-in-motion'].description,
       tags: t.items['marketing-in-motion'].tags,
-      stat: t.items['marketing-in-motion'].stat,
+      stat: formatStat(t.items['marketing-in-motion'].stat, dynamicCounts.marketingInMotion),
       icon: (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
           <polygon points="5 3 19 12 5 21 5 3"/>
@@ -330,7 +340,7 @@ export default function PortfolioClient({ locale, t }: Props) {
       subtitle: t.items['coding-projects'].subtitle,
       description: t.items['coding-projects'].description,
       tags: t.items['coding-projects'].tags,
-      stat: t.items['coding-projects'].stat,
+      stat: formatStat(t.items['coding-projects'].stat, dynamicCounts.codingProjects),
       icon: (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
           <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
@@ -345,7 +355,7 @@ export default function PortfolioClient({ locale, t }: Props) {
       subtitle: t.items['photography'].subtitle,
       description: t.items['photography'].description,
       tags: t.items['photography'].tags,
-      stat: t.items['photography'].stat,
+      stat: formatStat(t.items['photography'].stat, dynamicCounts.photography),
       icon: (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
           <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
@@ -361,7 +371,7 @@ export default function PortfolioClient({ locale, t }: Props) {
       subtitle: t.items['amv-editing'].subtitle,
       description: t.items['amv-editing'].description,
       tags: t.items['amv-editing'].tags,
-      stat: t.items['amv-editing'].stat,
+      stat: formatStat(t.items['amv-editing'].stat, dynamicCounts.amvEditing),
       icon: (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
           <rect x="2" y="2" width="20" height="20" rx="2.18"/>
