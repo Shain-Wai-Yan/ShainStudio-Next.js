@@ -49,6 +49,12 @@ export async function fetchFromStrapi<T>(
       headers['Authorization'] = `Bearer ${STRAPI_API_TOKEN}`;
     }
 
+    // VIP secret key for bypassing rate limit on Strapi backend and Cloudflare worker
+    const VIP_SECRET_KEY = process.env.VIP_SECRET_KEY;
+    if (VIP_SECRET_KEY) {
+      headers['x-shain-secret'] = VIP_SECRET_KEY;
+    }
+
     // Add timeout to fetch to avoid long waits
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
@@ -58,6 +64,8 @@ export async function fetchFromStrapi<T>(
         method,
         headers,
         signal: controller.signal,
+        // Ensure Next.js caches bypass VIP requests correctly if needed,
+        // though typically Strapi fetch caching is handled elsewhere.
       });
 
       clearTimeout(timeoutId);
