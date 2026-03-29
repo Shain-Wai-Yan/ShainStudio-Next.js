@@ -8,6 +8,7 @@ import { PhotoLightbox } from './PhotoLightbox';
 interface PhotographyGalleryProps {
   initialPhotos: Photo[];
   language: 'en' | 'zh';
+  initialPageCount?: number;
 }
 
 function shuffleArray<T>(array: T[]): T[] {
@@ -21,7 +22,7 @@ function shuffleArray<T>(array: T[]): T[] {
 
 const PAGE_SIZE = 16; // slightly larger batch for smoother infinite scroll
 
-export function PhotographyGallery({ initialPhotos, language }: PhotographyGalleryProps) {
+export function PhotographyGallery({ initialPhotos, language, initialPageCount = 1 }: PhotographyGalleryProps) {
   // HYDRATION FIX: render unshuffled on server, shuffle client-side only
   const [photos, setPhotos]           = useState<Photo[]>(initialPhotos);
   const [isClient, setIsClient]       = useState(false);
@@ -30,6 +31,9 @@ export function PhotographyGallery({ initialPhotos, language }: PhotographyGalle
   const [displayedCount, setDisplayedCount]     = useState(PAGE_SIZE);
   const [lightboxPhoto, setLightboxPhoto]       = useState<Photo | null>(null);
   const [isLoadingMore, setIsLoadingMore]       = useState(false);
+  const [currentPage, setCurrentPage]           = useState(1);
+  const [hasMorePages, setHasMorePages]         = useState(initialPageCount > 1);
+  const [isFetchingPage, setIsFetchingPage]     = useState(false);
 
   const searchRef   = useRef<HTMLInputElement>(null);
   const sentinelRef = useRef<HTMLDivElement>(null); // bottom sentinel for IntersectionObserver
@@ -43,9 +47,9 @@ export function PhotographyGallery({ initialPhotos, language }: PhotographyGalle
 
   const categories = useMemo(() => {
     const cats = new Set<string>();
-    initialPhotos.forEach((p) => { if (p.category) cats.add(p.category); });
+    photos.forEach((p) => { if (p.category) cats.add(p.category); });
     return Array.from(cats).sort();
-  }, [initialPhotos]);
+  }, [photos]);
 
   const filteredPhotos = useMemo(() => {
     return photos.filter((photo) => {
@@ -70,15 +74,42 @@ export function PhotographyGallery({ initialPhotos, language }: PhotographyGalle
   const hasMore = displayedCount < filteredPhotos.length;
 
   // ── Infinite scroll via IntersectionObserver ──────────────────────────────
-  const loadMore = useCallback(() => {
-    if (!hasMore || isLoadingMore) return;
-    setIsLoadingMore(true);
-    // Small timeout gives the browser a frame to paint existing cards first
-    setTimeout(() => {
-      setDisplayedCount((prev) => Math.min(prev + PAGE_SIZE, filteredPhotos.length));
-      setIsLoadingMore(false);
-    }, 150);
-  }, [hasMore, isLoadingMore, filteredPhotos.length]);
+  const loadMore = useCallback(async () => {
+    if (isLoadingMore || isFetchingPage) return;
+    
+    if (hasMore) {
+      setIsLoadingMore(true);
+      // Small timeout gives the browser a frame to paint existing cards first
+      setTimeout(() => {
+        setDisplayedCount((prev) => Math.min(prev + PAGE_SIZE, filteredPhotos.length));
+        setIsLoadingMore(false);
+      }, 150);
+    } else if (hasMorePages) {
+      setIsFetchingPage(true);
+      const nextPage = currentPage + 1;
+      
+      try {
+        const res = await fetch(`/api/photography?page=${nextPage}&pageSize=100&language=${language}`);
+        const data = await res.json();
+        
+        if (data.photos && Array.isArray(data.photos) && data.photos.length > 0) {
+          const newPhotos = shuffleArray<Photo>(data.photos);
+          setPhotos((prev) => [...prev, ...newPhotos]);
+          setCurrentPage(nextPage);
+          if (nextPage >= data.pageCount) {
+            setHasMorePages(false);
+          }
+          setDisplayedCount((prev) => prev + PAGE_SIZE);
+        } else {
+          setHasMorePages(false);
+        }
+      } catch (error) {
+        console.error("Failed to load more photos", error);
+      } finally {
+        setIsFetchingPage(false);
+      }
+    }
+  }, [hasMore, hasMorePages, isLoadingMore, isFetchingPage, filteredPhotos.length, currentPage, language]);
 
   useEffect(() => {
     const sentinel = sentinelRef.current;
@@ -184,12 +215,12 @@ export function PhotographyGallery({ initialPhotos, language }: PhotographyGalle
           >
             {t.all}
             <span className={`ml-1.5 text-xs px-1.5 py-0.5 rounded-full ${selectedCategory === null ? 'bg-white/20 dark:bg-[#191970]/20' : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'}`}>
-              {initialPhotos.length}
+              {photos.length}
             </span>
           </button>
 
           {categories.map((cat) => {
-            const count = initialPhotos.filter((p) => p.category === cat).length;
+            const count = photos.filter((p) => p.category === cat).length;
             return (
               <button
                 key={cat}
@@ -225,8 +256,8 @@ export function PhotographyGallery({ initialPhotos, language }: PhotographyGalle
         {isClient && (
           <p className="text-xs text-gray-400 dark:text-gray-500">
             {activeFilters
-              ? `${filteredPhotos.length} of ${initialPhotos.length} photos`
-              : `${initialPhotos.length} photos`}
+              ? `${filteredPhotos.length} of ${photos.length} photos`
+              : `${photos.length} photos`}
           </p>
         )}
       </div>
@@ -240,7 +271,7 @@ export function PhotographyGallery({ initialPhotos, language }: PhotographyGalle
           <div ref={sentinelRef} className="w-full h-px" aria-hidden="true" />
 
           {/* Subtle loading indicator while next batch is appended */}
-          {isLoadingMore && (
+          {(isLoadingMore || isFetchingPage) && (
             <div className="flex justify-center py-8">
               <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500 text-sm">
                 <div className="w-4 h-4 rounded-full border-2 border-gray-300 dark:border-gray-600 border-t-[#191970] dark:border-t-[#ffd700] animate-spin" />
@@ -250,7 +281,7 @@ export function PhotographyGallery({ initialPhotos, language }: PhotographyGalle
           )}
 
           {/* End-of-gallery message */}
-          {!hasMore && isClient && filteredPhotos.length > PAGE_SIZE && (
+          {!hasMore && !hasMorePages && isClient && filteredPhotos.length > PAGE_SIZE && (
             <p className="text-center text-xs text-gray-300 dark:text-gray-600 py-6">
               All {filteredPhotos.length} photos loaded
             </p>

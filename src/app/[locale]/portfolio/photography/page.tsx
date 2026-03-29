@@ -43,7 +43,7 @@ export default async function PhotographyPage(props: PhotographyPageProps) {
   const t = await getDictionary(locale); // ✅ Use async
   const basePath = locale === 'en' ? '' : `/${locale}`;
 
-  const { photos, error } = await fetchAllPhotography(locale as 'en' | 'zh', { pageSize: 100 });
+  const { photos, pageCount, error } = await fetchAllPhotography(locale as 'en' | 'zh', { pageSize: 100 });
 
   const breadcrumbItems = [
     { label: t.photography.breadcrumbs.home, href: basePath || '/' },
@@ -73,7 +73,7 @@ export default async function PhotographyPage(props: PhotographyPageProps) {
             </p>
           </div>
         ) : photos.length > 0 ? (
-          <PhotographyGallery initialPhotos={photos} language={locale as 'en' | 'zh'} />
+          <PhotographyGallery initialPhotos={photos} language={locale as 'en' | 'zh'} initialPageCount={pageCount} />
         ) : (
           <div className="flex flex-col items-center justify-center py-24 text-center">
             <p className="text-gray-400 dark:text-gray-500 font-medium">
