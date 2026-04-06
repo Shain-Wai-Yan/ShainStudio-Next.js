@@ -1,3 +1,16 @@
 {
-  "IDX.agenticWorkspace": true
+  "IDX.agenticWorkspace": true,
+
+  // Tailwind CSS — suppress false-positive warnings from VS Code's built-in CSS linter.
+  // @apply, @theme, @layer, @utility, @variant are valid Tailwind v4 directives.
+  "css.lint.unknownAtRules": "ignore",
+  "scss.lint.unknownAtRules": "ignore",
+
+  // Point the Tailwind IntelliSense extension at globals.css for full autocomplete
+  "tailwindCSS.includeLanguages": {
+    "css": "css"
+  },
+  "files.associations": {
+    "*.css": "tailwindcss"
+  }
 }

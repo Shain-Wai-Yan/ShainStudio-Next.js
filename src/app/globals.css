@@ -167,6 +167,12 @@
     list-style: none;
   }
 
+  /* Restore list styling inside blog content */
+  .blog-post-body ul,
+  .blog-post-body ol {
+    list-style: revert;
+  }
+
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-secondary);
     font-weight: 700;
@@ -953,5 +959,464 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* ========================================================================
+   BLOG POST BODY — CKEditor 5 Rich Text Rendering
+   Plain CSS — no @apply, no build dependencies, works everywhere.
+   ======================================================================== */
+
+/* ── Root ── */
+.blog-post-body {
+  font-size: 1.0625rem;
+  line-height: 1.8;
+  color: #1a1a2e;
+  max-width: 100%;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+@media (prefers-color-scheme: dark) {
+  .blog-post-body { color: #e2e8f0; }
+}
+.dark-mode .blog-post-body { color: #e2e8f0; }
+
+/* ── Headings ── */
+.blog-post-body h1,
+.blog-post-body h2,
+.blog-post-body h3,
+.blog-post-body h4,
+.blog-post-body h5,
+.blog-post-body h6 {
+  font-family: var(--font-secondary);
+  font-weight: 700;
+  line-height: 1.25;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  color: #111827;
+}
+@media (prefers-color-scheme: dark) {
+  .blog-post-body h1,
+  .blog-post-body h2,
+  .blog-post-body h3,
+  .blog-post-body h4,
+  .blog-post-body h5,
+  .blog-post-body h6 { color: #f9fafb; }
+}
+.dark-mode .blog-post-body h1,
+.dark-mode .blog-post-body h2,
+.dark-mode .blog-post-body h3,
+.dark-mode .blog-post-body h4,
+.dark-mode .blog-post-body h5,
+.dark-mode .blog-post-body h6 { color: #f9fafb; }
+
+.blog-post-body h1 { font-size: 2.25rem; }
+.blog-post-body h2 { font-size: 1.75rem; }
+.blog-post-body h3 { font-size: 1.375rem; }
+.blog-post-body h4 { font-size: 1.125rem; }
+.blog-post-body h5 { font-size: 1rem; }
+.blog-post-body h6 { font-size: 0.875rem; }
+
+/* ── Paragraphs ── */
+.blog-post-body p {
+  margin-bottom: 1.25rem;
+  line-height: 1.8;
+  color: inherit;
+}
+
+/* ── Links ── */
+.blog-post-body a {
+  color: #1e3a8a;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.2s;
+}
+.blog-post-body a:hover { color: #1d4ed8; }
+@media (prefers-color-scheme: dark) {
+  .blog-post-body a       { color: #fbbf24; }
+  .blog-post-body a:hover { color: #fde68a; }
+}
+.dark-mode .blog-post-body a       { color: #fbbf24; }
+.dark-mode .blog-post-body a:hover { color: #fde68a; }
+
+/* ── Lists ── */
+.blog-post-body ul {
+  list-style: disc;
+  padding-left: 1.75rem;
+  margin-bottom: 1.25rem;
+}
+.blog-post-body ol {
+  list-style: decimal;
+  padding-left: 1.75rem;
+  margin-bottom: 1.25rem;
+}
+.blog-post-body li {
+  margin-bottom: 0.375rem;
+  line-height: 1.75;
+}
+.blog-post-body ul ul,
+.blog-post-body ol ul  { list-style: circle; }
+.blog-post-body ul ul ul,
+.blog-post-body ol ol ul { list-style: square; }
+
+/* ── Blockquote ── */
+.blog-post-body blockquote {
+  margin: 1.5rem 0;
+  padding: 1rem 1.5rem;
+  background: #f3f4f6;
+  border-left: 4px solid #1e3a8a;
+  color: #374151;
+  font-style: italic;
+  border-radius: 0 0.375rem 0.375rem 0;
+}
+@media (prefers-color-scheme: dark) {
+  .blog-post-body blockquote {
+    background: #1f2937;
+    border-left-color: #fbbf24;
+    color: #d1d5db;
+  }
+}
+.dark-mode .blog-post-body blockquote {
+  background: #1f2937;
+  border-left-color: #fbbf24;
+  color: #d1d5db;
+}
+
+/* ── Code ── */
+.blog-post-body code {
+  background: #f1f5f9;
+  color: #1e3a8a;
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  font-size: 0.875em;
+  font-family: 'Courier New', Courier, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  .blog-post-body code { background: #1e293b; color: #fbbf24; }
+}
+.dark-mode .blog-post-body code { background: #1e293b; color: #fbbf24; }
+
+.blog-post-body pre {
+  background: #1e293b;
+  color: #e2e8f0;
+  padding: 1.25rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin: 1.25rem 0;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+.blog-post-body pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+  font-size: inherit;
+}
+
+/* ── Horizontal Rule ── */
+.blog-post-body hr {
+  border: none;
+  border-top: 1px solid #e5e7eb;
+  margin: 2rem 0;
+}
+@media (prefers-color-scheme: dark) {
+  .blog-post-body hr { border-top-color: #374151; }
+}
+.dark-mode .blog-post-body hr { border-top-color: #374151; }
+
+/* ── Mark / Highlight ── */
+.blog-post-body mark {
+  background: #dbeafe;
+  color: #1e3a8a;
+  padding: 0.1em 0.3em;
+  border-radius: 0.25rem;
+}
+@media (prefers-color-scheme: dark) {
+  .blog-post-body mark { background: rgba(251,191,36,0.2); color: #fbbf24; }
+}
+.dark-mode .blog-post-body mark { background: rgba(251,191,36,0.2); color: #fbbf24; }
+
+/* ── Strong / Em / Sub / Sup ── */
+.blog-post-body strong { font-weight: 700; color: #111827; }
+.blog-post-body em     { font-style: italic; }
+@media (prefers-color-scheme: dark) {
+  .blog-post-body strong { color: #f9fafb; }
+}
+.dark-mode .blog-post-body strong { color: #f9fafb; }
+
+.blog-post-body sub { font-size: 0.75em; vertical-align: sub; }
+.blog-post-body sup { font-size: 0.75em; vertical-align: super; }
+
+/* ── Tables ── */
+.blog-post-body table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  font-size: 0.9375rem;
+  display: block;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.blog-post-body th,
+.blog-post-body td {
+  border: 1px solid #d1d5db;
+  padding: 0.625rem 1rem;
+  text-align: left;
+  color: #111827;
+}
+.blog-post-body th {
+  background: #f3f4f6;
+  font-weight: 700;
+  color: #111827;
+}
+.blog-post-body tr:nth-child(even) td { background: #f9fafb; }
+@media (prefers-color-scheme: dark) {
+  .blog-post-body th,
+  .blog-post-body td { border-color: #374151; color: #e5e7eb; }
+  .blog-post-body th { background: #1f2937; color: #f9fafb; }
+  .blog-post-body tr:nth-child(even) td { background: #111827; }
+}
+.dark-mode .blog-post-body th,
+.dark-mode .blog-post-body td { border-color: #374151; color: #e5e7eb; }
+.dark-mode .blog-post-body th  { background: #1f2937; color: #f9fafb; }
+.dark-mode .blog-post-body tr:nth-child(even) td { background: #111827; }
+
+/* ── Images (base) ── */
+.blog-post-body img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  display: block;
+  margin: 1.5rem auto;
+}
+
+/* ── Figures ── */
+.blog-post-body figure {
+  margin: 1.5rem 0;
+  max-width: 100%;
+}
+.blog-post-body figure img {
+  display: block;
+  margin: 0 auto;
+}
+.blog-post-body figcaption {
+  font-size: 0.875rem;
+  color: #6b7280;
+  text-align: center;
+  margin-top: 0.5rem;
+}
+@media (prefers-color-scheme: dark) {
+  .blog-post-body figcaption { color: #9ca3af; }
+}
+.dark-mode .blog-post-body figcaption { color: #9ca3af; }
+
+/* ─────────────────────────────────────────────────────────────
+   CKEditor 5 Image Alignment Classes
+   CKEditor wraps images in <figure class="image image-style-*">
+   ──────────────────────────────────────────────────────────── */
+
+/* Default block — CKEditor centers images by default */
+.blog-post-body figure.image,
+.blog-post-body .image {
+  display: block;
+  clear: both;
+  width: fit-content;
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Side — float right beside text */
+.blog-post-body figure.image-style-side,
+.blog-post-body .image-style-side {
+  float: right;
+  margin: 0.25rem 0 1rem 1.5rem;
+  max-width: 50%;
+  clear: right;
+}
+
+/* Align left */
+.blog-post-body figure.image-style-align-left,
+.blog-post-body .image-style-align-left {
+  float: left;
+  margin: 0.25rem 1.5rem 1rem 0;
+  max-width: 50%;
+  clear: left;
+}
+
+/* Align right */
+.blog-post-body figure.image-style-align-right,
+.blog-post-body .image-style-align-right {
+  float: right;
+  margin: 0.25rem 0 1rem 1.5rem;
+  max-width: 50%;
+  clear: right;
+}
+
+/* Align center */
+.blog-post-body figure.image-style-align-center,
+.blog-post-body .image-style-align-center {
+  float: none;
+  clear: both;
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  margin: 1.5rem auto;
+}
+
+/* Block align left */
+.blog-post-body figure.image-style-block-align-left,
+.blog-post-body .image-style-block-align-left {
+  margin-right: auto;
+  margin-left: 0;
+}
+
+/* Block align right */
+.blog-post-body figure.image-style-block-align-right,
+.blog-post-body .image-style-block-align-right {
+  margin-left: auto;
+  margin-right: 0;
+}
+
+/* Inline float left */
+.blog-post-body figure.image-style-inline-left,
+.blog-post-body .image-style-inline-left {
+  float: left;
+  margin: 0.25rem 1rem 0.5rem 0;
+}
+
+/* Inline float right */
+.blog-post-body figure.image-style-inline-right,
+.blog-post-body .image-style-inline-right {
+  float: right;
+  margin: 0.25rem 0 0.5rem 1rem;
+}
+
+/* Clearfix */
+.blog-post-body::after,
+.blog-post-body p::after,
+.blog-post-body section::after {
+  content: '';
+  display: table;
+  clear: both;
+}
+
+/* Resizable images (CKEditor sets width via style attr) */
+.blog-post-body figure.image > img,
+.blog-post-body figure.image > a > img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+}
+
+/* ── CKEditor Text Size Classes ── */
+.blog-post-body .text-tiny  { font-size: 0.7em; }
+.blog-post-body .text-small { font-size: 0.85em; }
+.blog-post-body .text-big   { font-size: 1.4em; }
+.blog-post-body .text-huge  { font-size: 1.8em; }
+
+/* ── CKEditor ck-content wrapper ── */
+.blog-post-body .ck-content { word-break: break-word; }
+
+/* ── Todo list (checklist) ── */
+.blog-post-body .todo-list {
+  list-style: none;
+  padding-left: 0;
+}
+.blog-post-body .todo-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+.blog-post-body .todo-list li input[type='checkbox'] {
+  margin-top: 0.25rem;
+  flex-shrink: 0;
+  accent-color: #1e3a8a;
+}
+
+/* ── CKEditor media embed (YouTube, Vimeo) ── */
+.blog-post-body .media,
+.blog-post-body figure.media {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%;
+  height: 0;
+  overflow: hidden;
+  margin: 1.5rem 0;
+  border-radius: 0.5rem;
+  background: #000;
+}
+.blog-post-body .media iframe,
+.blog-post-body figure.media iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: 0.5rem;
+}
+
+/* ── YouTube wrapper (injected by fixYouTubeIframes) ── */
+.blog-post-body .yt-wrapper {
+  position: relative;
+  width: 100%;
+  height: 0;
+  padding-bottom: 56.25%;
+  margin: 1.5rem 0;
+  border-radius: 0.5rem;
+  background: #000;
+  overflow: hidden;
+}
+.blog-post-body .yt-wrapper iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: 0.5rem;
+}
+
+/* ── Table of contents / outline ── */
+.blog-post-body .document-outline-list,
+.blog-post-body .table-of-contents {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 1rem 1.5rem;
+  margin: 1.5rem 0;
+}
+@media (prefers-color-scheme: dark) {
+  .blog-post-body .document-outline-list,
+  .blog-post-body .table-of-contents {
+    background: #1e293b;
+    border-color: #334155;
+  }
+}
+
+/* ── Mention ── */
+.blog-post-body .mention {
+  color: #1e3a8a;
+  font-weight: 600;
+}
+
+/* ── Mobile: collapse floats on small screens ── */
+@media (max-width: 640px) {
+  .blog-post-body figure.image-style-side,
+  .blog-post-body .image-style-side,
+  .blog-post-body figure.image-style-align-left,
+  .blog-post-body .image-style-align-left,
+  .blog-post-body figure.image-style-align-right,
+  .blog-post-body .image-style-align-right,
+  .blog-post-body figure.image-style-inline-left,
+  .blog-post-body .image-style-inline-left,
+  .blog-post-body figure.image-style-inline-right,
+  .blog-post-body .image-style-inline-right {
+    float: none;
+    max-width: 100%;
+    margin: 1rem auto;
+    display: block;
   }
 }
