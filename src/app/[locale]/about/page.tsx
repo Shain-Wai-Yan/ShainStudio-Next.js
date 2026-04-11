@@ -19,7 +19,6 @@ export async function generateMetadata({ params }: AboutProps): Promise<Metadata
   const urlPath = locale === 'zh' ? '/zh/about' : '/about';
   const baseUrl = `${domain}${urlPath}`;
 
-  // Smart truncation: cut at the last full word under 155 characters
   const fullText = t.aboutPage.myStoryText;
   const description = fullText.length > 155 
     ? fullText.substring(0, 155).replace(/\s+\S*$/, '') + '...' 
@@ -83,513 +82,241 @@ export default async function AboutPage({ params }: AboutProps) {
   };
 
   return (
-    <main className="bg-white dark:bg-slate-950">
+    <main className="bg-background dark:bg-[#0a0a0a] min-h-screen text-text dark:text-gray-200">
       <ScrollAnimator />
-
-      {/* ── Hero ── */}
-      <section className="relative py-32 md:py-40 text-center overflow-hidden bg-gradient-to-b from-[#191970] to-[#2a2a9a] dark:from-[#a67c00] dark:to-[#704700]">
-        <div className="max-w-4xl mx-auto px-4 md:px-8">
-          <h1 className="text-5xl md:text-6xl font-bold text-white mb-4">
-            {t.aboutPage.heroTitle} <span className="text-[#ffd700] dark:text-[#f9df85]">{t.aboutPage.heroTitleHighlight}</span>
-          </h1>
-          <p className="text-xl md:text-2xl text-gray-100">
-            {t.aboutPage.heroSubtitle}
-          </p>
-        </div>
-      </section>
-
-      {/* ── Profile ── */}
-      <section
-        className="py-12 md:py-20 px-4 md:px-0 bg-background-alt relative"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23191970' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-        }}
-      >
-        <div className="max-w-6xl mx-auto px-4 md:px-8">
-          <div className="bg-background rounded-2xl shadow-lg p-8 md:p-12 text-center relative overflow-hidden
-            transition-all duration-500 hover:shadow-2xl hover:-translate-y-1">
-            <div className="absolute top-0 left-0 right-0 h-2 bg-primary-gradient" style={{ backgroundSize: '200% 200%' }} />
-
-            {/* Profile Image */}
-            <div className="mb-8 flex justify-center">
-              <div className="relative w-52 h-52 md:w-56 md:h-56 group">
-                <div className="relative w-full h-full">
-                  <Image
-                    src="/images/profile.jpeg"
-                    alt={t.aboutPage.profileAltText}
-                    fill
-                    sizes="(max-width: 768px) 208px, 224px"
-                    className="rounded-full object-cover border-4 border-background shadow-lg
-                      transition-transform duration-500 group-hover:scale-105"
-                    priority
-                  />
-                  <div className="absolute -inset-3 rounded-full border-2 border-dashed border-accent animate-rotate-circle pointer-events-none" />
-                </div>
-              </div>
-            </div>
-
-            {/* Name */}
-            <h2 className="text-3xl md:text-4xl font-bold text-primary dark:text-white mb-2 font-secondary
-              relative inline-block cursor-default
-              after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px]
-              after:bg-accent after:transition-all after:duration-400
-              hover:after:w-full hover:text-accent transition-colors duration-300">
-              {t.aboutPage.myName}
-            </h2>
-            <p className="text-lg text-muted mb-6 font-primary transition-colors duration-300 hover:text-primary dark:hover:text-accent">
-              {t.aboutPage.alsoKnownAs}
+      
+      {/* ── Premium Hero ── */}
+      <div className="relative w-full overflow-hidden pt-32 pb-20 md:pt-48 md:pb-32 px-4 bg-[#191970] dark:bg-gradient-to-br dark:from-[#d4af37] dark:via-[#c19b2e] dark:to-[#8a7322] border-none shadow-lg">
+         {/* Detail/Texture overlay */}
+         <div className="absolute inset-0 bg-black/5 dark:bg-black/10 mix-blend-overlay pointer-events-none" />
+         
+         <div className="max-w-7xl mx-auto flex flex-col items-center text-center animate-fade-in-down relative z-10">
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold font-secondary text-white dark:text-white tracking-tighter mb-8 max-w-4xl leading-tight drop-shadow-md">
+              {t.aboutPage.heroTitle} <span className="text-[#ffd700] dark:text-[#191970] italic font-light">{t.aboutPage.heroTitleHighlight}</span>
+            </h1>
+            <p className="text-lg md:text-xl text-gray-200 dark:text-white drop-shadow-sm font-primary max-w-2xl mx-auto font-medium leading-relaxed">
+              {t.aboutPage.heroSubtitle}
             </p>
+         </div>
+      </div>
 
-            {/* Motto */}
-            <div className="bg-gradient-to-br from-primary/5 to-accent/5 dark:from-accent/5 dark:to-primary/5
-              rounded-lg p-6 mb-0 border-l-4 border-accent
-              transition-all duration-400 hover:scale-[1.02] hover:shadow-lg
-              hover:border-primary dark:hover:border-accent">
-              <p className="text-2xl font-bold text-primary dark:text-white mb-2 font-secondary" lang="zh">
-                {t.aboutPage.motto}
-              </p>
-              <p className="text-base md:text-lg text-muted italic font-primary">
-                {t.aboutPage.mottoTranslation}
-              </p>
+      {/* ── Main Layout Container ── */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 relative items-start">
+          
+          {/* ── LEFT: Sticky Sidebar (Profile) ── */}
+          <div className="lg:col-span-4 lg:sticky lg:top-32 space-y-8 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
+            <div className="relative rounded-[2.5rem] p-[1px] bg-gradient-to-b from-gray-200 to-transparent dark:from-white/15 dark:to-transparent shadow-[0_8px_40px_rgb(0,0,0,0.08)] dark:shadow-[0_8px_40px_rgba(0,0,0,0.3)] overflow-hidden group">
+               {/* Inner Card */}
+               <div className="bg-white/90 dark:bg-[#0a0f1a]/95 backdrop-blur-2xl rounded-[calc(2.5rem-1px)] p-8 md:p-10 relative z-10 h-full overflow-hidden">
+                  
+                  {/* Subtle Top Glow */}
+                  <div className="absolute top-0 inset-x-0 h-48 bg-gradient-to-b from-accent/5 dark:from-accent/10 to-transparent pointer-events-none" />
+
+                  {/* Profile Image */}
+                  <div className="relative w-48 h-48 mx-auto mb-8 rounded-full overflow-hidden border-[3px] border-white dark:border-[#1a2542] shadow-lg group-hover:shadow-[0_0_30px_rgba(212,175,55,0.25)] transition-all duration-500 z-10">
+                    <Image
+                      src="/images/profile.avif"
+                      alt={t.aboutPage.profileAltText}
+                      fill
+                      sizes="192px"
+                      className="object-cover transition-transform duration-700 group-hover:scale-105"
+                      priority
+                    />
+                  </div>
+
+                  <div className="text-center mb-8 relative z-10 flex flex-col items-center">
+                    <h2 className="text-3xl font-bold text-primary dark:text-white font-secondary mb-1 tracking-tight">
+                      {t.aboutPage.myName}
+                    </h2>
+                    <div className="text-[#ffd700] dark:text-white font-primary font-medium text-sm tracking-[0.1em] uppercase mt-2 flex flex-col items-center gap-1">
+                       <span>{t.aboutPage.alsoKnownAs.split('|')[0]?.trim()}</span>
+                       <span>{t.aboutPage.alsoKnownAs.split('|')[1]?.trim()}</span>
+                    </div>
+                  </div>
+
+                  {/* Personal Info List */}
+                  <ul className="flex flex-col font-primary text-sm relative z-10 text-left bg-gray-50/50 dark:bg-white/5 rounded-2xl p-6 border border-gray-100/50 dark:border-white/5 space-y-4">
+                    <li className="flex flex-col gap-1.5 pb-4 border-b border-gray-200/50 dark:border-white/10 transition-transform duration-300 hover:translate-x-1">
+                      <span className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">{t.aboutPage.ageLabel}</span>
+                      <strong className="text-primary dark:text-white text-base font-semibold">{calculateAge()} {t.aboutPage.ageValueSuffix}</strong>
+                    </li>
+                    <li className="flex flex-col gap-1.5 pb-4 border-b border-gray-200/50 dark:border-white/10 transition-transform duration-300 hover:translate-x-1">
+                      <span className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">{t.aboutPage.completedLabel}</span>
+                      <strong className="text-primary dark:text-white text-base font-semibold">{t.aboutPage.completedValue}</strong>
+                    </li>
+                    <li className="flex flex-col gap-1.5 pb-4 border-b border-gray-200/50 dark:border-white/10 transition-transform duration-300 hover:translate-x-1">
+                      <span className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">{t.aboutPage.educationLabel}</span>
+                      <strong className="text-primary dark:text-white text-base font-semibold leading-snug">{t.aboutPage.educationValue1}</strong>
+                      <span className="text-[#ffd700] dark:text-white/70">{t.aboutPage.educationValue2}</span>
+                    </li>
+                    <li className="flex flex-col gap-2 pt-1 transition-transform duration-300 hover:translate-x-1">
+                      <span className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-1">{t.aboutPage.certificatesLabel}</span>
+                      <div className="flex flex-col gap-3">
+                         <span className="text-primary dark:text-white font-medium text-sm flex items-start gap-3">
+                           <span className="text-[#ffd700] dark:text-white/50 text-lg leading-none mt-[-1px]">•</span> {t.aboutPage.certificate1}
+                         </span>
+                         <span className="text-primary dark:text-white font-medium text-sm flex items-start gap-3">
+                           <span className="text-[#ffd700] dark:text-white/50 text-lg leading-none mt-[-1px]">•</span> {t.aboutPage.certificate2}
+                         </span>
+                      </div>
+                    </li>
+                  </ul>
+
+                  {/* Quote Box */}
+                  <div className="mt-12 pt-8 border-t border-gray-100 dark:border-white/5 relative z-10">
+                     <p className="italic text-text dark:text-gray-300 font-secondary text-lg leading-relaxed mb-6 text-center">
+                       "{t.aboutPage.quoteText}"
+                     </p>
+                     <p className="text-center font-bold text-[#ffd700] dark:text-white text-xs tracking-[0.2em] uppercase">
+                       — {t.aboutPage.quoteAuthor}
+                     </p>
+                  </div>
+               </div>
             </div>
           </div>
-        </div>
-      </section>
 
-      {/* ── Bio ── */}
-      <section className="py-12 md:py-20 px-4 md:px-0 bg-background relative">
-        <div className="max-w-6xl mx-auto px-4 md:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* ── RIGHT: Scrolling Content ── */}
+          <div className="lg:col-span-8 space-y-24">
+            
+            {/* Motto Section */}
+            <section className="animate-on-scroll">
+              <span className="text-sm font-bold text-[#ffd700] dark:text-white tracking-[0.2em] uppercase font-secondary mb-6 block">
+                My Motto
+              </span>
+              <div className="relative pl-6 border-l-4 border-[#ffd700] dark:border-[#d4af37] mb-4">
+                <h3 className="text-4xl md:text-5xl font-secondary font-bold text-primary dark:text-white tracking-tight leading-tight" lang="zh">
+                  {t.aboutPage.motto}
+                </h3>
+                <p className="mt-3 text-base md:text-lg text-text-light dark:text-gray-400 font-primary italic font-light">
+                  {t.aboutPage.mottoTranslation}
+                </p>
+              </div>
+            </section>
 
-            {/* ── Main Bio ── */}
-            <div className="lg:col-span-2">
-
-              {/* My Story heading */}
-              <h2 className="text-3xl md:text-4xl font-bold text-primary dark:text-white mb-6 font-secondary
-                relative inline-block pb-4 cursor-default
-                after:content-[''] after:absolute after:bottom-0 after:left-0
-                after:w-16 after:h-1 after:bg-accent after:rounded
-                after:transition-all after:duration-400
-                hover:after:w-full">
+            {/* Story Section */}
+            <section className="animate-on-scroll">
+              <h2 className="text-sm font-bold text-[#ffd700] dark:text-white tracking-[0.2em] uppercase font-secondary mb-4">
                 {t.aboutPage.myStoryHeading}
               </h2>
-
-              <p className="text-base md:text-lg text-text dark:text-gray-300 leading-relaxed mb-6 text-justify font-primary animate-on-scroll">
-                {t.aboutPage.myStoryText}
-              </p>
-
-              {/* Divider */}
-              <div className="h-px my-8 bg-gradient-to-r from-transparent via-accent to-transparent opacity-50 relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-accent/50 to-transparent animate-shimmer" />
+              
+              <div className="prose prose-lg dark:prose-invert max-w-none prose-p:leading-relaxed prose-p:text-text-light dark:prose-p:text-gray-400 prose-p:font-light">
+                <p>
+                  {t.aboutPage.myStoryText}
+                </p>
               </div>
+            </section>
 
-              {/* What I Bring heading */}
-              <h3 className="text-2xl md:text-3xl font-bold text-primary dark:text-white mb-6 font-secondary
-                relative inline-block pb-3 animate-on-scroll cursor-default
-                after:content-[''] after:absolute after:bottom-0 after:left-0
-                after:w-16 after:h-1 after:bg-accent after:rounded
-                after:transition-all after:duration-400
-                hover:after:w-full">
+            {/* Skills Bento Section */}
+            <section className="animate-on-scroll">
+              <h2 className="text-sm font-bold text-[#ffd700] dark:text-white tracking-[0.2em] uppercase font-secondary mb-10">
                 {t.aboutPage.whatIBringHeading}
-              </h3>
-
-              {/* Skills list */}
-              <ul className="space-y-6">
-
-                {/* Trilingual */}
-                <li className="flex gap-4 animate-on-scroll group
-                  transition-transform duration-300 hover:translate-x-3">
-                  <div className="flex-shrink-0 w-12 h-12 rounded-full bg-primary-gradient
-                    flex items-center justify-center text-white shadow-md
-                    transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg group-hover:rotate-6">
-                    <FaGlobe className="text-xl" />
+              </h2>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {[
+                  { icon: FaGlobe, title: t.aboutPage.trilingualTitle, desc: t.aboutPage.trilingualDesc },
+                  { icon: FaLaptopCode, title: t.aboutPage.digitalSkillsTitle, desc: t.aboutPage.digitalSkillsDesc },
+                  { icon: FaLightbulb, title: t.aboutPage.curiosityTitle, desc: t.aboutPage.curiosityDesc }
+                ].map((skill, idx) => (
+                  <div key={idx} className={`bg-white dark:bg-[#111111] rounded-3xl p-8 border border-gray-100 dark:border-white/5 transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_12px_40px_rgb(0,0,0,0.08)] dark:hover:shadow-[0_12px_40px_rgba(255,255,255,0.03)] hover:border-[#d4af37]/30 dark:hover:border-[#d4af37]/30 group ${idx === 2 ? 'md:col-span-2' : ''}`}>
+                     <div className="w-12 h-12 rounded-full bg-gray-50 dark:bg-white/5 flex items-center justify-center text-primary dark:text-white text-xl mb-6 shadow-sm group-hover:bg-gradient-to-br group-hover:from-[#d4af37] group-hover:to-[#c19b2e] group-hover:text-white dark:group-hover:text-white transition-all duration-300">
+                        <skill.icon />
+                     </div>
+                     <h4 className="text-xl font-bold font-secondary text-primary dark:text-white mb-3">
+                       {skill.title}
+                     </h4>
+                     <p className="text-text-light dark:text-gray-400 font-primary text-sm leading-relaxed font-light">
+                       {skill.desc}
+                     </p>
                   </div>
-                  <div className="border-b border-transparent group-hover:border-accent/30 transition-colors duration-300 pb-1 w-full">
-                    <h4 className="text-lg font-bold text-primary dark:text-white mb-1 font-secondary
-                      transition-colors duration-300 group-hover:text-accent dark:group-hover:text-accent">
-                      {t.aboutPage.trilingualTitle}
-                    </h4>
-                    <p className="text-muted dark:text-gray-400 font-primary transition-colors duration-300 group-hover:text-text dark:group-hover:text-gray-200">
-                      {t.aboutPage.trilingualDesc}
-                    </p>
-                  </div>
-                </li>
+                ))}
+              </div>
+            </section>
 
-                {/* Digital Skills */}
-                <li className="flex gap-4 animate-on-scroll group
-                  transition-transform duration-300 hover:translate-x-3">
-                  <div className="flex-shrink-0 w-12 h-12 rounded-full bg-primary-gradient
-                    flex items-center justify-center text-white shadow-md
-                    transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg group-hover:rotate-6">
-                    <FaLaptopCode className="text-xl" />
-                  </div>
-                  <div className="border-b border-transparent group-hover:border-accent/30 transition-colors duration-300 pb-1 w-full">
-                    <h4 className="text-lg font-bold text-primary dark:text-white mb-1 font-secondary
-                      transition-colors duration-300 group-hover:text-accent dark:group-hover:text-accent">
-                      {t.aboutPage.digitalSkillsTitle}
-                    </h4>
-                    <p className="text-muted dark:text-gray-400 font-primary transition-colors duration-300 group-hover:text-text dark:group-hover:text-gray-200">
-                      {t.aboutPage.digitalSkillsDesc}
-                    </p>
-                  </div>
-                </li>
+            {/* Journey Timeline */}
+            <section className="animate-on-scroll">
+               <h2 className="text-sm font-bold text-[#ffd700] dark:text-white tracking-[0.2em] uppercase font-secondary mb-12">
+                {t.aboutPage.myJourneyHeading}
+              </h2>
 
-                {/* Curiosity */}
-                <li className="flex gap-4 animate-on-scroll group
-                  transition-transform duration-300 hover:translate-x-3">
-                  <div className="flex-shrink-0 w-12 h-12 rounded-full bg-primary-gradient
-                    flex items-center justify-center text-white shadow-md
-                    transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg group-hover:rotate-6">
-                    <FaLightbulb className="text-xl" />
-                  </div>
-                  <div className="border-b border-transparent group-hover:border-accent/30 transition-colors duration-300 pb-1 w-full">
-                    <h4 className="text-lg font-bold text-primary dark:text-white mb-1 font-secondary
-                      transition-colors duration-300 group-hover:text-accent dark:group-hover:text-accent">
-                      {t.aboutPage.curiosityTitle}
-                    </h4>
-                    <p className="text-muted dark:text-gray-400 font-primary transition-colors duration-300 group-hover:text-text dark:group-hover:text-gray-200">
-                      {t.aboutPage.curiosityDesc}
-                    </p>
-                  </div>
-                </li>
-
-              </ul>
-            </div>
-
-            {/* ── Sidebar ── */}
-            <div className="flex flex-col gap-6">
-
-              {/* Personal Info Card */}
-              <div className="bg-background rounded-xl shadow-md p-6 border-t-4 border-accent animate-on-scroll
-                relative overflow-hidden
-                transition-all duration-400 hover:shadow-xl hover:-translate-y-2 hover:border-primary
-                group">
-                {/* Hover glow overlay */}
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/0 to-accent/0
-                  group-hover:from-primary/5 group-hover:to-accent/5
-                  transition-all duration-500 pointer-events-none rounded-xl" />
-
-                <h3 className="text-xl font-bold text-primary dark:text-white mb-4 font-secondary relative pb-3
-                  after:content-[''] after:absolute after:bottom-0 after:left-0
-                  after:w-10 after:h-1 after:bg-accent after:rounded
-                  after:transition-all after:duration-400
-                  group-hover:after:w-full">
-                  {t.aboutPage.personalInfoHeading}
-                </h3>
-
-                <ul className="space-y-3 font-primary text-sm">
-                  <li className="pb-3 border-b border-gray-200 dark:border-gray-700
-                    transition-all duration-300 hover:translate-x-2 hover:border-accent/40 cursor-default">
-                    <span className="font-bold text-primary dark:text-white block mb-0.5
-                      transition-colors duration-300 hover:text-accent">{t.aboutPage.ageLabel}</span>
-                    <span className="text-muted">{calculateAge()} {t.aboutPage.ageValueSuffix}</span>
-                  </li>
-                  <li className="pb-3 border-b border-gray-200 dark:border-gray-700
-                    transition-all duration-300 hover:translate-x-2 hover:border-accent/40 cursor-default">
-
-                  <span className="font-bold text-primary dark:text-white block mb-0.5
-                    transition-colors duration-300 hover:text-accent">
-                    {t.aboutPage.educationLabel}
-                 </span>
-
-                 <div className="text-muted flex flex-col">
-                  <span>{t.aboutPage.educationValue1}</span>
-                 <span>{t.aboutPage.educationValue2}</span>
-                </div>
-                 </li>
-                  <li className="pb-3 border-b border-gray-200 dark:border-gray-700
-                    transition-all duration-300 hover:translate-x-2 hover:border-accent/40 cursor-default">
-                    <span className="font-bold text-primary dark:text-white block mb-0.5
-                      transition-colors duration-300 hover:text-accent">{t.aboutPage.completedLabel}</span>
-                    <span className="text-muted">
-                      {t.aboutPage.completedValue}
-                    </span>
-                  </li>
-                  <li className="transition-all duration-300 hover:translate-x-2 cursor-default">
-                    <span className="font-bold text-primary dark:text-white block mb-1
-                      transition-colors duration-300 hover:text-accent">{t.aboutPage.certificatesLabel}</span>
-                    <div className="text-muted space-y-1">
-                      <p className="flex items-start gap-1.5">
-                        <span className="text-accent mt-0.5 flex-shrink-0">•</span>
-                        {t.aboutPage.certificate1}
+              <div className="relative pl-8 md:pl-10 border-l border-gray-200 dark:border-white/10 space-y-16">
+                  {[
+                    { year: t.aboutPage.timeline1Year, title: t.aboutPage.timeline1Title, desc: t.aboutPage.timeline1Desc },
+                    { year: t.aboutPage.timeline2Year, title: t.aboutPage.timeline2Title, desc: t.aboutPage.timeline2Desc },
+                    { year: t.aboutPage.timeline3Year, title: t.aboutPage.timeline3Title, desc: t.aboutPage.timeline3Desc },
+                    { year: t.aboutPage.timeline4Year, title: t.aboutPage.timeline4Title, desc: t.aboutPage.timeline4Desc },
+                    { year: t.aboutPage.timeline5Year, title: t.aboutPage.timeline5Title, desc: t.aboutPage.timeline5Desc },
+                    { year: t.aboutPage.timeline6Year, title: t.aboutPage.timeline6Title, desc: t.aboutPage.timeline6Desc },
+                  ].map((item, idx) => (
+                    <div key={idx} className="relative group">
+                      
+                      {/* Timeline Dot */}
+                      <span className="absolute -left-[45px] top-1.5 w-3 h-3 rounded-full bg-gray-300 dark:bg-white/20 border-[3px] border-background dark:border-[#0a0a0a] group-hover:bg-[#ffd700] dark:group-hover:bg-white group-hover:scale-[1.5] group-hover:shadow-[0_0_12px_rgba(255,215,0,0.6)] dark:group-hover:shadow-[0_0_12px_rgba(255,255,255,0.6)] transition-all duration-300" />
+                      
+                      {/* Content */}
+                      <div className="flex flex-col md:flex-row md:items-baseline gap-2 md:gap-6 mb-3">
+                          <span className="text-[#ffd700] dark:text-white font-bold text-sm tracking-wider font-secondary flex-shrink-0">
+                            {item.year}
+                          </span>
+                          <h4 className="text-xl font-bold font-secondary text-primary dark:text-white">
+                            {item.title}
+                          </h4>
+                      </div>
+                      <p className="text-text-light dark:text-gray-400 font-primary text-base leading-relaxed font-light">
+                        {item.desc}
                       </p>
-                      <p className="flex items-start gap-1.5">
-                        <span className="text-accent mt-0.5 flex-shrink-0">•</span>
-                        {t.aboutPage.certificate2}
-                      </p>
+
                     </div>
-                  </li>
-                </ul>
+                  ))}
               </div>
-
-              {/* Quote Card */}
-              <div className="bg-gradient-to-br from-primary/5 to-accent/5 dark:from-accent/5 dark:to-primary/5
-                rounded-xl p-6 border-l-4 border-accent shadow-md animate-on-scroll
-                transition-all duration-400 hover:shadow-xl hover:-translate-y-2 hover:border-primary
-                group relative overflow-hidden">
-                {/* Animated background shimmer on hover */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-accent/5 to-transparent
-                  translate-x-[-100%] group-hover:translate-x-[100%]
-                  transition-transform duration-700 pointer-events-none" />
-
-                <blockquote className="relative">
-                  <span className="text-5xl text-accent/20 absolute -top-4 -left-2 font-serif
-                    transition-all duration-300 group-hover:text-accent/40 group-hover:-top-6 group-hover:-left-3">
-                    &quot;
-                  </span>
-                  <p className="pl-6 text-base md:text-lg italic text-text font-primary leading-relaxed
-                    transition-colors duration-300 group-hover:text-primary dark:group-hover:text-white">
-                    {t.aboutPage.quoteText}
-                  </p>
-                  <cite className="block text-right font-bold text-primary dark:text-white mt-4 not-italic
-                    transition-all duration-300 group-hover:text-accent group-hover:translate-x-[-4px]">
-                    {t.aboutPage.quoteAuthor}
-                  </cite>
-                </blockquote>
-              </div>
-
-            </div>
+            </section>
           </div>
         </div>
-      </section>
-
-      {/* ── Timeline ── */}
-      <section className="py-12 md:py-20 px-4 md:px-0 bg-background-alt relative">
-        <div className="max-w-6xl mx-auto px-4 md:px-8">
-
-          <h2 className="animate-on-scroll text-3xl md:text-4xl font-bold text-primary dark:text-white
-            text-center mb-12 font-secondary relative pb-4 inline-block w-full cursor-default">
-            {t.aboutPage.myJourneyHeading}
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-20 h-1 bg-accent rounded" />
-          </h2>
-
-          <div className="relative">
-            {/* Center line */}
-            <div
-              className="hidden md:block absolute top-0 bottom-0 w-1 z-0"
-              style={{
-                left: '50%',
-                transform: 'translateX(-50%)',
-                background: 'linear-gradient(to bottom, var(--primary, #191970), var(--accent, #ffd700))',
-              }}
-            />
-
-            <div className="space-y-12">
-
-              {/* ── Item 1 LEFT ── */}
-              <div className="relative flex flex-col md:flex-row md:items-start">
-                <div className="animate-on-scroll md:w-1/2 md:pr-16 w-full" style={{ transitionDelay: '0ms' }}>
-                  <div className="bg-background rounded-lg p-6 shadow-md group
-                    transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-                    <h3 className="text-xl font-bold text-primary dark:text-white mb-2 font-secondary
-                      transition-all duration-300 group-hover:text-accent group-hover:translate-x-1">
-                      {t.aboutPage.timeline1Title}
-                    </h3>
-                    <span className="inline-block px-3 py-1 bg-primary/10 dark:bg-accent/10
-                      text-primary dark:text-accent rounded-full text-sm font-bold mb-3
-                      transition-all duration-300 group-hover:bg-accent group-hover:text-white">
-                      {t.aboutPage.timeline1Year}
-                    </span>
-                    <p className="text-muted dark:text-gray-400 font-primary transition-colors duration-300 group-hover:text-text dark:group-hover:text-gray-200">
-                      {t.aboutPage.timeline1Desc}
-                    </p>
-                  </div>
-                </div>
-                <div
-                  className="animate-on-scroll hidden md:flex absolute top-6 w-5 h-5 rounded-full
-                    bg-white dark:bg-slate-900 border-4 border-accent z-10
-                    transition-all duration-300 hover:scale-150 hover:bg-accent"
-                  style={{ left: '50%', transform: 'translateX(-50%)', transitionDelay: '150ms' }}
-                />
-                <div className="md:w-1/2 md:pl-16" />
-              </div>
-
-              {/* ── Item 2 RIGHT ── */}
-              <div className="relative flex flex-col md:flex-row md:items-start">
-                <div className="md:w-1/2 md:pr-16" />
-                <div
-                  className="animate-on-scroll hidden md:flex absolute top-6 w-5 h-5 rounded-full
-                    bg-white dark:bg-slate-900 border-4 border-accent z-10
-                    transition-all duration-300 hover:scale-150 hover:bg-accent"
-                  style={{ left: '50%', transform: 'translateX(-50%)', transitionDelay: '150ms' }}
-                />
-                <div className="animate-on-scroll md:w-1/2 md:pl-16 w-full" style={{ transitionDelay: '0ms' }}>
-                  <div className="bg-background rounded-lg p-6 shadow-md group
-                    transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-                    <h3 className="text-xl font-bold text-primary dark:text-white mb-2 font-secondary
-                      transition-all duration-300 group-hover:text-accent group-hover:translate-x-1">
-                      {t.aboutPage.timeline2Title}
-                    </h3>
-                    <span className="inline-block px-3 py-1 bg-primary/10 dark:bg-accent/10
-                      text-primary dark:text-accent rounded-full text-sm font-bold mb-3
-                      transition-all duration-300 group-hover:bg-accent group-hover:text-white">
-                      {t.aboutPage.timeline2Year}
-                    </span>
-                    <p className="text-muted dark:text-gray-400 font-primary transition-colors duration-300 group-hover:text-text dark:group-hover:text-gray-200">
-                      {t.aboutPage.timeline2Desc}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* ── Item 3 LEFT ── */}
-              <div className="relative flex flex-col md:flex-row md:items-start">
-                <div className="animate-on-scroll md:w-1/2 md:pr-16 w-full" style={{ transitionDelay: '0ms' }}>
-                  <div className="bg-background rounded-lg p-6 shadow-md group
-                    transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-                    <h3 className="text-xl font-bold text-primary dark:text-white mb-2 font-secondary
-                      transition-all duration-300 group-hover:text-accent group-hover:translate-x-1">
-                      {t.aboutPage.timeline3Title}
-                    </h3>
-                    <span className="inline-block px-3 py-1 bg-primary/10 dark:bg-accent/10
-                      text-primary dark:text-accent rounded-full text-sm font-bold mb-3
-                      transition-all duration-300 group-hover:bg-accent group-hover:text-white">
-                      {t.aboutPage.timeline3Year}
-                    </span>
-                    <p className="text-muted dark:text-gray-400 font-primary transition-colors duration-300 group-hover:text-text dark:group-hover:text-gray-200">
-                      {t.aboutPage.timeline3Desc}
-                    </p>
-                  </div>
-                </div>
-                <div
-                  className="animate-on-scroll hidden md:flex absolute top-6 w-5 h-5 rounded-full
-                    bg-white dark:bg-slate-900 border-4 border-accent z-10
-                    transition-all duration-300 hover:scale-150 hover:bg-accent"
-                  style={{ left: '50%', transform: 'translateX(-50%)', transitionDelay: '150ms' }}
-                />
-                <div className="md:w-1/2 md:pl-16" />
-              </div>
-
-              {/* ── Item 4 RIGHT ── */}
-              <div className="relative flex flex-col md:flex-row md:items-start">
-                <div className="md:w-1/2 md:pr-16" />
-                <div
-                  className="animate-on-scroll hidden md:flex absolute top-6 w-5 h-5 rounded-full
-                    bg-white dark:bg-slate-900 border-4 border-accent z-10
-                    transition-all duration-300 hover:scale-150 hover:bg-accent"
-                  style={{ left: '50%', transform: 'translateX(-50%)', transitionDelay: '150ms' }}
-                />
-                <div className="animate-on-scroll md:w-1/2 md:pl-16 w-full" style={{ transitionDelay: '0ms' }}>
-                  <div className="bg-background rounded-lg p-6 shadow-md group
-                    transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-                    <h3 className="text-xl font-bold text-primary dark:text-white mb-2 font-secondary
-                      transition-all duration-300 group-hover:text-accent group-hover:translate-x-1">
-                      {t.aboutPage.timeline4Title}
-                    </h3>
-                    <span className="inline-block px-3 py-1 bg-primary/10 dark:bg-accent/10
-                      text-primary dark:text-accent rounded-full text-sm font-bold mb-3
-                      transition-all duration-300 group-hover:bg-accent group-hover:text-white">
-                      {t.aboutPage.timeline4Year}
-                    </span>
-                    <p className="text-muted dark:text-gray-400 font-primary transition-colors duration-300 group-hover:text-text dark:group-hover:text-gray-200">
-                      {t.aboutPage.timeline4Desc}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* ── Item 5 LEFT ── */}
-              <div className="relative flex flex-col md:flex-row md:items-start">
-                <div className="animate-on-scroll md:w-1/2 md:pr-16 w-full" style={{ transitionDelay: '0ms' }}>
-                  <div className="bg-background rounded-lg p-6 shadow-md group
-                    transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-                    <h3 className="text-xl font-bold text-primary dark:text-white mb-2 font-secondary
-                      transition-all duration-300 group-hover:text-accent group-hover:translate-x-1">
-                      {t.aboutPage.timeline5Title}
-                    </h3>
-                    <span className="inline-block px-3 py-1 bg-primary/10 dark:bg-accent/10
-                      text-primary dark:text-accent rounded-full text-sm font-bold mb-3
-                      transition-all duration-300 group-hover:bg-accent group-hover:text-white">
-                      {t.aboutPage.timeline5Year}
-                    </span>
-                    <p className="text-muted dark:text-gray-400 font-primary transition-colors duration-300 group-hover:text-text dark:group-hover:text-gray-200">
-                      {t.aboutPage.timeline5Desc}
-                    </p>
-                  </div>
-                </div>
-                <div
-                  className="animate-on-scroll hidden md:flex absolute top-6 w-5 h-5 rounded-full
-                    bg-white dark:bg-slate-900 border-4 border-accent z-10
-                    transition-all duration-300 hover:scale-150 hover:bg-accent"
-                  style={{ left: '50%', transform: 'translateX(-50%)', transitionDelay: '150ms' }}
-                />
-                <div className="md:w-1/2 md:pl-16" />
-              </div>
-
-              {/* ── Item 6 RIGHT ── */}
-              <div className="relative flex flex-col md:flex-row md:items-start">
-                <div className="md:w-1/2 md:pr-16" />
-                <div
-                  className="animate-on-scroll hidden md:flex absolute top-6 w-5 h-5 rounded-full
-                    bg-white dark:bg-slate-900 border-4 border-accent z-10
-                    transition-all duration-300 hover:scale-150 hover:bg-accent"
-                  style={{ left: '50%', transform: 'translateX(-50%)', transitionDelay: '150ms' }}
-                />
-                <div className="animate-on-scroll md:w-1/2 md:pl-16 w-full" style={{ transitionDelay: '0ms' }}>
-                  <div className="bg-background rounded-lg p-6 shadow-md group
-                    transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-                    <h3 className="text-xl font-bold text-primary dark:text-white mb-2 font-secondary
-                      transition-all duration-300 group-hover:text-accent group-hover:translate-x-1">
-                      {t.aboutPage.timeline6Title}
-                    </h3>
-                    <span className="inline-block px-3 py-1 bg-primary/10 dark:bg-accent/10
-                      text-primary dark:text-accent rounded-full text-sm font-bold mb-3
-                      transition-all duration-300 group-hover:bg-accent group-hover:text-white">
-                      {t.aboutPage.timeline6Year}
-                    </span>
-                    <p className="text-muted dark:text-gray-400 font-primary transition-colors duration-300 group-hover:text-text dark:group-hover:text-gray-200">
-                      {t.aboutPage.timeline6Desc}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-          </div>
-        </div>
-      </section>
+      </div>
 
       {/* ── Mar-Tech Stack ── */}
-      <MarTechStack language={locale} />
+      <div className="animate-on-scroll">
+         <MarTechStack language={locale} />
+      </div>
 
-      {/* ── CTA ── */}
-      <section
-        className="py-12 md:py-20 px-4 md:px-0 bg-primary-gradient relative overflow-hidden"
-        style={{ backgroundSize: '200% 200%' }}
-      >
-        <div
-          className="absolute inset-0 opacity-20"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-          }}
-        />
-        <div className="relative z-10 max-w-3xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6 font-secondary animate-fade-in-up">
-            {t.aboutPage.ctaTitle}
-          </h2>
-          <p
-            className="text-lg md:text-xl text-white opacity-90 mb-8 font-primary animate-fade-in-up"
-            style={{ animationDelay: '0.2s' }}
-          >
-            {t.aboutPage.ctaDesc}
-          </p>
-          <Link
-            href={`${basePath}/contact`}
-            className="inline-flex items-center justify-center gap-2 bg-white text-primary font-bold
-              py-3 px-8 rounded hover:shadow-lg hover:scale-105 transition-all duration-300
-              relative overflow-hidden group animate-fade-in-up font-secondary"
-            style={{ animationDelay: '0.4s' }}
-          >
-            <span className="relative z-10">{t.aboutPage.ctaButton}</span>
-            <svg
-              className="w-5 h-5 relative z-10 group-hover:translate-x-1 transition-transform"
-              fill="none" stroke="currentColor" viewBox="0 0 24 24"
+      {/* ── Redesigned CTA ── */}
+      <section className="relative my-12 mx-4 md:mx-auto max-w-7xl overflow-hidden rounded-[2.5rem]">
+        {/* Background */}
+        <div className="absolute inset-0 bg-[#191970] dark:bg-[#0d0d1a] z-0" />
+        {/* Gold accent bar at top */}
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#d4af37] to-transparent z-20" />
+        {/* Subtle radial glow */}
+        <div className="absolute inset-0 z-0 pointer-events-none">
+          <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-[#d4af37]/10 rounded-full blur-[80px]" />
+          <div className="absolute -bottom-24 left-1/4 w-[400px] h-[300px] bg-white/5 rounded-full blur-[80px]" />
+        </div>
+
+        {/* Inner content — split layout on desktop */}
+        <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-0 items-stretch">
+
+          {/* LEFT: Text block */}
+          <div className="flex flex-col justify-center px-10 py-16 md:py-20 md:pl-14 md:pr-8">
+            <span className="text-[#d4af37] text-xs tracking-[0.25em] uppercase font-bold font-secondary mb-5 block">{t.aboutPage.ctaKicker}</span>
+            <h2 className="text-4xl md:text-5xl font-bold font-secondary text-white tracking-tight leading-[1.1] mb-6">
+              {t.aboutPage.ctaTitle}
+            </h2>
+            <p className="text-gray-300 dark:text-gray-400 font-primary text-base leading-relaxed max-w-sm">
+              {t.aboutPage.ctaDesc}
+            </p>
+          </div>
+
+          {/* RIGHT: Action block */}
+          <div className="flex flex-col items-center justify-center px-10 py-16 md:py-20 border-t md:border-t-0 md:border-l border-white/10 gap-6">
+            <Link
+              href={`${basePath}/contact`}
+              className="w-full max-w-xs text-center bg-gradient-to-r from-[#d4af37] to-[#c19b2e] text-[#191970] font-bold font-secondary text-lg py-4 px-10 rounded-2xl hover:scale-105 transition-all duration-300 shadow-[0_4px_24px_rgba(212,175,55,0.35)] hover:shadow-[0_6px_36px_rgba(212,175,55,0.55)]"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-            </svg>
-            <div className="absolute inset-0 bg-gradient-to-r from-primary to-accent opacity-0
-              group-hover:opacity-100 transition-opacity duration-300 -z-10 rounded" />
-          </Link>
+              {t.aboutPage.ctaButton} →
+            </Link>
+            <p className="text-white/40 text-xs font-primary tracking-wider text-center">{t.aboutPage.ctaFooter}</p>
+          </div>
+
         </div>
       </section>
 

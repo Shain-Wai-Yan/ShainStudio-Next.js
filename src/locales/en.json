@@ -415,7 +415,9 @@
     "timeline2Desc_Alt": "Expanded my language skills by beginning to learn Chinese, adding to my trilingual abilities.",
     "ctaTitle": "Ready to Work Together?",
     "ctaDesc": "Let's create something extraordinary together. Get in touch and let's discuss how we can collaborate.",
-    "ctaButton": "Contact Me"
+    "ctaButton": "Contact Me",
+    "ctaKicker": "Let's build something great",
+    "ctaFooter": "No commitment required"
   },
   "homePage": {
     "badge": "Marketing · Strategy · Innovation",

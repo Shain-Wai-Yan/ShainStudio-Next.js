@@ -415,7 +415,9 @@
     "timeline2Desc_Alt": "通过开始学习中文扩展我的语言技能，增加我的三语能力。",
     "ctaTitle": "准备好一起合作了吗？",
     "ctaDesc": "让我们创造一些了不起的东西。联系我，讨论我们如何合作。",
-    "ctaButton": "联系我"
+    "ctaButton": "联系我",
+    "ctaKicker": "一起成就非凡",
+    "ctaFooter": "无需任何承诺"
   },
   "homePage": {
     "badge": "营销 · 策略 · 创新",

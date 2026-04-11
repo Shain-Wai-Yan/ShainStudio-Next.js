@@ -567,32 +567,71 @@ export default function MarTechStack({ language = 'en' }: MarTechStackProps) {
 },
   ];
 
+  const firstHalf = tools.slice(0, Math.ceil(tools.length / 2));
+  const secondHalf = tools.slice(Math.ceil(tools.length / 2));
+
   return (
-    <section className="py-12 md:py-20 px-4 md:px-0 bg-background relative">
-      <div className="max-w-6xl mx-auto px-4 md:px-8">
-        <h2 className="text-3xl md:text-4xl font-bold text-primary dark:text-white mb-12 font-secondary text-center relative inline-block w-full pb-4">
-          {title}
-          <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-20 h-1 bg-accent rounded"></div>
-        </h2>
+    <section className="py-20 md:py-32 px-0 bg-transparent relative overflow-hidden">
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes scrollX {
+          from { transform: translateX(-50%); }
+          to { transform: translateX(0); }
+        }
+        .animate-scrollX { animation: scrollX 70s linear infinite; }
+        .animate-scrollXSlow { animation: scrollX 90s linear infinite; }
+        .hover-pause:hover .animate-scrollX, .hover-pause:hover .animate-scrollXSlow {
+          animation-play-state: paused !important;
+        }
+      `}} />
 
-        {/* Tools Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
-          {tools.map((tool, index) => (
-            <div
-              key={index}
-              className="flex flex-col items-center justify-center p-6 bg-background-alt rounded-xl shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer group"
-            >
-              {/* Icon Container */}
-              <div className="w-10 h-10 md:w-12 md:h-12 mb-4 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 [&>svg]:w-full [&>svg]:h-full">
-                {tool.icon}
+      <div className="max-w-7xl mx-auto px-4 md:px-8 mb-16 relative z-10">
+        <div className="flex flex-col items-center justify-center gap-4">
+          <span className="text-[#ffd700] dark:text-white text-sm md:text-base tracking-[0.2em] font-secondary uppercase font-bold text-center block">
+             Technologies & Platforms
+          </span>
+          <h2 className="text-3xl md:text-5xl font-bold text-primary dark:text-white font-secondary tracking-tight text-center">
+            {title}
+          </h2>
+        </div>
+      </div>
+
+      {/* Infinite Marquee Container */}
+      <div 
+        className="relative flex flex-col gap-6 overflow-hidden py-10 w-full z-0 hover-pause mask-image-fade" 
+      >
+        
+        {/* Row 1: Left to Right */}
+        <div className="flex w-max animate-scrollX gap-4 pr-4 items-center">
+            {[...firstHalf, ...firstHalf, ...firstHalf, ...firstHalf, ...firstHalf, ...firstHalf, ...firstHalf, ...firstHalf].map((tool, index) => (
+              <div
+                key={`row1-${index}`}
+                className="group flex items-center gap-3 py-3 px-6 rounded-full bg-white/60 dark:bg-white/5 backdrop-blur-xl border border-gray-200/80 dark:border-white/10 shadow-sm transition-all duration-300 cursor-pointer hover:-translate-y-1 shrink-0"
+              >
+                <div className="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-300 [&>svg]:w-full [&>svg]:h-full [&>svg]:object-contain">
+                  {tool.icon}
+                </div>
+                <span className="text-sm md:text-base font-bold text-primary font-secondary whitespace-nowrap transition-all duration-300 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-[#d4af37] group-hover:to-[#c19b2e] dark:group-hover:bg-none dark:group-hover:text-white">
+                  {tool.name}
+                </span>
               </div>
+            ))}
+        </div>
 
-              {/* Tool Name */}
-              <span className="text-sm md:text-base font-medium text-primary dark:text-white text-center group-hover:text-accent transition-colors duration-300 font-secondary">
-                {tool.name}
-              </span>
-            </div>
-          ))}
+        {/* Row 2: Left to Right (Slower) */}
+        <div className="flex w-max animate-scrollXSlow gap-4 pr-4 items-center mt-2">
+            {[...secondHalf, ...secondHalf, ...secondHalf, ...secondHalf, ...secondHalf, ...secondHalf, ...secondHalf, ...secondHalf].map((tool, index) => (
+              <div
+                key={`row2-${index}`}
+                className="group flex items-center gap-3 py-3 px-6 rounded-full bg-white/60 dark:bg-white/5 backdrop-blur-xl border border-gray-200/80 dark:border-white/10 shadow-sm transition-all duration-300 cursor-pointer hover:-translate-y-1 shrink-0"
+              >
+                <div className="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-300 [&>svg]:w-full [&>svg]:h-full [&>svg]:object-contain">
+                  {tool.icon}
+                </div>
+                <span className="text-sm md:text-base font-bold text-primary font-secondary whitespace-nowrap transition-all duration-300 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-[#d4af37] group-hover:to-[#c19b2e] dark:group-hover:bg-none dark:group-hover:text-white">
+                  {tool.name}
+                </span>
+              </div>
+            ))}
         </div>
       </div>
     </section>
