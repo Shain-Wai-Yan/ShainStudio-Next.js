@@ -72,6 +72,25 @@
     "body": "I combine traditional marketing expertise with cutting-edge AI tools to create innovative, data-driven strategies that deliver exceptional results.",
     "cta": "See AI Marketing in Action"
   },
+  "whatIDo": {
+    "eyebrow": "What I Do",
+    "titleLine1": "Services",
+    "titleLine2": "& Craft.",
+    "viewAll": "All Work",
+    "items": [
+      { "title": "Marketing Strategy" },
+      { "title": "Digital Marketing" },
+      { "title": "Brand & Content" },
+      { "title": "AI Marketing" },
+      { "title": "Analytics & Insights" },
+      { "title": "Web & Tech" }
+    ],
+    "tickerItems": [
+      "Marketing Strategy", "Digital Marketing", "Brand Identity",
+      "AI-Powered Campaigns", "Analytics", "Web & Tech", "Content Strategy",
+      "GO-TO-MARKET", "SEO & SEM", "Prompt Engineering"
+    ]
+  },
   "footer": {
     "quickLinks": "Quick Links",
     "getInTouch": "Get In Touch",

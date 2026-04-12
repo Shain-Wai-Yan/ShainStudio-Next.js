@@ -8,8 +8,9 @@ import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
 import {
   FaBullhorn, FaChartLine, FaUsers, FaComments,
   FaRobot, FaChartPie, FaBullseye, FaBrain,
-  FaAward, FaUsersCog, FaArrowRight,
+  FaAward, FaUsersCog, FaArrowRight
 } from 'react-icons/fa';
+import WhatIDoSection from '@/components/home/WhatIDoSection';
 
 /* ── HERO ────────────────────────────────────── */
 const Hero = ({ t, basePath }: { t: Dictionary, basePath: string }) => (
@@ -146,7 +147,7 @@ const Hero = ({ t, basePath }: { t: Dictionary, basePath: string }) => (
           </div>
         </div>
 
-        {/* ── CUBE column — full width on mobile, right column on lg ── */}
+        {/* ── CUBE column ── */}
         <div
           className="flex items-center justify-center relative mt-10 lg:mt-0"
           style={{ perspective: '900px', height: '280px', minHeight: '280px' }}
@@ -163,7 +164,7 @@ const Hero = ({ t, basePath }: { t: Dictionary, basePath: string }) => (
             }}
           />
 
-          {/* Outer orbit ring — gold in light, white in dark */}
+          {/* Outer orbit ring */}
           <div
             className="absolute rounded-full pointer-events-none border border-dashed border-[#ffd700] dark:border-white"
             style={{
@@ -173,7 +174,7 @@ const Hero = ({ t, basePath }: { t: Dictionary, basePath: string }) => (
               animation: 'orbitSpin 18s linear infinite',
             }}
           />
-          {/* Inner orbit ring — primary in light, white in dark */}
+          {/* Inner orbit ring */}
           <div
             className="absolute rounded-full pointer-events-none border border-solid border-[#191970] dark:border-white"
             style={{
@@ -184,7 +185,7 @@ const Hero = ({ t, basePath }: { t: Dictionary, basePath: string }) => (
             }}
           />
 
-          {/* Orbit dots — accent in light, white in dark */}
+          {/* Orbit dots */}
           {[0, 60, 120, 180, 240, 300].map((deg, i) => (
             <div
               key={i}
@@ -253,13 +254,9 @@ const Hero = ({ t, basePath }: { t: Dictionary, basePath: string }) => (
                     '0 0 15px rgba(25,25,112,0.4)',
                 }}
               >
-                {/* Top-left corner */}
                 <span style={{ position: 'absolute', top: '8px', left: '10px', width: '16px', height: '16px', borderTop: '2px solid var(--accent)', borderLeft: '2px solid var(--accent)', opacity: 0.6, borderRadius: '2px 0 0 0' }} />
-                {/* Bottom-right corner */}
                 <span style={{ position: 'absolute', bottom: '8px', right: '10px', width: '16px', height: '16px', borderBottom: '2px solid var(--accent)', borderRight: '2px solid var(--accent)', opacity: 0.6, borderRadius: '0 0 2px 0' }} />
-                {/* Gloss sweep */}
                 <span style={{ position: 'absolute', inset: 0, background: 'linear-gradient(115deg, transparent 25%, rgba(255,255,255,0.09) 50%, transparent 75%)', backgroundSize: '250% 250%', animation: 'cubeSweep 4s linear infinite', animationDelay: delay, pointerEvents: 'none' }} />
-                {/* Bottom shimmer line */}
                 <span style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '2px', background: 'linear-gradient(90deg, transparent, var(--accent), transparent)', opacity: 0.5, animation: 'shimmerLine 3s ease-in-out infinite', animationDelay: delay }} />
                 <span style={{ position: 'relative', zIndex: 1, textShadow: '0 1px 8px rgba(0,0,0,0.4)' }}>
                   {label}
@@ -280,7 +277,6 @@ const Hero = ({ t, basePath }: { t: Dictionary, basePath: string }) => (
         <path d="M19 9l-7 7-7-7" />
       </svg>
     </div>
-
 
   </section>
 );
@@ -413,65 +409,7 @@ const AiShowcase = ({ t, basePath }: { t: Dictionary, basePath: string }) => (
   </section>
 );
 
-/* ── SKILLS ──────────────────────────────────── */
 
-const Skills = ({ t }: { t: Dictionary }) => {
-  const marketingSkills = t.skills?.marketingSkills || [
-    { name: 'Traditional Marketing', level: 98 },
-    { name: 'Digital Marketing',     level: 95 },
-    { name: 'Analytics',             level: 85 },
-  ];
-  const creativeSkills = t.skills?.creativeSkills || [
-    { name: 'Branding & Strategy', level: 92 },
-    { name: 'Social Media Design', level: 85 },
-    { name: 'Content Writing',     level: 60 },
-  ];
-
-  return (
-    <section className="bg-white dark:bg-[#121212] py-16 sm:py-20">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-10 sm:mb-12">
-          <h2 className="text-3xl sm:text-4xl font-bold text-[#0f0f45] dark:text-[#d4af37]">{t.skills?.title || "Professional Skills"}</h2>
-          <p className="mt-4 text-base sm:text-lg text-[#666666] dark:text-[#b0b0b0]">{t.skills?.subtitle || "Tools and techniques I've mastered"}</p>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-12">
-          {[
-            { heading: t.skills?.marketingHeading || 'Marketing', skills: marketingSkills },
-            { heading: t.skills?.creativeHeading || 'Creative',  skills: creativeSkills  },
-          ].map(({ heading, skills }) => (
-            <div key={heading}>
-              <h3 className="text-xl sm:text-2xl font-bold mb-6 text-[#191970] dark:text-[#d4af37] relative inline-block">
-                {heading}
-                <span className="absolute bottom-[-8px] left-0 w-10 h-[3px] bg-[#ffd700] dark:bg-gradient-to-r dark:from-[#704700] dark:to-[#d4af37] rounded-full" />
-              </h3>
-              <div className="space-y-5 sm:space-y-6 mt-2">
-                {skills.map((skill: { name: string; level: number }) => (
-                  <div key={skill.name}>
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm sm:text-base font-medium text-[#333333] dark:text-[#e0e0e0]">{skill.name}</span>
-                      <span className="text-xs sm:text-sm font-medium text-[#191970] dark:text-[#d4af37]">{skill.level}%</span>
-                    </div>
-                    <div className="w-full rounded-full h-2 sm:h-2.5 overflow-hidden bg-[#f9f9f9] dark:bg-[#333333]">
-                      <div
-                        role="progressbar"
-                        aria-valuenow={skill.level}
-                        aria-valuemin={0}
-                        aria-valuemax={100}
-                        aria-label={`${skill.name}: ${skill.level}%`}
-                        className="h-full rounded-full bg-gradient-to-r from-[#191970] to-[#ffd700] dark:from-[#704700] dark:via-[#a67c00] dark:to-[#d4af37] transition-all duration-500"
-                        style={{ width: `${skill.level}%` }}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-};
 
 /* ── CERTIFICATE PREVIEW ─────────────────────── */
 const CertificatePreview = ({ t, basePath }: { t: Dictionary, basePath: string }) => {
@@ -585,11 +523,11 @@ export default async function Home({ params }: HomeProps) {
   const t = await getDictionary(locale);
 
   return (
-    <main className="overflow-x-hidden">
+    <main>
       <Hero t={t} basePath={basePath} />
       <Expertise t={t} basePath={basePath} />
       <AiShowcase t={t} basePath={basePath} />
-      <Skills t={t} />
+      <WhatIDoSection t={t} basePath={basePath} />
       <CertificatePreview t={t} basePath={basePath} />
       <Cta t={t} basePath={basePath} />
     </main>

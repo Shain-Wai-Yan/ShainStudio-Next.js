@@ -738,6 +738,17 @@
   }
 }
 
+/* ========== SKILL RING ANIMATION ========== */
+@keyframes skillRingFill {
+  from {
+    stroke-dasharray: 0 263.9;
+    opacity: 0.2;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 /* ========== ABOUT PAGE ANIMATIONS ========== */
 @keyframes gradientShift {
   0% {
@@ -1427,6 +1438,12 @@
   100% { transform: translateX(-100%); }
 }
 
+@keyframes tickerScroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+
 .animate-marquee {
   animation: marquee 30s linear infinite;
 }
@@ -1439,3 +1456,4 @@
   -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
   mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
 }
+
