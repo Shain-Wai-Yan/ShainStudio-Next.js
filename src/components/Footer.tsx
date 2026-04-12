@@ -1,19 +1,22 @@
 'use client';
-import React, { useEffect } from 'react';
+
+import React, { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { FaLinkedin, FaGithub, FaEnvelope } from 'react-icons/fa';
 import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
 import { getDictionarySync } from '@/lib/getDictionary';
 
+/* ─── animated verbs ──────────────────────────────────────────────────── */
+const VERBS = ['work', 'wow', 'discover', 'create', 'grow'];
+const VERB_INTERVAL = 2200; // ms between swaps
+
 const Footer = () => {
   const pathname = usePathname();
 
-  // Extract locale from pathname /[locale]/... or fallback to legacy /zh pattern
+  /* locale resolution */
   const pathSegments = pathname.split('/').filter(Boolean);
   let locale: 'en' | 'zh' = DEFAULT_LOCALE as 'en' | 'zh';
-
   if (pathSegments.length > 0) {
     if (isSupportedLocale(pathSegments[0])) {
       locale = pathSegments[0] as 'en' | 'zh';
@@ -26,132 +29,414 @@ const Footer = () => {
   const basePath = locale === 'en' ? '' : `/${locale}`;
   const currentYear = new Date().getFullYear();
 
-  // Load the Credly script after the component mounts
-  useEffect(() => {
-    const script = document.createElement('script');
-    script.src = '//cdn.credly.com/assets/utilities/embed.js';
-    script.async = true;
-    document.body.appendChild(script);
+  /* animated verb state – simple index only, no animating flag */
+  const [verbIdx, setVerbIdx] = useState(0);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  useEffect(() => {
+    intervalRef.current = setInterval(() => {
+      setVerbIdx((prev) => (prev + 1) % VERBS.length);
+    }, VERB_INTERVAL);
     return () => {
-      document.body.removeChild(script);
+      if (intervalRef.current) clearInterval(intervalRef.current);
     };
   }, []);
 
+  /* social icons */
   const socialLinks = [
     { href: 'https://www.linkedin.com/in/shainwaiyan/', label: 'LinkedIn', icon: FaLinkedin },
     { href: 'https://github.com/Shain-Wai-Yan', label: 'GitHub', icon: FaGithub },
     { href: 'mailto:mail@shainwaiyan.com', label: 'Email', icon: FaEnvelope },
   ];
 
+  /* scroll-to-top */
+  const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+
   return (
-    <footer className="bg-[#191970] dark:bg-[#0f0f1e] border-t-4 border-[#ffd700] text-white py-16 w-full">
-      <div className="px-4 sm:px-6 lg:px-8 max-w-full">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+    <footer className="footer-root">
+      {/* ── TOP SECTION ────────────────────────────────────────────── */}
+      <div className="footer-top">
+        {/* Left — editorial headline + CTA */}
+        <div className="footer-hero">
+          <p className="footer-eyebrow">/ {locale === 'zh' ? '准备好合作了吗？' : "READY TO MAKE IT OFFICIAL?"}</p>
 
-          {/* Brand Section */}
-          <div className="flex flex-col gap-4">
-            <Link href={locale === 'en' ? '/' : basePath} className="flex items-center gap-3 hover:opacity-90 transition-opacity duration-300 w-fit group">
-              <Image
-                src="/images/Shain Studio.png"
-                alt="Shain Studio Logo"
-                width={48}
-                height={48}
-                className="w-12 h-12 object-contain rounded group-hover:scale-110 transition-transform duration-300"
-              />
-              <div>
-                <span className="font-bold text-lg block text-[#ffd700] dark:text-[#d4af37]">{"Shain's Studio"}</span>
-                <span className="text-xs text-[#cccccc] dark:text-[#999999]">{t.footer.tagline}</span>
-              </div>
-            </Link>
-            <p className="text-sm leading-relaxed max-w-xs mt-2 text-[#cccccc] dark:text-[#999999]">
-              {t.footer.description}
-            </p>
-          </div>
+          <div className="footer-headline">
+            <span className="footer-hl-line">
+              {locale === 'zh' ? '让我们' : "let's"}&nbsp;
+              {/*
+                Fixed-width verb container: an invisible "discover" (the
+                longest word) reserves the space; each real verb is
+                absolutely stacked on top. Zero layout shift, Safari-safe.
+              */}
+              <span
+                className="relative inline-block"
+                aria-live="polite"
+                aria-atomic="true"
+              >
+                {/* invisible sizer — always "discover" with extra padding so it's never cut off */}
+                <span className="invisible select-none pr-2" aria-hidden="true">
+                  discover
+                </span>
 
-          {/* Certifications / Badges Section */}
-          <div>
-            <h3 className="font-bold text-lg mb-6 pb-2 border-b-2 text-[#ffd700] dark:text-[#d4af37] border-[#ffd700] dark:border-[#d4af37]">
-              {t.footer.certifications}
-            </h3>
-            <div className="flex flex-wrap gap-2 justify-start items-center">
-              {/* Badge 1 */}
-              <div
-                data-iframe-width="120"
-                data-iframe-height="240"
-                data-share-badge-id="69accbc5-d047-45d9-a997-544af3a0d61a"
-                data-share-badge-host="https://www.credly.com"
-              ></div>
+                {/* all verbs stacked; only the current one is visible */}
+                {VERBS.map((verb, i) => {
+                  let position = 'next';
+                  if (i === verbIdx) position = 'active';
+                  else if (i === verbIdx - 1 || (verbIdx === 0 && i === VERBS.length - 1)) position = 'prev';
 
-              {/* Badge 2 */}
-              <div
-                data-iframe-width="120"
-                data-iframe-height="240"
-                data-share-badge-id="335116bf-3f68-4605-8c27-26a59e7716c4"
-                data-share-badge-host="https://www.credly.com"
-              ></div>
-
-              {/* Badge 3 */}
-              <div
-                data-iframe-width="120"
-                data-iframe-height="240"
-                data-share-badge-id="a40dacba-cd6a-496d-8275-88339c8f18d4"
-                data-share-badge-host="https://www.credly.com"
-              ></div>
-            </div>
-            {/* SEO context for iframes */}
-            <span className="sr-only">
-              Certified by Google in Digital Marketing & E-Commerce. Certified by Meta in Social Media Marketing.
+                  return (
+                    <span
+                      key={verb}
+                      className="footer-verb absolute left-0 top-0 w-full h-full flex items-center justify-start"
+                      style={{
+                        opacity: position === 'active' ? 1 : 0,
+                        transform: 
+                          position === 'active' ? 'translateY(0)' :
+                          position === 'prev' ? 'translateY(-100%)' : 'translateY(100%)',
+                        transition: position === 'next' ? 'none' : 'opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1)',
+                        WebkitTransition: position === 'next' ? 'none' : 'opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), -webkit-transform 0.8s cubic-bezier(0.22, 1, 0.36, 1)',
+                        pointerEvents: position === 'active' ? 'auto' : 'none',
+                      }}
+                      aria-hidden={position !== 'active'}
+                    >
+                      {verb}
+                    </span>
+                  );
+                })}
+              </span>
             </span>
-          </div>
-
-          {/* Social Links Section */}
-          <div>
-            <h3 className="font-bold text-lg mb-6 pb-2 border-b-2 text-[#ffd700] dark:text-[#d4af37] border-[#ffd700] dark:border-[#d4af37]">
-              {t.footer.connectWithMe}
-            </h3>
-            <div className="flex gap-4">
-              {socialLinks.map((social) => {
-                const Icon = social.icon;
-                return (
-                  <a
-                    key={social.label}
-                    href={social.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-12 h-12 flex items-center justify-center rounded-lg transition-all duration-300 transform hover:scale-125 font-bold text-white bg-[#2a2a9a] dark:bg-[#3a3a4a] hover:bg-[#ffd700] dark:hover:bg-[#d4af37] hover:text-[#191970]"
-                    aria-label={social.label}
-                  >
-                    <Icon size={22} />
-                  </a>
-                );
-              })}
-            </div>
+            <span className="footer-hl-line footer-hl-line--row">
+              {locale === 'zh' ? '一起' : 'together'}
+              <button
+                onClick={scrollToTop}
+                aria-label="Scroll to top / Contact CTA"
+                className="footer-cta-btn"
+              >
+                <span className="footer-cta-arrow">↗</span>
+              </button>
+            </span>
           </div>
         </div>
 
-        <div className="border-t border-[#2a2a9a] dark:border-[#333333] my-12"></div>
+        {/* Right — columns */}
+        <div className="footer-cols">
+          {/* Write to us */}
+          <div className="footer-col">
+            <p className="footer-col-label">/ {locale === 'zh' ? '联系我们' : 'WRITE TO US'}</p>
+            <div className="footer-col-group">
+              <p className="footer-col-key">{locale === 'zh' ? '电子邮件' : 'EMAIL'}</p>
+              <a href="mailto:mail@shainwaiyan.com" className="footer-col-val footer-link">
+                mail@shainwaiyan.com
+              </a>
+            </div>
+            <div className="footer-col-group">
+              <p className="footer-col-key">{locale === 'zh' ? '社交媒体' : 'SOCIAL'}</p>
+              <div className="footer-social-row">
+                {socialLinks.map(({ href, label, icon: Icon }) => (
+                  <a
+                    key={label}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={label}
+                    className="footer-social-icon"
+                  >
+                    <Icon size={16} />
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
 
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-sm">
-          <p className="text-[#e0e0e0] dark:text-[#999999]">
-            &copy; {currentYear} {"Shain Studio"}. {t.footer.allRightsReserved}
+          {/* Navigate */}
+          <div className="footer-col">
+            <p className="footer-col-label">/ {locale === 'zh' ? '网站导航' : 'NAVIGATE'}</p>
+            <div className="footer-col-group">
+              <Link href={locale === 'en' ? '/' : basePath} className="footer-col-val footer-link">
+                {locale === 'zh' ? '首页' : 'Home'}
+              </Link>
+              <Link href={`${basePath}/about`} className="footer-col-val footer-link">
+                {locale === 'zh' ? '关于' : 'About'}
+              </Link>
+              <Link href={`${basePath}/portfolio`} className="footer-col-val footer-link">
+                {locale === 'zh' ? '作品集' : 'Portfolio'}
+              </Link>
+              <Link href={`${basePath}/contact`} className="footer-col-val footer-link">
+                {locale === 'zh' ? '联系' : 'Contact'}
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── BACK TO TOP ───────────────────────────────────────────── */}
+      <div className="footer-divider" />
+      <button onClick={scrollToTop} className="footer-back-top">
+        <span className="footer-back-top-arrow">↗</span>
+        <span>{locale === 'zh' ? '回到顶部' : 'BACK TO THE TOP'}</span>
+      </button>
+
+      {/* ── BOTTOM BAR ────────────────────────────────────────────── */}
+      <div className="footer-bottom-wrapper">
+        <div className="footer-bottom">
+          <p className="footer-copy">
+            &copy; {currentYear} Shain Studio.&nbsp;{t.footer.allRightsReserved}
           </p>
-          <div className="flex gap-8">
-            <Link
-              href={`${basePath}/privacy`}
-              className="text-[#cccccc] dark:text-[#777777] hover:text-[#ffd700] dark:hover:text-[#d4af37] transition-colors duration-300 font-medium"
-            >
+
+          <div className="footer-bottom-links">
+            <Link href={`${basePath}/privacy`} className="footer-bottom-link">
               {t.footer.privacyPolicy}
             </Link>
-            <Link
-              href={`${basePath}/terms`}
-              className="text-[#cccccc] dark:text-[#777777] hover:text-[#ffd700] dark:hover:text-[#d4af37] transition-colors duration-300 font-medium"
-            >
+            <span className="footer-bottom-sep">\</span>
+            <Link href={`${basePath}/terms`} className="footer-bottom-link">
               {t.footer.termsOfService}
             </Link>
           </div>
         </div>
       </div>
+
+      {/* ── INLINE STYLES ─────────────────────────────────────────── */}
+      <style>{`
+        /* ── root ── */
+        .footer-root {
+          background-color: #191970;
+          color: #e8e8e8;
+          font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+          width: 100%;
+          border-top: 3px solid #ffd700;
+        }
+
+        /* dark mode override */
+        @media (prefers-color-scheme: dark) {
+          .footer-root { background-color: #0c0c14; }
+        }
+        :global(.dark-mode) .footer-root,
+        .dark .footer-root {
+          background-color: #0c0c14;
+        }
+
+        /* ── top section ── */
+        .footer-top {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 3rem;
+          padding: 4rem 5vw 2rem;
+          align-items: start;
+        }
+        @media (max-width: 768px) {
+          .footer-top { grid-template-columns: 1fr; padding: 3rem 1.5rem 1.5rem; }
+        }
+
+        /* ── hero ── */
+        .footer-hero { display: flex; flex-direction: column; gap: 1rem; }
+
+        .footer-eyebrow {
+          font-size: 0.7rem;
+          letter-spacing: 0.18em;
+          color: #808080;
+          text-transform: uppercase;
+          margin: 0;
+          font-weight: 500;
+        }
+
+        .footer-headline {
+          display: flex;
+          flex-direction: column;
+          gap: 0.1rem;
+          line-height: 1;
+        }
+
+        .footer-hl-line {
+          display: block;
+          font-size: clamp(3rem, 7vw, 6rem);
+          font-weight: 800;
+          color: #ffffff;
+          letter-spacing: -0.03em;
+          line-height: 1.05;
+          text-transform: lowercase;
+          font-family: 'Poppins', 'Inter', sans-serif;
+        }
+
+        .footer-hl-line--row {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+        }
+
+        /* ── animated verb (color + italic only; transitions via inline style) ── */
+        .footer-verb {
+          color: #ffd700;
+          font-style: italic;
+          will-change: opacity, transform;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* ── CTA circle button ── */
+        .footer-cta-btn {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 3.2rem;
+          height: 3.2rem;
+          border-radius: 50%;
+          background: #ffffff;
+          color: #0c0c14;
+          border: none;
+          cursor: pointer;
+          flex-shrink: 0;
+          transition: background 0.25s ease, transform 0.25s ease;
+          font-size: 1.1rem;
+        }
+        .footer-cta-btn:hover {
+          background: #ffd700;
+          transform: rotate(45deg) scale(1.08);
+        }
+        .footer-cta-arrow { line-height: 1; }
+
+        /* ── columns ── */
+        .footer-cols {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 2rem;
+          padding-top: 2rem;
+        }
+        @media (max-width: 480px) {
+          .footer-cols { grid-template-columns: 1fr; }
+        }
+
+        .footer-col { display: flex; flex-direction: column; gap: 1.2rem; }
+
+        .footer-col-label {
+          font-size: 0.65rem;
+          letter-spacing: 0.18em;
+          color: #666;
+          text-transform: uppercase;
+          margin: 0;
+          font-weight: 500;
+        }
+
+        .footer-col-group { display: flex; flex-direction: column; gap: 0.25rem; }
+
+        .footer-col-key {
+          font-size: 0.7rem;
+          letter-spacing: 0.12em;
+          font-weight: 700;
+          color: #aaaaaa;
+          text-transform: uppercase;
+          margin: 0 0 0.15rem;
+        }
+
+        .footer-col-val {
+          font-size: 0.82rem;
+          color: #cccccc;
+          margin: 0;
+          line-height: 1.7;
+        }
+
+        .footer-link {
+          text-decoration: none;
+          color: #cccccc;
+          transition: color 0.2s ease;
+        }
+        .footer-link:hover { color: #ffd700; }
+
+        /* social row */
+        .footer-social-row {
+          display: flex;
+          gap: 0.6rem;
+          margin-top: 0.3rem;
+          flex-wrap: wrap;
+        }
+        .footer-social-icon {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 2rem;
+          height: 2rem;
+          border-radius: 6px;
+          background: rgba(255,215,0,0.08);
+          border: 1px solid rgba(255,215,0,0.15);
+          color: #cccccc;
+          text-decoration: none;
+          transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+        }
+        .footer-social-icon:hover {
+          background: #ffd700;
+          color: #0c0c14;
+          transform: translateY(-2px);
+          border-color: #ffd700;
+        }
+
+        /* ── divider ── */
+        .footer-divider {
+          height: 1px;
+          background: rgba(255,255,255,0.08);
+          margin: 0 5vw;
+        }
+
+        /* ── back to top ── */
+        .footer-back-top {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 1rem 5vw;
+          background: none;
+          border: none;
+          cursor: pointer;
+          color: #888;
+          font-size: 0.68rem;
+          letter-spacing: 0.16em;
+          text-transform: uppercase;
+          font-weight: 600;
+          transition: color 0.2s ease;
+        }
+        .footer-back-top:hover { color: #ffd700; }
+        .footer-back-top-arrow { font-size: 0.9rem; }
+
+        /* ── bottom bar wrapper (white card, flush to bottom) ── */
+        .footer-bottom-wrapper {
+          padding: 0 5vw 0;
+        }
+        .footer-bottom {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 1.2rem 2rem;
+          flex-wrap: wrap;
+          gap: 0.75rem;
+          background: #ffffff;
+          border-radius: 16px 16px 0 0;
+        }
+
+        .footer-copy {
+          font-size: 0.7rem;
+          color: #333333;
+          margin: 0;
+          letter-spacing: 0.05em;
+          text-transform: uppercase;
+          font-weight: 500;
+        }
+
+        .footer-bottom-links {
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+
+        .footer-bottom-link {
+          font-size: 0.7rem;
+          color: #333333;
+          text-decoration: none;
+          text-transform: uppercase;
+          letter-spacing: 0.06em;
+          font-weight: 500;
+          transition: color 0.2s ease;
+        }
+        .footer-bottom-link:hover { color: #191970; }
+
+        .footer-bottom-sep { color: #aaaaaa; font-size: 0.75rem; }
+      `}</style>
     </footer>
   );
 };
