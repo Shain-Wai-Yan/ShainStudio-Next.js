@@ -24,74 +24,62 @@ export function CertificateCard({
     <div
       onClick={onClick}
       className="
-        relative w-full h-full cursor-pointer overflow-hidden
-        bg-white dark:bg-gray-900
-        shadow-md
-        border-2 border-transparent
-        transition-all duration-500
-        hover:-translate-y-3 hover:scale-[1.02] hover:[rotateX(5deg)] hover:shadow-2xl
-        hover:[border-image:linear-gradient(135deg,#ffd700,#191970,#ffd700)_1]
+        relative w-full h-full cursor-pointer overflow-hidden rounded-[16px]
+        bg-white/80 dark:bg-gray-900/60 backdrop-blur-md
+        shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)]
+        border border-gray-200/50 dark:border-gray-700/50
+        transition-all duration-700 ease-out
+        hover:-translate-y-4 hover:scale-[1.04] hover:shadow-2xl hover:shadow-[#1A3A2A]/15 dark:hover:shadow-[#a67c00]/20
         group
-        [transform-style:preserve-3d] [perspective:1000px]
+        [transform-style:preserve-3d] [perspective:1200px]
         [-webkit-tap-highlight-color:transparent]
       "
-      style={{ borderRadius: '0.375rem' }}
     >
-      {/* Gold gradient border on hover via pseudo — done with a wrapper div */}
-      <div className="absolute -inset-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10 rounded-[6px]"
-        style={{ background: 'linear-gradient(135deg, #ffd700 0%, #191970 50%, #ffd700 100%)' }}
-      />
-
-      {/* Image */}
-      <div className="relative w-full h-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
-        {displayImage ? (
-          <Image
-            src={optimizeCloudinaryUrl(displayImage)}
-            alt={title}
-            fill
-            sizes="(max-width: 768px) 288px, 320px"
-            className="object-cover transition-all duration-500 group-hover:scale-[1.08] group-hover:brightness-[1.05] group-hover:saturate-[1.2]"
-            onError={() => setImageError(true)}
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-300 to-gray-400 dark:from-gray-600 dark:to-gray-700">
-            <svg className="w-12 h-12 text-gray-500 opacity-50" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
-            </svg>
-          </div>
-        )}
+      {/* Premium Inner Ambient Glow */}
+      <div className="absolute inset-0 rounded-[16px] border border-white/60 dark:border-white/10 z-20 pointer-events-none" />
+      
+      {/* Animated Foil Sweep on Hover */}
+      <div className="absolute inset-0 z-20 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-700 overflow-hidden rounded-[16px]">
+        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/50 dark:via-[#ffd700]/15 to-transparent -translate-x-[150%] group-hover:translate-x-[150%] transition-transform duration-1000 ease-in-out" />
       </div>
 
-      {/* Hover overlay — gradient fades to transparent at top, certificate stays visible */}
-      <div
-        className="absolute inset-x-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out backdrop-blur-[10px] p-3 md:p-4"
-        style={{
-          background: 'linear-gradient(to top, rgba(25,25,112,0.95) 0%, rgba(25,25,112,0.80) 50%, transparent 100%)',
-        }}
-      >
-        {/* Dark mode overlay */}
-        <div
-          className="absolute inset-0 opacity-0 dark:opacity-100 pointer-events-none"
-          style={{
-            background: 'linear-gradient(to top, rgba(166,124,0,0.95) 0%, rgba(166,124,0,0.80) 50%, transparent 100%)',
-          }}
-        />
+      {/* Image Container with Elegant Matting */}
+      <div className="relative w-full h-full bg-gray-50/30 dark:bg-gray-950/30 p-[8px]">
+        <div className="relative w-full h-full overflow-hidden rounded-[10px] shadow-[inset_0_2px_10px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_10px_rgba(0,0,0,0.4)]">
+          {displayImage ? (
+            <Image
+              src={optimizeCloudinaryUrl(displayImage)}
+              alt={title}
+              fill
+              sizes="(max-width: 768px) 288px, 320px"
+              className="object-cover transition-transform duration-1000 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] group-hover:scale-[1.12]"
+              onError={() => setImageError(true)}
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900">
+              <svg className="w-12 h-12 text-gray-400 dark:text-gray-600 opacity-50" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
+              </svg>
+            </div>
+          )}
+        </div>
+      </div>
 
-        <div className="relative z-10">
-          {/* Title — gold/accent color, wraps fully */}
-          <h3 className="font-semibold text-[#ffe347] dark:text-white text-sm leading-snug mb-1">
+      {/* Hover Information Overlay - Refined Glassmorphic Card */}
+      <div className="absolute inset-x-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] p-[8px] z-30">
+         <div className="w-full rounded-[10px] overflow-hidden backdrop-blur-xl bg-white/85 dark:bg-gray-950/85 border border-white/60 dark:border-gray-700/50 p-4 shadow-xl transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 delay-75 ease-[cubic-bezier(0.23,1,0.32,1)]">
+          <h3 className="font-semibold text-[#1A3A2A] dark:text-[#ffd700] text-sm leading-snug mb-1 line-clamp-2">
             {title}
           </h3>
-
-          {/* Issuer — white, slightly muted */}
-          <p className="text-white/90 text-xs font-normal mb-1.5">
+          <p className="text-[#1A3A2A]/70 dark:text-gray-300 text-[0.7rem] font-medium mb-3 tracking-widest uppercase">
             {issuedBy}
           </p>
-
-          {/* Click hint — gold italic */}
-          <p className="text-[#ffd700] dark:text-[#191970] text-[0.7rem] italic opacity-90">
-            Click to view details
-          </p>
+          <div className="flex items-center gap-3">
+            <div className="h-[1px] flex-1 bg-gradient-to-r from-[#1A3A2A]/30 dark:from-[#ffd700]/30 to-transparent" />
+            <p className="text-[#1A3A2A]/60 dark:text-[#ffd700]/70 text-[0.6rem] font-bold tracking-[0.2em]">
+              VIEW
+            </p>
+          </div>
         </div>
       </div>
     </div>

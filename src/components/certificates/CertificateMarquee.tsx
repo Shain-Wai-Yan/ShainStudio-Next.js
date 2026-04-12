@@ -26,7 +26,9 @@ export function CertificateMarquee({ certificates }: CertificateMarqueeProps) {
   return (
     <>
       {/* Full-width marquee section — edge to edge, no padding */}
-      <div className="w-screen relative left-1/2 -translate-x-1/2 space-y-1">
+      <div 
+        className="w-full relative space-y-4 py-8 max-md:[mask-image:none] max-md:[-webkit-mask-image:none] md:[mask-image:linear-gradient(to_right,transparent,black_15%,black_85%,transparent)] md:[-webkit-mask-image:linear-gradient(to_right,transparent,black_15%,black_85%,transparent)]"
+      >
         <CertificateRow
           certificates={rows.row1.map((c) => ({ id: c.id, title: c.Title, issuedBy: c.IssuedBy, imageUrl: c.imageUrl }))}
           direction="left"
