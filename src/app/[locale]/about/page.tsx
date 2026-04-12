@@ -6,6 +6,7 @@ import { getDictionary } from '@/lib/getDictionary';
 import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
 import MarTechStack from '@/components/MarTechStack';
 import ScrollAnimator from '@/components/ScrollAnimator';
+import ScrollRevealText from '@/components/about/ScrollRevealText';
 
 interface AboutProps {
   params: Promise<{ locale: string }>;
@@ -201,9 +202,7 @@ export default async function AboutPage({ params }: AboutProps) {
               </h2>
               
               <div className="prose prose-lg dark:prose-invert max-w-none prose-p:leading-relaxed prose-p:text-text-light dark:prose-p:text-gray-400 prose-p:font-light">
-                <p>
-                  {t.aboutPage.myStoryText}
-                </p>
+                <ScrollRevealText text={t.aboutPage.myStoryText} />
               </div>
             </section>
 

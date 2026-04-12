@@ -8,7 +8,6 @@ import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
 import { getDictionarySync } from '@/lib/getDictionary';
 
 /* ─── animated verbs ──────────────────────────────────────────────────── */
-const VERBS = ['work', 'wow', 'discover', 'create', 'grow'];
 const VERB_INTERVAL = 2200; // ms between swaps
 
 const Footer = () => {
@@ -25,9 +24,13 @@ const Footer = () => {
     }
   }
 
+  /* ── localization ── */
   const t = getDictionarySync(locale);
   const basePath = locale === 'en' ? '' : `/${locale}`;
   const currentYear = new Date().getFullYear();
+
+  const verbs = (t.footer.verbs as string[]) || ['work', 'wow', 'discover', 'create', 'grow'];
+  const longestVerb = (t.footer.longestVerb as string) || 'discover';
 
   /* animated verb state – simple index only, no animating flag */
   const [verbIdx, setVerbIdx] = useState(0);
@@ -35,12 +38,12 @@ const Footer = () => {
 
   useEffect(() => {
     intervalRef.current = setInterval(() => {
-      setVerbIdx((prev) => (prev + 1) % VERBS.length);
+      setVerbIdx((prev) => (prev + 1) % verbs.length);
     }, VERB_INTERVAL);
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, []);
+  }, [verbs.length]);
 
   /* social icons */
   const socialLinks = [
@@ -62,51 +65,83 @@ const Footer = () => {
 
           <div className="footer-headline">
             <span className="footer-hl-line">
-              {locale === 'zh' ? '让我们' : "let's"}&nbsp;
-              {/*
-                Fixed-width verb container: an invisible "discover" (the
-                longest word) reserves the space; each real verb is
-                absolutely stacked on top. Zero layout shift, Safari-safe.
-              */}
-              <span
-                className="relative inline-block"
-                aria-live="polite"
-                aria-atomic="true"
-              >
-                {/* invisible sizer — always "discover" with extra padding so it's never cut off */}
-                <span className="invisible select-none pr-2" aria-hidden="true">
-                  discover
+              {locale === 'zh' ? '让我们一起' : "let's"}&nbsp;
+              {locale === 'en' && (
+                <span
+                  className="relative inline-block"
+                  aria-live="polite"
+                  aria-atomic="true"
+                >
+                  {/* invisible sizer — always longestVerb with extra padding so it's never cut off */}
+                  <span className="invisible select-none pr-2" aria-hidden="true">
+                    {longestVerb}
+                  </span>
+
+                  {/* all verbs stacked; only the current one is visible */}
+                  {verbs.map((verb, i) => {
+                    let position = 'next';
+                    if (i === verbIdx) position = 'active';
+                    else if (i === verbIdx - 1 || (verbIdx === 0 && i === verbs.length - 1)) position = 'prev';
+
+                    return (
+                      <span
+                        key={verb}
+                        className="footer-verb absolute left-0 top-0 w-full h-full flex items-center justify-start"
+                        style={{
+                          opacity: position === 'active' ? 1 : 0,
+                          transform: 
+                            position === 'active' ? 'translateY(0)' :
+                            position === 'prev' ? 'translateY(-100%)' : 'translateY(100%)',
+                          transition: position === 'next' ? 'none' : 'opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1)',
+                          WebkitTransition: position === 'next' ? 'none' : 'opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), -webkit-transform 0.8s cubic-bezier(0.22, 1, 0.36, 1)',
+                          pointerEvents: position === 'active' ? 'auto' : 'none',
+                        }}
+                        aria-hidden={position !== 'active'}
+                      >
+                        {verb}
+                      </span>
+                    );
+                  })}
                 </span>
-
-                {/* all verbs stacked; only the current one is visible */}
-                {VERBS.map((verb, i) => {
-                  let position = 'next';
-                  if (i === verbIdx) position = 'active';
-                  else if (i === verbIdx - 1 || (verbIdx === 0 && i === VERBS.length - 1)) position = 'prev';
-
-                  return (
-                    <span
-                      key={verb}
-                      className="footer-verb absolute left-0 top-0 w-full h-full flex items-center justify-start"
-                      style={{
-                        opacity: position === 'active' ? 1 : 0,
-                        transform: 
-                          position === 'active' ? 'translateY(0)' :
-                          position === 'prev' ? 'translateY(-100%)' : 'translateY(100%)',
-                        transition: position === 'next' ? 'none' : 'opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1)',
-                        WebkitTransition: position === 'next' ? 'none' : 'opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), -webkit-transform 0.8s cubic-bezier(0.22, 1, 0.36, 1)',
-                        pointerEvents: position === 'active' ? 'auto' : 'none',
-                      }}
-                      aria-hidden={position !== 'active'}
-                    >
-                      {verb}
-                    </span>
-                  );
-                })}
-              </span>
+              )}
             </span>
             <span className="footer-hl-line footer-hl-line--row">
-              {locale === 'zh' ? '一起' : 'together'}
+              {locale === 'zh' && (
+                <span
+                  className="relative inline-block"
+                  aria-live="polite"
+                  aria-atomic="true"
+                >
+                  <span className="invisible select-none pr-2" aria-hidden="true">
+                    {longestVerb}
+                  </span>
+                  {verbs.map((verb, i) => {
+                    let position = 'next';
+                    if (i === verbIdx) position = 'active';
+                    else if (i === verbIdx - 1 || (verbIdx === 0 && i === verbs.length - 1)) position = 'prev';
+
+                    return (
+                      <span
+                        key={verb}
+                        className="footer-verb absolute left-0 top-0 w-full h-full flex items-center justify-start"
+                        style={{
+                          opacity: position === 'active' ? 1 : 0,
+                          transform: 
+                            position === 'active' ? 'translateY(0)' :
+                            position === 'prev' ? 'translateY(-100%)' : 'translateY(100%)',
+                          transition: position === 'next' ? 'none' : 'opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1)',
+                          WebkitTransition: position === 'next' ? 'none' : 'opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), -webkit-transform 0.8s cubic-bezier(0.22, 1, 0.36, 1)',
+                          pointerEvents: position === 'active' ? 'auto' : 'none',
+                        }}
+                        aria-hidden={position !== 'active'}
+                      >
+                        {verb}
+                      </span>
+                    );
+                  })}
+                </span>
+              )}
+              {locale === 'en' && 'together'}
               <button
                 onClick={scrollToTop}
                 aria-label="Scroll to top / Contact CTA"

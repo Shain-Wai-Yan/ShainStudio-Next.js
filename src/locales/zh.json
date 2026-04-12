@@ -73,6 +73,8 @@
     "cta": "查看 AI 营销实例"
   },
   "footer": {
+    "verbs": ["合作", "惊艳", "探索", "创造", "成长"],
+    "longestVerb": "探索",
     "quickLinks": "快速链接",
     "getInTouch": "联系我",
     "followMe": "关注我",

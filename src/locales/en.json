@@ -73,6 +73,8 @@
     "cta": "See AI Marketing in Action"
   },
   "footer": {
+    "verbs": ["work", "wow", "discover", "create", "grow"],
+    "longestVerb": "discover",
     "quickLinks": "Quick Links",
     "getInTouch": "Get In Touch",
     "followMe": "Follow Me",
