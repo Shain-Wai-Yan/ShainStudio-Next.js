@@ -422,13 +422,71 @@
     "ctaFooter": "无需任何承诺"
   },
   "homePage": {
-    "badge": "营销 · 策略 · 创新",
-    "title": "欢迎来到",
-    "titleHighlight": "Shain的工作室",
-    "subtitle": "创意与成果完美结合。",
-    "description": "探索我通过营销卓越、专业成就和创意解决方案的历程。",
-    "viewPortfolio": "查看我的作品集",
-    "getInTouch": "联系我"
+    "badge": "开放合作中",
+    "eyebrow": "Shain Wai Yan · Xolbine · 明元易",
+    "title": "架构",
+    "titleHighlight": "数字身份.",
+    "subtitle": "我不只是使用工具，我创造它们。",
+    "description": "数字营销行家。氛围编码者 (Vibe Coder)。系统架构师。我通过 AI 编排构建获奖级别的产品，并在谷歌上建立个人品牌权重 —— 一切皆非科班出身。",
+    "viewPortfolio": "查看作品",
+    "getInTouch": "联系我",
+    "marqueeItems": [
+      "数字营销",
+      "Vibe Coding",
+      "SEO 实体管理",
+      "Next.js",
+      "系统架构",
+      "AI 编排",
+      "全国奖项获得者",
+      "三语双轨",
+      "品牌战略",
+      "Cloudflare Workers",
+      "内容创作者",
+      "超 10W+ 浏览量"
+    ],
+    "stats": [
+      { "value": 99, "suffix": "/100", "label": "SEO健康评分" },
+      { "value": 100, "suffix": "K+", "label": "累计浏览量" },
+      { "value": 2, "suffix": "×", "label": "全国奖项" },
+      { "value": 3, "suffix": "", "label": "掌握语言" }
+    ],
+    "projects": [
+      {
+        "tag": "AI · 医疗",
+        "award": "🏆 亚军 + 影响力奖",
+        "title": "MedCare AI",
+        "desc": "基于 Next.js 与 Cloudflare Workers 构建的全国获奖级 AI 医疗健康原型。",
+        "href": "/portfolio/coding-projects"
+      },
+      {
+        "tag": "金融 · 数据",
+        "title": "WOWS Terminal",
+        "desc": "专业级股票图表终端，深度集成 TradingView 高级图表库。",
+        "href": "/portfolio/coding-projects"
+      },
+      {
+        "tag": "身份 · SEO",
+        "title": "数字作品集",
+        "desc": "基于 Strapi CMS 与 Cloudflare 驱动的双语 Next.js 极速网站，SEO 得分 99/100。",
+        "href": "/portfolio/coding-projects"
+      },
+      {
+        "tag": "底层基础设施",
+        "title": "私有短信网关",
+        "desc": "集成了 Twilio 与 Next.js 的私有仪表盘，用于自动化触发和极速身份验证。",
+        "href": "/portfolio/coding-projects"
+      }
+    ],
+    "stack": [
+      "Next.js", "TypeScript", "Cloudflare Workers", "Strapi", "Twilio",
+      "Cursor AI", "v0", "TradingView API", "AmneziaWG", "SEO",
+      "Google Analytics", "Vercel"
+    ],
+    "ctaTitle": "让我们构建",
+    "ctaHighlight": "非凡之作.",
+    "ctaSub": "无论您需要制定前沿的营销策略，还是落地一套完整的软件系统 —— 我都能完美衔接愿景与执行的鸿沟。",
+    "ctaButton": "立即联系",
+    "ctaSecondary": "查看作品集"
   },
   "contactPage": {
     "heroTitle": "联系",

@@ -422,14 +422,73 @@
     "ctaFooter": "No commitment required"
   },
   "homePage": {
-    "badge": "Marketing · Strategy · Innovation",
-    "title": "Welcome to",
-    "titleHighlight": "Shain's Studio",
-    "subtitle": "Where creativity meets results.",
-    "description": "Explore my journey through marketing excellence, professional achievements, and creative solutions.",
-    "viewPortfolio": "View My Portfolio",
-    "getInTouch": "Get In Touch"
+    "badge": "Available for Collaboration",
+    "eyebrow": "Shain Wai Yan · Xolbine · 明元易",
+    "title": "Architecting",
+    "titleHighlight": "Digital Identities.",
+    "subtitle": "I don't just use tools — I build them.",
+    "description": "Digital Marketer. Vibe Coder. Systems Architect. I orchestrate AI to build award-winning products and rank myself on Google — all without a CS degree.",
+    "viewPortfolio": "View My Work",
+    "getInTouch": "Let's Talk",
+    "marqueeItems": [
+      "Digital Marketing",
+      "Vibe Coding",
+      "SEO Entity Management",
+      "Next.js",
+      "Systems Architecture",
+      "AI Orchestration",
+      "Award Winner",
+      "Trilingual",
+      "Brand Strategy",
+      "Cloudflare Workers",
+      "Content Creator",
+      "100K+ Views"
+    ],
+    "stats": [
+      { "value": 99, "suffix": "/100", "label": "SEO Health Score" },
+      { "value": 100, "suffix": "K+", "label": "Combined Views" },
+      { "value": 2, "suffix": "×", "label": "Award Winner" },
+      { "value": 3, "suffix": "", "label": "Languages" }
+    ],
+    "projects": [
+      {
+        "tag": "AI · Healthcare",
+        "award": "🏆 2nd Prize + Impact Award",
+        "title": "MedCare AI",
+        "desc": "National award-winning AI healthcare prototype built with Next.js, Cloudflare Workers & Shadcn UI.",
+        "href": "/portfolio/coding-projects"
+      },
+      {
+        "tag": "Finance · Data",
+        "title": "WOWS Terminal",
+        "desc": "Professional-grade stock analyzer integrating TradingView's Advanced Charting Library.",
+        "href": "/portfolio/coding-projects"
+      },
+      {
+        "tag": "Identity · SEO",
+        "title": "Portfolio Ecosystem",
+        "desc": "A bilingual Next.js portfolio with Strapi CMS, Cloudflare Workers, and a 99/100 SEO health score.",
+        "href": "/portfolio/coding-projects"
+      },
+      {
+        "tag": "Infrastructure",
+        "title": "Private SMS Gateway",
+        "desc": "Custom Twilio + Next.js dashboard for private SMS-based triggers and verifications.",
+        "href": "/portfolio/coding-projects"
+      }
+    ],
+    "stack": [
+      "Next.js", "TypeScript", "Cloudflare Workers", "Strapi", "Twilio",
+      "Cursor AI", "v0", "TradingView API", "AmneziaWG", "SEO",
+      "Google Analytics", "Vercel"
+    ],
+    "ctaTitle": "Let's Build Something",
+    "ctaHighlight": "Remarkable.",
+    "ctaSub": "Whether you need a marketing strategy, a coded system, or both — I bridge the gap between vision and execution.",
+    "ctaButton": "Get In Touch",
+    "ctaSecondary": "See My Work"
   },
+
   "contactPage": {
     "heroTitle": "Contact",
     "heroTitleHighlight": "Me",
