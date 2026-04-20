@@ -1,0 +1,89 @@
+"use client";
+
+import React, { useRef } from "react";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
+
+interface GsapMarqueeProps {
+  items: string[];
+}
+
+export default function GsapMarquee({ items }: GsapMarqueeProps) {
+  const containerRef = useRef<HTMLElement>(null);
+  const marqueeInnerRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(
+    () => {
+      // 1. Entrance animation on scroll
+      gsap.fromTo(
+        containerRef.current,
+        { opacity: 0, rotate: 2 },
+        {
+          opacity: 1,
+          rotate: -2, // Final rotation like the awwwards style
+          duration: 1,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: containerRef.current,
+            start: "top 90%",
+            end: "top 60%",
+            scrub: 1,
+          },
+        }
+      );
+
+      // 2. Continuous horizontal scroll using GSAP
+      // Actually, simple CSS animation is often better for battery life, but GSAP offers scrub features.
+      // We will do a standard CSS infinite but modify the X speed on scroll!
+      
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 0.5,
+        },
+      });
+
+      // When user scrolls down, push the marquee slightly left to create a parallax dynamic feeling
+      tl.to(marqueeInnerRef.current, {
+        xPercent: -20,
+        ease: "none",
+      });
+    },
+    { scope: containerRef }
+  );
+
+  const displayItems = items && items.length > 0 ? items : ["Vibe Coding", "Digital Strategy"];
+
+  return (
+    <section ref={containerRef} className="py-12 md:py-24 bg-transparent overflow-hidden">
+      <div className="relative -mx-4 pb-4 md:mx-0 w-[110%] -left-[5%] bg-gradient-to-r from-[#bf953f] via-[#fcf6ba] to-[#b38728] text-[#1e1e48] border-y-2 border-[#1e1e48] dark:border-[#d4af37] shadow-2xl z-20">
+        <div 
+          ref={marqueeInnerRef}
+          className="flex whitespace-nowrap overflow-hidden py-4 md:py-6"
+        >
+          <div className="animate-[marqueeScroll_30s_linear_infinite] flex items-center min-w-max">
+            {[...displayItems, ...displayItems, ...displayItems].map(
+              (item, idx) => (
+                <div key={idx} className="flex items-center mx-6 md:mx-10">
+                  <span className="text-3xl md:text-5xl lg:text-7xl font-serif font-black uppercase tracking-tighter mix-blend-color-burn opacity-90 drop-shadow-sm">
+                    {item}
+                  </span>
+                  <span className="mx-6 md:mx-10 text-2xl md:text-4xl text-[#1e1e48]/50">
+                    ✦
+                  </span>
+                </div>
+              )
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}

@@ -59,7 +59,9 @@ export default function HeroTypewriter() {
       className="hero-typewriter"
       aria-label={`Role: ${ROLES[roleIndex]}`}
     >
-      <span className="hero-typewriter__text">{displayed}</span>
+      <span className="hero-typewriter__text text-[#1e1e48] dark:!text-transparent dark:!bg-clip-text dark:!bg-gradient-to-r dark:!from-[#bf953f] dark:!via-[#fcf6ba] dark:!to-[#b38728]">
+        {displayed}
+      </span>
       <span className="hero-typewriter__cursor" aria-hidden="true">|</span>
     </span>
   );

@@ -427,7 +427,7 @@
     "title": "Architecting",
     "titleHighlight": "Digital Identities.",
     "subtitle": "I don't just use tools — I build them.",
-    "description": "Digital Marketer. Vibe Coder. Systems Architect. I orchestrate AI to build award-winning products and rank myself on Google — all without a CS degree.",
+    "description": "Digital Marketer. Vibe Coder. Systems Architect. I am a marketer who understands the technology that powers modern marketing. I don't just know how to use the tools; I know how to build them. I can bridge the gap between the marketing team's vision and the engineering team's execution.",
     "viewPortfolio": "View My Work",
     "getInTouch": "Let's Talk",
     "marqueeItems": [
@@ -442,11 +442,11 @@
       "Brand Strategy",
       "Cloudflare Workers",
       "Content Creator",
-      "100K+ Views"
+      "250K+ Views"
     ],
     "stats": [
       { "value": 99, "suffix": "/100", "label": "SEO Health Score" },
-      { "value": 100, "suffix": "K+", "label": "Combined Views" },
+      { "value": 250, "suffix": "K+", "label": "Combined Views" },
       { "value": 2, "suffix": "×", "label": "Award Winner" },
       { "value": 3, "suffix": "", "label": "Languages" }
     ],
@@ -456,13 +456,13 @@
         "award": "🏆 2nd Prize + Impact Award",
         "title": "MedCare AI",
         "desc": "National award-winning AI healthcare prototype built with Next.js, Cloudflare Workers & Shadcn UI.",
-        "href": "/portfolio/coding-projects"
+        "href": "https://medcare.shainwaiyan.com/"
       },
       {
         "tag": "Finance · Data",
         "title": "WOWS Terminal",
         "desc": "Professional-grade stock analyzer integrating TradingView's Advanced Charting Library.",
-        "href": "/portfolio/coding-projects"
+        "href": "https://wows.shainwaiyan.com/"
       },
       {
         "tag": "Identity · SEO",
@@ -471,10 +471,10 @@
         "href": "/portfolio/coding-projects"
       },
       {
-        "tag": "Infrastructure",
-        "title": "Private SMS Gateway",
-        "desc": "Custom Twilio + Next.js dashboard for private SMS-based triggers and verifications.",
-        "href": "/portfolio/coding-projects"
+        "tag": "Edge AI · Chatbot",
+        "title": "Syntax AI",
+        "desc": "Embedded context-aware Shain Studio's assistant powered by Cloudflare Workers & KV storage and Llama.",
+        "href": "https://syntax.shainwaiyan.com"
       }
     ],
     "stack": [

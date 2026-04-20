@@ -1,3 +1,4 @@
+import { Inter, Playfair_Display } from "next/font/google";
 import type { Metadata } from "next";
 import { use } from "react";
 import "@/app/globals.css";
@@ -7,6 +8,9 @@ import Footer from "@/components/Footer";
 import { GoogleAnalytics } from '@next/third-parties/google';
 import SyntaxWidget from "@/components/syntax ai/SyntaxWidget";
 import ClarityAnalytics from "@/components/analytics/ClarityAnalytics";
+
+const inter = Inter({ subsets: ['latin'], variable: '--font-sans', display: 'swap' });
+const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-serif', display: 'swap' });
 
 interface LocaleLayoutProps {
   children: React.ReactNode;
@@ -139,8 +143,8 @@ export default function LocaleLayout({ children, params }: LocaleLayoutProps) {
   };
 
   return (
-    <html lang={htmlLang} suppressHydrationWarning dir="ltr">
-      <body>
+    <html lang={htmlLang} suppressHydrationWarning dir="ltr" className={`${inter.variable} ${playfair.variable}`}>
+      <body className="font-sans">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

@@ -300,8 +300,12 @@ const Footer = () => {
 
         /* ── animated verb (color + italic only; transitions via inline style) ── */
         .footer-verb {
-          color: #ffd700;
+          background-image: linear-gradient(to right, #bf953f, #fcf6ba, #b38728);
+          -webkit-background-clip: text;
+          background-clip: text;
+          color: transparent;
           font-style: italic;
+          display: inline-block;
           will-change: opacity, transform;
           -webkit-font-smoothing: antialiased;
           -moz-osx-font-smoothing: grayscale;
