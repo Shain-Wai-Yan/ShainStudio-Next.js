@@ -9,6 +9,7 @@ import GsapHero from '@/components/landing/GsapHero';
 import GsapMarquee from '@/components/landing/GsapMarquee';
 import GsapStats from '@/components/landing/GsapStats';
 import GsapBento from '@/components/landing/GsapBento';
+import GsapMarketing from '@/components/landing/GsapMarketing';
 import GsapCta from '@/components/landing/GsapCta';
 
 /* ─────────────────────────────────────────────────────────── */
@@ -90,6 +91,7 @@ export default async function Page({ params }: { params: { locale: string } }) {
         <GsapMarquee items={resolvedMarqueeItems} />
         <GsapStats stats={resolvedStats} />
         <GsapBento projects={resolvedProjects} locale={locale} />
+        <GsapMarketing data={t.gsapMarketing} />
         <GsapCta hp={hp} locale={locale} />
       </main>
     </>

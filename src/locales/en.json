@@ -489,6 +489,59 @@
     "ctaSecondary": "See My Work"
   },
 
+  "gsapMarketing": {
+    "header": {
+      "eyebrow": "The Marketer's DNA",
+      "line1": "Strategy.",
+      "line2": "Perception.",
+      "line3": "Execution.",
+      "description": "I don't just build products. I design why people use them. Marketing isn't a layer added on top—it's built into every decision."
+    },
+    "pillars": [
+      {
+        "index": "01",
+        "eyebrow": "Retail floor reality meets agency strategy.",
+        "title": "Ground‑Level Psychology",
+        "body": "I don't just look at analytics dashboards. My experience spans direct retail sales to high‑level agency strategy. I've seen both sides—selling face-to-face and shaping strategy behind the scenes. I understand where people hesitate, and what finally gets them to say yes."
+      },
+      {
+        "index": "02",
+        "eyebrow": "Award‑winning business acumen.",
+        "title": "Commercial Viability",
+        "body": "A great idea is useless if it doesn't sell. I shape how it's seen—so people get it fast, believe it, and are willing to pay for it. I strip away the fluff and sell the raw vision—so the brand feels valuable, not just looks it."
+      },
+      {
+        "index": "03",
+        "eyebrow": "Trilingual marketing without borders.",
+        "title": "Cultural Fluency",
+        "body": "Fluent in Burmese, English, and Chinese (HSK 4). I don't just translate words—I localize psychology. Understanding how distinct demographics think and consume media lets me craft cross‑cultural campaigns that resonate deeply with diverse markets."
+      },
+      {
+        "index": "04",
+        "eyebrow": "Clarity over complexity.",
+        "title": "The Anti‑Jargon Edge",
+        "body": "In an industry bloated with meaningless buzzwords, clarity is the ultimate luxury. I turn complex ideas into language people instantly understand. Because whether you are B2B or B2C, you are still convincing another human."
+      }
+    ],
+    "intersection": {
+      "line1": "Most developers stop at deployment.",
+      "line2": "Most marketers start at the landing page.",
+      "line3": "I own the entire space in between."
+    },
+    "verdict": {
+      "eyebrow": "The Verdict",
+      "text1": "If your product works but doesn't",
+      "highlight1": "move",
+      "highlight2": "people,",
+      "text2": "that's exactly where I come in.",
+      "items": [
+        "I understand human desire.",
+        "I package it beautifully.",
+        "I sell it in a language they trust."
+      ]
+    }
+  },
+
   "contactPage": {
     "heroTitle": "Contact",
     "heroTitleHighlight": "Me",

@@ -19,18 +19,8 @@ export default function GsapStats({ stats }: GsapStatsProps) {
 
   useGSAP(
     () => {
-      // Pinning the stats section slightly or just staggering their entrance
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: "top 80%",
-          end: "top 30%",
-          scrub: false,
-          toggleActions: "play none none reverse",
-        },
-      });
-
-      tl.fromTo(
+      // 1. Entrance animation for the items
+      gsap.fromTo(
         ".stat-item",
         { opacity: 0, y: 50, scale: 0.9 },
         {
@@ -40,23 +30,30 @@ export default function GsapStats({ stats }: GsapStatsProps) {
           stagger: 0.15,
           duration: 0.8,
           ease: "back.out(1.2)",
+          scrollTrigger: {
+            trigger: containerRef.current,
+            start: "top 80%",
+            toggleActions: "play none none reverse",
+          },
         }
       );
 
-      // Animate the numbers counting up
-      const numberEls = document.querySelectorAll(".stat-number");
-      numberEls.forEach((el) => {
+      // 2. Animate the numbers counting up using scoped selector
+      gsap.utils.toArray<HTMLElement>(".stat-number").forEach((el) => {
+        const targetValue = Number(el.getAttribute("data-value"));
+        
         gsap.from(el, {
           textContent: 0,
           duration: 2,
           ease: "power2.out",
           snap: { textContent: 1 },
           scrollTrigger: {
-            trigger: containerRef.current,
-            start: "top 80%",
+            trigger: el,
+            start: "top 90%",
           },
           onUpdate: function () {
-            el.innerHTML = Math.ceil(
+            // Using a simple textContent update is cleaner than innerHTML for numbers
+            el.textContent = Math.ceil(
               Number(this.targets()[0].textContent)
             ).toString();
           },
