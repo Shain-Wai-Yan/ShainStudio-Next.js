@@ -7,25 +7,43 @@ const GITHUB_USERNAME = 'Shain-Wai-Yan';
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN || '';
 
 /**
- * Fetches GitHub repository count directly via GraphQL — works on Vercel
- * (avoids the localhost:3000 self-referencing route used by fetchGithubUser).
+ * Fetches GitHub repository count.
+ * - With GITHUB_TOKEN: uses GraphQL API (authenticated, higher rate limits)
+ * - Without token: falls back to the unauthenticated REST API
+ * Both paths work on Vercel without needing localhost.
  */
 async function fetchGithubRepoCount(): Promise<number> {
-  const query = `query($login: String!) { user(login: $login) { repositories { totalCount } } }`;
-  const res = await fetch('https://api.github.com/graphql', {
-    method: 'POST',
-    headers: {
-      Authorization: `bearer ${GITHUB_TOKEN}`,
-      'Content-Type': 'application/json',
-      'User-Agent': 'Portfolio-Counter',
-    },
-    body: JSON.stringify({ query, variables: { login: GITHUB_USERNAME } }),
-    next: { revalidate: 3600 },
+  // Authenticated GraphQL path (preferred)
+  if (GITHUB_TOKEN) {
+    const query = `query($login: String!) { user(login: $login) { repositories { totalCount } } }`;
+    const res = await fetch('https://api.github.com/graphql', {
+      method: 'POST',
+      headers: {
+        Authorization: `bearer ${GITHUB_TOKEN}`,
+        'Content-Type': 'application/json',
+        'User-Agent': 'Portfolio-Counter',
+      },
+      body: JSON.stringify({ query, variables: { login: GITHUB_USERNAME } }),
+      // Note: next.revalidate only works on GET fetches — use cache: 'force-cache' instead
+      cache: 'force-cache',
+    });
+    if (res.ok) {
+      const json = await res.json() as { data?: { user?: { repositories?: { totalCount?: number } } }; errors?: unknown[] };
+      if (!json.errors) {
+        return json.data?.user?.repositories?.totalCount ?? 0;
+      }
+    }
+    console.warn('[getPortfolioCounts] GitHub GraphQL failed, falling back to REST');
+  }
+
+  // Unauthenticated REST fallback (works without a token, 60 req/hour limit)
+  const res = await fetch(`https://api.github.com/users/${GITHUB_USERNAME}`, {
+    headers: { 'User-Agent': 'Portfolio-Counter', Accept: 'application/vnd.github.v3+json' },
+    cache: 'force-cache',
   });
-  if (!res.ok) throw new Error(`GitHub GraphQL error: ${res.status}`);
-  const json = await res.json() as { data?: { user?: { repositories?: { totalCount?: number } } }; errors?: unknown[] };
-  if (json.errors) throw new Error(`GitHub GraphQL errors: ${JSON.stringify(json.errors)}`);
-  return json.data?.user?.repositories?.totalCount ?? 0;
+  if (!res.ok) throw new Error(`GitHub REST error: ${res.status}`);
+  const user = await res.json() as { public_repos?: number };
+  return user.public_repos ?? 0;
 }
 
 const YOUTUBE_WORKER_URL = 'https://youtube-api-fetcher.shainwaiyan2002.workers.dev';
