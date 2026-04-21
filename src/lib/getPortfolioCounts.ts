@@ -1,8 +1,50 @@
 import { fetchBusinessPlans } from './strapi/business-plans';
 import { fetchMarketingPlans } from './strapi/marketing-plans';
 import { fetchMarketingProjects } from './strapi/marketing-in-motion';
-import { fetchGithubUser } from './github-api';
 import { fetchFromStrapi } from './strapi/client';
+
+const GITHUB_USERNAME = 'Shain-Wai-Yan';
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN || '';
+
+/**
+ * Fetches GitHub repository count.
+ * - With GITHUB_TOKEN: uses GraphQL API (authenticated, higher rate limits)
+ * - Without token: falls back to the unauthenticated REST API
+ * Both paths work on Vercel without needing localhost.
+ */
+async function fetchGithubRepoCount(): Promise<number> {
+  // Authenticated GraphQL path (preferred)
+  if (GITHUB_TOKEN) {
+    const query = `query($login: String!) { user(login: $login) { repositories { totalCount } } }`;
+    const res = await fetch('https://api.github.com/graphql', {
+      method: 'POST',
+      headers: {
+        Authorization: `bearer ${GITHUB_TOKEN}`,
+        'Content-Type': 'application/json',
+        'User-Agent': 'Portfolio-Counter',
+      },
+      body: JSON.stringify({ query, variables: { login: GITHUB_USERNAME } }),
+      // Note: next.revalidate only works on GET fetches — use cache: 'force-cache' instead
+      cache: 'force-cache',
+    });
+    if (res.ok) {
+      const json = await res.json() as { data?: { user?: { repositories?: { totalCount?: number } } }; errors?: unknown[] };
+      if (!json.errors) {
+        return json.data?.user?.repositories?.totalCount ?? 0;
+      }
+    }
+    console.warn('[getPortfolioCounts] GitHub GraphQL failed, falling back to REST');
+  }
+
+  // Unauthenticated REST fallback (works without a token, 60 req/hour limit)
+  const res = await fetch(`https://api.github.com/users/${GITHUB_USERNAME}`, {
+    headers: { 'User-Agent': 'Portfolio-Counter', Accept: 'application/vnd.github.v3+json' },
+    cache: 'force-cache',
+  });
+  if (!res.ok) throw new Error(`GitHub REST error: ${res.status}`);
+  const user = await res.json() as { public_repos?: number };
+  return user.public_repos ?? 0;
+}
 
 const YOUTUBE_WORKER_URL = 'https://youtube-api-fetcher.shainwaiyan2002.workers.dev';
 const YOUTUBE_CHANNEL_ID = 'UCV4ZLWfXF15d4tyzdJTkzpw';
@@ -23,7 +65,7 @@ export async function getPortfolioCounts(): Promise<PortfolioCounts> {
     fetchMarketingProjects(1, 1),
     // Ping Strapi directly for photography count (Safer than local API route)
     fetchFromStrapi<Record<string, unknown>>('photographies', { queryParams: { 'pagination[pageSize]': 1 } }),
-    fetchGithubUser(),
+    fetchGithubRepoCount(),
     fetchYouTubeCount(),
   ]);
 
@@ -33,9 +75,9 @@ export async function getPortfolioCounts(): Promise<PortfolioCounts> {
     marketingInMotion: getNestedValue(results[2], 'total'),
     // Photography is now a direct Strapi response (has .meta.pagination.total)
     photography: getStrapiTotal(results[3]),
-    // GitHub: data.repositories.totalCount (now at index 4)
-    codingProjects: getGithubValue(results[4]),
-    amvEditing: getSimpleValue(results[5]),
+    // GitHub: direct count (plain number)
+    codingProjects: getSimpleValue(results[4] as PromiseSettledResult<number>),
+    amvEditing: getSimpleValue(results[5] as PromiseSettledResult<number>),
   };
 }
 

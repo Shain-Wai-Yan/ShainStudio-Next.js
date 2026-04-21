@@ -273,7 +273,7 @@ export default function PortfolioClient({ locale, t, dynamicCounts }: Props) {
   }, []);
 
   const isZh = locale === 'zh';
-  const displayFont = isZh ? "'ZCOOL XiaoWei', sans-serif" : "'Bebas Neue', sans-serif";
+  const displayFont = "var(--font-serif)";
   const basePath = locale === 'en' ? '' : `/${locale}`;
 
   // Helper to replace number in string like "6+ Projects" with actual count
@@ -389,8 +389,6 @@ export default function PortfolioClient({ locale, t, dynamicCounts }: Props) {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=ZCOOL+QingKe+HuangYou&family=ZCOOL+XiaoWei&display=swap');
-        
         .font-display { font-family: ${displayFont}; letter-spacing:0.02em; ${isZh ? 'font-weight:400;' : ''} }
 
         @keyframes fadeSlideUp {

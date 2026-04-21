@@ -422,14 +422,126 @@
     "ctaFooter": "No commitment required"
   },
   "homePage": {
-    "badge": "Marketing · Strategy · Innovation",
-    "title": "Welcome to",
-    "titleHighlight": "Shain's Studio",
-    "subtitle": "Where creativity meets results.",
-    "description": "Explore my journey through marketing excellence, professional achievements, and creative solutions.",
-    "viewPortfolio": "View My Portfolio",
-    "getInTouch": "Get In Touch"
+    "badge": "Available for Collaboration",
+    "eyebrow": "Shain Wai Yan · Xolbine · 明元易",
+    "title": "Architecting",
+    "titleHighlight": "Digital Identities.",
+    "subtitle": "I don't just use tools — I build them.",
+    "description": "Digital Marketer. Vibe Coder. Systems Architect. I am a marketer who understands the technology that powers modern marketing. I don't just know how to use the tools; I know how to build them. I can bridge the gap between the marketing team's vision and the engineering team's execution.",
+    "viewPortfolio": "View My Work",
+    "getInTouch": "Let's Talk",
+    "marqueeItems": [
+      "Digital Marketing",
+      "Vibe Coding",
+      "SEO Entity Management",
+      "Next.js",
+      "Systems Architecture",
+      "AI Orchestration",
+      "Award Winner",
+      "Trilingual",
+      "Brand Strategy",
+      "Cloudflare Workers",
+      "Content Creator",
+      "250K+ Views"
+    ],
+    "stats": [
+      { "value": 99, "suffix": "/100", "label": "SEO Health Score" },
+      { "value": 250, "suffix": "K+", "label": "Combined Views" },
+      { "value": 2, "suffix": "×", "label": "Award Winner" },
+      { "value": 3, "suffix": "", "label": "Languages" }
+    ],
+    "projects": [
+      {
+        "tag": "AI · Healthcare",
+        "award": "🏆 2nd Prize + Impact Award",
+        "title": "MedCare AI",
+        "desc": "National award-winning AI healthcare prototype built with Next.js, Cloudflare Workers & Shadcn UI.",
+        "href": "https://medcare.shainwaiyan.com/"
+      },
+      {
+        "tag": "Finance · Data",
+        "title": "WOWS Terminal",
+        "desc": "Professional-grade stock analyzer integrating TradingView's Advanced Charting Library.",
+        "href": "https://wows.shainwaiyan.com/"
+      },
+      {
+        "tag": "Identity · SEO",
+        "title": "Portfolio Ecosystem",
+        "desc": "A bilingual Next.js portfolio with Strapi CMS, Cloudflare Workers, and a 99/100 SEO health score.",
+        "href": "/portfolio/coding-projects"
+      },
+      {
+        "tag": "Edge AI · Chatbot",
+        "title": "Syntax AI",
+        "desc": "Embedded context-aware Shain Studio's assistant powered by Cloudflare Workers & KV storage and Llama.",
+        "href": "https://syntax.shainwaiyan.com"
+      }
+    ],
+    "stack": [
+      "Next.js", "TypeScript", "Cloudflare Workers", "Strapi", "Twilio",
+      "Cursor AI", "v0", "TradingView API", "AmneziaWG", "SEO",
+      "Google Analytics", "Vercel"
+    ],
+    "ctaTitle": "Let's Build Something",
+    "ctaHighlight": "Remarkable.",
+    "ctaSub": "Whether you need a marketing strategy, a coded system, or both — I bridge the gap between vision and execution.",
+    "ctaButton": "Get In Touch",
+    "ctaSecondary": "See My Work"
   },
+
+  "gsapMarketing": {
+    "header": {
+      "eyebrow": "The Marketer's DNA",
+      "line1": "Strategy.",
+      "line2": "Perception.",
+      "line3": "Execution.",
+      "description": "I don't just build products. I design why people use them. Marketing isn't a layer added on top—it's built into every decision."
+    },
+    "pillars": [
+      {
+        "index": "01",
+        "eyebrow": "Retail floor reality meets agency strategy.",
+        "title": "Ground‑Level Psychology",
+        "body": "I don't just look at analytics dashboards. My experience spans direct retail sales to high‑level agency strategy. I've seen both sides—selling face-to-face and shaping strategy behind the scenes. I understand where people hesitate, and what finally gets them to say yes."
+      },
+      {
+        "index": "02",
+        "eyebrow": "Award‑winning business acumen.",
+        "title": "Commercial Viability",
+        "body": "A great idea is useless if it doesn't sell. I shape how it's seen—so people get it fast, believe it, and are willing to pay for it. I strip away the fluff and sell the raw vision—so the brand feels valuable, not just looks it."
+      },
+      {
+        "index": "03",
+        "eyebrow": "Trilingual marketing without borders.",
+        "title": "Cultural Fluency",
+        "body": "Fluent in Burmese, English, and Chinese (HSK 4). I don't just translate words—I localize psychology. Understanding how distinct demographics think and consume media lets me craft cross‑cultural campaigns that resonate deeply with diverse markets."
+      },
+      {
+        "index": "04",
+        "eyebrow": "Clarity over complexity.",
+        "title": "The Anti‑Jargon Edge",
+        "body": "In an industry bloated with meaningless buzzwords, clarity is the ultimate luxury. I turn complex ideas into language people instantly understand. Because whether you are B2B or B2C, you are still convincing another human."
+      }
+    ],
+    "intersection": {
+      "line1": "Most developers stop at deployment.",
+      "line2": "Most marketers start at the landing page.",
+      "line3": "I own the entire space in between."
+    },
+    "verdict": {
+      "eyebrow": "The Verdict",
+      "text1": "If your product works but doesn't",
+      "highlight1": "move",
+      "highlight2": "people,",
+      "text2": "that's exactly where I come in.",
+      "items": [
+        "I understand human desire.",
+        "I package it beautifully.",
+        "I sell it in a language they trust."
+      ]
+    }
+  },
+
   "contactPage": {
     "heroTitle": "Contact",
     "heroTitleHighlight": "Me",

@@ -422,14 +422,126 @@
     "ctaFooter": "无需任何承诺"
   },
   "homePage": {
-    "badge": "营销 · 策略 · 创新",
-    "title": "欢迎来到",
-    "titleHighlight": "Shain的工作室",
-    "subtitle": "创意与成果完美结合。",
-    "description": "探索我通过营销卓越、专业成就和创意解决方案的历程。",
-    "viewPortfolio": "查看我的作品集",
-    "getInTouch": "联系我"
+    "badge": "开放合作中",
+    "eyebrow": "Shain Wai Yan · Xolbine · 明元易",
+    "title": "架构",
+    "titleHighlight": "数字身份.",
+    "subtitle": "我不只是使用工具，我创造它们。",
+    "description": "数字营销专家。代码达人。系统架构师。我是一位深谙现代营销底层技术的营销专家。我不只是懂得如何使用工具，更懂得如何构建它们。我能够完美桥接营销团队的愿景与工程团队的执行。",
+    "viewPortfolio": "查看作品",
+    "getInTouch": "联系我",
+    "marqueeItems": [
+      "数字营销",
+      "Vibe Coding",
+      "SEO 实体管理",
+      "Next.js",
+      "系统架构",
+      "AI 编排",
+      "全国奖项获得者",
+      "三语双轨",
+      "品牌战略",
+      "Cloudflare Workers",
+      "内容创作者",
+      "超 25W+ 浏览量"
+    ],
+    "stats": [
+      { "value": 99, "suffix": "/100", "label": "SEO健康评分" },
+      { "value": 250, "suffix": "K+", "label": "累计浏览量" },
+      { "value": 2, "suffix": "×", "label": "全国奖项" },
+      { "value": 3, "suffix": "", "label": "掌握语言" }
+    ],
+    "projects": [
+      {
+        "tag": "AI · 医疗",
+        "award": "🏆 亚军 + 影响力奖",
+        "title": "MedCare AI",
+        "desc": "基于 Next.js 与 Cloudflare Workers 构建的全国获奖级 AI 医疗健康原型。",
+        "href": "https://medcare.shainwaiyan.com/"
+      },
+      {
+        "tag": "金融 · 数据",
+        "title": "WOWS Terminal",
+        "desc": "专业级股票图表终端，深度集成 TradingView 高级图表库。",
+        "href": "https://wows.shainwaiyan.com/"
+      },
+      {
+        "tag": "身份 · SEO",
+        "title": "数字作品集",
+        "desc": "基于 Strapi CMS 与 Cloudflare 驱动的双语 Next.js 极速网站，SEO 得分 99/100。",
+        "href": "/portfolio/coding-projects"
+      },
+      {
+        "tag": "边缘 AI · 助手",
+        "title": "Syntax AI",
+        "desc": "基于 Cloudflare Workers、KV 存储与 Llama 模型构建的内嵌式、上下文感知 Shain Studio 助手。",
+        "href": "https://syntax.shainwaiyan.com"
+      }
+    ],
+    "stack": [
+      "Next.js", "TypeScript", "Cloudflare Workers", "Strapi", "Twilio",
+      "Cursor AI", "v0", "TradingView API", "AmneziaWG", "SEO",
+      "Google Analytics", "Vercel"
+    ],
+    "ctaTitle": "让我们构建",
+    "ctaHighlight": "非凡之作.",
+    "ctaSub": "无论您需要制定前沿的营销策略，还是落地一套完整的软件系统 —— 我都能完美衔接愿景与执行的鸿沟。",
+    "ctaButton": "立即联系",
+    "ctaSecondary": "查看作品集"
   },
+
+  "gsapMarketing": {
+    "header": {
+      "eyebrow": "营销人的底层逻辑",
+      "line1": "策略.",
+      "line2": "认知.",
+      "line3": "执行.",
+      "description": "我不只是构建产品，我设计人们使用它的理由。营销不是附加的一层——它嵌入在每一个决策之中。"
+    },
+    "pillars": [
+      {
+        "index": "01",
+        "eyebrow": "零售一线与顶层策略的双重积淀",
+        "title": "基层心理洞察",
+        "body": "我不只是盯着数据仪表盘。从零售一线的面对面销售，到代理商层面的高端策略制定，两端我都亲历过。我深知消费者在哪个环节犹豫，也清楚什么样的叙事能让他们最终点头说「是」。"
+      },
+      {
+        "index": "02",
+        "eyebrow": "屡获殊荣的商业洞察力",
+        "title": "商业变现力",
+        "body": "再好的创意，卖不出去也是零。我塑造品牌被感知的方式——让受众秒懂、心动，并愿意为之买单。我剥去一切包装，直击原始价值——让品牌真正有分量，而不只是看起来光鲜。"
+      },
+      {
+        "index": "03",
+        "eyebrow": "无国界的三语营销",
+        "title": "文化通感",
+        "body": "精通缅甸语、英语与中文（HSK 4）。我不只是翻译文字——我本地化的是心理认知与情感共鸣。深入理解不同族群的思维方式与媒体消费习惯，让我能打造真正触动多元市场的跨文化营销。"
+      },
+      {
+        "index": "04",
+        "eyebrow": "以清晰为奢侈",
+        "title": "反术语优势",
+        "body": "在一个充斥着无意义行话的行业里，清晰表达才是真正的奢侈品。我将复杂概念转化为人们能立刻理解的语言。因为无论你面向 B2B 还是 B2C，你终究是在说服另一个真实的人。"
+      }
+    ],
+    "intersection": {
+      "line1": "大多数开发者，止步于产品上线。",
+      "line2": "大多数营销人，起点是落地页。",
+      "line3": "两者之间的全部空间，由我掌控。"
+    },
+    "verdict": {
+      "eyebrow": "最终判断",
+      "text1": "如果你的产品功能完善，却无法真正",
+      "highlight1": "打动",
+      "highlight2": "人心，",
+      "text2": "那正是我出场的地方。",
+      "items": [
+        "我洞察人心深处的渴望。",
+        "我将它包装得令人心动。",
+        "我用他们信任的语言将它售出。"
+      ]
+    }
+  },
+
   "contactPage": {
     "heroTitle": "联系",
     "heroTitleHighlight": "我",

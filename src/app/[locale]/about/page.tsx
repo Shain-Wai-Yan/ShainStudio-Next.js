@@ -167,7 +167,7 @@ export default async function AboutPage({ params }: AboutProps) {
                   {/* Quote Box */}
                   <div className="mt-12 pt-8 border-t border-gray-100 dark:border-white/5 relative z-10">
                      <p className="italic text-text dark:text-gray-300 font-secondary text-lg leading-relaxed mb-6 text-center">
-                       "{t.aboutPage.quoteText}"
+                       &quot;{t.aboutPage.quoteText}&quot;
                      </p>
                      <p className="text-center font-bold text-[#ffd700] dark:text-white text-xs tracking-[0.2em] uppercase">
                        — {t.aboutPage.quoteAuthor}

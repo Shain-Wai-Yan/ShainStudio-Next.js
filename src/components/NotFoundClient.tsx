@@ -49,7 +49,6 @@ export default function NotFoundClient() {
   const outCtxRef     = useRef<CanvasRenderingContext2D | null>(null);
 
   // FPS-adaptive quality throttle
-  const lastFrameTime = useRef<number>(0);
   const qualityScale  = useRef<number>(1); // 1 = full, 0.75 = degraded
 
   useEffect(() => {

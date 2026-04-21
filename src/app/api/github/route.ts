@@ -73,9 +73,13 @@ async function handleUserProfile(username: string) {
     repositories { totalCount }
   }}`, { login: username });
 
-  if (data.errors) return NextResponse.json(data, { status: 400 });
-  setCache(cacheKey, data.data?.user);
-  return NextResponse.json(data.data?.user);
+  if (data.errors) {
+    console.error('[github-api] GraphQL Errors:', data.errors);
+    return NextResponse.json(data, { status: 400 });
+  }
+  const user = data.data?.user || null;
+  setCache(cacheKey, user);
+  return NextResponse.json(user);
 }
 
 async function handlePinnedRepos(username: string) {
@@ -91,7 +95,10 @@ async function handlePinnedRepos(username: string) {
     }}
   }}`, { login: username });
 
-  if (data.errors) return NextResponse.json(data, { status: 400 });
+  if (data.errors) {
+    console.error('[github-api] Pinned Repos GraphQL Errors:', data.errors);
+    return NextResponse.json(data, { status: 400 });
+  }
   const repos = data.data?.user?.pinnedItems?.nodes || [];
   setCache(cacheKey, repos);
   return NextResponse.json(repos);
@@ -112,10 +119,12 @@ async function handleContributions(username: string) {
     contributionsCollection { contributionCalendar {
       totalContributions
       weeks { contributionDays { date contributionCount color } }
-    }}
-  }}`, { login: username }) as { data?: { user?: { contributionsCollection?: { contributionCalendar?: { totalContributions: number; weeks: Array<{ contributionDays: Array<{ date: string; contributionCount: number; color: string }> }> } } } }; errors?: unknown[] };
+    }}}}`, { login: username }) as { data?: { user?: { contributionsCollection?: { contributionCalendar?: { totalContributions: number; weeks: Array<{ contributionDays: Array<{ date: string; contributionCount: number; color: string }> }> } } } }; errors?: unknown[] };
 
-  if (data.errors) return NextResponse.json(data, { status: 400 });
+  if (data.errors) {
+    console.error('[github-api] Contributions GraphQL Errors:', data.errors);
+    return NextResponse.json(data, { status: 400 });
+  }
   const calendar = data.data?.user?.contributionsCollection?.contributionCalendar;
   const contributions: GitHubContribution[] = [];
   if (calendar) {
@@ -139,11 +148,12 @@ async function handleTopLanguages(username: string) {
     repositories(first: 100, orderBy: {field: UPDATED_AT, direction: DESC}, isFork: false) {
       nodes { languages(first: 10, orderBy: {field: SIZE, direction: DESC}) {
         edges { size node { name color } }
-      }}
-    }
-  }}`, { login: username }) as { data?: { user?: { repositories?: { nodes?: Array<{ languages?: { edges?: Array<{ size: number; node: { name: string; color: string } }> } }> } } }; errors?: unknown[] };
+      }}}}}`, { login: username }) as { data?: { user?: { repositories?: { nodes?: Array<{ languages?: { edges?: Array<{ size: number; node: { name: string; color: string } }> } }> } } }; errors?: unknown[] };
 
-  if (data.errors) return NextResponse.json(data, { status: 400 });
+  if (data.errors) {
+    console.error('[github-api] Top Languages GraphQL Errors:', data.errors);
+    return NextResponse.json(data, { status: 400 });
+  }
   const languages: Record<string, { size: number; color: string }> = {};
   let totalSize = 0;
   data.data?.user?.repositories?.nodes?.forEach((repo) => {
@@ -175,7 +185,10 @@ async function handleRepositories(username: string) {
     }
   }}`, { login: username });
 
-  if (data.errors) return NextResponse.json(data, { status: 400 });
+  if (data.errors) {
+    console.error('[github-api] GraphQL Errors:', data.errors);
+    return NextResponse.json(data, { status: 400 });
+  }
   const repos = data.data?.user?.repositories?.nodes || [];
   setCache(cacheKey, repos);
   return NextResponse.json(repos);
@@ -248,7 +261,10 @@ async function handleDetailedActivity(username: string) {
     }
   }`, { login: username });
 
-  if (data.errors) return NextResponse.json(data, { status: 400 });
+  if (data.errors) {
+    console.error('[github-api] Detailed Activity GraphQL Errors:', data.errors);
+    return NextResponse.json(data, { status: 400 });
+  }
   const result = data.data?.user?.contributionsCollection || {};
   setCache(cacheKey, result);
   return NextResponse.json(result);
