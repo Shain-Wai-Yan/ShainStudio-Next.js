@@ -40,7 +40,6 @@ export default function GsapStats({ stats }: GsapStatsProps) {
 
       // 2. Animate the numbers counting up using scoped selector
       gsap.utils.toArray<HTMLElement>(".stat-number").forEach((el) => {
-        const targetValue = Number(el.getAttribute("data-value"));
         
         gsap.from(el, {
           textContent: 0,

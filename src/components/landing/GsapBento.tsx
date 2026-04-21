@@ -6,7 +6,6 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
-import { SplitTextTitle } from "./SplitTextTitle";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
