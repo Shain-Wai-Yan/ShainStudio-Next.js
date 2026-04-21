@@ -1,8 +1,32 @@
 import { fetchBusinessPlans } from './strapi/business-plans';
 import { fetchMarketingPlans } from './strapi/marketing-plans';
 import { fetchMarketingProjects } from './strapi/marketing-in-motion';
-import { fetchGithubUser } from './github-api';
 import { fetchFromStrapi } from './strapi/client';
+
+const GITHUB_USERNAME = 'Shain-Wai-Yan';
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN || '';
+
+/**
+ * Fetches GitHub repository count directly via GraphQL — works on Vercel
+ * (avoids the localhost:3000 self-referencing route used by fetchGithubUser).
+ */
+async function fetchGithubRepoCount(): Promise<number> {
+  const query = `query($login: String!) { user(login: $login) { repositories { totalCount } } }`;
+  const res = await fetch('https://api.github.com/graphql', {
+    method: 'POST',
+    headers: {
+      Authorization: `bearer ${GITHUB_TOKEN}`,
+      'Content-Type': 'application/json',
+      'User-Agent': 'Portfolio-Counter',
+    },
+    body: JSON.stringify({ query, variables: { login: GITHUB_USERNAME } }),
+    next: { revalidate: 3600 },
+  });
+  if (!res.ok) throw new Error(`GitHub GraphQL error: ${res.status}`);
+  const json = await res.json() as { data?: { user?: { repositories?: { totalCount?: number } } }; errors?: unknown[] };
+  if (json.errors) throw new Error(`GitHub GraphQL errors: ${JSON.stringify(json.errors)}`);
+  return json.data?.user?.repositories?.totalCount ?? 0;
+}
 
 const YOUTUBE_WORKER_URL = 'https://youtube-api-fetcher.shainwaiyan2002.workers.dev';
 const YOUTUBE_CHANNEL_ID = 'UCV4ZLWfXF15d4tyzdJTkzpw';
@@ -23,7 +47,7 @@ export async function getPortfolioCounts(): Promise<PortfolioCounts> {
     fetchMarketingProjects(1, 1),
     // Ping Strapi directly for photography count (Safer than local API route)
     fetchFromStrapi<Record<string, unknown>>('photographies', { queryParams: { 'pagination[pageSize]': 1 } }),
-    fetchGithubUser(),
+    fetchGithubRepoCount(),
     fetchYouTubeCount(),
   ]);
 
@@ -33,9 +57,9 @@ export async function getPortfolioCounts(): Promise<PortfolioCounts> {
     marketingInMotion: getNestedValue(results[2], 'total'),
     // Photography is now a direct Strapi response (has .meta.pagination.total)
     photography: getStrapiTotal(results[3]),
-    // GitHub: data.repositories.totalCount (now at index 4)
-    codingProjects: getGithubValue(results[4]),
-    amvEditing: getSimpleValue(results[5]),
+    // GitHub: direct count (plain number)
+    codingProjects: getSimpleValue(results[4] as PromiseSettledResult<number>),
+    amvEditing: getSimpleValue(results[5] as PromiseSettledResult<number>),
   };
 }
 
