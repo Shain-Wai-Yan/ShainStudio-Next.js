@@ -73,7 +73,7 @@ const Header = () => {
   const isPortfolioActive = pathname.includes('/portfolio');
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-[1000] transition-all duration-300 shadow-lg bg-[#191970] dark:bg-[#0f0f1e]">
+    <header data-nosnippet className="fixed top-0 left-0 right-0 z-[1000] transition-all duration-300 shadow-lg bg-[#191970] dark:bg-[#0f0f1e]">
       {/* Animated gold glow bottom border */}
       <div className="absolute bottom-0 left-0 right-0 h-1 overflow-hidden z-10 header-glow-wrapper">
         <div className="header-glow-bar h-full w-full" />

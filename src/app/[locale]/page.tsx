@@ -25,6 +25,7 @@ interface HomePage {
   titleHighlight: string;
   subtitle: string;
   description: string;
+  metaDescription?: string;
   viewPortfolio: string;
   getInTouch: string;
   marqueeItems?: string[];
@@ -50,8 +51,8 @@ export async function generateMetadata({ params }: { params: { locale: string } 
   const hp = t.homePage as unknown as HomePage;
 
   return {
-    title: hp.title ? `${hp.title} ${hp.titleHighlight}` : 'Shain Wai Yan',
-    description: hp.description || 'Shain Wai Yan Portfolio',
+    title: hp.title ? { absolute: `Shain Studio | ${hp.title} ${hp.titleHighlight}` } : { absolute: 'Shain Studio' },
+    description: hp.metaDescription || hp.description || 'Shain Wai Yan Portfolio',
   };
 }
 
