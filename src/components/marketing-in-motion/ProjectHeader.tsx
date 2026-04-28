@@ -1,7 +1,6 @@
 'use client';
 
-import Image from 'next/image';
-import { optimizeCloudinaryUrl } from '@/lib/utils/cloudinary-optimizer';
+import CImage from '@/components/ui/CImage';
 import { MarketingProject, formatProjectDate } from '@/lib/strapi/marketing-in-motion';
 
 interface ProjectHeaderProps {
@@ -16,8 +15,8 @@ export default function ProjectHeader({ project, language }: ProjectHeaderProps)
     <header className="relative">
       {/* Cover Image */}
       <div className="relative w-full h-[300px] sm:h-[400px] md:h-[500px] overflow-hidden">
-        <Image
-          src={optimizeCloudinaryUrl(project.coverImage)}
+        <CImage
+          src={project.coverImage}
           alt={project.title}
           fill
           priority

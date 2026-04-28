@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import Image from 'next/image';
+import CImage from '@/components/ui/CImage';
 
 interface Certificate {
   id: number;
@@ -153,13 +153,13 @@ export function CertificateModal({
       height: '100%',
     }}
   >
-    <Image
+    <CImage
       src={displayImage}
       alt={certificate.title}
       fill
       className="object-contain"
-      unoptimized
       priority
+      sizes="100vw"
     />
   </div>
 </div>
@@ -244,14 +244,14 @@ export function CertificateModal({
 <div className="w-full md:w-3/5 bg-gray-50 dark:bg-gray-800 flex items-center justify-center p-4 md:p-6 min-h-[300px] md:min-h-0 md:self-stretch">
   {displayImage ? (
     <div className="relative w-full h-full min-h-[300px] md:min-h-[500px]">
-      <Image
+      <CImage
         src={displayImage}
         alt={certificate.title}
         fill
         className="object-contain"
         onError={() => setImageError(true)}
         priority
-        unoptimized
+        sizes="(max-width: 768px) 100vw, 80vw"
       />
     </div>
   ) : (

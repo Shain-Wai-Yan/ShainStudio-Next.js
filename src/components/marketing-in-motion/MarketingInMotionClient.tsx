@@ -2,9 +2,8 @@
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
-import Image from 'next/image';
+import CImage from '@/components/ui/CImage';
 import Link from 'next/link';
-import { optimizeCloudinaryUrl } from '@/lib/utils/cloudinary-optimizer';
 import { MarketingHero } from './MarketingHero';
 import { MarketingControls } from './MarketingControls';
 import { MarketingProjectGrid } from './MarketingProjectGrid';
@@ -454,8 +453,8 @@ function ListRow({
     >
       {/* Thumbnail */}
       <div className="relative w-24 h-16 flex-shrink-0 overflow-hidden bg-gray-100 dark:bg-gray-800">
-        <Image
-          src={optimizeCloudinaryUrl(project.coverImage)}
+        <CImage
+          src={project.coverImage}
           alt={project.title}
           fill
           className="object-cover group-hover:scale-105 transition-transform duration-300"

@@ -1,8 +1,7 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
-import { optimizeCloudinaryUrl } from '@/lib/utils/cloudinary-optimizer';
+import CImage from '@/components/ui/CImage';
 import type { CodingProject } from '@/lib/strapi/coding-projects';
 import { SiGithub } from 'react-icons/si';
 import { FaExternalLinkAlt } from 'react-icons/fa';
@@ -36,14 +35,14 @@ export function CodingProjectCard({
       "
     >
       {/* ── Image Header ── */}
-      <div className="relative w-full aspect-[16/10] overflow-hidden bg-gray-100 dark:bg-gray-800">
-        <Image
-          src={optimizeCloudinaryUrl(project.coverImage)}
+      <div className="relative aspect-[16/9] w-full overflow-hidden">
+        <CImage
+          src={project.coverImage}
           alt={project.title}
           fill
-          priority={priority}
           className="object-cover transition-transform duration-500 group-hover:scale-105"
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          priority={priority}
         />
         
         {/* Subtle overlay gradient */}
