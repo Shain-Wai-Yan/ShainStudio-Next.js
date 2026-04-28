@@ -3,14 +3,18 @@ import { Metadata } from 'next';
 import { getDictionary } from '@/lib/getDictionary';
 import type { Dictionary } from '@/lib/getDictionary';
 import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
+import dynamic from 'next/dynamic';
 
-
+// GsapHero is above-the-fold — direct import so it ships with the initial bundle
 import GsapHero from '@/components/landing/GsapHero';
-import GsapMarquee from '@/components/landing/GsapMarquee';
-import GsapStats from '@/components/landing/GsapStats';
-import GsapBento from '@/components/landing/GsapBento';
-import GsapMarketing from '@/components/landing/GsapMarketing';
-import GsapCta from '@/components/landing/GsapCta';
+
+// Below-fold sections: next/dynamic splits their JS into separate chunks
+// (no ssr:false — HTML is still server-rendered so SEO/accessibility is preserved)
+const GsapMarquee  = dynamic(() => import('@/components/landing/GsapMarquee'));
+const GsapStats    = dynamic(() => import('@/components/landing/GsapStats'));
+const GsapBento    = dynamic(() => import('@/components/landing/GsapBento'));
+const GsapMarketing = dynamic(() => import('@/components/landing/GsapMarketing'));
+const GsapCta      = dynamic(() => import('@/components/landing/GsapCta'));
 
 /* ─────────────────────────────────────────────────────────── */
 /*  TYPES                                                       */

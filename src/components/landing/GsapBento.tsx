@@ -2,14 +2,9 @@
 
 import React, { useRef } from "react";
 import { useGSAP } from "@gsap/react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { gsap, ScrollTrigger } from "@/lib/gsapSetup";
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
-
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
-}
 
 interface ProjectDef { tag: string; award?: string; title: string; desc: string; href: string; }
 interface GsapBentoProps {

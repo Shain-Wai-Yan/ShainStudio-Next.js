@@ -144,6 +144,14 @@ export default function LocaleLayout({ children, params }: LocaleLayoutProps) {
 
   return (
     <html lang={htmlLang} suppressHydrationWarning dir="ltr" className={`${inter.variable} ${playfair.variable}`}>
+      <head>
+        {/* Resource hints — pre-warm connections to Google Fonts & Cloudinary CDN
+            These fire before the browser discovers font requests, saving ~200-300 ms FCP */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://res.cloudinary.com" />
+        <link rel="dns-prefetch" href="https://res.cloudinary.com" />
+      </head>
       <body className="font-sans">
         <script
           type="application/ld+json"

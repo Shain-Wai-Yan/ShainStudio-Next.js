@@ -2,12 +2,7 @@
 
 import React, { useRef } from "react";
 import { useGSAP } from "@gsap/react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
-}
+import { gsap, ScrollTrigger } from "@/lib/gsapSetup";
 
 interface StatDef { value: number; suffix: string; label: string; }
 interface GsapStatsProps {
@@ -72,7 +67,7 @@ export default function GsapStats({ stats }: GsapStatsProps) {
       <div className="container mx-auto px-6 md:px-12">
         <div className="mb-12 md:mb-16 flex items-center gap-4">
           <span className="w-8 h-[1px] bg-[#d4af37]"></span>
-          <h2 className="text-[#1e1e48]/60 dark:text-[#d4af37] text-sm md:text-base font-bold tracking-widest uppercase">Numbers that speak</h2>
+          <h2 className="text-[#1e1e48]/80 dark:text-[#d4af37] text-sm md:text-base font-bold tracking-widest uppercase">Numbers that speak</h2>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
           {stats.map((s: StatDef, i: number) => (

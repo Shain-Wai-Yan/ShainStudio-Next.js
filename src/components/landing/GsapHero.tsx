@@ -2,16 +2,11 @@
 
 import React, { useRef } from "react";
 import { useGSAP } from "@gsap/react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { gsap, ScrollTrigger } from "@/lib/gsapSetup";
 import { SplitTextTitle } from "./SplitTextTitle";
 import { Play, ArrowRight } from "lucide-react";
 import Link from "next/link";
-import HeroTypewriter from "../HeroTypewriter"; // We keep the robust typewriter
-
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
-}
+import HeroTypewriter from "../HeroTypewriter";
 
 interface HeroHomePageSchema {
   badge?: string;
@@ -66,7 +61,24 @@ export default function GsapHero({ hp, locale }: GsapHeroProps) {
         "-=0.4"
       );
 
-      // 4. Parallax fading on scroll
+      // 4. GPU-composited background circle rotations (replaces CSS animate-spin)
+      //    Using GSAP `rotation` tweens keeps these on the compositor thread only.
+      gsap.to(".hero-spin-1", {
+        rotation: 360,
+        duration: 60,
+        ease: "none",
+        repeat: -1,
+        transformOrigin: "center center",
+      });
+      gsap.to(".hero-spin-2", {
+        rotation: -360,
+        duration: 90,
+        ease: "none",
+        repeat: -1,
+        transformOrigin: "center center",
+      });
+
+      // 5. Parallax fading on scroll
       const heroTl = gsap.timeline({
         scrollTrigger: {
           trigger: containerRef.current,
@@ -76,7 +88,6 @@ export default function GsapHero({ hp, locale }: GsapHeroProps) {
         },
       });
 
-      // The background moves down slower, the content moves up and fades out
       heroTl
         .to(".hero-bg-layer", {
           yPercent: 30,
@@ -112,9 +123,9 @@ export default function GsapHero({ hp, locale }: GsapHeroProps) {
           <div className="absolute left-3/4 top-0 w-[1px] h-full bg-gradient-to-b from-transparent via-[#1e1e48]/10 dark:via-white/5 to-transparent"></div>
           <div className="absolute top-1/4 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#1e1e48]/10 dark:via-white/5 to-transparent"></div>
           
-          {/* Subtle floating circles */}
-          <div className="absolute top-[20%] right-[15%] w-[30vh] h-[30vh] rounded-full border border-[#d4af37]/20 dark:border-[#d4af37]/10 scale-150 animate-[spin_60s_linear_infinite]"></div>
-          <div className="absolute bottom-[10%] left-[5%] w-[50vh] h-[50vh] rounded-full border border-[#1e1e48]/5 dark:border-white/5 scale-125 animate-[spin_90s_linear_infinite_reverse]"></div>
+          {/* GPU-composited rotating circles — driven by GSAP (transform-only, no layout/paint) */}
+          <div className="hero-spin-1 absolute top-[20%] right-[15%] w-[30vh] h-[30vh] rounded-full border border-[#d4af37]/20 dark:border-[#d4af37]/10 scale-150 will-change-transform"></div>
+          <div className="hero-spin-2 absolute bottom-[10%] left-[5%] w-[50vh] h-[50vh] rounded-full border border-[#1e1e48]/5 dark:border-white/5 scale-125 will-change-transform"></div>
         </div>
 
         {/* Brand Color Ambient Glows */}
@@ -127,10 +138,10 @@ export default function GsapHero({ hp, locale }: GsapHeroProps) {
           {/* Eyebrow & Badge */}
           <div className="hero-fade-up-1 flex flex-wrap items-center gap-4 mb-10">
             <span className="px-5 py-2 rounded-full border border-[#1e1e48]/10 dark:border-[#d4af37]/20 bg-white/60 dark:bg-[#1e1e48]/60 backdrop-blur-md text-xs tracking-widest font-semibold uppercase text-[#1e1e48] dark:text-[#d4af37] shadow-[0_4px_20px_-10px_rgba(0,0,0,0.1)]">
-              <span className="inline-block w-2 h-2 rounded-full bg-[#d4af37] mr-3 animate-pulse"></span>
+              <span className="inline-block w-2 h-2 rounded-full bg-[#d4af37] mr-3 animate-pulse" aria-hidden="true"></span>
               {hp.badge || "Status"}
             </span>
-            <span className="text-xs md:text-sm tracking-[0.2em] text-[#1e1e48]/60 dark:text-gray-400 font-mono uppercase">
+            <span className="text-xs md:text-sm tracking-[0.2em] text-[#1e1e48]/75 dark:text-gray-400 font-mono uppercase">
               {hp.eyebrow || "Eyebrow"}
             </span>
           </div>
@@ -177,6 +188,7 @@ export default function GsapHero({ hp, locale }: GsapHeroProps) {
 
             <Link
               href={`/${locale}/contact`}
+              aria-label={hp.getInTouch || "Contact Me"}
               className="group inline-flex items-center text-slate-900 dark:text-white font-medium hover:text-amber-600 dark:hover:text-amber-400 transition-colors"
             >
               <span className="w-12 h-12 rounded-full border border-gray-200 dark:border-gray-800 flex items-center justify-center mr-4 group-hover:border-amber-500 dark:group-hover:border-amber-400 transition-colors bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm">

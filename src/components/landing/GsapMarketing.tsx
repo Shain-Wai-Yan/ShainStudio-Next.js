@@ -2,14 +2,9 @@
 
 import React, { useRef } from "react";
 import { useGSAP } from "@gsap/react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { gsap, ScrollTrigger } from "@/lib/gsapSetup";
 import { SplitTextTitle } from "./SplitTextTitle";
 import { Globe, Users, TrendingUp, Zap } from "lucide-react";
-
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
-}
 
 /* ─────────────────────────────────────────────── */
 /*  TYPES                                           */
