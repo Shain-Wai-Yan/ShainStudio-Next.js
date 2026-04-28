@@ -143,7 +143,7 @@ export default function LocaleLayout({ children, params }: LocaleLayoutProps) {
   };
 
   return (
-    <html lang={htmlLang} suppressHydrationWarning dir="ltr" className={`${inter.variable} ${playfair.variable}`}>
+    <html lang={htmlLang} suppressHydrationWarning dir="ltr" data-scroll-behavior="smooth" className={`${inter.variable} ${playfair.variable}`}>
       <head>
         {/* Resource hints — pre-warm connections to Google Fonts & Cloudinary CDN
             These fire before the browser discovers font requests, saving ~200-300 ms FCP */}

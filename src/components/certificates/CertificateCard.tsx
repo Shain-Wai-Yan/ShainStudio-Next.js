@@ -1,7 +1,6 @@
 'use client';
 
-import Image from 'next/image';
-import { optimizeCloudinaryUrl } from '@/lib/utils/cloudinary-optimizer';
+import CImage from '@/components/ui/CImage';
 import { useState } from 'react';
 
 interface CertificateCardProps {
@@ -47,8 +46,8 @@ export function CertificateCard({
       <div className="relative w-full h-full bg-gray-50/30 dark:bg-gray-950/30 p-[8px]">
         <div className="relative w-full h-full overflow-hidden rounded-[10px] shadow-[inset_0_2px_10px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_10px_rgba(0,0,0,0.4)]">
           {displayImage ? (
-            <Image
-              src={optimizeCloudinaryUrl(displayImage)}
+            <CImage
+              src={displayImage}
               alt={title}
               fill
               sizes="(max-width: 768px) 288px, 320px"

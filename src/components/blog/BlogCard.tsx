@@ -1,8 +1,7 @@
 'use client';
 
-import Image from 'next/image';
-import { optimizeCloudinaryUrl } from '@/lib/utils/cloudinary-optimizer';
 import Link from 'next/link';
+import CImage from '@/components/ui/CImage';
 import { BlogPost, transformBlog } from '@/lib/strapi/blogs';
 
 interface BlogCardProps {
@@ -22,11 +21,12 @@ export default function BlogCard({ blog, language, variant = 'grid', priority = 
         <Link href={`${baseUrl}/${blog.Slug}`} className="flex gap-5">
           {transformed.featuredImageUrl && (
             <div className="relative w-36 h-28 flex-shrink-0 overflow-hidden rounded-sm">
-              <Image
-                src={optimizeCloudinaryUrl(transformed.featuredImageUrl)}
+              <CImage
+                src={transformed.featuredImageUrl}
                 alt={blog.Title}
                 fill
                 priority={priority}
+                sizes="(max-width: 768px) 100vw, 400px"
                 className="object-cover group-hover:scale-[1.08] transition-transform duration-300"
               />
             </div>
@@ -75,11 +75,12 @@ export default function BlogCard({ blog, language, variant = 'grid', priority = 
         {/* Image */}
         <div className="relative w-full h-40 overflow-hidden bg-[#f8f9fa] dark:bg-[#1e1e1e] flex-shrink-0">
           {transformed.featuredImageUrl ? (
-            <Image
-              src={optimizeCloudinaryUrl(transformed.featuredImageUrl)}
+            <CImage
+              src={transformed.featuredImageUrl}
               alt={blog.Title}
               fill
               priority={priority}
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
               className="object-cover group-hover:scale-[1.08] transition-transform duration-300"
             />
           ) : (

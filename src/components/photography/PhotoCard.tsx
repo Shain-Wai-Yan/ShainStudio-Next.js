@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import Image from 'next/image';
+import CImage from '@/components/ui/CImage';
 import { Photo } from '@/lib/strapi/photography';
 
 interface PhotoCardProps {
@@ -10,17 +10,7 @@ interface PhotoCardProps {
   priority?: boolean;
 }
 
-function buildSrc(url: string | null, width: number): string {
-  if (!url) return '';
-  if (
-    url.includes('cloudinary.com') &&
-    !url.includes('/upload/c_') &&
-    !url.includes('/upload/w_')
-  ) {
-    return url.replace('/upload/', `/upload/c_scale,w_${width},q_auto,f_auto/`);
-  }
-  return url;
-}
+// buildSrc replaced by cloudinaryLoader — the loader generates the srcset per breakpoint
 
 function buildBlurSrc(url: string | null): string | undefined {
   if (!url?.includes('cloudinary.com')) return undefined;
@@ -32,7 +22,7 @@ export function PhotoCard({ photo, onClick, priority = false }: PhotoCardProps) 
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
 
-  const src     = useMemo(() => buildSrc(photo.image, 600), [photo.image]);
+  const src     = photo.image ?? '';
   const blurSrc = useMemo(() => buildBlurSrc(photo.image), [photo.image]);
 
   // ── Error / no image ────────────────────────────────────────────────────────
@@ -80,7 +70,7 @@ export function PhotoCard({ photo, onClick, priority = false }: PhotoCardProps) 
       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onClick(); }}
       aria-label={`View photo: ${photo.title}`}
     >
-      <Image
+      <CImage
         src={src}
         alt={photo.title}
         width={600}

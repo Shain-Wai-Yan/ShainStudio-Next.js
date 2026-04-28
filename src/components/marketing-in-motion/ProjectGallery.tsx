@@ -1,8 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import Image from 'next/image';
-import { optimizeCloudinaryUrl } from '@/lib/utils/cloudinary-optimizer';
+import CImage from '@/components/ui/CImage';
 
 const BATCH = 4;
 
@@ -131,8 +130,8 @@ export default function ProjectGallery({ images, title, language }: ProjectGalle
                 "
                 aria-label={imgLabel(idx)}
               >
-                <Image
-                  src={optimizeCloudinaryUrl(img)}
+                <CImage
+                  src={img}
                   alt={imgLabel(idx)}
                   fill
                   className="object-cover transition-transform duration-400 group-hover:scale-110"
@@ -322,8 +321,8 @@ export default function ProjectGallery({ images, title, language }: ProjectGalle
               `}
               onClick={(e) => { e.stopPropagation(); setIsZoomed((z) => !z); }}
             >
-              <Image
-                src={optimizeCloudinaryUrl(currentImage)}
+              <CImage
+                src={currentImage}
                 alt={imgLabel(selectedIndex ?? 0)}
                 fill
                 className={`transition-all duration-300 ${isZoomed ? 'object-contain' : 'object-contain'}`}
@@ -374,7 +373,13 @@ export default function ProjectGallery({ images, title, language }: ProjectGalle
                     aria-label={imgLabel(idx)}
                     aria-current={idx === selectedIndex}
                   >
-                    <Image src={optimizeCloudinaryUrl(img)} alt={imgLabel(idx)} fill className="object-cover" sizes="48px" />
+                    <CImage 
+                      src={img} 
+                      alt={imgLabel(idx)} 
+                      fill 
+                      className="object-cover" 
+                      sizes="48px" 
+                    />
                   </button>
                 ))}
               </div>

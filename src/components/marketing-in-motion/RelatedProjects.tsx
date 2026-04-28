@@ -1,8 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
-import { optimizeCloudinaryUrl } from '@/lib/utils/cloudinary-optimizer';
+import CImage from '@/components/ui/CImage';
 import { MarketingProject, formatProjectDate } from '@/lib/strapi/marketing-in-motion';
 
 interface RelatedProjectsProps {
@@ -94,8 +93,8 @@ function RelatedRow({
 
       {/* Thumbnail */}
       <div className="flex-shrink-0 relative w-20 h-14 overflow-hidden bg-white/5 mr-4 self-start">
-        <Image
-          src={optimizeCloudinaryUrl(project.coverImage)}
+        <CImage
+          src={project.coverImage}
           alt={project.title}
           fill
           className="object-cover opacity-70 group-hover:opacity-100 transition-all duration-400 group-hover:scale-105"

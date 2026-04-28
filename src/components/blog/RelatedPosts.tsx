@@ -1,7 +1,6 @@
 'use client';
 
-import Image from 'next/image';
-import { optimizeCloudinaryUrl } from '@/lib/utils/cloudinary-optimizer';
+import CImage from '@/components/ui/CImage';
 import Link from 'next/link';
 import { BlogPost, transformBlog } from '@/lib/strapi/blogs';
 
@@ -25,11 +24,12 @@ function RelatedCard({ post, language, featured = false }: { post: BlogPost; lan
         {/* Large image */}
         <div className="relative w-full h-56 overflow-hidden bg-[#f8f9fa] dark:bg-[#1e1e1e] flex-shrink-0">
           {transformed.featuredImageUrl ? (
-            <Image
-              src={optimizeCloudinaryUrl(transformed.featuredImageUrl)}
+            <CImage
+              src={transformed.featuredImageUrl}
               alt={post.Title}
               fill
               className="object-cover group-hover:scale-[1.04] transition-transform duration-500"
+              sizes="(max-width: 768px) 100vw, 400px"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#191970]/10 to-[#ffd700]/10">
@@ -80,11 +80,12 @@ function RelatedCard({ post, language, featured = false }: { post: BlogPost; lan
       {/* Thumbnail */}
       <div className="relative w-20 h-16 flex-shrink-0 overflow-hidden rounded-sm bg-[#f8f9fa] dark:bg-[#1e1e1e]">
         {transformed.featuredImageUrl ? (
-          <Image
-            src={optimizeCloudinaryUrl(transformed.featuredImageUrl)}
+          <CImage
+            src={transformed.featuredImageUrl}
             alt={post.Title}
             fill
             className="object-cover group-hover:scale-[1.06] transition-transform duration-300"
+            sizes="80px"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">

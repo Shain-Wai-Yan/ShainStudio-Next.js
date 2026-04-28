@@ -1,7 +1,6 @@
 'use client';
 
-import Image from 'next/image';
-import { optimizeCloudinaryUrl } from '@/lib/utils/cloudinary-optimizer';
+import CImage from '@/components/ui/CImage';
 import { BlogPost, transformBlog } from '@/lib/strapi/blogs';
 
 interface BlogPostHeaderProps {
@@ -17,12 +16,13 @@ export default function BlogPostHeader({ blog, language }: BlogPostHeaderProps) 
       {/* Hero section with featured image */}
       {transformed.featuredImageUrl && (
         <div className="relative w-full h-96 md:h-[500px] overflow-hidden">
-          <Image
-            src={optimizeCloudinaryUrl(transformed.featuredImageUrl)}
+          <CImage
+            src={transformed.featuredImageUrl}
             alt={blog.Title}
             fill
             priority
             className="object-cover"
+            sizes="100vw"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
         </div>

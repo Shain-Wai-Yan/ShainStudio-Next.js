@@ -26,7 +26,6 @@ const securityHeaders = [
       "img-src 'self' data: blob: https://res.cloudinary.com https://www.shainwaiyan.com https://api.shainwaiyan.com https://backend-cms-89la.onrender.com https://personal-cms-backup.onrender.com https://i.ytimg.com https://yt3.googleusercontent.com https://yt3.ggpht.com https://via.placeholder.com",
       "connect-src 'self' https://api.shainwaiyan.com https://backend-cms-89la.onrender.com https://personal-cms-backup.onrender.com https://www.google-analytics.com https://www.clarity.ms",
       "frame-src 'self' https://www.youtube.com",
-      "report-uri /api/csp-report",
     ].join("; "),
   },
 ];
@@ -60,7 +59,8 @@ const nextConfig: NextConfig = {
   },
 
   images: {
-    unoptimized: true, // Cloudinary handles image optimisation on its CDN
+    // Next.js built-in optimizer handles local public assets (logo, profile, etc.)
+    // Cloudinary images use the custom loader via prop on individual <Image> components.
     remotePatterns: [
       { protocol: 'https', hostname: 'res.cloudinary.com' },
       { protocol: 'https', hostname: 'api.shainwaiyan.com' },

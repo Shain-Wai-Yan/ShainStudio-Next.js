@@ -1,9 +1,8 @@
 'use client';
 
 import { useRef, useCallback, useMemo, useState, useEffect } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
-import { optimizeCloudinaryUrl } from '@/lib/utils/cloudinary-optimizer';
+import CImage from '@/components/ui/CImage';
 import type { CodingProject } from '@/lib/strapi/coding-projects';
 
 const CARD_W = 220;
@@ -267,13 +266,7 @@ export function CodingProjectShelf({
         >
           {sorted.map((project, idx) => {
             const isFeatured = project.isFeatured;
-            let finalImageStr = project.coverImage;
-            if (finalImageStr && !finalImageStr.includes('placeholder')) {
-              try {
-                finalImageStr = optimizeCloudinaryUrl(finalImageStr);
-              } catch {}
-            }
-            const hasImage = finalImageStr && !finalImageStr.includes('placeholder');
+            const hasImage = project.coverImage && !project.coverImage.includes('placeholder');
 
             // Limit tools down to 3
             const visibleTools = project.toolsUsed.slice(0, 3);
@@ -305,12 +298,12 @@ export function CodingProjectShelf({
                 {/* Cover Image */}
                 <div className="relative h-[110px] w-full shrink-0 bg-gray-100 dark:bg-gray-800 flex items-center justify-center overflow-hidden">
                   {hasImage ? (
-                    <Image
-                      src={finalImageStr}
+                    <CImage
+                      src={project.coverImage}
                       alt={project.title}
                       fill
-                      sizes="(max-width: 640px) 200px, 220px"
-                      className="object-cover"
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                       priority={idx === 0}
                       draggable={false}
                     />

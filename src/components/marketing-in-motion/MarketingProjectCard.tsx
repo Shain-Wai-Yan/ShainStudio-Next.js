@@ -1,8 +1,7 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
-import { optimizeCloudinaryUrl } from '@/lib/utils/cloudinary-optimizer';
+import CImage from '@/components/ui/CImage';
 import type { MarketingProject } from '@/lib/strapi/marketing-in-motion';
 import { formatProjectDate } from '@/lib/strapi/marketing-in-motion';
 
@@ -58,17 +57,13 @@ export function MarketingProjectCard({
       <Link href={href} className="flex flex-col h-full focus:outline-none focus-visible:ring-2 focus-visible:ring-[#191970] dark:focus-visible:ring-[#ffd700]">
         {/* Cover image */}
         <div className="relative w-full aspect-video overflow-hidden bg-gray-100 dark:bg-gray-800">
-          <Image
-            src={optimizeCloudinaryUrl(project.coverImage)}
+          <CImage
+            src={project.coverImage}
             alt={project.title}
             fill
             priority={priority}
             className="object-cover transition-transform duration-500 group-hover:scale-105"
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            onError={(e) => {
-              (e.target as HTMLImageElement).src =
-                '/placeholder.svg?height=400&width=600&text=Marketing+Project';
-            }}
           />
 
           {/* Hover overlay */}
