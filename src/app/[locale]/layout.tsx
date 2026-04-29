@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 import { GoogleAnalytics } from '@next/third-parties/google';
 import SyntaxWidget from "@/components/syntax ai/SyntaxWidget";
 import ClarityAnalytics from "@/components/analytics/ClarityAnalytics";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans', display: 'swap' });
 const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-serif', display: 'swap' });
@@ -153,20 +154,22 @@ export default function LocaleLayout({ children, params }: LocaleLayoutProps) {
         <link rel="dns-prefetch" href="https://res.cloudinary.com" />
       </head>
       <body className="font-sans">
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
-        <Header />
-        <main className="min-h-screen">
-          {children}
-        </main>
-        <Footer />
-        <SyntaxWidget />
-        <ClarityAnalytics />
-        {process.env.NEXT_PUBLIC_GA_ID && (
-          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
-        )}
+        <ThemeProvider attribute="class" disableTransitionOnChange>
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          />
+          <Header />
+          <main className="min-h-screen">
+            {children}
+          </main>
+          <Footer />
+          <SyntaxWidget />
+          <ClarityAnalytics />
+          {process.env.NEXT_PUBLIC_GA_ID && (
+            <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
+          )}
+        </ThemeProvider>
       </body>
     </html>
   );

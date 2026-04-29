@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 
 import { RepoFile } from '@/lib/github-api';
+import { useTheme } from 'next-themes';
 
 interface RepoViewerProps {
   repoName: string;
@@ -104,14 +105,11 @@ export function RepoViewer({ repoName, defaultBranch = 'main', onClose }: RepoVi
   const [isDark, setIsDark]             = useState(false);
   const contentRef                      = useRef<HTMLDivElement>(null);
 
-  // Detect dark mode reactively
+  // Detect dark mode reactively via next-themes
+  const { resolvedTheme } = useTheme();
   useEffect(() => {
-    const mq = window.matchMedia('(prefers-color-scheme: dark)');
-    setIsDark(mq.matches);
-    const handler = (e: MediaQueryListEvent) => setIsDark(e.matches);
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
-  }, []);
+    setIsDark(resolvedTheme === 'dark');
+  }, [resolvedTheme]);
 
   // Load CDN libs once
   useEffect(() => {
@@ -496,25 +494,23 @@ export function RepoViewer({ repoName, defaultBranch = 'main', onClose }: RepoVi
         .rv-markdown tr:nth-child(even) td { background:#f6f8fa; }
         .rv-markdown img { max-width:100%; border-radius:4px; }
 
-        /* ── Dark mode overrides — uses media query so it works in any DOM position ── */
-        @media (prefers-color-scheme: dark) {
-          .rv-markdown { color: #e0e0e0; }
-          .rv-markdown h1 { color:#d4af37; border-bottom-color:#333; }
-          .rv-markdown h2 { color:#d4af37; border-bottom-color:#333; }
-          .rv-markdown h3, .rv-markdown h4, .rv-markdown h5, .rv-markdown h6 { color:#e0e0e0; }
-          .rv-markdown p  { color:#e0e0e0; }
-          .rv-markdown li { color:#e0e0e0; }
-          .rv-markdown a  { color:#d4af37; }
-          .rv-markdown hr { border-top-color:#444; }
-          .rv-markdown blockquote { color:#9ca3af; border-left-color:#444; }
-          .rv-markdown blockquote p { color:#9ca3af; }
-          .rv-markdown code { background:rgba(255,255,255,.1); color:#f1a040; }
-          .rv-markdown pre { background:#1e1e1e; }
-          .rv-markdown pre code { color:inherit; }
-          .rv-markdown th, .rv-markdown td { border-color:#444; color:#e0e0e0; }
-          .rv-markdown th { background:#252525; }
-          .rv-markdown tr:nth-child(even) td { background:#1e1e1e; }
-        }
+        /* ── Dark mode overrides — bound to next-themes .dark class ── */
+        .dark .rv-markdown { color: #e0e0e0; }
+        .dark .rv-markdown h1 { color:#d4af37; border-bottom-color:#333; }
+        .dark .rv-markdown h2 { color:#d4af37; border-bottom-color:#333; }
+        .dark .rv-markdown h3, .dark .rv-markdown h4, .dark .rv-markdown h5, .dark .rv-markdown h6 { color:#e0e0e0; }
+        .dark .rv-markdown p  { color:#e0e0e0; }
+        .dark .rv-markdown li { color:#e0e0e0; }
+        .dark .rv-markdown a  { color:#d4af37; }
+        .dark .rv-markdown hr { border-top-color:#444; }
+        .dark .rv-markdown blockquote { color:#9ca3af; border-left-color:#444; }
+        .dark .rv-markdown blockquote p { color:#9ca3af; }
+        .dark .rv-markdown code { background:rgba(255,255,255,.1); color:#f1a040; }
+        .dark .rv-markdown pre { background:#1e1e1e; }
+        .dark .rv-markdown pre code { color:inherit; }
+        .dark .rv-markdown th, .dark .rv-markdown td { border-color:#444; color:#e0e0e0; }
+        .dark .rv-markdown th { background:#252525; }
+        .dark .rv-markdown tr:nth-child(even) td { background:#1e1e1e; }
       `}</style>
     </div>
   );

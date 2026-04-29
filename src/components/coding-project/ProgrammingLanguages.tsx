@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useTheme } from 'next-themes';
 
 interface Language {
   name: string;
@@ -25,6 +26,7 @@ export function ProgrammingLanguages({ languages, isLoading }: ProgrammingLangua
   const params = useParams();
   const locale = (params?.locale as string) || 'en';
   const t = getDictionarySync(locale).codingProjects;
+  const { resolvedTheme } = useTheme();
   const canvasRef               = useRef<HTMLCanvasElement>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const chartRef                = useRef<any>(null);
@@ -46,7 +48,7 @@ export function ProgrammingLanguages({ languages, isLoading }: ProgrammingLangua
     const Chart = (window as any).Chart;
     if (chartRef.current) { chartRef.current.destroy(); chartRef.current = null; }
 
-    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const isDark = resolvedTheme === 'dark';
 
     chartRef.current = new Chart(canvasRef.current, {
       type: 'doughnut',
@@ -73,7 +75,7 @@ export function ProgrammingLanguages({ languages, isLoading }: ProgrammingLangua
     });
 
     return () => { chartRef.current?.destroy(); chartRef.current = null; };
-  }, [libReady, languages]);
+  }, [libReady, languages, resolvedTheme]);
 
   if (isLoading) {
     return (

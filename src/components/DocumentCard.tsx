@@ -66,13 +66,11 @@ export function DocumentCard({
         .desc-link:hover {
           color: #1d4ed8;
         }
-        @media (prefers-color-scheme: dark) {
-          .desc-link {
-            color: #60a5fa;
-          }
-          .desc-link:hover {
-            color: #93c5fd;
-          }
+        .dark .desc-link {
+          color: #60a5fa;
+        }
+        .dark .desc-link:hover {
+          color: #93c5fd;
         }
       `}</style>
 

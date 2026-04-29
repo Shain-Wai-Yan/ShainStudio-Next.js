@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { FaBars, FaTimes, FaChevronDown } from 'react-icons/fa';
 import LanguageSwitcher from './LanguageSwitcher';
+import ThemeToggle from './ThemeToggle';
 import { getDictionarySync } from '@/lib/getDictionary';
 import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
 
@@ -155,9 +156,10 @@ const Header = () => {
           </ul>
         </nav>
 
-        {/* Language Switcher + Mobile Button */}
-        <div className="flex items-center gap-2">
+        {/* Language Switcher + Theme Toggle + Mobile Button */}
+        <div className="flex items-center gap-1 sm:gap-2">
           <LanguageSwitcher />
+          <ThemeToggle />
           <button
             className="lg:hidden hover:text-[#ffd700] transition-colors duration-300 flex items-center justify-center p-2 w-12 h-12 text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ffd700]"
             onClick={toggleMenu}

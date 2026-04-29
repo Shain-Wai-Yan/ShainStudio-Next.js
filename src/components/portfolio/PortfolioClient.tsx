@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { PortfolioCounts } from '@/lib/getPortfolioCounts';
+import { useTheme } from 'next-themes';
 
 // ─── Particle canvas — gold in both modes, denser on dark ─────────────────────
 
@@ -261,16 +262,12 @@ interface Props {
 
 export default function PortfolioClient({ locale, t, dynamicCounts }: Props) {
 
+  const { resolvedTheme } = useTheme();
   const [dark, setDark] = useState(false);
+  
   useEffect(() => {
-    const mq = window.matchMedia('(prefers-color-scheme: dark)');
-    const check = () => setDark(document.documentElement.classList.contains('dark') || mq.matches);
-    check();
-    const obs = new MutationObserver(check);
-    obs.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-    mq.addEventListener('change', check);
-    return () => { obs.disconnect(); mq.removeEventListener('change', check); };
-  }, []);
+    setDark(resolvedTheme === 'dark');
+  }, [resolvedTheme]);
 
   const isZh = locale === 'zh';
   const displayFont = "var(--font-serif)";

@@ -56,15 +56,15 @@ const Footer = () => {
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
   return (
-    <footer className="footer-root">
+    <footer className="w-full border-t-[3px] border-[#ffd700] bg-[#191970] dark:bg-[#0c0c14] text-[#e8e8e8] font-sans transition-colors duration-300">
       {/* ── TOP SECTION ────────────────────────────────────────────── */}
-      <div className="footer-top">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-12 px-6 md:px-[5vw] pt-12 md:pt-16 pb-6 md:pb-8 items-start">
         {/* Left — editorial headline + CTA */}
-        <div className="footer-hero">
-          <p className="footer-eyebrow">/ {locale === 'zh' ? '准备好合作了吗？' : "READY TO MAKE IT OFFICIAL?"}</p>
+        <div className="flex flex-col gap-4">
+          <p className="text-[0.7rem] tracking-[0.18em] text-[#808080] uppercase m-0 font-medium">/ {locale === 'zh' ? '准备好合作了吗？' : "READY TO MAKE IT OFFICIAL?"}</p>
 
-          <div className="footer-headline">
-            <span className="footer-hl-line">
+          <div className="flex flex-col gap-0.5 leading-[1]">
+            <span className="block text-[clamp(3rem,8vw,6rem)] font-[800] text-white tracking-[-0.03em] leading-[1.05] lowercase font-secondary">
               {locale === 'zh' ? '让我们一起' : "let's"}&nbsp;
               {locale === 'en' && (
                 <span
@@ -86,7 +86,7 @@ const Footer = () => {
                     return (
                       <span
                         key={verb}
-                        className="footer-verb absolute left-0 top-0 w-full h-full flex items-center justify-start"
+                        className="bg-gradient-to-r from-[#bf953f] via-[#fcf6ba] to-[#b38728] bg-clip-text text-transparent italic inline-block antialiased absolute left-0 top-0 w-full h-full flex items-center justify-start"
                         style={{
                           opacity: position === 'active' ? 1 : 0,
                           transform: 
@@ -105,7 +105,7 @@ const Footer = () => {
                 </span>
               )}
             </span>
-            <span className="footer-hl-line footer-hl-line--row">
+            <span className="flex items-center gap-4 text-[clamp(3rem,9vw,6rem)] font-[800] text-white tracking-[-0.03em] leading-[1.05] lowercase font-secondary">
               {locale === 'zh' && (
                 <span
                   className="relative inline-block"
@@ -123,7 +123,7 @@ const Footer = () => {
                     return (
                       <span
                         key={verb}
-                        className="footer-verb absolute left-0 top-0 w-full h-full flex items-center justify-start"
+                        className="bg-gradient-to-r from-[#bf953f] via-[#fcf6ba] to-[#b38728] bg-clip-text text-transparent italic inline-block antialiased absolute left-0 top-0 w-full h-full flex items-center justify-start"
                         style={{
                           opacity: position === 'active' ? 1 : 0,
                           transform: 
@@ -145,28 +145,28 @@ const Footer = () => {
               <button
                 onClick={scrollToTop}
                 aria-label="Scroll to top / Contact CTA"
-                className="footer-cta-btn"
+                className="inline-flex items-center justify-center w-[3.2rem] h-[3.2rem] rounded-full bg-white text-[#0c0c14] border-none cursor-pointer shrink-0 transition-all duration-300 ease-out hover:bg-[#ffd700] hover:rotate-45 hover:scale-105 text-[1.1rem]"
               >
-                <span className="footer-cta-arrow">↗</span>
+                <span className="leading-none text-xl">↗</span>
               </button>
             </span>
           </div>
         </div>
 
         {/* Right — columns */}
-        <div className="footer-cols">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 pt-8">
           {/* Write to us */}
-          <div className="footer-col">
-            <p className="footer-col-label">/ {locale === 'zh' ? '联系我们' : 'WRITE TO US'}</p>
-            <div className="footer-col-group">
-              <p className="footer-col-key">{locale === 'zh' ? '电子邮件' : 'EMAIL'}</p>
-              <a href="mailto:mail@shainwaiyan.com" className="footer-col-val footer-link">
+          <div className="flex flex-col gap-5">
+            <p className="text-[0.65rem] tracking-[0.18em] text-[#666] uppercase m-0 font-medium">/ {locale === 'zh' ? '联系我们' : 'WRITE TO US'}</p>
+            <div className="flex flex-col gap-1">
+              <p className="text-[0.7rem] tracking-[0.12em] font-bold text-[#aaaaaa] uppercase m-0 mb-0.5">{locale === 'zh' ? '电子邮件' : 'EMAIL'}</p>
+              <a href="mailto:mail@shainwaiyan.com" className="text-[0.82rem] text-[#cccccc] dark:text-[#cccccc] m-0 leading-[1.7] no-underline transition-colors duration-200 hover:text-[#ffd700] dark:hover:text-[#ffd700]">
                 mail@shainwaiyan.com
               </a>
             </div>
-            <div className="footer-col-group">
-              <p className="footer-col-key">{locale === 'zh' ? '社交媒体' : 'SOCIAL'}</p>
-              <div className="footer-social-row">
+            <div className="flex flex-col gap-1">
+              <p className="text-[0.7rem] tracking-[0.12em] font-bold text-[#aaaaaa] uppercase m-0 mb-0.5">{locale === 'zh' ? '社交媒体' : 'SOCIAL'}</p>
+              <div className="flex gap-2.5 mt-1 flex-wrap">
                 {socialLinks.map(({ href, label, icon: Icon }) => (
                   <a
                     key={label}
@@ -174,7 +174,7 @@ const Footer = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={label}
-                    className="footer-social-icon"
+                    className="flex items-center justify-center w-8 h-8 rounded-md bg-[#ffd700]/10 border border-[#ffd700]/15 text-[#cccccc] transition-all duration-200 hover:bg-[#ffd700] hover:text-[#0c0c14] hover:-translate-y-0.5 hover:border-[#ffd700]"
                   >
                     <Icon size={16} />
                   </a>
@@ -184,19 +184,19 @@ const Footer = () => {
           </div>
 
           {/* Navigate */}
-          <div className="footer-col">
-            <p className="footer-col-label">/ {locale === 'zh' ? '网站导航' : 'NAVIGATE'}</p>
-            <div className="footer-col-group">
-              <Link href={locale === 'en' ? '/' : basePath} className="footer-col-val footer-link">
+          <div className="flex flex-col gap-5">
+            <p className="text-[0.65rem] tracking-[0.18em] text-[#666] uppercase m-0 font-medium">/ {locale === 'zh' ? '网站导航' : 'NAVIGATE'}</p>
+            <div className="flex flex-col gap-1">
+              <Link href={locale === 'en' ? '/' : basePath} className="text-[0.82rem] text-[#cccccc] dark:text-[#cccccc] m-0 leading-[1.7] no-underline transition-colors duration-200 hover:text-[#ffd700] dark:hover:text-[#ffd700]">
                 {locale === 'zh' ? '首页' : 'Home'}
               </Link>
-              <Link href={`${basePath}/about`} className="footer-col-val footer-link">
+              <Link href={`${basePath}/about`} className="text-[0.82rem] text-[#cccccc] dark:text-[#cccccc] m-0 leading-[1.7] no-underline transition-colors duration-200 hover:text-[#ffd700] dark:hover:text-[#ffd700]">
                 {locale === 'zh' ? '关于' : 'About'}
               </Link>
-              <Link href={`${basePath}/portfolio`} className="footer-col-val footer-link">
+              <Link href={`${basePath}/portfolio`} className="text-[0.82rem] text-[#cccccc] dark:text-[#cccccc] m-0 leading-[1.7] no-underline transition-colors duration-200 hover:text-[#ffd700] dark:hover:text-[#ffd700]">
                 {locale === 'zh' ? '作品集' : 'Portfolio'}
               </Link>
-              <Link href={`${basePath}/contact`} className="footer-col-val footer-link">
+              <Link href={`${basePath}/contact`} className="text-[0.82rem] text-[#cccccc] dark:text-[#cccccc] m-0 leading-[1.7] no-underline transition-colors duration-200 hover:text-[#ffd700] dark:hover:text-[#ffd700]">
                 {locale === 'zh' ? '联系' : 'Contact'}
               </Link>
             </div>
@@ -205,277 +205,30 @@ const Footer = () => {
       </div>
 
       {/* ── BACK TO TOP ───────────────────────────────────────────── */}
-      <div className="footer-divider" />
-      <button onClick={scrollToTop} className="footer-back-top">
-        <span className="footer-back-top-arrow">↗</span>
+      <div className="h-[1px] bg-white/10 mx-[5vw]" />
+      <button onClick={scrollToTop} className="inline-flex items-center gap-2 px-[5vw] py-4 bg-transparent border-none cursor-pointer text-[#888] text-[0.68rem] tracking-[0.16em] uppercase font-semibold transition-colors duration-200 hover:text-[#ffd700]">
+        <span className="text-[0.9rem]">↗</span>
         <span>{locale === 'zh' ? '回到顶部' : 'BACK TO THE TOP'}</span>
       </button>
 
       {/* ── BOTTOM BAR ────────────────────────────────────────────── */}
-      <div className="footer-bottom-wrapper">
-        <div className="footer-bottom">
-          <p className="footer-copy">
+      <div className="px-6 md:px-[5vw]">
+        <div className="flex items-center justify-between py-[1.2rem] px-[2rem] flex-wrap gap-3 bg-white rounded-t-[16px] transition-colors duration-300">
+          <p className="text-[0.7rem] text-[#333333] m-0 tracking-[0.05em] uppercase font-medium transition-colors duration-300">
             &copy; {currentYear} Shain Studio.&nbsp;{t.footer.allRightsReserved}
           </p>
 
-          <div className="footer-bottom-links">
-            <Link href={`${basePath}/privacy`} className="footer-bottom-link">
+          <div className="flex items-center gap-2.5">
+            <Link href={`${basePath}/privacy`} className="text-[0.7rem] text-[#333333] no-underline uppercase tracking-[0.06em] font-medium transition-colors duration-300 hover:text-[#191970]">
               {t.footer.privacyPolicy}
             </Link>
-            <span className="footer-bottom-sep">\</span>
-            <Link href={`${basePath}/terms`} className="footer-bottom-link">
+            <span className="text-[#aaaaaa] text-[0.75rem] transition-colors duration-300">\</span>
+            <Link href={`${basePath}/terms`} className="text-[0.7rem] text-[#333333] no-underline uppercase tracking-[0.06em] font-medium transition-colors duration-300 hover:text-[#191970]">
               {t.footer.termsOfService}
             </Link>
           </div>
         </div>
       </div>
-
-      {/* ── INLINE STYLES ─────────────────────────────────────────── */}
-      <style>{`
-        /* ── root ── */
-        .footer-root {
-          background-color: #191970;
-          color: #e8e8e8;
-          font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-          width: 100%;
-          border-top: 3px solid #ffd700;
-        }
-
-        /* dark mode override */
-        @media (prefers-color-scheme: dark) {
-          .footer-root { background-color: #0c0c14; }
-        }
-        :global(.dark-mode) .footer-root,
-        .dark .footer-root {
-          background-color: #0c0c14;
-        }
-
-        /* ── top section ── */
-        .footer-top {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 3rem;
-          padding: 4rem 5vw 2rem;
-          align-items: start;
-        }
-        @media (max-width: 768px) {
-          .footer-top { grid-template-columns: 1fr; padding: 3rem 1.5rem 1.5rem; }
-        }
-
-        /* ── hero ── */
-        .footer-hero { display: flex; flex-direction: column; gap: 1rem; }
-
-        .footer-eyebrow {
-          font-size: 0.7rem;
-          letter-spacing: 0.18em;
-          color: #808080;
-          text-transform: uppercase;
-          margin: 0;
-          font-weight: 500;
-        }
-
-        .footer-headline {
-          display: flex;
-          flex-direction: column;
-          gap: 0.1rem;
-          line-height: 1;
-        }
-
-        .footer-hl-line {
-          display: block;
-          font-size: clamp(3rem, 7vw, 6rem);
-          font-weight: 800;
-          color: #ffffff;
-          letter-spacing: -0.03em;
-          line-height: 1.05;
-          text-transform: lowercase;
-          font-family: 'Poppins', 'Inter', sans-serif;
-        }
-
-        .footer-hl-line--row {
-          display: flex;
-          align-items: center;
-          gap: 1rem;
-        }
-
-        /* ── animated verb (color + italic only; transitions via inline style) ── */
-        .footer-verb {
-          background-image: linear-gradient(to right, #bf953f, #fcf6ba, #b38728);
-          -webkit-background-clip: text;
-          background-clip: text;
-          color: transparent;
-          font-style: italic;
-          display: inline-block;
-          will-change: opacity, transform;
-          -webkit-font-smoothing: antialiased;
-          -moz-osx-font-smoothing: grayscale;
-        }
-
-        /* ── CTA circle button ── */
-        .footer-cta-btn {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          width: 3.2rem;
-          height: 3.2rem;
-          border-radius: 50%;
-          background: #ffffff;
-          color: #0c0c14;
-          border: none;
-          cursor: pointer;
-          flex-shrink: 0;
-          transition: background 0.25s ease, transform 0.25s ease;
-          font-size: 1.1rem;
-        }
-        .footer-cta-btn:hover {
-          background: #ffd700;
-          transform: rotate(45deg) scale(1.08);
-        }
-        .footer-cta-arrow { line-height: 1; }
-
-        /* ── columns ── */
-        .footer-cols {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 2rem;
-          padding-top: 2rem;
-        }
-        @media (max-width: 480px) {
-          .footer-cols { grid-template-columns: 1fr; }
-        }
-
-        .footer-col { display: flex; flex-direction: column; gap: 1.2rem; }
-
-        .footer-col-label {
-          font-size: 0.65rem;
-          letter-spacing: 0.18em;
-          color: #666;
-          text-transform: uppercase;
-          margin: 0;
-          font-weight: 500;
-        }
-
-        .footer-col-group { display: flex; flex-direction: column; gap: 0.25rem; }
-
-        .footer-col-key {
-          font-size: 0.7rem;
-          letter-spacing: 0.12em;
-          font-weight: 700;
-          color: #aaaaaa;
-          text-transform: uppercase;
-          margin: 0 0 0.15rem;
-        }
-
-        .footer-col-val {
-          font-size: 0.82rem;
-          color: #cccccc;
-          margin: 0;
-          line-height: 1.7;
-        }
-
-        .footer-link {
-          text-decoration: none;
-          color: #cccccc;
-          transition: color 0.2s ease;
-        }
-        .footer-link:hover { color: #ffd700; }
-
-        /* social row */
-        .footer-social-row {
-          display: flex;
-          gap: 0.6rem;
-          margin-top: 0.3rem;
-          flex-wrap: wrap;
-        }
-        .footer-social-icon {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 2rem;
-          height: 2rem;
-          border-radius: 6px;
-          background: rgba(255,215,0,0.08);
-          border: 1px solid rgba(255,215,0,0.15);
-          color: #cccccc;
-          text-decoration: none;
-          transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
-        }
-        .footer-social-icon:hover {
-          background: #ffd700;
-          color: #0c0c14;
-          transform: translateY(-2px);
-          border-color: #ffd700;
-        }
-
-        /* ── divider ── */
-        .footer-divider {
-          height: 1px;
-          background: rgba(255,255,255,0.08);
-          margin: 0 5vw;
-        }
-
-        /* ── back to top ── */
-        .footer-back-top {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.5rem;
-          padding: 1rem 5vw;
-          background: none;
-          border: none;
-          cursor: pointer;
-          color: #888;
-          font-size: 0.68rem;
-          letter-spacing: 0.16em;
-          text-transform: uppercase;
-          font-weight: 600;
-          transition: color 0.2s ease;
-        }
-        .footer-back-top:hover { color: #ffd700; }
-        .footer-back-top-arrow { font-size: 0.9rem; }
-
-        /* ── bottom bar wrapper (white card, flush to bottom) ── */
-        .footer-bottom-wrapper {
-          padding: 0 5vw 0;
-        }
-        .footer-bottom {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 1.2rem 2rem;
-          flex-wrap: wrap;
-          gap: 0.75rem;
-          background: #ffffff;
-          border-radius: 16px 16px 0 0;
-        }
-
-        .footer-copy {
-          font-size: 0.7rem;
-          color: #333333;
-          margin: 0;
-          letter-spacing: 0.05em;
-          text-transform: uppercase;
-          font-weight: 500;
-        }
-
-        .footer-bottom-links {
-          display: flex;
-          align-items: center;
-          gap: 0.6rem;
-        }
-
-        .footer-bottom-link {
-          font-size: 0.7rem;
-          color: #333333;
-          text-decoration: none;
-          text-transform: uppercase;
-          letter-spacing: 0.06em;
-          font-weight: 500;
-          transition: color 0.2s ease;
-        }
-        .footer-bottom-link:hover { color: #191970; }
-
-        .footer-bottom-sep { color: #aaaaaa; font-size: 0.75rem; }
-      `}</style>
     </footer>
   );
 };
