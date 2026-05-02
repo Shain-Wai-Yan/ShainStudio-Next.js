@@ -1,7 +1,7 @@
 'use client';
-
 import Link from 'next/link';
 import { MarketingProject } from '@/lib/strapi/marketing-in-motion';
+import RichTextRenderer from '../shared/RichTextRenderer';
 
 interface ProjectContentProps {
   project: MarketingProject;
@@ -57,10 +57,11 @@ export default function ProjectContent({ project, language }: ProjectContentProp
         </div>
       )}
 
-      {/* Main Content */}
-      <div
+      {/* Main Content Rendered via Parser */}
+      <RichTextRenderer
+        content={project.fullText}
         className="
-          prose prose-sm dark:prose-invert max-w-none
+          prose prose-sm md:prose-base dark:prose-invert max-w-none
           prose-headings:text-[#191970] dark:prose-headings:text-[#ffd700]
           prose-headings:font-bold prose-headings:tracking-tight
           prose-h2:text-xl prose-h2:mt-10 prose-h2:mb-4
@@ -86,7 +87,6 @@ export default function ProjectContent({ project, language }: ProjectContentProp
           prose-figure:my-8
           prose-figcaption:text-center prose-figcaption:text-xs prose-figcaption:text-[#666] dark:prose-figcaption:text-[#999] prose-figcaption:mt-2
         "
-        dangerouslySetInnerHTML={{ __html: project.fullText }}
       />
 
       {/* ── Low-profile back link ──────────────────────────────────────────── */}
@@ -95,7 +95,7 @@ export default function ProjectContent({ project, language }: ProjectContentProp
           href={backHref}
           className="
             inline-flex items-center gap-1.5
-            text-xs text-gray-400 dark:text-gray-500
+            text-xs font-medium text-gray-500 dark:text-gray-400
             hover:text-[#191970] dark:hover:text-[#d4af37]
             transition-colors duration-150
             group
@@ -103,7 +103,7 @@ export default function ProjectContent({ project, language }: ProjectContentProp
         >
           <svg
             width="12" height="12" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" strokeWidth="2"
+            stroke="currentColor" strokeWidth="2.5"
             className="transition-transform duration-150 group-hover:-translate-x-0.5"
           >
             <path d="M19 12H5M12 5l-7 7 7 7"/>

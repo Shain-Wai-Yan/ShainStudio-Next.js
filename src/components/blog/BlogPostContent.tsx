@@ -1,92 +1,19 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
 import { BlogPost } from '@/lib/strapi/blogs';
+import RichTextRenderer from '../shared/RichTextRenderer';
 
 interface BlogPostContentProps {
   blog: BlogPost;
   language: 'en' | 'zh';
 }
 
-function fixYouTubeIframes(container: HTMLElement) {
-  // 1. Convert <oembed> → <iframe>
-  container.querySelectorAll('oembed').forEach((oembed) => {
-    const url = oembed.getAttribute('url');
-    if (!url) return;
-    const iframe = document.createElement('iframe');
-    iframe.src = url;
-    iframe.style.width = '100%';
-    iframe.style.height = '100%';
-    iframe.setAttribute('frameborder', '0');
-    iframe.setAttribute('allowfullscreen', '');
-    iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
-    iframe.setAttribute('title', 'Embedded video content');
-    oembed.parentNode?.replaceChild(iframe, oembed);
-  });
-
-  // 2. Fix all iframes
-  container.querySelectorAll<HTMLIFrameElement>('iframe').forEach((iframe) => {
-    let src = iframe.getAttribute('src');
-    if (!src) return;
-    const isYouTube = src.includes('youtube.com') || src.includes('youtu.be');
-    if (!isYouTube) return;
-
-    if (src.includes('watch?v=')) src = src.replace('watch?v=', 'embed/');
-    else if (src.includes('youtu.be/')) src = src.replace('youtu.be/', 'www.youtube.com/embed/');
-
-    try {
-      const url = new URL(src.startsWith('//') ? `https:${src}` : src);
-      if (!url.searchParams.has('rel')) url.searchParams.set('rel', '0');
-      if (!url.searchParams.has('controls')) url.searchParams.set('controls', '1');
-      if (!url.searchParams.has('modestbranding')) url.searchParams.set('modestbranding', '1');
-      src = url.toString();
-    } catch { /* malformed URL */ }
-
-    iframe.setAttribute('src', src);
-    if (!iframe.hasAttribute('allowfullscreen')) iframe.setAttribute('allowfullscreen', '');
-    if (!iframe.hasAttribute('frameborder')) iframe.setAttribute('frameborder', '0');
-    if (!iframe.hasAttribute('allow')) {
-      iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
-    }
-
-    // Wrap in 16:9 responsive container if needed
-    const parent = iframe.parentElement;
-    if (parent && !parent.classList.contains('yt-wrapper') && !parent.classList.contains('media')) {
-      const wrapper = document.createElement('div');
-      wrapper.className = 'yt-wrapper';
-      wrapper.style.cssText = 'position:relative;width:100%;padding-bottom:56.25%;height:0;overflow:hidden;margin:1.5em 0;border-radius:4px;background:#000';
-      parent.insertBefore(wrapper, iframe);
-      wrapper.appendChild(iframe);
-      iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;border:0';
-    }
-  });
-
-  // 3. Wrap CKEditor .media figures
-  container.querySelectorAll<HTMLElement>('figure.media, .media').forEach((media) => {
-    const iframe = media.querySelector('iframe');
-    if (!iframe || media.style.paddingBottom) return;
-    media.style.cssText += ';position:relative;width:100%;padding-bottom:56.25%;height:0;overflow:hidden;margin:1.5em 0;border-radius:4px';
-    iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;border:0';
-  });
-}
-
 export default function BlogPostContent({ blog, language }: BlogPostContentProps) {
-  const contentRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (contentRef.current) fixYouTubeIframes(contentRef.current);
-  }, [blog.Content]);
-
-  const sanitised = (blog.Content || '')
-    .replace(/<script/gi, '<noscript')
-    .replace(/<\/script>/gi, '</noscript>')
-    .replace(/onerror=/gi, '')
-    .replace(/onload=/gi, '');
 
   return (
     <div>
-      {/* Post body */}
-      <div ref={contentRef} className="blog-post-body" dangerouslySetInnerHTML={{ __html: sanitised }} />
+      {/* Post body Rendered via Parser */}
+      <RichTextRenderer content={blog.Content || ''} className="blog-post-body" />
 
       {/* Share section */}
       <div className="mt-12 pt-8 border-t border-gray-300 dark:border-gray-700">

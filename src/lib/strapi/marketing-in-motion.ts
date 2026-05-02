@@ -34,6 +34,7 @@ export interface StrapiMarketingProject {
   slug: string;
   summary?: string;
   fullText?: unknown;
+  content?: unknown; // New CKEditor field
   coverImage?: StrapiFile;
   imageGallery?: StrapiFile[];
   category?: string | { name?: string; data?: { attributes?: { name: string } } };
@@ -202,7 +203,10 @@ export function transformMarketingProject(raw: StrapiMarketingProject): Marketin
     const slug = raw.slug || `project-${raw.id}`;
     const summary = raw.summary || '';
     const projectDate = raw.projectDate || raw.publishedAt || raw.createdAt || '';
-    const fullText = convertRichTextToHtml(raw.fullText);
+    
+    // Support both 'content' (new CKEditor field) and 'fullText' (legacy field)
+    const rawContent = raw.content || raw.fullText;
+    const fullText = convertRichTextToHtml(rawContent);
 
     // Cover image
     const coverImage =

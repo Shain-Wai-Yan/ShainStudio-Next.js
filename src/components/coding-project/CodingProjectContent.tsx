@@ -1,8 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import DOMPurify from 'isomorphic-dompurify';
 import { CodingProject } from '@/lib/strapi/coding-projects';
+import RichTextRenderer from '../shared/RichTextRenderer';
 
 interface CodingProjectContentProps {
   project: CodingProject;
@@ -14,14 +14,6 @@ export default function CodingProjectContent({ project, language }: CodingProjec
     language === 'zh' ? '/zh/portfolio/coding-projects' : '/portfolio/coding-projects';
   const archiveHref =
     language === 'zh' ? '/zh/portfolio/coding-projects/archive' : '/portfolio/coding-projects/archive';
-
-  const DOMPURIFY_CONFIG = {
-    ADD_TAGS: ['iframe'],
-    ADD_ATTR: ['allow', 'allowfullscreen', 'frameborder', 'scrolling', 'src'],
-    ALLOWED_URI_REGEXP: /^(?:(?:https:)?\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be|vimeo\.com|player\.vimeo\.com)\//i,
-  };
-
-  const cleanContent = DOMPurify.sanitize(project.content, DOMPURIFY_CONFIG);
 
   return (
     <article className="max-w-3xl mx-auto px-4 sm:px-6 py-8 md:py-12">
@@ -68,8 +60,9 @@ export default function CodingProjectContent({ project, language }: CodingProjec
         </div>
       )}
 
-      {/* Main Content (CK Editor HTML) */}
-      <div
+      {/* Main Content (CK Editor HTML Rendered via Parser) */}
+      <RichTextRenderer
+        content={project.content}
         className="
           prose prose-sm md:prose-base dark:prose-invert max-w-none
           prose-headings:text-[#191970] dark:prose-headings:text-[#ffd700]
@@ -97,7 +90,6 @@ export default function CodingProjectContent({ project, language }: CodingProjec
           prose-figure:my-8
           prose-figcaption:text-center prose-figcaption:text-xs prose-figcaption:text-[#666] dark:prose-figcaption:text-[#999] prose-figcaption:mt-2
         "
-        dangerouslySetInnerHTML={{ __html: cleanContent }}
       />
 
       {/* ── Low-profile back links ──────────────────────────────────────────── */}
