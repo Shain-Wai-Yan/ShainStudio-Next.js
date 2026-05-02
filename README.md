@@ -1,36 +1,100 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Shain Wai Yan — Portfolio
+
+A bilingual (English & Chinese) personal portfolio website built with **Next.js 16 App Router**.
+
+## Tech Stack
+
+| | |
+|-|-|
+| Framework | Next.js 16.1.6 (App Router) |
+| React | React 19 |
+| Styling | Tailwind CSS 4 |
+| Language | TypeScript 5 |
+| CMS | Strapi (headless, hosted on Render) |
+| Animation | GSAP 3 + @gsap/react |
+| Theme | next-themes (dark / light mode) |
+| Image CDN | Cloudinary |
+| Deployment | Vercel |
+
+## Features
+
+- **Bilingual** — English (`/`) and Chinese (`/zh`) via a single `[locale]` dynamic route
+- **Dark / Light Mode** — `next-themes` class-based theming
+- **GSAP Animations** — Hero, bento grid, marquee, scroll-triggered reveals
+- **Blog** — Strapi CMS with dynamic slug routing
+- **Coding Projects** — GitHub API + Strapi, with detail pages and archive
+- **Marketing in Motion** — Strapi project gallery with detail pages
+- **Photography** — Cloudinary-hosted masonry gallery
+- **AMV Editing** — YouTube API integration with video modal
+- **Certificates** — Animated marquee carousel
+- **Analytics** — Google Analytics 4, Microsoft Clarity, Vercel Analytics
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+- Node.js 20+
+- npm
+
+### Installation
+
+```bash
+npm install
+```
+
+### Environment Variables
+
+Create a `.env.local` file:
+
+```env
+NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
+NEXT_PUBLIC_CLARITY_ID=xxxxxxxxxx
+STRAPI_API_URL=https://your-strapi-url
+STRAPI_API_TOKEN=your-strapi-token
+GITHUB_TOKEN=your-github-token
+```
+
+### Development
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Build & Lint
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build    # Production build
+npm run lint     # ESLint check
+```
 
-## Learn More
+## Project Structure
 
-To learn more about Next.js, take a look at the following resources:
+See [`ARCHITECTURE.md`](./ARCHITECTURE.md) for the full detailed architecture reference.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+src/
+├── app/                # Next.js App Router (pages, API routes)
+│   ├── [locale]/       # All pages (EN + ZH via single source)
+│   └── api/            # 8 API route handlers
+├── components/         # Reusable React components (28 subdirs)
+├── lib/                # Utilities, Strapi client, GitHub/YouTube API
+├── locales/            # en.json & zh.json translations
+└── types/              # Shared TypeScript types
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## i18n
 
-## Deploy on Vercel
+- English: served at `/`
+- Chinese: served at `/zh`
+- Auto-detection via `Accept-Language` header on first visit
+- Language preference stored in `NEXT_LOCALE` cookie (1 year)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+See [`I18N_QUICK_START.md`](./I18N_QUICK_START.md) for adding translations and pages.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Deployment
+
+Deployed on **Vercel** with automatic deploys on push to `main`.
+
+- Production: `https://www.shainwaiyan.com`
+- CMS API: `https://api.shainwaiyan.com`
