@@ -42,6 +42,13 @@ export const secureLinksPlugin: RichTextPlugin = (element) => {
       href = `https://${href}`;
     }
 
+    // DEFENSE IN DEPTH: Hard reject non-standard protocols (e.g., javascript:, data:)
+    // We only allow http, https, mailto, tel, or relative links (/ or #)
+    const isSafeProtocol = /^(https?|mailto|tel):|^\/|^\#/i.test(href);
+    if (!isSafeProtocol) {
+      href = '#'; // Neutralize dangerous links
+    }
+
     const props = attributesToProps({
       ...element.attribs,
       href,

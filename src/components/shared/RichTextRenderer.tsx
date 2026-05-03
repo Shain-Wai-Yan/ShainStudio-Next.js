@@ -1,6 +1,4 @@
-'use client';
-
-import DOMPurify from 'isomorphic-dompurify';
+import sanitizeHtml from 'sanitize-html';
 import parse, { Element } from 'html-react-parser';
 import React from 'react';
 import { 
@@ -22,15 +20,18 @@ const activePlugins = [
 
 export default function RichTextRenderer({ content, className = '' }: RichTextRendererProps) {
   
-  const DOMPURIFY_CONFIG = {
-    ADD_TAGS: ['iframe', 'oembed'],
-    ADD_ATTR: ['allow', 'allowfullscreen', 'frameborder', 'scrolling', 'src', 'url', 'target', 'rel'],
-    // 🚨 HARDENED: Explicitly allow http, https, mailto, tel, and relative paths. 
-    // This absolutely kills `javascript:alert(1)` payloads.
-    ALLOWED_URI_REGEXP: /^(?:(?:https?|mailto|tel):|\/\/|\/)/i, 
-  };
-
-  const cleanContent = DOMPurify.sanitize(content || '', DOMPURIFY_CONFIG);
+  const cleanContent = sanitizeHtml(content || '', {
+    allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img', 'oembed', 'figure']),
+    allowedAttributes: {
+      ...sanitizeHtml.defaults.allowedAttributes,
+      img: ['src', 'alt', 'loading', 'decoding', 'style', 'class'],
+      figure: ['class'],
+      oembed: ['url', 'src']
+    },
+    allowedSchemesByTag: {
+      img: ['http', 'https', 'data']
+    }
+  });
 
   const parsedContent = parse(cleanContent, {
     replace: (domNode) => {

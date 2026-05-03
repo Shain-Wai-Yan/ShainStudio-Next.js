@@ -1,5 +1,12 @@
 export function isTrustedVideo(url: string | undefined): boolean {
-  if (!url) return false;
+  if (!url || typeof url !== 'string') return false;
+
+  // DEFENSE IN DEPTH: The Ultimate Safeguard
+  // Strictly enforce http:// or https:// (or protocol-relative //)
+  if (!/^(https?:)?\/\//i.test(url)) {
+    return false;
+  }
+
   const trustedDomains = ['youtube.com', 'youtu.be', 'youtube-nocookie.com', 'vimeo.com'];
   
   try {
