@@ -63,33 +63,7 @@ export default function CodingProjectContent({ project, language }: CodingProjec
       {/* Main Content (CK Editor HTML Rendered via Parser) */}
       <RichTextRenderer
         content={project.content}
-        className="
-          prose prose-sm md:prose-base dark:prose-invert max-w-none
-          prose-headings:text-[#191970] dark:prose-headings:text-[#ffd700]
-          prose-headings:font-bold prose-headings:tracking-tight
-          prose-h2:text-xl prose-h2:mt-10 prose-h2:mb-4
-          prose-h3:text-lg prose-h3:mt-8 prose-h3:mb-3
-          prose-p:text-[#333] dark:prose-p:text-[#e0e0e0]
-          prose-p:leading-relaxed prose-p:mb-5
-          prose-a:text-[#191970] dark:prose-a:text-[#ffd700]
-          prose-a:no-underline hover:prose-a:underline
-          prose-strong:text-[#191970] dark:prose-strong:text-[#ffd700]
-          prose-ul:my-5 prose-ol:my-5
-          prose-li:text-[#333] dark:prose-li:text-[#e0e0e0]
-          prose-li:mb-1.5
-          prose-blockquote:border-l-2 prose-blockquote:border-[#191970] dark:prose-blockquote:border-[#ffd700]
-          prose-blockquote:bg-[#f8f9fa] dark:prose-blockquote:bg-[#1e1e1e]
-          prose-blockquote:py-3 prose-blockquote:px-5 prose-blockquote:not-italic
-          prose-blockquote:text-[#555] dark:prose-blockquote:text-[#b0b0b0]
-          prose-code:bg-[#f1f3f5] dark:prose-code:bg-[#2a2a2a]
-          prose-code:px-1.5 prose-code:py-0.5
-          prose-code:text-[#d63384] dark:prose-code:text-[#ffa7c4]
-          prose-code:font-mono prose-code:text-[0.85em]
-          prose-pre:bg-[#1e1e1e] prose-pre:text-[#e0e0e0]
-          prose-img:rounded-none prose-img:shadow-md
-          prose-figure:my-8
-          prose-figcaption:text-center prose-figcaption:text-xs prose-figcaption:text-[#666] dark:prose-figcaption:text-[#999] prose-figcaption:mt-2
-        "
+        className="ck-body"
       />
 
       {/* ── Low-profile back links ──────────────────────────────────────────── */}

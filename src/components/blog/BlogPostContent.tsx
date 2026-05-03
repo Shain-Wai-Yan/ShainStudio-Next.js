@@ -13,7 +13,7 @@ export default function BlogPostContent({ blog, language }: BlogPostContentProps
   return (
     <div>
       {/* Post body Rendered via Parser */}
-      <RichTextRenderer content={blog.Content || ''} className="blog-post-body" />
+      <RichTextRenderer content={blog.Content || ''} className="ck-body" />
 
       {/* Share section */}
       <div className="mt-12 pt-8 border-t border-gray-300 dark:border-gray-700">
