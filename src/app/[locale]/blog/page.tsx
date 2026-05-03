@@ -111,6 +111,7 @@ export default async function BlogPage(props: BlogPageProps) {
         tags={tags}
         language={locale}
         error={error}
+        labels={t.blog.labels}
       />
     </main>
   );

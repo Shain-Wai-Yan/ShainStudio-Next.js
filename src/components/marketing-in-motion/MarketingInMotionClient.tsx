@@ -40,6 +40,8 @@ export interface MarketingInMotionClientProps {
     retryText: string;
     noProjects: string;
     noProjectsHint: string;
+    prev: string;
+    next: string;
   };
   initialProjects?: MarketingProject[];
 }
@@ -47,7 +49,7 @@ export interface MarketingInMotionClientProps {
 type SortOption = 'date-desc' | 'date-asc' | 'title-asc' | 'title-desc';
 type ViewMode = 'grid' | 'list';
 
-const PAGE_SIZE = 12;
+const PAGE_SIZE = 9;
 
 export function MarketingInMotionClient({
   locale = 'en',
@@ -64,7 +66,7 @@ export function MarketingInMotionClient({
   const [isLoading, setIsLoading] = useState(initialProjects.length === 0);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [displayCount, setDisplayCount] = useState(PAGE_SIZE);
+  const [currentPage, setCurrentPage] = useState(1);
 
   // ─── UI state ─────────────────────────────────────────────────────────────
   const [sortBy, setSortBy] = useState<SortOption>('date-desc');
@@ -118,8 +120,24 @@ export function MarketingInMotionClient({
     [allProjects],
   );
 
-  const visibleProjects = filteredProjects.slice(0, displayCount);
-  const hasMore = displayCount < filteredProjects.length;
+  const totalPages = Math.ceil(filteredProjects.length / PAGE_SIZE);
+
+  const getPaginationItems = (currentPage: number, totalPages: number) => {
+    if (totalPages <= 7) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+    if (currentPage <= 4) {
+      return [1, 2, 3, 4, 5, '...', totalPages];
+    }
+    if (currentPage >= totalPages - 3) {
+      return [1, '...', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
+    }
+    return [1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages];
+  };
+
+  const paginationItems = getPaginationItems(currentPage, totalPages);
+
+  const visibleProjects = filteredProjects.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
   // ─── Load data ────────────────────────────────────────────────────────────
   const loadProjects = useCallback(async (isInitial = false) => {
@@ -153,7 +171,7 @@ export function MarketingInMotionClient({
     await loadProjects(false);
     setSearch('');
     setFilters({ category: '', tools: '', tag: '', type: '' });
-    setDisplayCount(PAGE_SIZE);
+    setCurrentPage(1);
     setIsRefreshing(false);
   }, [loadProjects]);
 
@@ -179,7 +197,7 @@ export function MarketingInMotionClient({
   const handleSearchChange = useCallback(
     (value: string) => {
       setSearch(value);
-      setDisplayCount(PAGE_SIZE);
+      setCurrentPage(1);
       syncUrl(value, filters);
     },
     [filters, syncUrl],
@@ -189,13 +207,11 @@ export function MarketingInMotionClient({
     (key: keyof typeof filters, value: string) => {
       const next = { ...filters, [key]: value };
       setFilters(next);
-      setDisplayCount(PAGE_SIZE);
+      setCurrentPage(1);
       syncUrl(search, next);
     },
     [filters, search, syncUrl],
   );
-
-  const handleLoadMore = () => setDisplayCount((c) => c + PAGE_SIZE);
 
   // ─── Accessibility live region ────────────────────────────────────────────
   const liveMessage =
@@ -283,7 +299,7 @@ export function MarketingInMotionClient({
               {/* Sort */}
               <select
                 value={sortBy}
-                onChange={(e) => { setSortBy(e.target.value as SortOption); setDisplayCount(PAGE_SIZE); }}
+                onChange={(e) => { setSortBy(e.target.value as SortOption); setCurrentPage(1); }}
                 className="
                   h-8 px-2 text-xs font-medium
                   border border-gray-200 dark:border-gray-700
@@ -378,25 +394,57 @@ export function MarketingInMotionClient({
           )}
         </section>
 
-        {/* Load more */}
-        {hasMore && !isLoading && !error && (
-          <div className="flex flex-col items-center mt-12 gap-2">
-            <button
-              onClick={handleLoadMore}
-              className="
-                px-8 py-2.5 font-semibold text-sm
-                bg-[#191970] dark:bg-[#a67c00] text-white
-                hover:bg-[#0f0f45] dark:hover:bg-[#d4af37]
-                shadow-sm hover:shadow-md
-                transition-all duration-200
-                focus:outline-none focus:ring-2 focus:ring-[#191970]/40 dark:focus:ring-[#a67c00]/40
-              "
-            >
-              {labels.loadMore}
-            </button>
-            <p className="text-xs text-gray-400 dark:text-gray-500">
-              {visibleProjects.length} of {filteredProjects.length} shown
-            </p>
+        {/* ── Pagination ── */}
+        {totalPages > 1 && !isLoading && !error && (
+          <div className="mt-12 flex justify-center md:justify-start items-center gap-1 md:gap-2">
+            {currentPage > 1 && (
+              <button
+                onClick={() => {
+                  setCurrentPage(p => Math.max(1, p - 1));
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className="px-2 h-10 flex items-center justify-center text-[#666] dark:text-[#b0b0b0] hover:text-[#191970] dark:hover:text-white transition-all text-xs font-bold tracking-wider"
+                aria-label="Previous page"
+              >
+                {labels.prev}
+              </button>
+            )}
+            
+            {paginationItems.map((item, idx) => (
+              item === '...' ? (
+                <span key={`ellipsis-${idx}`} className="px-1 text-[#666] dark:text-[#b0b0b0]">
+                  ...
+                </span>
+              ) : (
+                <button
+                  key={`page-${item}`}
+                  onClick={() => {
+                    setCurrentPage(item as number);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  className={`w-10 h-10 flex items-center justify-center rounded-sm transition-all text-sm font-medium ${
+                    currentPage === item
+                      ? 'bg-[#191970] text-white dark:bg-white dark:text-[#121212]'
+                      : 'bg-transparent text-[#666] dark:text-[#b0b0b0] hover:text-[#191970] dark:hover:text-white'
+                  }`}
+                >
+                  {item}
+                </button>
+              )
+            ))}
+
+            {currentPage < totalPages && (
+              <button
+                onClick={() => {
+                  setCurrentPage(p => Math.min(totalPages, p + 1));
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className="px-2 h-10 flex items-center justify-center text-[#666] dark:text-[#b0b0b0] hover:text-[#191970] dark:hover:text-white transition-all text-xs font-bold tracking-wider"
+                aria-label="Next page"
+              >
+                {labels.next}
+              </button>
+            )}
           </div>
         )}
       </main>

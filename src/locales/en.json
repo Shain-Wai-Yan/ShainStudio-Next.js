@@ -73,7 +73,13 @@
     "cta": "See AI Marketing in Action"
   },
   "footer": {
-    "verbs": ["work", "wow", "discover", "create", "grow"],
+    "verbs": [
+      "work",
+      "wow",
+      "discover",
+      "create",
+      "grow"
+    ],
     "longestVerb": "discover",
     "quickLinks": "Quick Links",
     "getInTouch": "Get In Touch",
@@ -122,7 +128,9 @@
       "retryText": "Try Again",
       "noProjects": "No projects found",
       "noProjectsHint": "Try adjusting your search or filter criteria.",
-      "loading": "Loading..."
+      "loading": "Loading...",
+      "prev": "PREV",
+      "next": "NEXT"
     },
     "breadcrumbs": {
       "home": "Home",
@@ -341,7 +349,23 @@
     "backToBlog": "Back to Blog",
     "previousPost": "Previous Post",
     "nextPost": "Next Post",
-    "postNotFound": "Post Not Found"
+    "postNotFound": "Post Not Found",
+    "labels": {
+      "searchPlaceholder": "Search posts...",
+      "allCategories": "All Categories",
+      "allTags": "All Tags",
+      "tags": "Tags",
+      "showing": "Showing",
+      "post": "post",
+      "posts": "posts",
+      "of": "of",
+      "clearAll": "Clear all",
+      "noMatchingPosts": "No posts match your filters — try clearing them",
+      "noBlogPosts": "No blog posts found. Check back soon!",
+      "prev": "PREV",
+      "next": "NEXT",
+      "failedToLoad": "Failed to load blog posts. Please try again."
+    }
   },
   "certificate": {
     "title": "Certificates & Credentials",
@@ -446,10 +470,26 @@
       "250K+ Views"
     ],
     "stats": [
-      { "value": 99, "suffix": "/100", "label": "SEO Health Score" },
-      { "value": 250, "suffix": "K+", "label": "Combined Views" },
-      { "value": 2, "suffix": "×", "label": "Award Winner" },
-      { "value": 3, "suffix": "", "label": "Languages" }
+      {
+        "value": 99,
+        "suffix": "/100",
+        "label": "SEO Health Score"
+      },
+      {
+        "value": 250,
+        "suffix": "K+",
+        "label": "Combined Views"
+      },
+      {
+        "value": 2,
+        "suffix": "×",
+        "label": "Award Winner"
+      },
+      {
+        "value": 3,
+        "suffix": "",
+        "label": "Languages"
+      }
     ],
     "projects": [
       {
@@ -479,9 +519,18 @@
       }
     ],
     "stack": [
-      "Next.js", "TypeScript", "Cloudflare Workers", "Strapi", "Twilio",
-      "Cursor AI", "v0", "TradingView API", "AmneziaWG", "SEO",
-      "Google Analytics", "Vercel"
+      "Next.js",
+      "TypeScript",
+      "Cloudflare Workers",
+      "Strapi",
+      "Twilio",
+      "Cursor AI",
+      "v0",
+      "TradingView API",
+      "AmneziaWG",
+      "SEO",
+      "Google Analytics",
+      "Vercel"
     ],
     "ctaTitle": "Let's Build Something",
     "ctaHighlight": "Remarkable.",
@@ -489,7 +538,6 @@
     "ctaButton": "Get In Touch",
     "ctaSecondary": "See My Work"
   },
-
   "gsapMarketing": {
     "header": {
       "eyebrow": "The Marketer's DNA",
@@ -542,7 +590,6 @@
       ]
     }
   },
-
   "contactPage": {
     "heroTitle": "Contact",
     "heroTitleHighlight": "Me",
@@ -762,7 +809,6 @@
       }
     }
   },
-  
   "privacy": {
     "title": "Privacy Policy",
     "effectiveDate": "Last Updated: March 24, 2026",
@@ -834,7 +880,6 @@
       }
     ]
   },
-  
   "terms": {
     "title": "Terms and Conditions",
     "effectiveDate": "Last Updated: March 24, 2026",

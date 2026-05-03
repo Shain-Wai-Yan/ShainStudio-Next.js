@@ -20,13 +20,32 @@ interface BlogListingClientProps {
   tags: string[];
   language: 'en' | 'zh';
   error: string | null;
+  labels: {
+    searchPlaceholder: string;
+    allCategories: string;
+    allTags: string;
+    tags: string;
+    showing: string;
+    post: string;
+    posts: string;
+    of: string;
+    clearAll: string;
+    noMatchingPosts: string;
+    noBlogPosts: string;
+    prev: string;
+    next: string;
+    failedToLoad: string;
+  };
 }
 
-export default function BlogListingClient({ allBlogs, categories, tags, language, error }: BlogListingClientProps) {
+export default function BlogListingClient({ allBlogs, categories, tags, language, error, labels }: BlogListingClientProps) {
   const [searchInput, setSearchInput]       = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedTag, setSelectedTag]       = useState('');
   const [showFilters, setShowFilters]       = useState(false);
+  const [currentPage, setCurrentPage]       = useState(1);
+
+  const postsPerPage = 12;
 
   const debouncedSearch = useDebounce(searchInput, 280);
 
@@ -59,14 +78,31 @@ export default function BlogListingClient({ allBlogs, categories, tags, language
     return result;
   }, [allBlogs, debouncedSearch, selectedCategory, selectedTag]);
 
-  const clearAll = () => { setSearchInput(''); setSelectedCategory(''); setSelectedTag(''); };
+  const clearAll = () => { setSearchInput(''); setSelectedCategory(''); setSelectedTag(''); setCurrentPage(1); };
   const hasFilters = searchInput || selectedCategory || selectedTag;
+
+  const totalPages = Math.ceil(filtered.length / postsPerPage);
+
+  const getPaginationItems = (currentPage: number, totalPages: number) => {
+    if (totalPages <= 7) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+    if (currentPage <= 4) {
+      return [1, 2, 3, 4, 5, '...', totalPages];
+    }
+    if (currentPage >= totalPages - 3) {
+      return [1, '...', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
+    }
+    return [1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages];
+  };
+
+  const paginationItems = getPaginationItems(currentPage, totalPages);
 
   if (error) {
     return (
       <section className="py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center py-12 bg-[#f8f9fa] dark:bg-[#1e1e1e] rounded-sm">
-          <p className="text-[#dc3545] dark:text-[#ff6b6b]">Failed to load blog posts. Please try again.</p>
+          <p className="text-[#dc3545] dark:text-[#ff6b6b]">{labels.failedToLoad}</p>
         </div>
       </section>
     );
@@ -86,13 +122,13 @@ export default function BlogListingClient({ allBlogs, categories, tags, language
             <input
               type="text"
               value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              placeholder={language === 'zh' ? '搜索文章...' : 'Search posts...'}
+              onChange={(e) => { setSearchInput(e.target.value); setCurrentPage(1); }}
+              placeholder={labels.searchPlaceholder}
               className="w-full pl-10 pr-10 py-2.5 text-sm bg-white dark:bg-[#1e1e1e] text-[#333] dark:text-[#e0e0e0] placeholder-[#999] border-0 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#191970]/20 transition-all"
               style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.08)' }}
             />
             {searchInput && (
-              <button onClick={() => setSearchInput('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#999] hover:text-[#191970] transition-colors">
+              <button onClick={() => { setSearchInput(''); setCurrentPage(1); }} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#999] hover:text-[#191970] transition-colors">
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                 </svg>
@@ -104,11 +140,11 @@ export default function BlogListingClient({ allBlogs, categories, tags, language
           {categories.length > 0 && (
             <select
               value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
+              onChange={(e) => { setSelectedCategory(e.target.value); setCurrentPage(1); }}
               className="py-2.5 px-3 text-sm bg-white dark:bg-[#1e1e1e] text-[#333] dark:text-[#e0e0e0] border-0 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#191970]/20 cursor-pointer transition-all min-w-[140px]"
               style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.08)' }}
             >
-              <option value="">{language === 'zh' ? '所有分类' : 'All Categories'}</option>
+              <option value="">{labels.allCategories}</option>
               {categories.map((cat) => (
                 <option key={cat} value={cat}>{cat}</option>
               ))}
@@ -119,11 +155,11 @@ export default function BlogListingClient({ allBlogs, categories, tags, language
           {tags.length > 0 && (
             <select
               value={selectedTag}
-              onChange={(e) => setSelectedTag(e.target.value)}
+              onChange={(e) => { setSelectedTag(e.target.value); setCurrentPage(1); }}
               className="py-2.5 px-3 text-sm bg-white dark:bg-[#1e1e1e] text-[#333] dark:text-[#e0e0e0] border-0 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#191970]/20 cursor-pointer transition-all min-w-[120px] hidden md:block"
               style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.08)' }}
             >
-              <option value="">{language === 'zh' ? '所有标签' : 'All Tags'}</option>
+              <option value="">{labels.allTags}</option>
               {tags.map((tag) => (
                 <option key={tag} value={tag}>#{tag}</option>
               ))}
@@ -147,13 +183,13 @@ export default function BlogListingClient({ allBlogs, categories, tags, language
         {showFilters && tags.length > 0 && (
           <div className="mb-4 p-4 bg-[#f8f9fa] dark:bg-[#1e1e1e] rounded-sm" style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.06)' }}>
             <p className="text-[10px] font-semibold text-[#666] uppercase tracking-widest mb-2">
-              {language === 'zh' ? '标签' : 'Tags'}
+              {labels.tags}
             </p>
             <div className="flex flex-wrap gap-1.5">
               {tags.map((tag) => (
                 <button
                   key={tag}
-                  onClick={() => setSelectedTag(selectedTag === tag ? '' : tag)}
+                  onClick={() => { setSelectedTag(selectedTag === tag ? '' : tag); setCurrentPage(1); }}
                   className="px-2.5 py-1 text-[11px] rounded-full transition-all"
                   style={{
                     background: selectedTag === tag ? '#191970' : 'rgba(25,25,112,0.07)',
@@ -171,8 +207,8 @@ export default function BlogListingClient({ allBlogs, categories, tags, language
         <div className="flex items-center justify-between flex-wrap gap-2 mb-6">
           <p className="text-xs text-[#666] dark:text-[#b0b0b0]">
             {language === 'zh'
-              ? `显示 ${filtered.length} 篇文章`
-              : `Showing ${filtered.length} post${filtered.length !== 1 ? 's' : ''}${allBlogs.length !== filtered.length ? ` of ${allBlogs.length}` : ''}`}
+              ? `${labels.showing} ${filtered.length} ${labels.posts}`
+              : `${labels.showing} ${filtered.length} ${filtered.length === 1 ? labels.post : labels.posts}${allBlogs.length !== filtered.length ? ` ${labels.of} ${allBlogs.length}` : ''}`}
           </p>
 
           {hasFilters && (
@@ -180,17 +216,17 @@ export default function BlogListingClient({ allBlogs, categories, tags, language
               {selectedCategory && (
                 <span className="flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-full" style={{ background: '#191970', color: '#fff' }}>
                   {selectedCategory}
-                  <button onClick={() => setSelectedCategory('')} className="ml-1 hover:opacity-70">×</button>
+                  <button onClick={() => { setSelectedCategory(''); setCurrentPage(1); }} className="ml-1 hover:opacity-70">×</button>
                 </span>
               )}
               {selectedTag && (
                 <span className="flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-full" style={{ background: '#191970', color: '#fff' }}>
                   #{selectedTag}
-                  <button onClick={() => setSelectedTag('')} className="ml-1 hover:opacity-70">×</button>
+                  <button onClick={() => { setSelectedTag(''); setCurrentPage(1); }} className="ml-1 hover:opacity-70">×</button>
                 </span>
               )}
               <button onClick={clearAll} className="text-xs text-[#191970] dark:text-[#ffd700] hover:underline">
-                {language === 'zh' ? '清除全部' : 'Clear all'}
+                {labels.clearAll}
               </button>
             </div>
           )}
@@ -198,15 +234,67 @@ export default function BlogListingClient({ allBlogs, categories, tags, language
 
         {/* ── Grid ── */}
         <BlogGrid
-          blogs={filtered}
+          blogs={filtered.slice((currentPage - 1) * postsPerPage, currentPage * postsPerPage)}
           language={language}
           isEmpty={filtered.length === 0}
           emptyMessage={
-            hasFilters
-              ? (language === 'zh' ? '没有匹配的文章，请尝试其他筛选条件' : 'No posts match your filters — try clearing them')
-              : (language === 'zh' ? '暂无博文' : 'No blog posts found. Check back soon!')
+            hasFilters ? labels.noMatchingPosts : labels.noBlogPosts
           }
         />
+
+        {/* ── Pagination ── */}
+        {totalPages > 1 && (
+          <div className="mt-12 flex justify-center md:justify-start items-center gap-1 md:gap-2">
+            {currentPage > 1 && (
+              <button
+                onClick={() => {
+                  setCurrentPage(p => Math.max(1, p - 1));
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className="px-2 h-10 flex items-center justify-center text-[#666] dark:text-[#b0b0b0] hover:text-[#191970] dark:hover:text-white transition-all text-xs font-bold tracking-wider"
+                aria-label="Previous page"
+              >
+                {labels.prev}
+              </button>
+            )}
+            
+            {paginationItems.map((item, idx) => (
+              item === '...' ? (
+                <span key={`ellipsis-${idx}`} className="px-1 text-[#666] dark:text-[#b0b0b0]">
+                  ...
+                </span>
+              ) : (
+                <button
+                  key={`page-${item}`}
+                  onClick={() => {
+                    setCurrentPage(item as number);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  className={`w-10 h-10 flex items-center justify-center rounded-sm transition-all text-sm font-medium ${
+                    currentPage === item
+                      ? 'bg-[#191970] text-white dark:bg-white dark:text-[#121212]'
+                      : 'bg-transparent text-[#666] dark:text-[#b0b0b0] hover:text-[#191970] dark:hover:text-white'
+                  }`}
+                >
+                  {item}
+                </button>
+              )
+            ))}
+
+            {currentPage < totalPages && (
+              <button
+                onClick={() => {
+                  setCurrentPage(p => Math.min(totalPages, p + 1));
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className="px-2 h-10 flex items-center justify-center text-[#666] dark:text-[#b0b0b0] hover:text-[#191970] dark:hover:text-white transition-all text-xs font-bold tracking-wider"
+                aria-label="Next page"
+              >
+                {labels.next}
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </section>
   );

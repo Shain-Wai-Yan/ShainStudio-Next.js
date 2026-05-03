@@ -73,7 +73,13 @@
     "cta": "查看 AI 营销实例"
   },
   "footer": {
-    "verbs": ["合作", "惊艳", "探索", "创造", "成长"],
+    "verbs": [
+      "合作",
+      "惊艳",
+      "探索",
+      "创造",
+      "成长"
+    ],
     "longestVerb": "探索",
     "quickLinks": "快速链接",
     "getInTouch": "联系我",
@@ -122,7 +128,9 @@
       "retryText": "重试",
       "noProjects": "未找到项目",
       "noProjectsHint": "请尝试调整您的搜索或筛选条件。",
-      "loading": "加载中..."
+      "loading": "加载中...",
+      "prev": "上一页",
+      "next": "下一页"
     },
     "breadcrumbs": {
       "home": "主页",
@@ -341,7 +349,23 @@
     "backToBlog": "返回博客",
     "previousPost": "上一篇",
     "nextPost": "下一篇",
-    "postNotFound": "文章未找到"
+    "postNotFound": "文章未找到",
+    "labels": {
+      "searchPlaceholder": "搜索文章...",
+      "allCategories": "所有分类",
+      "allTags": "所有标签",
+      "tags": "标签",
+      "showing": "显示",
+      "post": "篇文章",
+      "posts": "篇文章",
+      "of": "共",
+      "clearAll": "清除全部",
+      "noMatchingPosts": "没有匹配的文章，请尝试其他筛选条件",
+      "noBlogPosts": "暂无博文",
+      "prev": "上一页",
+      "next": "下一页",
+      "failedToLoad": "加载博文失败。请重试。"
+    }
   },
   "certificate": {
     "title": "证书与资质",
@@ -446,10 +470,26 @@
       "超 25W+ 浏览量"
     ],
     "stats": [
-      { "value": 99, "suffix": "/100", "label": "SEO健康评分" },
-      { "value": 250, "suffix": "K+", "label": "累计浏览量" },
-      { "value": 2, "suffix": "×", "label": "全国奖项" },
-      { "value": 3, "suffix": "", "label": "掌握语言" }
+      {
+        "value": 99,
+        "suffix": "/100",
+        "label": "SEO健康评分"
+      },
+      {
+        "value": 250,
+        "suffix": "K+",
+        "label": "累计浏览量"
+      },
+      {
+        "value": 2,
+        "suffix": "×",
+        "label": "全国奖项"
+      },
+      {
+        "value": 3,
+        "suffix": "",
+        "label": "掌握语言"
+      }
     ],
     "projects": [
       {
@@ -479,9 +519,18 @@
       }
     ],
     "stack": [
-      "Next.js", "TypeScript", "Cloudflare Workers", "Strapi", "Twilio",
-      "Cursor AI", "v0", "TradingView API", "AmneziaWG", "SEO",
-      "Google Analytics", "Vercel"
+      "Next.js",
+      "TypeScript",
+      "Cloudflare Workers",
+      "Strapi",
+      "Twilio",
+      "Cursor AI",
+      "v0",
+      "TradingView API",
+      "AmneziaWG",
+      "SEO",
+      "Google Analytics",
+      "Vercel"
     ],
     "ctaTitle": "让我们构建",
     "ctaHighlight": "非凡之作.",
@@ -489,7 +538,6 @@
     "ctaButton": "立即联系",
     "ctaSecondary": "查看作品集"
   },
-
   "gsapMarketing": {
     "header": {
       "eyebrow": "营销人的底层逻辑",
@@ -542,7 +590,6 @@
       ]
     }
   },
-
   "contactPage": {
     "heroTitle": "联系",
     "heroTitleHighlight": "我",
@@ -762,7 +809,6 @@
       }
     }
   },
-
   "privacy": {
     "title": "隐私政策",
     "effectiveDate": "最后更新日期：2026年3月24日",
@@ -834,7 +880,6 @@
       }
     ]
   },
-  
   "terms": {
     "title": "使用条款与条件",
     "effectiveDate": "最后更新日期：2026年3月24日",
