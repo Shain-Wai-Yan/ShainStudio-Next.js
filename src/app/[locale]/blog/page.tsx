@@ -1,5 +1,5 @@
+import { Suspense } from 'react';
 import { Metadata } from 'next';
-import Script from 'next/script';
 import { fetchAllBlogs, fetchBlogCategories, fetchBlogTags } from '@/lib/strapi/blogs';
 import BlogHero from '@/components/blog/BlogHero';
 import BlogListingClient from '@/components/blog/BlogListingClient';
@@ -95,8 +95,7 @@ export default async function BlogPage(props: BlogPageProps) {
 
   return (
     <main className="min-h-screen bg-white dark:bg-[#121212]">
-      <Script
-        id="schema-org-blog-index"
+      <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
@@ -105,14 +104,16 @@ export default async function BlogPage(props: BlogPageProps) {
         subtitle={t.blog.description}
         language={locale}
       />
-      <BlogListingClient
-        allBlogs={blogs}
-        categories={categories}
-        tags={tags}
-        language={locale}
-        error={error}
-        labels={t.blog.labels}
-      />
+      <Suspense fallback={<div className="py-20 text-center text-[#666] dark:text-[#b0b0b0]">Loading blogs...</div>}>
+        <BlogListingClient
+          allBlogs={blogs}
+          categories={categories}
+          tags={tags}
+          language={locale}
+          error={error}
+          labels={t.blog.labels}
+        />
+      </Suspense>
     </main>
   );
 }

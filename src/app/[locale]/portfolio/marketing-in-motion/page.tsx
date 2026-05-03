@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { Metadata } from 'next';
 
 import { MarketingInMotionClient } from '@/components/marketing-in-motion/MarketingInMotionClient';
@@ -102,12 +103,14 @@ export default async function MarketingInMotionPage(props: MarketingInMotionPage
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <MarketingInMotionClient
-        locale={locale as 'en' | 'zh'}
-        breadcrumbItems={BREADCRUMBS}
-        labels={t.marketingInMotion.labels}
-        initialProjects={projects}
-      />
+      <Suspense fallback={<div className="py-20 text-center text-[#666] dark:text-[#b0b0b0]">Loading projects...</div>}>
+        <MarketingInMotionClient
+          locale={locale as 'en' | 'zh'}
+          breadcrumbItems={BREADCRUMBS}
+          labels={t.marketingInMotion.labels}
+          initialProjects={projects}
+        />
+      </Suspense>
     </div>
   );
 }

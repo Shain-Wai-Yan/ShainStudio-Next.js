@@ -12,6 +12,15 @@ import { Breadcrumb } from '@/components/Breadcrumb';
 import type { MarketingProject, FilterOptions } from '@/lib/strapi/marketing-in-motion';
 import { filterProjects, extractFilterOptions } from '@/lib/strapi/marketing-in-motion';
 
+function useDebounce<T>(value: T, delay: number): T {
+  const [debounced, setDebounced] = useState(value);
+  useEffect(() => {
+    const t = setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(t);
+  }, [value, delay]);
+  return debounced;
+}
+
 interface BreadcrumbItem {
   label: string;
   href: string;
@@ -66,21 +75,38 @@ export function MarketingInMotionClient({
   const [isLoading, setIsLoading] = useState(initialProjects.length === 0);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
 
   // ─── UI state ─────────────────────────────────────────────────────────────
-  const [sortBy, setSortBy] = useState<SortOption>('date-desc');
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [showScrollTop, setShowScrollTop] = useState(false);
 
-  // ─── Filter state (from URL) ──────────────────────────────────────────────
-  const [search, setSearch] = useState(searchParams.get('search') ?? '');
-  const [filters, setFilters] = useState({
-    category: searchParams.get('category') ?? '',
-    tools: searchParams.get('tools') ?? '',
-    tag: searchParams.get('tag') ?? '',
-    type: searchParams.get('type') ?? '',
-  });
+  // ─── Derived state (from URL) ──────────────────────────────────────────────
+  const urlSearch = searchParams.get('search') ?? '';
+  const urlCategory = searchParams.get('category') ?? '';
+  const urlTools = searchParams.get('tools') ?? '';
+  const urlTag = searchParams.get('tag') ?? '';
+  const urlType = searchParams.get('type') ?? '';
+  const urlSortBy = (searchParams.get('sort') as SortOption) || 'date-desc';
+
+  const urlFilters = useMemo(() => ({
+    category: urlCategory,
+    tools: urlTools,
+    tag: urlTag,
+    type: urlType,
+  }), [urlCategory, urlTools, urlTag, urlType]);
+
+  const totalProjects = useMemo(() => filterProjects(allProjects, urlSearch, urlFilters).length, [allProjects, urlSearch, urlFilters]);
+  const totalPages = Math.max(1, Math.ceil(totalProjects / PAGE_SIZE));
+  const currentPageRaw = Number(searchParams.get('page')) || 1;
+  const currentPage = Math.min(Math.max(1, currentPageRaw), totalPages);
+
+  // Local state for search input (for fast typing before debounce)
+  const [searchInput, setSearchInput] = useState(urlSearch);
+
+  // Sync back local search input when URL changes (e.g. Back button)
+  useEffect(() => {
+    setSearchInput(urlSearch);
+  }, [urlSearch]);
 
   // ─── Scroll-to-top button ─────────────────────────────────────────────────
   useEffect(() => {
@@ -98,9 +124,9 @@ export function MarketingInMotionClient({
   );
 
   const filteredProjects = useMemo(() => {
-    const filtered = filterProjects(allProjects, search, filters);
+    const filtered = filterProjects(allProjects, urlSearch, urlFilters);
     return [...filtered].sort((a, b) => {
-      switch (sortBy) {
+      switch (urlSortBy) {
         case 'date-desc':
           return new Date(b.projectDate).getTime() - new Date(a.projectDate).getTime();
         case 'date-asc':
@@ -113,14 +139,14 @@ export function MarketingInMotionClient({
           return 0;
       }
     });
-  }, [allProjects, search, filters, sortBy]);
+  }, [allProjects, urlSearch, urlFilters, urlSortBy]);
 
   const featuredProjects = useMemo(
     () => allProjects.filter((p) => p.isFeatured),
     [allProjects],
   );
 
-  const totalPages = Math.ceil(filteredProjects.length / PAGE_SIZE);
+  const totalPagesComputed = Math.ceil(filteredProjects.length / PAGE_SIZE);
 
   const getPaginationItems = (currentPage: number, totalPages: number) => {
     if (totalPages <= 7) {
@@ -135,7 +161,7 @@ export function MarketingInMotionClient({
     return [1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages];
   };
 
-  const paginationItems = getPaginationItems(currentPage, totalPages);
+  const paginationItems = getPaginationItems(currentPage, totalPagesComputed);
 
   const visibleProjects = filteredProjects.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
@@ -169,48 +195,71 @@ export function MarketingInMotionClient({
   const handleRefresh = useCallback(async () => {
     setIsRefreshing(true);
     await loadProjects(false);
-    setSearch('');
-    setFilters({ category: '', tools: '', tag: '', type: '' });
-    setCurrentPage(1);
+    setSearchInput('');
     setIsRefreshing(false);
-  }, [loadProjects]);
+    // Note: since this is a hard refresh, we can just replace the URL with the base pathname
+    router.replace(pathname, { scroll: false });
+  }, [loadProjects, router, pathname]);
 
   // ─── URL sync (debounced) ─────────────────────────────────────────────────
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  const syncUrl = useCallback(
-    (newSearch: string, newFilters: typeof filters) => {
-      clearTimeout(debounceRef.current);
-      debounceRef.current = setTimeout(() => {
-        const params = new URLSearchParams();
-        if (newSearch) params.set('search', newSearch);
-        if (newFilters.category) params.set('category', newFilters.category);
-        if (newFilters.tools) params.set('tools', newFilters.tools);
-        if (newFilters.tag) params.set('tag', newFilters.tag);
-        if (newFilters.type) params.set('type', newFilters.type);
-        const qs = params.toString();
-        router.replace(`${pathname}${qs ? `?${qs}` : ''}`, { scroll: false });
-      }, 300);
-    },
-    [router, pathname],
-  );
+  const updateUrl = useCallback((newSearch: string, newFilters: typeof urlFilters, newSort: SortOption, newPage: number) => {
+    const params = new URLSearchParams();
+    if (newSearch) params.set('search', newSearch);
+    if (newFilters.category) params.set('category', newFilters.category);
+    if (newFilters.tools) params.set('tools', newFilters.tools);
+    if (newFilters.tag) params.set('tag', newFilters.tag);
+    if (newFilters.type) params.set('type', newFilters.type);
+    if (newSort !== 'date-desc') params.set('sort', newSort);
+    if (newPage > 1) params.set('page', newPage.toString());
+    const qs = params.toString();
+    const nextUrl = `${pathname}${qs ? `?${qs}` : ''}`;
+    if (nextUrl !== window.location.pathname + window.location.search) {
+      router.replace(nextUrl, { scroll: false });
+    }
+  }, [pathname, router]);
+
+  const debouncedSearch = useDebounce(searchInput, 300);
+
+  // Push debounced search to URL
+  useEffect(() => {
+    if (debouncedSearch !== urlSearch) {
+      updateUrl(debouncedSearch, urlFilters, urlSortBy, 1);
+    }
+  }, [debouncedSearch, urlSearch, urlFilters, urlSortBy, updateUrl]);
 
   const handleSearchChange = useCallback(
     (value: string) => {
-      setSearch(value);
-      setCurrentPage(1);
-      syncUrl(value, filters);
+      setSearchInput(value); // purely local updates
     },
-    [filters, syncUrl],
+    [],
   );
 
   const handleFilterChange = useCallback(
-    (key: keyof typeof filters, value: string) => {
-      const next = { ...filters, [key]: value };
-      setFilters(next);
-      setCurrentPage(1);
-      syncUrl(search, next);
+    (key: keyof typeof urlFilters, value: string) => {
+      const nextFilters = { ...urlFilters, [key]: value };
+      updateUrl(urlSearch, nextFilters, urlSortBy, 1);
     },
-    [filters, search, syncUrl],
+    [urlFilters, urlSearch, urlSortBy, updateUrl],
+  );
+
+  const scrollRafRef = useRef<number | null>(null);
+
+  const handlePageChange = useCallback(
+    (page: number) => {
+      updateUrl(urlSearch, urlFilters, urlSortBy, page);
+      if (scrollRafRef.current) cancelAnimationFrame(scrollRafRef.current);
+      scrollRafRef.current = requestAnimationFrame(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    },
+    [urlSearch, urlFilters, urlSortBy, updateUrl],
+  );
+
+  const handleSortChange = useCallback(
+    (sort: SortOption) => {
+      updateUrl(urlSearch, urlFilters, sort, 1);
+    },
+    [urlSearch, urlFilters, updateUrl],
   );
 
   // ─── Accessibility live region ────────────────────────────────────────────
@@ -231,8 +280,8 @@ export function MarketingInMotionClient({
 
       {/* Sticky controls */}
       <MarketingControls
-        search={search}
-        filters={filters}
+        search={searchInput}
+        filters={urlFilters}
         filterOptions={filterOptions}
         onSearchChange={handleSearchChange}
         onFilterChange={handleFilterChange}
@@ -298,8 +347,8 @@ export function MarketingInMotionClient({
             <div className="flex items-center gap-2">
               {/* Sort */}
               <select
-                value={sortBy}
-                onChange={(e) => { setSortBy(e.target.value as SortOption); setCurrentPage(1); }}
+                value={urlSortBy}
+                onChange={(e) => handleSortChange(e.target.value as SortOption)}
                 className="
                   h-8 px-2 text-xs font-medium
                   border border-gray-200 dark:border-gray-700
@@ -399,10 +448,7 @@ export function MarketingInMotionClient({
           <div className="mt-12 flex justify-center md:justify-start items-center gap-1 md:gap-2">
             {currentPage > 1 && (
               <button
-                onClick={() => {
-                  setCurrentPage(p => Math.max(1, p - 1));
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                }}
+                onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
                 className="px-2 h-10 flex items-center justify-center text-[#666] dark:text-[#b0b0b0] hover:text-[#191970] dark:hover:text-white transition-all text-xs font-bold tracking-wider"
                 aria-label="Previous page"
               >
@@ -418,10 +464,7 @@ export function MarketingInMotionClient({
               ) : (
                 <button
                   key={`page-${item}`}
-                  onClick={() => {
-                    setCurrentPage(item as number);
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }}
+                  onClick={() => handlePageChange(item as number)}
                   className={`w-10 h-10 flex items-center justify-center rounded-sm transition-all text-sm font-medium ${
                     currentPage === item
                       ? 'bg-[#191970] text-white dark:bg-white dark:text-[#121212]'
@@ -435,10 +478,7 @@ export function MarketingInMotionClient({
 
             {currentPage < totalPages && (
               <button
-                onClick={() => {
-                  setCurrentPage(p => Math.min(totalPages, p + 1));
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                }}
+                onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
                 className="px-2 h-10 flex items-center justify-center text-[#666] dark:text-[#b0b0b0] hover:text-[#191970] dark:hover:text-white transition-all text-xs font-bold tracking-wider"
                 aria-label="Next page"
               >
