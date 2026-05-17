@@ -10,7 +10,7 @@ import { ThemeProvider as NextThemesProvider } from 'next-themes';
 //   - "dark"   (Forces dark mode by default)
 //   - "light"  (Forces light mode by default)
 // ─────────────────────────────────────────────────────────────────────────────
-const DEFAULT_THEME_COLOR = "dark";
+const DEFAULT_THEME_COLOR = "system";
 
 export function ThemeProvider({ children, ...props }: React.ComponentProps<typeof NextThemesProvider>) {
   return (
