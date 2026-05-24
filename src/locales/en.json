@@ -372,18 +372,50 @@
     "subtitle": "Professional Certifications",
     "description": "A collection of my professional certifications, credentials, and achievements.",
     "seo": {
-      "title": "Professional Certificates & Achievements | Shain Wai Yan",
-      "description": "View my professional certifications and achievements from leading institutions and platforms in digital marketing, business strategy, and professional development."
+      "title": "Verified Certifications: Google · Meta · HubSpot | Shain Wai Yan",
+      "description": "Browse Shain Wai Yan's verified professional certifications from Google, Meta, HubSpot, and more — spanning digital marketing, SEO, e-commerce, social media strategy, and business development.",
+      "keywords": "Shain Wai Yan certifications, Google Digital Marketing Certificate, Meta Social Media Marketing, HubSpot Academy, professional credentials, digital marketing certification, verified achievements, Coursera certificates, SEO certification, marketing professional",
+      "ogTitle": "Verified Professional Certifications | Shain Wai Yan",
+      "ogDescription": "A curated vault of verified credentials from Google, Meta, HubSpot, and leading global platforms — spanning SEO, digital marketing, e-commerce, and strategy."
     },
     "labels": {
       "heroTitle": "Professional Certificates & Achievements",
       "heroDescription": "A collection of professional certifications and achievements from leading institutions and platforms in digital marketing, business strategy, and professional development.",
+      "heroBadge": "• THE CREDENTIAL VAULT",
+      "heroStamp": "N° 01 / PRES.ERA",
+      "heroHeadlinePart1": "Sculpting",
+      "heroHeadlinePart2": "Credentials",
+      "heroHeadlinePart3": "curated in",
+      "heroHeadlinePart4": "Prestige",
       "errorTitle": "Unable to Load Certificates",
       "noData": "No certificates available at the moment."
     },
     "breadcrumbs": {
       "home": "Home",
       "certificate": "Certificate"
+    },
+    "search": "Search credentials...",
+    "allIssuers": "All Issuers",
+    "allCategories": "All Years",
+    "filterCategory": "Select Year",
+    "viewGrid": "Vault Grid",
+    "viewTimeline": "Resume Timeline",
+    "viewShowcase": "3D Showcase",
+    "skillsValidated": "Skills Validated",
+    "credentialId": "Credential ID",
+    "issueDate": "Issue Date",
+    "flipCard": "Flip Certificate",
+    "zoomReset": "Reset Zoom",
+    "verified": "Verified Credential",
+    "verify": "Verify",
+    "stats": {
+      "total": "Total Credentials",
+      "issuers": "Prestige Partners",
+      "hours": "Continuous Hours",
+      "skills": "Chronological Eras"
+    },
+    "categories": {
+      "all": "All Years"
     }
   },
   "aboutPage": {

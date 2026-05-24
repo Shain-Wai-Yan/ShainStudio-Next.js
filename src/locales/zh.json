@@ -372,18 +372,50 @@
     "subtitle": "专业认证",
     "description": "我的专业证书、资质和成就的集合。",
     "seo": {
-      "title": "专业证书与成就 | 闪怀晏",
-      "description": "查看我的专业证书和成就，来自数字营销、商业战略和专业发展领域的领先机构和平台。"
+      "title": "认证资质：谷歌 · Meta · HubSpot | 明元易 Shain Wai Yan",
+      "description": "浏览明元易（Shain Wai Yan）来自谷歌、Meta、HubSpot Academy等权威机构的专业认证——涵盖数字营销、SEO、电商运营、社交媒体策略与商业发展。",
+      "keywords": "明元易证书, 谷歌数字营销认证, Meta社媒营销证书, HubSpot Academy, 专业资质, 数字营销认证, Shain Wai Yan, Coursera证书, SEO认证, 营销专业人士",
+      "ogTitle": "专业认证资质库 | 明元易 Shain Wai Yan",
+      "ogDescription": "精心整理的权威认证展示库，涵盖谷歌、Meta、HubSpot及全球领先平台——涉及SEO、数字营销、电商与策略领域。"
     },
     "labels": {
       "heroTitle": "专业证书与成就",
       "heroDescription": "来自数字营销、商业战略和专业发展领域的领先机构和平台的专业证书和成就的集合。",
+      "heroBadge": "• 荣誉资质库",
+      "heroStamp": "N° 01 / 荣誉纪元",
+      "heroHeadlinePart1": "铸就",
+      "heroHeadlinePart2": "资质认证，",
+      "heroHeadlinePart3": "精心策展于",
+      "heroHeadlinePart4": "卓越之境",
       "errorTitle": "无法加载证书",
       "noData": "目前没有可用的证书。"
     },
     "breadcrumbs": {
       "home": "首页",
       "certificate": "证书"
+    },
+    "search": "搜索证书与凭证...",
+    "allIssuers": "所有颁发机构",
+    "allCategories": "所有获得年份",
+    "filterCategory": "选择年份",
+    "viewGrid": "凭证网格",
+    "viewTimeline": "履历时间线",
+    "viewShowcase": "3D 展台",
+    "skillsValidated": "认证技能",
+    "credentialId": "凭证编号",
+    "issueDate": "颁发日期",
+    "flipCard": "翻转证书",
+    "zoomReset": "重置缩放",
+    "verified": "已认证凭证",
+    "verify": "验证资质",
+    "stats": {
+      "total": "所获证书总数",
+      "issuers": "卓越合作机构",
+      "hours": "持续学习学时",
+      "skills": "所获年代纪元"
+    },
+    "categories": {
+      "all": "所有获得年份"
     }
   },
   "aboutPage": {
