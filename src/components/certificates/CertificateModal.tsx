@@ -291,58 +291,57 @@ export function CertificateModal({
                   </div>
                 </div>
 
-                {/* ── 3D BACK FACE ── */}
                 <div 
                   style={{ transform: 'rotateY(180deg)' }}
-                  className="absolute inset-0 w-full h-full bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-950 rounded-xl [backface-visibility:hidden] z-10 border border-[#ffd700]/30 dark:border-[#a67c00]/50 p-6 flex flex-col justify-between shadow-2xl"
+                  className="absolute inset-0 w-full h-full bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-950 rounded-xl [backface-visibility:hidden] z-10 border border-[#ffd700]/30 dark:border-[#a67c00]/50 p-4 sm:p-6 flex flex-col justify-between shadow-2xl"
                 >
                   {/* Luxury Inner Border */}
                   <div className="absolute inset-1.5 rounded-[10px] border-2 border-double border-[#ffd700]/10 dark:border-[#a67c00]/20 pointer-events-none" />
                   
                   {/* Crest Stamp */}
                   <div className="flex justify-between items-start z-10">
-                    <div className="space-y-1">
+                    <div className="space-y-0.5 sm:space-y-1">
                       <div className="flex items-center gap-1.5 text-[#191970] dark:text-[#f9df85]">
-                        <ShieldCheck className="w-5 h-5 text-[#ffd700]" />
-                        <span className="text-[0.65rem] font-extrabold tracking-[0.2em] uppercase font-secondary">
+                        <ShieldCheck className="w-3.5 h-3.5 sm:w-5 sm:h-5 text-[#ffd700] flex-shrink-0" />
+                        <span className="text-[7px] sm:text-[0.65rem] font-extrabold tracking-[0.2em] uppercase font-secondary">
                           Verified Audit
                         </span>
                       </div>
-                      <h4 className="text-[0.55rem] font-bold text-gray-400 uppercase tracking-widest leading-none">
+                      <h4 className="text-[6px] sm:text-[0.55rem] font-bold text-gray-400 uppercase tracking-widest leading-none">
                         Serial Registration
                       </h4>
                     </div>
                     {/* Simulated wax logo */}
-                    <div className="w-11 h-11 rounded-full border border-[#ffd700]/30 dark:border-[#a67c00]/40 flex items-center justify-center bg-[#ffd700]/5 dark:bg-[#a67c00]/10">
-                      <Award className="w-5 h-5 text-[#ffd700] dark:text-[#d4af37]" />
+                    <div className="w-8 h-8 sm:w-11 sm:h-11 rounded-full border border-[#ffd700]/30 dark:border-[#a67c00]/40 flex items-center justify-center bg-[#ffd700]/5 dark:bg-[#a67c00]/10">
+                      <Award className="w-4 h-4 sm:w-5 sm:h-5 text-[#ffd700] dark:text-[#d4af37]" />
                     </div>
                   </div>
 
                   {/* Core License details */}
-                  <div className="space-y-4 z-10">
-                    <div className="space-y-1">
-                      <p className="text-[0.55rem] font-extrabold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">
+                  <div className="space-y-2 sm:space-y-4 z-10">
+                    <div className="space-y-0.5 sm:space-y-1">
+                      <p className="text-[6px] sm:text-[0.55rem] font-extrabold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">
                         Credential Title
                       </p>
-                      <h3 className="font-extrabold text-gray-900 dark:text-white text-base line-clamp-2 leading-tight">
+                      <h3 className="font-extrabold text-gray-900 dark:text-white text-[10px] sm:text-base line-clamp-2 leading-tight">
                         {certificate.title}
                       </h3>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <p className="text-[0.55rem] font-extrabold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">
+                    <div className="grid grid-cols-2 gap-2 sm:gap-4">
+                      <div className="min-w-0">
+                        <p className="text-[6px] sm:text-[0.55rem] font-extrabold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">
                           {certificate.issuedBy ? 'Issued By' : 'Institution'}
                         </p>
-                        <p className="text-xs font-bold text-[#191970] dark:text-[#f9df85] leading-normal uppercase">
+                        <p className="text-[8px] sm:text-xs font-bold text-[#191970] dark:text-[#f9df85] leading-normal uppercase break-words">
                           {certificate.issuedBy}
                         </p>
                       </div>
-                      <div>
-                        <p className="text-[0.55rem] font-extrabold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">
+                      <div className="min-w-0">
+                        <p className="text-[6px] sm:text-[0.55rem] font-extrabold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">
                           Verification ID
                         </p>
-                        <p className="text-xs font-bold text-gray-800 dark:text-gray-300 font-mono tracking-wider">
+                        <p className="text-[8px] sm:text-xs font-bold text-gray-800 dark:text-gray-300 font-mono tracking-wider break-all">
                           {mockLicense}
                         </p>
                       </div>
@@ -350,29 +349,29 @@ export function CertificateModal({
                   </div>
 
                   {/* Stamp & Seal Footer */}
-                  <div className="flex justify-between items-end border-t border-gray-100 dark:border-gray-800/80 pt-4 z-10">
+                  <div className="flex justify-between items-end border-t border-gray-100 dark:border-gray-800/80 pt-2 sm:pt-4 z-10 pb-6 sm:pb-0">
                     <div className="space-y-0.5">
-                      <p className="text-[0.55rem] font-extrabold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">
+                      <p className="text-[6px] sm:text-[0.55rem] font-extrabold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">
                         Date of Issue
                       </p>
-                      <p className="text-xs font-bold text-gray-700 dark:text-gray-400">
+                      <p className="text-[8px] sm:text-xs font-bold text-gray-700 dark:text-gray-400">
                         {certificate.formattedDate}
                       </p>
                     </div>
                     {/* Simulated validation signature */}
                     <div className="text-right">
-                      <div className="font-serif italic text-sm text-[#191970] dark:text-[#ffd700] leading-none select-none tracking-wider font-semibold">
+                      <div className="font-serif italic text-[10px] sm:text-sm text-[#191970] dark:text-[#ffd700] leading-none select-none tracking-wider font-semibold">
                         Shain Studio
                       </div>
-                      <p className="text-[0.5rem] font-bold text-gray-400 uppercase tracking-widest mt-1">
+                      <p className="text-[6px] sm:text-[0.5rem] font-bold text-gray-400 uppercase tracking-widest mt-1">
                         Systems Register
                       </p>
                     </div>
                   </div>
 
                   {/* Flip Action Backplate */}
-                  <div className="absolute bottom-4 left-4 z-20 flex items-center gap-1 px-3 py-1.5 rounded-full bg-black/60 border border-white/10 text-[0.6rem] font-bold text-white tracking-widest uppercase backdrop-blur-md shadow-md opacity-70 hover:opacity-100 transition-opacity">
-                    <RotateCw className="w-3 h-3" />
+                  <div className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 z-20 flex items-center gap-1 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full bg-black/60 border border-white/10 text-[8px] sm:text-[0.6rem] font-bold text-white tracking-widest uppercase backdrop-blur-md shadow-md opacity-70 hover:opacity-100 transition-opacity">
+                    <RotateCw className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                     <span>View front</span>
                   </div>
 
