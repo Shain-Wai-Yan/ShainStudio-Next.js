@@ -216,20 +216,22 @@ export function ContactForm() {
       <div className="max-w-7xl mx-auto px-8 md:px-16 pt-32 pb-24 relative z-10">
         
         {/* ── Top Fine-Line Status Header ── */}
-        <header className="flex flex-wrap items-center justify-between border-b border-stone-200 dark:border-stone-900 pb-6 mb-16 gap-4">
-          <div className="flex items-center gap-6">
-            <span className="text-[10px] font-mono font-extrabold tracking-widest text-[#191970] dark:text-[#ffd700]">
+        <header className="flex flex-row items-center justify-between border-b border-stone-200 dark:border-stone-900 pb-6 mb-16 gap-2 md:gap-6 w-full overflow-hidden">
+          <div className="flex items-center gap-2 md:gap-4">
+            <span className="text-[7.5px] xs:text-[8.5px] sm:text-[9px] md:text-[10px] font-mono font-extrabold tracking-wider md:tracking-widest text-[#191970] dark:text-[#ffd700] whitespace-nowrap">
               OD / 2026
             </span>
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
-            <span className="text-[10px] font-mono tracking-widest text-stone-400 dark:text-stone-600 uppercase">
-              FILED UNDER: DESIGN • INTELLIGENCE
+            <span className="w-1 h-1 md:w-1.5 md:h-1.5 rounded-full bg-emerald-500 animate-ping shrink-0" />
+            <span className="text-[7.5px] xs:text-[8.5px] sm:text-[9px] md:text-[10px] font-mono tracking-wider md:tracking-widest text-stone-400 dark:text-stone-600 uppercase whitespace-nowrap">
+              <span className="hidden sm:inline">FILED UNDER: </span>DESIGN &bull; INTELLIGENCE
             </span>
           </div>
 
-          <div className="flex items-center gap-6 text-[10px] font-mono text-stone-400 dark:text-stone-600 uppercase tracking-widest">
-            <span>LIVE &bull; V0.8.0</span>
-            <span className="text-[#191970] dark:text-[#ffd700] font-bold">AVAILABILITY: RECEPTIVE</span>
+          <div className="flex items-center gap-3 md:gap-6 text-[7.5px] xs:text-[8.5px] sm:text-[9px] md:text-[10px] font-mono text-stone-400 dark:text-stone-600 uppercase tracking-wider md:tracking-widest whitespace-nowrap">
+            <span className="hidden xs:inline">LIVE &bull; V0.8.0</span>
+            <span className="text-[#191970] dark:text-[#ffd700] font-bold">
+              <span className="hidden sm:inline">AVAILABILITY: </span>RECEPTIVE
+            </span>
           </div>
         </header>
 
@@ -237,27 +239,35 @@ export function ContactForm() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
           
           {/* ── LEFT COLUMN: The Typographic Statement & Minimalist Form ── */}
-          <div className="lg:col-span-7 space-y-12">
+          <div className="contents lg:block lg:col-span-7 lg:space-y-12">
             
-            <div className="space-y-4">
-              <span className="text-[10px] font-mono tracking-[0.25em] text-stone-400 dark:text-stone-500 uppercase font-bold block">
-                COLLABORATORS &bull; N&ordm; 06
-              </span>
-              
-              <h2 className="text-4xl sm:text-5xl md:text-[54px] font-extrabold tracking-tight text-stone-950 dark:text-white leading-[1.08] mb-6">
-                &ldquo;Let&apos;s build something <span className="font-serif italic font-normal text-[#191970] dark:text-[#ffd700]">open</span> and <span className="font-serif italic font-normal text-[#191970] dark:text-[#ffd700]">visually unforgettable</span>.&rdquo;
-              </h2>
+            <div className="contents lg:block lg:space-y-4">
+              <div className="space-y-4 order-1 lg:order-none">
+                <span className="text-[10px] font-mono tracking-[0.25em] text-stone-400 dark:text-stone-500 uppercase font-bold block">
+                  {t.collaboratorsBadge || "COLLABORATORS • Nº 06"}
+                </span>
+                
+                <h2 className="text-[28px] xs:text-[32px] sm:text-5xl md:text-[54px] font-extrabold tracking-tight text-stone-950 dark:text-white leading-[1.1] sm:leading-[1.08] mb-6">
+                  &ldquo;{t.headlinePart1} <br className="block sm:hidden" />
+                  <span className="font-serif italic font-normal text-[#191970] dark:text-[#ffd700]">{t.headlinePart2}</span>{' '}
+                  {t.headlinePart3}{' '}
+                  <span className="font-serif italic font-normal text-[#191970] dark:text-[#ffd700]">
+                    {t.headlinePart4} <br className="block sm:hidden" /> {t.headlinePart5}
+                  </span>
+                  &rdquo;
+                </h2>
+              </div>
 
-              <p className="text-sm sm:text-base text-stone-500 dark:text-stone-400 max-w-xl leading-relaxed font-medium">
+              <p className="text-sm sm:text-base text-stone-500 dark:text-stone-400 max-w-xl leading-relaxed font-medium order-3 lg:order-none">
                 {t.heroSubtitle}
               </p>
             </div>
 
             {/* ── The Minimalist Editorial Form ── */}
-            <form onSubmit={handleSubmit} className="space-y-8 border-t border-stone-200 dark:border-stone-900 pt-10">
+            <form onSubmit={handleSubmit} className="space-y-8 border-t border-stone-200 dark:border-stone-900 pt-10 order-4 lg:order-none">
               
               {/* Field 01: Email */}
-              <div className="group relative border-b border-stone-200 dark:border-stone-900 pb-3 transition-colors duration-300 focus-within:border-stone-950 dark:focus-within:border-white">
+              <div className="group relative border-b border-stone-200 dark:border-stone-900 pb-3 transition-colors duration-300 focus-within:border-stone-955 dark:focus-within:border-white">
                 <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
                   <label htmlFor="email" className="text-xs font-mono tracking-widest text-stone-400 dark:text-stone-500 uppercase flex items-center gap-2">
                     <span>01 /</span>
@@ -281,7 +291,7 @@ export function ContactForm() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                 
                 {/* First Name */}
-                <div className="group relative border-b border-stone-200 dark:border-stone-900 pb-3 transition-colors duration-300 focus-within:border-stone-950 dark:focus-within:border-white">
+                <div className="group relative border-b border-stone-200 dark:border-stone-900 pb-3 transition-colors duration-300 focus-within:border-stone-955 dark:focus-within:border-white">
                   <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
                     <label htmlFor="firstName" className="text-xs font-mono tracking-widest text-stone-400 dark:text-stone-500 uppercase flex items-center gap-2">
                       <span>02 /</span>
@@ -302,7 +312,7 @@ export function ContactForm() {
                 </div>
 
                 {/* Last Name */}
-                <div className="group relative border-b border-stone-200 dark:border-stone-900 pb-3 transition-colors duration-300 focus-within:border-stone-950 dark:focus-within:border-white">
+                <div className="group relative border-b border-stone-200 dark:border-stone-900 pb-3 transition-colors duration-300 focus-within:border-stone-955 dark:focus-within:border-white">
                   <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
                     <label htmlFor="lastName" className="text-xs font-mono tracking-widest text-stone-400 dark:text-stone-500 uppercase flex items-center gap-2">
                       <span>03 /</span>
@@ -368,7 +378,7 @@ export function ContactForm() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="group relative flex items-center justify-center gap-2.5 px-8 py-3.5 rounded-full font-bold text-white bg-stone-950 dark:bg-white dark:text-stone-950 hover:opacity-90 transform active:scale-95 transition-all duration-300 disabled:opacity-50"
+                  className="group relative flex items-center justify-center gap-2.5 px-8 py-3.5 rounded-full font-bold text-white bg-stone-950 dark:bg-white dark:text-stone-955 hover:opacity-90 transform active:scale-95 transition-all duration-300 disabled:opacity-50"
                 >
                   {isSubmitting ? (
                     <>
@@ -398,7 +408,7 @@ export function ContactForm() {
             </form>
 
             {/* Direct Connect Quick Avenues */}
-            <div className="border-t border-stone-200 dark:border-stone-900 pt-8 flex flex-wrap gap-x-8 gap-y-4 text-xs font-mono">
+            <div className="border-t border-stone-200 dark:border-stone-900 pt-8 flex flex-wrap gap-x-8 gap-y-4 text-xs font-mono order-5 lg:order-none">
               <a 
                 href="https://www.linkedin.com/in/shainwaiyan/" 
                 target="_blank" 
@@ -430,73 +440,73 @@ export function ContactForm() {
             ref={containerRef}
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
-            className="lg:col-span-5 relative w-full aspect-square md:aspect-[4/5] lg:aspect-[3/4] overflow-hidden"
+            className="lg:col-span-5 relative w-full aspect-square md:aspect-[4/5] lg:aspect-[3/4] overflow-hidden order-2 lg:order-none"
             style={{
-              background: 'linear-gradient(145deg, #e8e0d0 0%, #d9cfc0 35%, #c8bfb2 65%, #bab2a8 100%)',
+              background: 'linear-gradient(145deg, #faf9f6 0%, #f4f3ef 35%, #e9e7e2 70%, #dcdad0 100%)',
             }}
           >
             {/* Dark mode gradient override */}
             <div className="absolute inset-0 dark:block hidden" style={{ background: 'linear-gradient(145deg, #111827 0%, #0f172a 40%, #0c1220 70%, #080d18 100%)' }} />
 
             {/* ── Thick outer border frame ── */}
-            <div className="absolute inset-0 border-2 border-stone-400/60 dark:border-stone-600/60 pointer-events-none z-30" />
+            <div className="absolute inset-0 border-2 border-stone-300/40 dark:border-stone-600/60 pointer-events-none z-30" />
 
             {/* ── Inner inset border rule (8px gap from outer) ── */}
-            <div className="absolute inset-[7px] border border-stone-400/25 dark:border-stone-600/20 pointer-events-none z-30" />
+            <div className="absolute inset-[7px] border border-stone-300/20 dark:border-stone-600/20 pointer-events-none z-30" />
 
             {/* ── Scanline texture overlay (premium print feel) ── */}
             <div 
-              className="absolute inset-0 pointer-events-none z-30 opacity-[0.04] dark:opacity-[0.06]"
+              className="absolute inset-0 pointer-events-none z-30 opacity-[0.015] dark:opacity-[0.06]"
               style={{ backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,1) 3px, rgba(0,0,0,1) 4px)' }}
             />
 
             {/* ── Blueprint cross-rule grid lines ── */}
-            <div className="absolute left-1/2 top-0 bottom-0 w-[1px] bg-stone-600/8 dark:bg-stone-400/5 pointer-events-none z-20" />
-            <div className="absolute top-1/2 left-0 right-0 h-[1px] bg-stone-600/8 dark:bg-stone-400/5 pointer-events-none z-20" />
-            <div className="absolute left-1/4 top-0 bottom-0 w-[1px] bg-stone-600/5 dark:bg-stone-400/3 pointer-events-none z-20" />
-            <div className="absolute left-3/4 top-0 bottom-0 w-[1px] bg-stone-600/5 dark:bg-stone-400/3 pointer-events-none z-20" />
+            <div className="absolute left-1/2 top-0 bottom-0 w-[1px] bg-stone-400/10 dark:bg-stone-400/5 pointer-events-none z-20" />
+            <div className="absolute top-1/2 left-0 right-0 h-[1px] bg-stone-400/10 dark:bg-stone-400/5 pointer-events-none z-20" />
+            <div className="absolute left-1/4 top-0 bottom-0 w-[1px] bg-stone-400/6 dark:bg-stone-400/3 pointer-events-none z-20" />
+            <div className="absolute left-3/4 top-0 bottom-0 w-[1px] bg-stone-400/6 dark:bg-stone-400/3 pointer-events-none z-20" />
 
             {/* ── Corner bracket accents (precision editorial tick marks) ── */}
             {/* Top-Left */}
             <div className="absolute top-[14px] left-[14px] z-40 pointer-events-none">
-              <div className="w-5 h-[2px] bg-stone-600/70 dark:bg-stone-300/60" />
-              <div className="w-[2px] h-5 bg-stone-600/70 dark:bg-stone-300/60 mt-0" />
+              <div className="w-5 h-[1.5px] bg-stone-400/40 dark:bg-stone-300/60" />
+              <div className="w-[1.5px] h-5 bg-stone-400/40 dark:bg-stone-300/60 mt-0" />
             </div>
             {/* Top-Right */}
             <div className="absolute top-[14px] right-[14px] z-40 pointer-events-none flex flex-col items-end">
-              <div className="w-5 h-[2px] bg-stone-600/70 dark:bg-stone-300/60" />
-              <div className="w-[2px] h-5 bg-stone-600/70 dark:bg-stone-300/60 self-end" />
+              <div className="w-5 h-[1.5px] bg-stone-400/40 dark:bg-stone-300/60" />
+              <div className="w-[1.5px] h-5 bg-stone-400/40 dark:bg-stone-300/60 self-end" />
             </div>
             {/* Bottom-Left */}
             <div className="absolute bottom-[14px] left-[14px] z-40 pointer-events-none flex flex-col justify-end">
-              <div className="w-[2px] h-5 bg-stone-600/70 dark:bg-stone-300/60" />
-              <div className="w-5 h-[2px] bg-stone-600/70 dark:bg-stone-300/60" />
+              <div className="w-[1.5px] h-5 bg-stone-400/40 dark:bg-stone-300/60" />
+              <div className="w-5 h-[1.5px] bg-stone-400/40 dark:bg-stone-300/60" />
             </div>
             {/* Bottom-Right */}
             <div className="absolute bottom-[14px] right-[14px] z-40 pointer-events-none flex flex-col items-end justify-end">
-              <div className="w-[2px] h-5 bg-stone-600/70 dark:bg-stone-300/60 self-end" />
-              <div className="w-5 h-[2px] bg-stone-600/70 dark:bg-stone-300/60" />
+              <div className="w-[1.5px] h-5 bg-stone-400/40 dark:bg-stone-300/60 self-end" />
+              <div className="w-5 h-[1.5px] bg-stone-400/40 dark:bg-stone-300/60" />
             </div>
 
             {/* ── Header editorial meta strip ── */}
-            <div className="absolute top-0 left-0 right-0 h-[32px] border-b border-stone-400/30 dark:border-stone-600/30 flex items-center justify-between px-5 z-40 pointer-events-none">
-              <span className="text-[8px] font-mono tracking-[0.28em] text-stone-500 dark:text-stone-500 uppercase">FIG.01 &nbsp;/&nbsp; OD-2026</span>
+            <div className="absolute top-0 left-0 right-0 h-[32px] border-b border-stone-300/20 dark:border-stone-600/30 flex items-center justify-between px-5 z-40 pointer-events-none">
+              <span className="text-[8px] font-mono tracking-[0.28em] text-stone-400 dark:text-stone-550 uppercase">FIG.01 &nbsp;/&nbsp; OD-2026</span>
               <div className="flex items-center gap-3">
                 <div className="w-1 h-1 bg-emerald-500 rounded-full animate-ping" />
-                <span className="text-[8px] font-mono tracking-[0.28em] text-stone-500 dark:text-stone-500 uppercase">PLATE&nbsp;Nº&nbsp;08</span>
+                <span className="text-[8px] font-mono tracking-[0.28em] text-stone-400 dark:text-stone-550 uppercase">PLATE&nbsp;Nº&nbsp;08</span>
               </div>
             </div>
 
             {/* ── Bottom editorial caption strip ── */}
-            <div className="absolute bottom-0 left-0 right-0 h-[32px] border-t border-stone-400/30 dark:border-stone-600/30 flex items-center justify-between px-5 z-40 pointer-events-none">
-              <span className="text-[8px] font-mono tracking-[0.28em] text-stone-500 dark:text-stone-500 uppercase">SHATTERED&nbsp;MATRIX&nbsp;&bull;&nbsp;VOL.01</span>
-              <span className="text-[8px] font-mono tracking-[0.28em] text-[#191970]/60 dark:text-[#ffd700]/50 uppercase font-bold">SYNTHESIS</span>
+            <div className="absolute bottom-0 left-0 right-0 h-[32px] border-t border-stone-300/20 dark:border-stone-600/30 flex items-center justify-between px-5 z-40 pointer-events-none">
+              <span className="text-[8px] font-mono tracking-[0.28em] text-stone-400 dark:text-stone-550 uppercase">SHATTERED&nbsp;MATRIX&nbsp;&bull;&nbsp;VOL.01</span>
+              <span className="text-[8px] font-mono tracking-[0.28em] text-[#191970]/50 dark:text-[#ffd700]/50 uppercase font-bold">SYNTHESIS</span>
             </div>
 
             {/* ── Left ruled margin bar ── */}
-            <div className="absolute top-[32px] bottom-[32px] left-[36px] w-[1px] border-l border-dashed border-stone-400/20 dark:border-stone-600/15 pointer-events-none z-20" />
+            <div className="absolute top-[32px] bottom-[32px] left-[36px] w-[1px] border-l border-dashed border-stone-300/20 dark:border-stone-600/15 pointer-events-none z-20" />
             {/* ── Right ruled margin bar ── */}
-            <div className="absolute top-[32px] bottom-[32px] right-[36px] w-[1px] border-r border-dashed border-stone-400/20 dark:border-stone-600/15 pointer-events-none z-20" />
+            <div className="absolute top-[32px] bottom-[32px] right-[36px] w-[1px] border-r border-dashed border-stone-300/20 dark:border-stone-600/15 pointer-events-none z-20" />
 
             {/* Collage Center Canvas Area */}
             <div className="relative w-full h-full flex items-center justify-center pt-[32px] pb-[32px]">
@@ -505,7 +515,7 @@ export function ContactForm() {
               <div
                 className="absolute inset-x-10 inset-y-4 pointer-events-none"
                 style={{
-                  background: 'linear-gradient(160deg, rgba(224,91,62,0.18) 0%, rgba(200,70,43,0.08) 40%, rgba(25,25,112,0.06) 70%, rgba(10,10,64,0.14) 100%)',
+                  background: 'linear-gradient(160deg, rgba(224,91,62,0.10) 0%, rgba(200,70,43,0.04) 40%, rgba(25,25,112,0.03) 70%, rgba(10,10,64,0.06) 100%)',
                 }}
               />
               <div className="absolute inset-0 dark:block hidden pointer-events-none inset-x-10 inset-y-4"
@@ -537,7 +547,7 @@ export function ContactForm() {
                   ref={apolloRift1Ref}
                   style={{ 
                     clipPath: 'polygon(24% 18%, 44% 14%, 38% 46%, 18% 50%)',
-                    filter: 'drop-shadow(0 2px 10px rgba(25,25,112,0.12)) drop-shadow(0 0 2px rgba(255,215,0,0.65))'
+                    filter: 'var(--contact-shard-shadow-apollo)'
                   }}
                   className="absolute inset-0 w-full h-full transition-all duration-350 ease-out z-10 pointer-events-none overflow-hidden"
                 >
@@ -556,7 +566,7 @@ export function ContactForm() {
                   ref={apolloRift2Ref}
                   style={{ 
                     clipPath: 'polygon(20% 54%, 40% 50%, 36% 76%, 16% 80%)',
-                    filter: 'drop-shadow(0 2px 10px rgba(25,25,112,0.12)) drop-shadow(0 0 2px rgba(255,215,0,0.65))'
+                    filter: 'var(--contact-shard-shadow-apollo)'
                   }}
                   className="absolute inset-0 w-full h-full transition-all duration-350 ease-out z-10 pointer-events-none overflow-hidden"
                 >
@@ -575,7 +585,7 @@ export function ContactForm() {
                   ref={apolloRift3Ref}
                   style={{ 
                     clipPath: 'polygon(6% 12%, 26% 8%, 18% 34%)',
-                    filter: 'drop-shadow(0 2px 8px rgba(25,25,112,0.1)) drop-shadow(0 0 2px rgba(255,215,0,0.6))'
+                    filter: 'var(--contact-shard-shadow-apollo)'
                   }}
                   className="absolute inset-0 w-full h-full transition-all duration-350 ease-out z-10 pointer-events-none overflow-hidden"
                 >
@@ -594,7 +604,7 @@ export function ContactForm() {
                   ref={apolloRift4Ref}
                   style={{ 
                     clipPath: 'polygon(6% 56%, 26% 52%, 22% 68%, 5% 70%)',
-                    filter: 'drop-shadow(0 2px 8px rgba(25,25,112,0.1)) drop-shadow(0 0 2px rgba(255,215,0,0.6))'
+                    filter: 'var(--contact-shard-shadow-apollo)'
                   }}
                   className="absolute inset-0 w-full h-full transition-all duration-350 ease-out z-10 pointer-events-none overflow-hidden"
                 >
@@ -613,7 +623,7 @@ export function ContactForm() {
                   ref={apolloRift5Ref}
                   style={{ 
                     clipPath: 'polygon(5% 72%, 24% 70%, 14% 75%)',
-                    filter: 'drop-shadow(0 2px 8px rgba(25,25,112,0.1)) drop-shadow(0 0 2px rgba(255,215,0,0.6))'
+                    filter: 'var(--contact-shard-shadow-apollo)'
                   }}
                   className="absolute inset-0 w-full h-full transition-all duration-350 ease-out z-10 pointer-events-none overflow-hidden"
                 >
@@ -632,7 +642,7 @@ export function ContactForm() {
                   ref={apolloRift6Ref}
                   style={{ 
                     clipPath: 'polygon(48% 62%, 74% 58%, 66% 77%)',
-                    filter: 'drop-shadow(0 2px 10px rgba(25,25,112,0.12)) drop-shadow(0 0 2px rgba(255,215,0,0.65))'
+                    filter: 'var(--contact-shard-shadow-apollo)'
                   }}
                   className="absolute inset-0 w-full h-full transition-all duration-350 ease-out z-10 pointer-events-none overflow-hidden"
                 >
@@ -651,7 +661,7 @@ export function ContactForm() {
                   ref={athenaRift1Ref}
                   style={{ 
                     clipPath: 'polygon(54% 8%, 76% 12%, 70% 38%, 48% 34%)',
-                    filter: 'drop-shadow(0 2px 10px rgba(224,91,62,0.12)) drop-shadow(0 0 2px rgba(255,215,0,0.65))'
+                    filter: 'var(--contact-shard-shadow-athena)'
                   }}
                   className="absolute inset-0 w-full h-full transition-all duration-350 ease-out z-10 pointer-events-none"
                 >
@@ -670,7 +680,7 @@ export function ContactForm() {
                   ref={athenaRift2Ref}
                   style={{ 
                     clipPath: 'polygon(52% 42%, 74% 38%, 68% 68%, 46% 72%)',
-                    filter: 'drop-shadow(0 2px 10px rgba(224,91,62,0.12)) drop-shadow(0 0 2.5px rgba(255,215,0,0.7))'
+                    filter: 'var(--contact-shard-shadow-athena)'
                   }}
                   className="absolute inset-0 w-full h-full transition-all duration-350 ease-out z-15 pointer-events-none"
                 >
@@ -689,7 +699,7 @@ export function ContactForm() {
                   ref={athenaRift3Ref}
                   style={{ 
                     clipPath: 'polygon(76% 42%, 94% 48%, 84% 68%)',
-                    filter: 'drop-shadow(0 2px 8px rgba(224,91,62,0.1)) drop-shadow(0 0 2px rgba(255,215,0,0.65))'
+                    filter: 'var(--contact-shard-shadow-athena)'
                   }}
                   className="absolute inset-0 w-full h-full transition-all duration-350 ease-out z-10 pointer-events-none"
                 >
@@ -708,7 +718,7 @@ export function ContactForm() {
                   ref={athenaRift4Ref}
                   style={{ 
                     clipPath: 'polygon(16% 82%, 42% 78%, 34% 96%)',
-                    filter: 'drop-shadow(0 2px 10px rgba(224,91,62,0.12)) drop-shadow(0 0 2px rgba(255,215,0,0.65))'
+                    filter: 'var(--contact-shard-shadow-athena)'
                   }}
                   className="absolute inset-0 w-full h-full transition-all duration-350 ease-out z-10 pointer-events-none"
                 >
