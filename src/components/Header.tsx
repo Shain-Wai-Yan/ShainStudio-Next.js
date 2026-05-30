@@ -85,7 +85,7 @@ const Header = () => {
         <div className="flex items-center gap-3 flex-shrink-0">
           <Link href={basePath || '/'} className="flex items-center gap-3 hover:opacity-90 transition-opacity duration-300">
             <Image
-              src="/images/Shain Studio.png"
+              src="/images/Shain Studio.webp"
               alt="Shain Studio Logo"
               width={48}
               height={48}

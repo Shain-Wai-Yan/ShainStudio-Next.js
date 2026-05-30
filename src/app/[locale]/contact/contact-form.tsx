@@ -533,7 +533,7 @@ export function ContactForm() {
                   className="absolute inset-0 w-full h-full select-none"
                 >
                   <Image
-                    src="/images/statue_medusa.png"
+                    src="/images/statue_medusa.webp"
                     alt="Base Medusa Statue Bust"
                     fill
                     sizes="(max-width: 1024px) 100vw, 450px"
@@ -552,7 +552,7 @@ export function ContactForm() {
                   className="absolute inset-0 w-full h-full transition-all duration-350 ease-out z-10 pointer-events-none overflow-hidden"
                 >
                   <Image
-                    src="/images/statue_apollo.png"
+                    src="/images/statue_apollo.webp"
                     alt="Apollo Eye Shard"
                     fill
                     sizes="(max-width: 1024px) 100vw, 450px"
@@ -571,7 +571,7 @@ export function ContactForm() {
                   className="absolute inset-0 w-full h-full transition-all duration-350 ease-out z-10 pointer-events-none overflow-hidden"
                 >
                   <Image
-                    src="/images/statue_apollo.png"
+                    src="/images/statue_apollo.webp"
                     alt="Apollo Lips Shard"
                     fill
                     sizes="(max-width: 1024px) 100vw, 450px"
@@ -590,7 +590,7 @@ export function ContactForm() {
                   className="absolute inset-0 w-full h-full transition-all duration-350 ease-out z-10 pointer-events-none overflow-hidden"
                 >
                   <Image
-                    src="/images/statue_apollo.png"
+                    src="/images/statue_apollo.webp"
                     alt="Apollo Curls Shard"
                     fill
                     sizes="(max-width: 1024px) 100vw, 450px"
@@ -609,7 +609,7 @@ export function ContactForm() {
                   className="absolute inset-0 w-full h-full transition-all duration-350 ease-out z-10 pointer-events-none overflow-hidden"
                 >
                   <Image
-                    src="/images/statue_apollo.png"
+                    src="/images/statue_apollo.webp"
                     alt="Apollo Upper Shoulder Shard"
                     fill
                     sizes="(max-width: 1024px) 100vw, 450px"
@@ -628,7 +628,7 @@ export function ContactForm() {
                   className="absolute inset-0 w-full h-full transition-all duration-350 ease-out z-10 pointer-events-none overflow-hidden"
                 >
                   <Image
-                    src="/images/statue_apollo.png"
+                    src="/images/statue_apollo.webp"
                     alt="Apollo Lower Shoulder Shard"
                     fill
                     sizes="(max-width: 1024px) 100vw, 450px"
@@ -647,7 +647,7 @@ export function ContactForm() {
                   className="absolute inset-0 w-full h-full transition-all duration-350 ease-out z-10 pointer-events-none overflow-hidden"
                 >
                   <Image
-                    src="/images/statue_apollo.png"
+                    src="/images/statue_apollo.webp"
                     alt="Apollo Drape Crossover Shard"
                     fill
                     sizes="(max-width: 1024px) 100vw, 450px"
@@ -666,7 +666,7 @@ export function ContactForm() {
                   className="absolute inset-0 w-full h-full transition-all duration-350 ease-out z-10 pointer-events-none"
                 >
                   <Image
-                    src="/images/statue_athena.png"
+                    src="/images/statue_athena.webp"
                     alt="Athena Helmet Shard"
                     fill
                     sizes="(max-width: 1024px) 100vw, 450px"
@@ -685,7 +685,7 @@ export function ContactForm() {
                   className="absolute inset-0 w-full h-full transition-all duration-350 ease-out z-15 pointer-events-none"
                 >
                   <Image
-                    src="/images/statue_athena.png"
+                    src="/images/statue_athena.webp"
                     alt="Athena Eye/Face Shard"
                     fill
                     sizes="(max-width: 1024px) 100vw, 450px"
@@ -704,7 +704,7 @@ export function ContactForm() {
                   className="absolute inset-0 w-full h-full transition-all duration-350 ease-out z-10 pointer-events-none"
                 >
                   <Image
-                    src="/images/statue_athena.png"
+                    src="/images/statue_athena.webp"
                     alt="Athena Collar Shard"
                     fill
                     sizes="(max-width: 1024px) 100vw, 450px"
@@ -723,7 +723,7 @@ export function ContactForm() {
                   className="absolute inset-0 w-full h-full transition-all duration-350 ease-out z-10 pointer-events-none"
                 >
                   <Image
-                    src="/images/statue_athena.png"
+                    src="/images/statue_athena.webp"
                     alt="Athena Breastplate Crossover Shard"
                     fill
                     sizes="(max-width: 1024px) 100vw, 450px"

@@ -3,7 +3,6 @@
 import React, { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import { gsap, ScrollTrigger } from "@/lib/gsapSetup";
-import { SplitTextTitle } from "./SplitTextTitle";
 import { Play, ArrowRight, Sparkles } from "lucide-react";
 import Link from "next/link";
 import HeroTypewriter from "../HeroTypewriter";
@@ -339,9 +338,9 @@ export default function GsapHero({ hp, locale }: GsapHeroProps) {
                 {/* ─── LIGHT MODE STATUE SLICES (Transparent BG Statue) ─── */}
                 <div className="block dark:hidden absolute inset-0 w-full h-full">
                   {/* LEFT SLICE */}
-                  <div className="hero-statue-slice-left absolute inset-0 w-full h-full select-none" style={{ clipPath: "polygon(0 0, 36% 0, 36% 100%, 0 100%)" }}>
+                  <div className="hero-statue-slice-left absolute inset-0 w-full h-full select-none will-change-transform" style={{ clipPath: "polygon(0 0, 36% 0, 36% 100%, 0 100%)" }}>
                     <CImage
-                      src="/images/hero-statue-clean.png"
+                      src="/images/hero-statue-clean.webp"
                       alt="Left slice of Classical Statue artwork"
                       fill
                       className="object-contain mix-blend-multiply"
@@ -351,9 +350,9 @@ export default function GsapHero({ hp, locale }: GsapHeroProps) {
                   </div>
 
                   {/* CENTER SLICE */}
-                  <div className="hero-statue-slice-center absolute inset-0 w-full h-full select-none translate-y-3" style={{ clipPath: "polygon(36% 0, 68% 0, 68% 100%, 36% 100%)" }}>
+                  <div className="hero-statue-slice-center absolute inset-0 w-full h-full select-none translate-y-3 will-change-transform" style={{ clipPath: "polygon(36% 0, 68% 0, 68% 100%, 36% 100%)" }}>
                     <CImage
-                      src="/images/hero-statue-clean.png"
+                      src="/images/hero-statue-clean.webp"
                       alt="Center slice of Classical Statue artwork"
                       fill
                       className="object-contain mix-blend-multiply"
@@ -363,9 +362,9 @@ export default function GsapHero({ hp, locale }: GsapHeroProps) {
                   </div>
 
                   {/* RIGHT SLICE */}
-                  <div className="hero-statue-slice-right absolute inset-0 w-full h-full select-none -translate-y-1.5" style={{ clipPath: "polygon(68% 0, 100% 0, 100% 100%, 68% 100%)" }}>
+                  <div className="hero-statue-slice-right absolute inset-0 w-full h-full select-none -translate-y-1.5 will-change-transform" style={{ clipPath: "polygon(68% 0, 100% 0, 100% 100%, 68% 100%)" }}>
                     <CImage
-                      src="/images/hero-statue-clean.png"
+                      src="/images/hero-statue-clean.webp"
                       alt="Right slice of Classical Statue artwork"
                       fill
                       className="object-contain mix-blend-multiply"
@@ -378,9 +377,9 @@ export default function GsapHero({ hp, locale }: GsapHeroProps) {
                 {/* ─── DARK MODE STATUE SLICES (Dark BG Statue for Perfect Contrast) ─── */}
                 <div className="hidden dark:block absolute inset-0 w-full h-full">
                   {/* LEFT SLICE */}
-                  <div className="hero-statue-slice-left absolute inset-0 w-full h-full select-none" style={{ clipPath: "polygon(0 0, 36% 0, 36% 100%, 0 100%)" }}>
+                  <div className="hero-statue-slice-left absolute inset-0 w-full h-full select-none will-change-transform" style={{ clipPath: "polygon(0 0, 36% 0, 36% 100%, 0 100%)" }}>
                     <CImage
-                      src="/images/hero-statue.png"
+                      src="/images/hero-statue.webp"
                       alt="Left slice of Classical Statue artwork"
                       fill
                       className="object-contain mix-blend-screen"
@@ -390,9 +389,9 @@ export default function GsapHero({ hp, locale }: GsapHeroProps) {
                   </div>
 
                   {/* CENTER SLICE */}
-                  <div className="hero-statue-slice-center absolute inset-0 w-full h-full select-none translate-y-3" style={{ clipPath: "polygon(36% 0, 68% 0, 68% 100%, 36% 100%)" }}>
+                  <div className="hero-statue-slice-center absolute inset-0 w-full h-full select-none translate-y-3 will-change-transform" style={{ clipPath: "polygon(36% 0, 68% 0, 68% 100%, 36% 100%)" }}>
                     <CImage
-                      src="/images/hero-statue.png"
+                      src="/images/hero-statue.webp"
                       alt="Center slice of Classical Statue artwork"
                       fill
                       className="object-contain mix-blend-screen"
@@ -402,9 +401,9 @@ export default function GsapHero({ hp, locale }: GsapHeroProps) {
                   </div>
 
                   {/* RIGHT SLICE */}
-                  <div className="hero-statue-slice-right absolute inset-0 w-full h-full select-none -translate-y-1.5" style={{ clipPath: "polygon(68% 0, 100% 0, 100% 100%, 68% 100%)" }}>
+                  <div className="hero-statue-slice-right absolute inset-0 w-full h-full select-none -translate-y-1.5 will-change-transform" style={{ clipPath: "polygon(68% 0, 100% 0, 100% 100%, 68% 100%)" }}>
                     <CImage
-                      src="/images/hero-statue.png"
+                      src="/images/hero-statue.webp"
                       alt="Right slice of Classical Statue artwork"
                       fill
                       className="object-contain mix-blend-screen"
