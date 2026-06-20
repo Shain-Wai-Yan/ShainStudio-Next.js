@@ -7,6 +7,8 @@ import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
 import MarTechStack from '@/components/MarTechStack';
 import ScrollAnimator from '@/components/ScrollAnimator';
 import ScrollRevealText from '@/components/about/ScrollRevealText';
+import AgeDisplay from '@/components/about/AgeDisplay';
+import { calculateAge } from '@/lib/calculateAge';
 
 interface AboutProps {
   params: Promise<{ locale: string }>;
@@ -71,16 +73,7 @@ export default async function AboutPage({ params }: AboutProps) {
   const t = await getDictionary(locale);
   const basePath = locale === 'en' ? '' : `/${locale}`;
 
-  const calculateAge = () => {
-    const birthDate = new Date(2002, 5, 20);
-    const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const hasBirthdayOccurred =
-      today.getMonth() > birthDate.getMonth() ||
-      (today.getMonth() === birthDate.getMonth() && today.getDate() >= birthDate.getDate());
-    if (!hasBirthdayOccurred) age--;
-    return age;
-  };
+  const age = calculateAge();
 
   return (
     <main className="bg-background dark:bg-[#0a0a0a] min-h-screen text-text dark:text-gray-200">
@@ -140,7 +133,7 @@ export default async function AboutPage({ params }: AboutProps) {
                   <ul className="flex flex-col font-primary text-sm relative z-10 text-left bg-gray-50/50 dark:bg-white/5 rounded-2xl p-6 border border-gray-100/50 dark:border-white/5 space-y-4">
                     <li className="flex flex-col gap-1.5 pb-4 border-b border-gray-200/50 dark:border-white/10 transition-transform duration-300 hover:translate-x-1">
                       <span className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">{t.aboutPage.ageLabel}</span>
-                      <strong className="text-primary dark:text-white text-base font-semibold">{calculateAge()} {t.aboutPage.ageValueSuffix}</strong>
+                      <strong className="text-primary dark:text-white text-base font-semibold"><AgeDisplay initialAge={age} suffix={t.aboutPage.ageValueSuffix} /></strong>
                     </li>
                     <li className="flex flex-col gap-1.5 pb-4 border-b border-gray-200/50 dark:border-white/10 transition-transform duration-300 hover:translate-x-1">
                       <span className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">{t.aboutPage.completedLabel}</span>
