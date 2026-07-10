@@ -996,5 +996,23 @@
         "content": "如您对本《条款》有任何疑问，或需就本网站或本《条款》向我们发出任何通知或沟通，您可通过以下方式与我们联系：contact@shainwaiyan.com。"
       }
     ]
+  },
+  "game": {
+    "title": "Shain 的国度",
+    "loading": "遗迹正在苏醒…",
+    "loadingHint": "一个由大理石与星光雕琢而成的小世界",
+    "skip": "跳过 — 浏览网站",
+    "enter": "进入 3D 世界",
+    "interact": "进入",
+    "interactKey": "按 E 键",
+    "controlsHint": "WASD / 方向键移动 · E 进入神殿 · Esc 跳过",
+    "controlsHintTouch": "使用摇杆移动 · 靠近神殿后点按「进入」",
+    "shrines": {
+      "about": "起源之殿 · 关于我",
+      "portfolio": "作品之廊 · 作品集",
+      "certificate": "荣誉之堂 · 证书",
+      "blog": "思想之库 · 博客",
+      "contact": "联络之灯 · 联系我"
+    }
   }
 }

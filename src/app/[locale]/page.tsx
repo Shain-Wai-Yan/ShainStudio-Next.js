@@ -8,6 +8,10 @@ import dynamic from 'next/dynamic';
 // GsapHero is above-the-fold — direct import so it ships with the initial bundle
 import GsapHero from '@/components/landing/GsapHero';
 
+// 3D game overlay gate — tiny client component; the three.js chunk itself is
+// loaded lazily (ssr:false) inside it, so SSR/SEO of the sections below is untouched
+import GameGate from '@/components/game/GameGate';
+
 // Below-fold sections: next/dynamic splits their JS into separate chunks
 // (no ssr:false — HTML is still server-rendered so SEO/accessibility is preserved)
 const GsapMarquee  = dynamic(() => import('@/components/landing/GsapMarquee'));
@@ -91,6 +95,7 @@ export default async function Page({ params }: { params: { locale: string } }) {
 
   return (
     <>
+      <GameGate locale={locale} t={t.game} />
       <main className="font-sans antialiased text-slate-900 dark:text-slate-50 bg-white dark:bg-black selection:bg-amber-500/30">
         <GsapHero hp={hp} locale={locale} />
         <GsapMarquee items={resolvedMarqueeItems} />

@@ -996,5 +996,23 @@
         "content": "If you have any questions about these Terms, or if you wish to provide any notices or communications regarding the Site or these Terms, you may contact us at: contact@shainwaiyan.com."
       }
     ]
+  },
+  "game": {
+    "title": "Shain's Realm",
+    "loading": "Awakening the ruins…",
+    "loadingHint": "A small world carved from marble and starlight",
+    "skip": "Skip — browse the site",
+    "enter": "Enter the 3D world",
+    "interact": "Enter",
+    "interactKey": "Press E",
+    "controlsHint": "WASD / Arrows to move · E to enter a shrine · Esc to skip",
+    "controlsHintTouch": "Use the joystick to move · Tap Enter at a shrine",
+    "shrines": {
+      "about": "Temple of Origins · About",
+      "portfolio": "Gallery of Works · Portfolio",
+      "certificate": "Hall of Honors · Certificates",
+      "blog": "Archive of Thoughts · Blog",
+      "contact": "Beacon of Contact · Contact"
+    }
   }
 }
