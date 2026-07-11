@@ -7,6 +7,7 @@ import { Play, ArrowRight, Sparkles } from "lucide-react";
 import Link from "next/link";
 import HeroTypewriter from "../HeroTypewriter";
 import CImage from "@/components/ui/CImage";
+import StatueHoverReveal from "./StatueHoverReveal";
 
 interface HeroHomePageSchema {
   badge?: string;
@@ -483,6 +484,9 @@ export default function GsapHero({ hp, locale }: GsapHeroProps) {
                 </div>
 
               </div>
+
+              {/* Cursor-driven liquid portal — reveals the opposite theme's statue */}
+              <StatueHoverReveal />
 
               {/* Architectural ticks on corners */}
               <div className="absolute top-3 left-3 w-4 h-[1px] bg-gray-300 dark:bg-gray-700"></div>
