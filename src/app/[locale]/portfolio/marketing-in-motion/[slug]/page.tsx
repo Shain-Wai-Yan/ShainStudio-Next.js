@@ -11,6 +11,7 @@ import ProjectHeader from '@/components/marketing-in-motion/ProjectHeader';
 import ProjectContent from '@/components/marketing-in-motion/ProjectContent';
 import ProjectGallery from '@/components/marketing-in-motion/ProjectGallery';
 import RelatedProjects from '@/components/marketing-in-motion/RelatedProjects';
+import TableOfContents from '@/components/shared/TableOfContents';
 import { getDictionary } from '@/lib/getDictionary';
 import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
 
@@ -231,6 +232,9 @@ export default async function MarketingProjectPage(
 
       {/* Project Header with Cover Image */}
       <ProjectHeader project={project} language={locale as 'en' | 'zh'} />
+
+      {/* Floating table of contents (desktop) */}
+      <TableOfContents language={locale as 'en' | 'zh'} />
 
       {/* Project Content */}
       <ProjectContent project={project} language={locale as 'en' | 'zh'} />

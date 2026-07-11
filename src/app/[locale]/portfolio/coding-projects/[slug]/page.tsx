@@ -12,6 +12,7 @@ import CodingProjectHeader from '@/components/coding-project/CodingProjectHeader
 import CodingProjectContent from '@/components/coding-project/CodingProjectContent';
 import CodingProjectGallery from '@/components/coding-project/CodingProjectGallery';
 import RelatedCodingProjects from '@/components/coding-project/RelatedCodingProjects';
+import TableOfContents from '@/components/shared/TableOfContents';
 import { getDictionary } from '@/lib/getDictionary';
 import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
 
@@ -228,6 +229,9 @@ export default async function CodingProjectDetailPage({ params }: CodingProjectP
 
       {/* Project Header */}
       <CodingProjectHeader project={project} language={locale as 'en' | 'zh'} />
+
+      {/* Floating table of contents (desktop) */}
+      <TableOfContents language={locale as 'en' | 'zh'} />
 
       {/* Project Content */}
       <CodingProjectContent project={project} language={locale as 'en' | 'zh'} />

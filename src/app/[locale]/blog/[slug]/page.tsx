@@ -6,6 +6,7 @@ import { fetchBlogBySlug, fetchRelatedBlogs } from '@/lib/strapi/blogs';
 import BlogPostHeader from '@/components/blog/BlogPostHeader';
 import BlogPostContent from '@/components/blog/BlogPostContent';
 import RelatedPosts from '@/components/blog/RelatedPosts';
+import TableOfContents from '@/components/shared/TableOfContents';
 import { getDictionary } from '@/lib/getDictionary';
 
 const SITE_URL = 'https://www.shainwaiyan.com';
@@ -165,6 +166,9 @@ export default async function BlogPostPage(props: BlogPostPageProps) {
 
       {/* ── Post header (featured image + meta) ── */}
       <BlogPostHeader blog={blog} language={lang} />
+
+      {/* ── Floating table of contents (desktop) ── */}
+      <TableOfContents language={lang} />
 
       {/* ── Post body ── */}
       <section className="py-8 md:py-12">
