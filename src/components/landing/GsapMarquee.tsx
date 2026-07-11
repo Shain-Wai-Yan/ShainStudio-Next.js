@@ -17,34 +17,44 @@ export default function GsapMarquee({ items }: GsapMarqueeProps) {
 
   useGSAP(
     () => {
-      // 1. Entrance animation — rotate the BAND div (transform-only, GPU-composited)
-      gsap.fromTo(
-        bandRef.current,
-        { opacity: 0, rotate: 2 },
-        {
-          opacity: 1,
-          rotate: -2,
-          duration: 1,
-          ease: "power2.out",
+      const mm = gsap.matchMedia();
+
+      mm.add("(prefers-reduced-motion: no-preference)", () => {
+        // 1. Entrance animation — rotate the BAND div (transform-only, GPU-composited)
+        gsap.fromTo(
+          bandRef.current,
+          { opacity: 0, rotate: 2 },
+          {
+            opacity: 1,
+            rotate: -2,
+            duration: 1,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: containerRef.current,
+              start: "top 90%",
+              end: "top 60%",
+              scrub: 1,
+            },
+          }
+        );
+
+        // 2. Parallax on scroll
+        gsap.to(marqueeInnerRef.current, {
+          xPercent: -20,
+          ease: "none",
           scrollTrigger: {
             trigger: containerRef.current,
-            start: "top 90%",
-            end: "top 60%",
-            scrub: 1,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: 0.5,
           },
-        }
-      );
+        });
+      });
 
-      // 2. Parallax on scroll
-      gsap.to(marqueeInnerRef.current, {
-        xPercent: -20,
-        ease: "none",
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: "top bottom",
-          end: "bottom top",
-          scrub: 0.5,
-        },
+      // The band ships with inline opacity:0 and relies on the tween to appear —
+      // under reduced motion, reveal it statically in its final pose.
+      mm.add("(prefers-reduced-motion: reduce)", () => {
+        gsap.set(bandRef.current, { opacity: 1, rotate: -2 });
       });
     },
     { scope: containerRef }

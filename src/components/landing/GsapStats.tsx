@@ -14,6 +14,11 @@ export default function GsapStats({ stats }: GsapStatsProps) {
 
   useGSAP(
     () => {
+      const mm = gsap.matchMedia();
+
+      // Under reduced motion no tweens are created — items render visible and
+      // the SSR'd final numbers stay as-is.
+      mm.add("(prefers-reduced-motion: no-preference)", () => {
       // 1. Entrance animation for the items
       gsap.fromTo(
         ".stat-item",
@@ -52,6 +57,7 @@ export default function GsapStats({ stats }: GsapStatsProps) {
             ).toString();
           },
         });
+      });
       });
     },
     { scope: containerRef }

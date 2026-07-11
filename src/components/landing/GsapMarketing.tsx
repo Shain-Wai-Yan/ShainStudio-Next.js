@@ -3,7 +3,6 @@
 import React, { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import { gsap, ScrollTrigger } from "@/lib/gsapSetup";
-import { SplitTextTitle } from "./SplitTextTitle";
 import { Globe, Users, TrendingUp, Zap } from "lucide-react";
 
 /* ─────────────────────────────────────────────── */
@@ -86,8 +85,19 @@ function PillarCard({
       className={`mkt-card will-change-transform relative w-full rounded-[2rem] border border-[#1e1e48]/10 dark:border-[#d4af37]/15 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.15)] dark:shadow-[0_30px_80px_-20px_rgba(0,0,0,0.6)] overflow-hidden ${style.bg}`}
       style={{ height: "clamp(420px, 65vh, 680px)" }}
     >
-      <div className="pointer-events-none absolute -top-32 -right-32 w-96 h-96 rounded-full bg-[#d4af37]/5 blur-[100px]" />
-      <div className="pointer-events-none absolute -bottom-24 -left-24 w-72 h-72 rounded-full bg-[#1e1e48]/5 dark:bg-[#d4af37]/5 blur-[80px]" />
+      {/* Radial-gradient glows instead of blur() filters — same look, far cheaper paint */}
+      <div
+        className="pointer-events-none absolute -top-48 -right-48 w-[36rem] h-[36rem] rounded-full"
+        style={{ background: "radial-gradient(circle, rgba(212, 175, 55, 0.05) 0%, rgba(212, 175, 55, 0) 60%)" }}
+      />
+      <div
+        className="pointer-events-none absolute -bottom-36 -left-36 w-[27rem] h-[27rem] rounded-full dark:hidden"
+        style={{ background: "radial-gradient(circle, rgba(30, 30, 72, 0.05) 0%, rgba(30, 30, 72, 0) 60%)" }}
+      />
+      <div
+        className="pointer-events-none absolute -bottom-36 -left-36 w-[27rem] h-[27rem] rounded-full hidden dark:block"
+        style={{ background: "radial-gradient(circle, rgba(212, 175, 55, 0.05) 0%, rgba(212, 175, 55, 0) 60%)" }}
+      />
 
       <div className="relative z-10 flex flex-col h-full justify-between p-8 md:p-14">
         <div className="flex items-start justify-between">
@@ -136,6 +146,9 @@ export default function GsapMarketing({ data }: GsapMarketingProps) {
 
   useGSAP(
     () => {
+      const mm = gsap.matchMedia();
+
+      mm.add("(prefers-reduced-motion: no-preference)", () => {
       /* ── 1. Section header reveal ── */
       gsap.fromTo(
         ".mkt-header-line",
@@ -165,6 +178,7 @@ export default function GsapMarketing({ data }: GsapMarketingProps) {
           end: "bottom bottom",
           pin: true,
           pinSpacing: false,
+          anticipatePin: 1,
           id: `mkt-pin-${i}`,
         });
 
@@ -176,7 +190,7 @@ export default function GsapMarketing({ data }: GsapMarketingProps) {
             scrollTrigger: {
               trigger: card,
               start: "top 10%",
-              end: `+=${window.innerHeight * 0.85}`,
+              end: () => `+=${window.innerHeight * 0.85}`,
               scrub: 1.2,
             },
           });
@@ -252,7 +266,7 @@ export default function GsapMarketing({ data }: GsapMarketingProps) {
         { opacity: 1, x: 0, stagger: 0.1, duration: 0.8, ease: "power2.out" },
         "<+0.2"
       );
-
+      });
     },
     { scope: containerRef, dependencies: [pillars] }
   );
@@ -269,16 +283,13 @@ export default function GsapMarketing({ data }: GsapMarketingProps) {
           </span>
         </div>
 
-        <h2 className="mkt-header-line text-5xl md:text-7xl lg:text-[5.5rem] font-serif tracking-tighter leading-[1.05] text-[#1e1e48] dark:text-white mb-6" style={{ fontFeatureSettings: '"kern" 1, "liga" 1' }}>
-          <SplitTextTitle text={header.line1} className="block mb-1" />
-          <SplitTextTitle text={header.line2} className="block mb-1" />
-          <span className="block">
-            <SplitTextTitle
-              text={header.line3}
-              className="inline-flex"
-              charClassName="split-char-mkt inline-block translate-y-[120%] rotate-3 opacity-0 will-change-transform text-transparent bg-clip-text bg-gradient-to-r from-[#bf953f] via-[#fcf6ba] to-[#b38728]"
-            />
-          </span>
+        {/* Headline space intentionally left blank — the heading stays in the
+            DOM but invisible (opacity-0), preserving the section's semantics
+            and the original spacing between the eyebrow and the copy. */}
+        <h2 className="text-5xl md:text-7xl lg:text-[5.5rem] font-serif tracking-tighter leading-[1.05] mb-6 opacity-0 select-none pointer-events-none">
+          <span className="block mb-1">{header.line1}</span>
+          <span className="block mb-1">{header.line2}</span>
+          <span className="block">{header.line3}</span>
         </h2>
 
         <p className="mkt-header-line text-base md:text-xl text-[#1e1e48]/55 dark:text-gray-400 max-w-2xl font-light leading-relaxed">
@@ -304,7 +315,10 @@ export default function GsapMarketing({ data }: GsapMarketingProps) {
         <div className="relative text-center flex flex-col items-center justify-center space-y-6 md:space-y-8">
           
           {/* Subtle background glow */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[600px] h-[300px] bg-[#d4af37]/5 blur-[120px] rounded-full pointer-events-none" />
+          <div
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[900px] h-[500px] rounded-full pointer-events-none"
+            style={{ background: "radial-gradient(ellipse, rgba(212, 175, 55, 0.05) 0%, rgba(212, 175, 55, 0) 60%)" }}
+          />
 
           <p className="intersect-line-1 text-2xl md:text-5xl lg:text-6xl font-serif tracking-tight text-[#1e1e48]/40 dark:text-white/30 italic">
             {intersection.line1}

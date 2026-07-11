@@ -28,8 +28,14 @@ export default function GsapHero({ hp, locale }: GsapHeroProps) {
 
   useGSAP(
     () => {
-      // Entrance timeline
-      const tl = gsap.timeline({ delay: 0.1 });
+      const mm = gsap.matchMedia();
+
+      mm.add("(prefers-reduced-motion: no-preference)", () => {
+      // Entrance timeline — built paused; fromTo applies the hidden "from"
+      // states immediately, then we play once the statue image has painted
+      // (or after a bounded fallback) so the reveal never animates over a
+      // still-decoding image.
+      const tl = gsap.timeline({ paused: true });
 
       // 1. Reveal margins, grid lines, and tags
       tl.fromTo(
@@ -66,45 +72,70 @@ export default function GsapHero({ hp, locale }: GsapHeroProps) {
         "-=0.8"
       );
 
-      // Floating animations: staggered bobs for the three collage panels to create an organic sliced wave
-      gsap.to(".hero-statue-slice-left", {
-        y: -10,
-        duration: 4.8,
-        ease: "sine.inOut",
-        yoyo: true,
-        repeat: -1,
-      });
-      gsap.to(".hero-statue-slice-center", {
-        y: 12,
-        duration: 5.2,
-        ease: "sine.inOut",
-        yoyo: true,
-        repeat: -1,
-      });
-      gsap.to(".hero-statue-slice-right", {
-        y: -6,
-        duration: 4.5,
-        ease: "sine.inOut",
-        yoyo: true,
-        repeat: -1,
+      // Floating animations: staggered bobs for the three collage panels to create an organic sliced wave.
+      // Created paused: they animate the same `y` the entrance timeline owns, so they
+      // only start once the entrance completes. Collected so they can also be paused
+      // whenever the hero scrolls out of view instead of running forever.
+      const floatTweens = [
+        gsap.to(".hero-statue-slice-left", {
+          y: -10,
+          duration: 4.8,
+          ease: "sine.inOut",
+          yoyo: true,
+          repeat: -1,
+          paused: true,
+        }),
+        gsap.to(".hero-statue-slice-center", {
+          y: 12,
+          duration: 5.2,
+          ease: "sine.inOut",
+          yoyo: true,
+          repeat: -1,
+          paused: true,
+        }),
+        gsap.to(".hero-statue-slice-right", {
+          y: -6,
+          duration: 4.5,
+          ease: "sine.inOut",
+          yoyo: true,
+          repeat: -1,
+          paused: true,
+        }),
+        // Float the abstract circular background sun disks
+        gsap.to(".hero-collage-sun", {
+          y: -12,
+          x: 8,
+          duration: 8,
+          ease: "sine.inOut",
+          yoyo: true,
+          repeat: -1,
+          paused: true,
+        }),
+        gsap.to(".hero-collage-moon", {
+          y: 10,
+          x: -6,
+          duration: 10,
+          ease: "sine.inOut",
+          yoyo: true,
+          repeat: -1,
+          paused: true,
+        }),
+      ];
+
+      let floatsEnabled = false;
+      const heroInView = ScrollTrigger.create({
+        trigger: containerRef.current,
+        start: "top bottom",
+        end: "bottom top",
+        onToggle: (self) => {
+          if (!floatsEnabled) return;
+          floatTweens.forEach((t) => (self.isActive ? t.play() : t.pause()));
+        },
       });
 
-      // Float the abstract circular background sun disks
-      gsap.to(".hero-collage-sun", {
-        y: -12,
-        x: 8,
-        duration: 8,
-        ease: "sine.inOut",
-        yoyo: true,
-        repeat: -1,
-      });
-      gsap.to(".hero-collage-moon", {
-        y: 10,
-        x: -6,
-        duration: 10,
-        ease: "sine.inOut",
-        yoyo: true,
-        repeat: -1,
+      tl.eventCallback("onComplete", () => {
+        floatsEnabled = true;
+        if (heroInView.isActive) floatTweens.forEach((t) => t.play());
       });
 
       // Scroll parallax timeline
@@ -132,6 +163,29 @@ export default function GsapHero({ hp, locale }: GsapHeroProps) {
           },
           "<"
         );
+
+      // Play the entrance once fonts + the statue image are ready, racing a
+      // bounded fallback so a slow network can never hold the reveal hostage.
+      let cancelled = false;
+      const statueImg =
+        containerRef.current?.querySelector<HTMLImageElement>(
+          ".hero-statue-slice-center img"
+        );
+      const imageReady =
+        statueImg && !statueImg.complete
+          ? statueImg.decode().catch(() => {})
+          : Promise.resolve();
+      const ready = Promise.all([document.fonts.ready, imageReady]);
+      const fallback = new Promise((resolve) => setTimeout(resolve, 800));
+
+      Promise.race([ready, fallback]).then(() => {
+        if (!cancelled) tl.play();
+      });
+
+      return () => {
+        cancelled = true;
+      };
+      });
     },
     { scope: containerRef }
   );
@@ -154,9 +208,24 @@ export default function GsapHero({ hp, locale }: GsapHeroProps) {
           <div className="hero-grid-line absolute bottom-[18%] left-0 w-full h-[1px] bg-gray-100 dark:bg-white/5 opacity-40"></div>
         </div>
 
-        {/* Brand Ambient Color Glows (Midnight Blue & Gold) */}
-        <div className="absolute top-0 right-0 w-[700px] h-[700px] bg-[#ffd700]/5 dark:bg-[#d4af37]/4 blur-[120px] rounded-full translate-x-1/4 -translate-y-1/4"></div>
-        <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-[#191970]/5 dark:bg-[#191970]/10 blur-[150px] rounded-full -translate-x-1/2 translate-y-1/4"></div>
+        {/* Brand Ambient Color Glows (Midnight Blue & Gold) — radial-gradients
+            instead of blur-[120px]+ filters, which cause severe paint cost (see GsapCta) */}
+        <div
+          className="absolute top-0 right-0 w-[900px] h-[900px] rounded-full translate-x-1/4 -translate-y-1/4 dark:hidden"
+          style={{ background: "radial-gradient(circle, rgba(255, 215, 0, 0.05) 0%, rgba(255, 215, 0, 0) 60%)" }}
+        ></div>
+        <div
+          className="absolute top-0 right-0 w-[900px] h-[900px] rounded-full translate-x-1/4 -translate-y-1/4 hidden dark:block"
+          style={{ background: "radial-gradient(circle, rgba(212, 175, 55, 0.04) 0%, rgba(212, 175, 55, 0) 60%)" }}
+        ></div>
+        <div
+          className="absolute bottom-0 left-0 w-[800px] h-[800px] rounded-full -translate-x-1/2 translate-y-1/4 dark:hidden"
+          style={{ background: "radial-gradient(circle, rgba(25, 25, 112, 0.05) 0%, rgba(25, 25, 112, 0) 60%)" }}
+        ></div>
+        <div
+          className="absolute bottom-0 left-0 w-[800px] h-[800px] rounded-full -translate-x-1/2 translate-y-1/4 hidden dark:block"
+          style={{ background: "radial-gradient(circle, rgba(25, 25, 112, 0.10) 0%, rgba(25, 25, 112, 0) 60%)" }}
+        ></div>
       </div>
 
       {/* Viewport Frame Grid Lines (Modeled directly after Open Design) */}
@@ -345,7 +414,7 @@ export default function GsapHero({ hp, locale }: GsapHeroProps) {
                       fill
                       className="object-contain mix-blend-multiply"
                       sizes="280px"
-                      priority
+                      preload
                     />
                   </div>
 
@@ -357,7 +426,7 @@ export default function GsapHero({ hp, locale }: GsapHeroProps) {
                       fill
                       className="object-contain mix-blend-multiply"
                       sizes="280px"
-                      priority
+                      preload
                     />
                   </div>
 
@@ -369,7 +438,7 @@ export default function GsapHero({ hp, locale }: GsapHeroProps) {
                       fill
                       className="object-contain mix-blend-multiply"
                       sizes="280px"
-                      priority
+                      preload
                     />
                   </div>
                 </div>
@@ -384,7 +453,7 @@ export default function GsapHero({ hp, locale }: GsapHeroProps) {
                       fill
                       className="object-contain mix-blend-screen"
                       sizes="280px"
-                      priority
+                      loading="eager"
                     />
                   </div>
 
@@ -396,7 +465,7 @@ export default function GsapHero({ hp, locale }: GsapHeroProps) {
                       fill
                       className="object-contain mix-blend-screen"
                       sizes="280px"
-                      priority
+                      loading="eager"
                     />
                   </div>
 
@@ -408,7 +477,7 @@ export default function GsapHero({ hp, locale }: GsapHeroProps) {
                       fill
                       className="object-contain mix-blend-screen"
                       sizes="280px"
-                      priority
+                      loading="eager"
                     />
                   </div>
                 </div>

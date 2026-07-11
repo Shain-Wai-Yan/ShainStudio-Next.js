@@ -19,6 +19,9 @@ export default function GsapBento({ projects, locale }: GsapBentoProps) {
 
   useGSAP(
     () => {
+      const mm = gsap.matchMedia();
+
+      mm.add("(prefers-reduced-motion: no-preference)", () => {
       // Pin horizontal scroll section
       const tl = gsap.timeline({
         scrollTrigger: {
@@ -81,6 +84,19 @@ export default function GsapBento({ projects, locale }: GsapBentoProps) {
       return () => {
         cleanupFns.forEach((fn) => fn());
       };
+      });
+
+      // Without the pinned scrub the horizontal row is unreachable — fall back
+      // to native horizontal scrolling under reduced motion.
+      mm.add("(prefers-reduced-motion: reduce)", () => {
+        const scrollParent = scrollWrapperRef.current?.parentElement;
+        if (!scrollParent) return;
+        const prev = scrollParent.style.overflowX;
+        scrollParent.style.overflowX = "auto";
+        return () => {
+          scrollParent.style.overflowX = prev;
+        };
+      });
     },
     { scope: containerRef }
   );

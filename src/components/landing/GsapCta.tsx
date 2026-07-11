@@ -26,47 +26,51 @@ export default function GsapCta({ hp, locale }: GsapCtaProps) {
 
   useGSAP(
     () => {
-      // Pin the CTA section and animate its content
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: "top 60%",
-          end: "top 10%",
-          scrub: 1.5,
-        },
+      const mm = gsap.matchMedia();
+
+      mm.add("(prefers-reduced-motion: no-preference)", () => {
+        // Pin the CTA section and animate its content
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: containerRef.current,
+            start: "top 60%",
+            end: "top 10%",
+            scrub: 1.5,
+          },
+        });
+
+        tl.fromTo(
+          ".cta-fade-up",
+          { y: 50, opacity: 0 },
+          { y: 0, opacity: 1, stagger: 0.2, ease: "power2.out" }
+        );
+
+        // High-Performance Hollow to Solid Text Effect using Clip-Path overlay
+        if (solidTextRef.current) {
+          gsap.fromTo(
+            solidTextRef.current,
+            { clipPath: "inset(0% 100% 0% 0%)" },
+            {
+              clipPath: "inset(0% 0% 0% 0%)",
+              ease: "none",
+              scrollTrigger: {
+                trigger: containerRef.current,
+                start: "top 75%",
+                end: "center center",
+                scrub: 0.5,
+              },
+            }
+          );
+        }
       });
 
-      tl.to(".cta-split-char", {
-        yPercent: 0,
-        y: 0,
-        rotate: 0,
-        opacity: 1,
-        stagger: 0.1,
-        ease: "power2.out",
-      }).fromTo(
-        ".cta-fade-up",
-        { y: 50, opacity: 0 },
-        { y: 0, opacity: 1, stagger: 0.2, ease: "power2.out" },
-        "-=0.5"
-      );
-
-      // High-Performance Hollow to Solid Text Effect using Clip-Path overlay
-      if (solidTextRef.current) {
-        gsap.fromTo(
-          solidTextRef.current,
-          { clipPath: "inset(0% 100% 0% 0%)" },
-          {
-            clipPath: "inset(0% 0% 0% 0%)",
-            ease: "none",
-            scrollTrigger: {
-              trigger: containerRef.current,
-              start: "top 75%",
-              end: "center center",
-              scrub: 0.5,
-            },
-          }
-        );
-      }
+      // The solid overlay ships clipped away via inline style — reveal it
+      // statically under reduced motion so the gold fill is still visible.
+      mm.add("(prefers-reduced-motion: reduce)", () => {
+        if (solidTextRef.current) {
+          gsap.set(solidTextRef.current, { clipPath: "inset(0% 0% 0% 0%)" });
+        }
+      });
     },
     { scope: containerRef }
   );
