@@ -8,9 +8,11 @@ import CImage from "@/components/ui/CImage";
 /**
  * StatueHoverReveal
  * ------------------------------------------------------------------
- * A cursor-driven "liquid portal" that reveals the OPPOSITE theme's
+ * A pointer-driven "liquid portal" that reveals the OPPOSITE theme's
  * statue through a chaotic, gooey, water-drop blob (inspired by the
- * Cuberto-built Lando Norris site).
+ * Cuberto-built Lando Norris site). Desktop drives it by hover; touch
+ * drives it by press-drag-lift (the card owns the gesture via
+ * `touch-action: none`, so a finger paints the portal in any direction).
  *
  *  - Light mode  →  blob reveals the DARK statue on a dark backdrop.
  *  - Dark mode   →  blob reveals the LIGHT statue on a light backdrop.
@@ -63,8 +65,12 @@ const initialVars = {
   "--b3y": "52px",
 } as React.CSSProperties;
 
-function RevealLayer() {
+// Memoised so a re-render of the parent gate (e.g. a matchMedia change)
+// never re-runs this subtree — which would re-apply the JSX `filter` style
+// and clobber the imperative on/off toggling in the ticker.
+const RevealLayer = React.memo(function RevealLayer() {
   const rootRef = useRef<HTMLDivElement>(null);
+  const filterRef = useRef<HTMLDivElement>(null);
   const turbRef = useRef<SVGFETurbulenceElement>(null);
   const dispRef = useRef<SVGFEDisplacementMapElement>(null);
 
@@ -73,10 +79,22 @@ function RevealLayer() {
       const el = rootRef.current;
       if (!el) return;
 
+      // WebKit (desktop Safari + every iOS browser) runs the SVG water filter
+      // on the CPU and can't sustain the full effect, so it gets a calmer,
+      // lighter variant: static noise, 1 octave, gentler ripple, slower drift.
+      // `vendor` is the most reliable WebKit signal (Safari = "Apple Computer,
+      // Inc."; Chrome = "Google Inc."). Cast past its lib.dom deprecation tag.
+      const vendor = typeof navigator !== "undefined" ? (navigator as { vendor?: string }).vendor : "";
+      const isWebKit = vendor === "Apple Computer, Inc.";
+
       const BASE_R = 56; // smallest visible radius (awake but slow / still)
       const MAX_R = 212; // largest radius on a fast flick
-      const SPEED_TO_R = 2.6; // how strongly speed inflates the visible area
+      const SPEED_TO_R = isWebKit ? 2.0 : 2.6; // how strongly speed inflates the area
       const IDLE_HIDE = 0.4; // seconds of stillness before it dissolves
+      // Displacement (watery warp) — gentler on WebKit to keep it calm & cheap.
+      const DISP_BASE = isWebKit ? 12 : 16;
+      const DISP_K = isWebKit ? 1.6 : 2.3;
+      const DISP_MAX = isWebKit ? 46 : 72;
       const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
       const max0 = (v: number) => Math.max(0, v);
 
@@ -119,52 +137,12 @@ function RevealLayer() {
       // the ticker. The idle timer flips it false so the blob dissolves.
       let awake = false;
 
-      const render = () => {
-        // Integrate + decay velocity.
-        S.velx += (rawVx - S.velx) * 0.25;
-        S.vely += (rawVy - S.vely) * 0.25;
-        rawVx *= 0.82;
-        rawVy *= 0.82;
-        const speed = Math.hypot(S.velx, S.vely);
-        const vx = clamp(S.velx, -90, 90);
-        const vy = clamp(S.vely, -90, 90);
-
-        // Visible area tracks speed: small when slow/still, large on a
-        // fast flick. Grows quickly, contracts more gently.
-        const targetR = awake ? BASE_R + Math.min(speed * SPEED_TO_R, MAX_R - BASE_R) : 0;
-        // Grow fast; ease down gently while still hovering (watery), but
-        // dissolve snappily once the idle timer has fired.
-        const rLerp = targetR > S.r ? 0.24 : awake ? 0.1 : 0.19;
-        S.r += (targetR - S.r) * rLerp;
-
-        // Faster movement = more turbulent, watery displacement.
-        if (dispRef.current) {
-          dispRef.current.setAttribute("scale", String(16 + Math.min(speed * 2.3, 72)));
-        }
-
-        el.style.setProperty("--mx", S.mx + "px");
-        el.style.setProperty("--my", S.my + "px");
-        el.style.setProperty("--r", max0(S.r) + "px");
-        el.style.setProperty("--r1", max0(S.r * S.m1) + "px");
-        el.style.setProperty("--r2", max0(S.r * S.m2) + "px");
-        el.style.setProperty("--r3", max0(S.r * S.m3) + "px");
-        el.style.setProperty("--b1x", S.d1x - vx * TF[0] + "px");
-        el.style.setProperty("--b1y", S.d1y - vy * TF[0] + "px");
-        el.style.setProperty("--b2x", S.d2x - vx * TF[1] + "px");
-        el.style.setProperty("--b2y", S.d2y - vy * TF[1] + "px");
-        el.style.setProperty("--b3x", S.d3x - vx * TF[2] + "px");
-        el.style.setProperty("--b3y", S.d3y - vy * TF[2] + "px");
-      };
-
-      gsap.ticker.add(render);
-
-      // Smoothed cursor follow — the signature trailing lag.
-      const xTo = gsap.quickTo(S, "mx", { duration: 0.45, ease: "power3.out" });
-      const yTo = gsap.quickTo(S, "my", { duration: 0.45, ease: "power3.out" });
+      const fw = filterRef.current;
 
       // Chaos drivers: satellites perpetually drift + pulse so the goo
       // shape merges and splits. repeatRefresh + function values
-      // re-randomise every cycle.
+      // re-randomise every cycle. Paused while idle (see setActive) so an
+      // untouched hero spends zero CPU.
       const rnd = gsap.utils.random;
       const loops: gsap.core.Tween[] = [
         gsap.to(S, {
@@ -206,18 +184,138 @@ function RevealLayer() {
         }),
       ];
 
-      // Idle shimmer: keep the turbulence noise itself alive over time
-      // (the displacement *scale* is driven by pointer speed in render).
-      if (turbRef.current) {
-        loops.push(
-          gsap.to(turbRef.current, {
-            attr: { baseFrequency: 0.024 },
-            duration: 7,
-            ease: "sine.inOut",
-            repeat: -1,
-            yoyo: true,
-          })
-        );
+      // Calmer chaos on WebKit: one octave, static noise (the shimmer is
+      // skipped in the render loop), and slower-drifting satellites.
+      if (isWebKit) {
+        turbRef.current?.setAttribute("numOctaves", "1");
+        loops.forEach((l) => l.timeScale(0.7));
+      }
+
+      // Active = SVG goo filter running + chaos loops playing. Once the
+      // portal has fully dissolved we flip this off: the (Safari-expensive)
+      // filter drops to `none` and the loops pause, so an idle hero costs
+      // nothing and Safari stops re-rasterising a filter layer every frame.
+      let active = false;
+      const setActive = (on: boolean) => {
+        if (on === active) return;
+        active = on;
+        if (fw) {
+          const f = on ? "url(#hero-reveal-goo)" : "none";
+          fw.style.filter = f;
+          fw.style.setProperty("-webkit-filter", f);
+          fw.style.willChange = on ? "filter" : "auto";
+        }
+        for (const l of loops) {
+          if (on) l.resume();
+          else l.pause();
+        }
+      };
+
+      // Commit the twelve mask CSS vars in a single pass.
+      const writeVars = (vx: number, vy: number) => {
+        el.style.setProperty("--mx", S.mx + "px");
+        el.style.setProperty("--my", S.my + "px");
+        el.style.setProperty("--r", max0(S.r) + "px");
+        el.style.setProperty("--r1", max0(S.r * S.m1) + "px");
+        el.style.setProperty("--r2", max0(S.r * S.m2) + "px");
+        el.style.setProperty("--r3", max0(S.r * S.m3) + "px");
+        el.style.setProperty("--b1x", S.d1x - vx * TF[0] + "px");
+        el.style.setProperty("--b1y", S.d1y - vy * TF[0] + "px");
+        el.style.setProperty("--b2x", S.d2x - vx * TF[1] + "px");
+        el.style.setProperty("--b2y", S.d2y - vy * TF[1] + "px");
+        el.style.setProperty("--b3x", S.d3x - vx * TF[2] + "px");
+        el.style.setProperty("--b3y", S.d3y - vy * TF[2] + "px");
+      };
+
+      // Cap the heavy mask/filter writes at ~60fps so a 120Hz ProMotion
+      // Safari doesn't recompute the displacement filter twice as often as
+      // the eye needs. Velocity + radius still integrate every tick (cheap).
+      // The turbulence shimmer refreshes even less often (see below).
+      const MIN_FRAME_MS = 15;
+      const SHIMMER_MS = 66; // ~15fps baseFrequency refresh
+      const TWO_PI = Math.PI * 2;
+      let lastWrite = 0;
+      let lastShim = 0;
+      let lastTick = 0; // for frame-rate-independent stepping
+      let lastScale = -1;
+
+      const render = () => {
+        if (!active) return;
+        const now = performance.now();
+
+        // Frame-rate-independent step. `dr` = how long this frame took vs a
+        // 60fps baseline, so the smoothing/decay/growth below advance by real
+        // elapsed time. This is what stops Safari's dropped frames from making
+        // the motion chaotic: the blob covers the same ground per second at
+        // 30fps as at 120fps. Clamped so a tab-away / resume can't jump.
+        const dt = lastTick ? now - lastTick : 16.667;
+        lastTick = now;
+        const dr = Math.min(3, Math.max(0.1, dt / 16.667));
+
+        // Living-water shimmer — skipped on WebKit, which keeps STATIC noise
+        // (re-seeding feTurbulence per frame is the op Safari can't afford).
+        // Elsewhere the ~14s cycle refreshes ~15fps: identical to per-frame,
+        // but the browser reuses the cached noise on the frames between.
+        if (!isWebKit && turbRef.current && now - lastShim >= SHIMMER_MS) {
+          lastShim = now;
+          const bf = 0.019 - 0.005 * Math.cos((now / 14000) * TWO_PI); // 0.014↔0.024
+          turbRef.current.setAttribute("baseFrequency", bf.toFixed(4));
+        }
+
+        // Integrate + decay velocity, normalised to frame time.
+        const smooth = 1 - Math.pow(0.75, dr); // ≙ *0.25 at 60fps
+        S.velx += (rawVx - S.velx) * smooth;
+        S.vely += (rawVy - S.vely) * smooth;
+        const decay = Math.pow(0.82, dr); // ≙ *0.82 at 60fps
+        rawVx *= decay;
+        rawVy *= decay;
+        const speed = Math.hypot(S.velx, S.vely);
+        const vx = clamp(S.velx, -90, 90);
+        const vy = clamp(S.vely, -90, 90);
+
+        // Visible area tracks speed: small when slow/still, large on a
+        // fast flick. Grows quickly, contracts more gently.
+        const targetR = awake ? BASE_R + Math.min(speed * SPEED_TO_R, MAX_R - BASE_R) : 0;
+        const rLerpBase = targetR > S.r ? 0.24 : awake ? 0.1 : 0.19;
+        const rLerp = 1 - Math.pow(1 - rLerpBase, dr);
+        S.r += (targetR - S.r) * rLerp;
+
+        // Fully dissolved and idle → collapse once, then drop the filter.
+        if (!awake && S.r < 0.5) {
+          S.r = 0;
+          writeVars(0, 0);
+          setActive(false);
+          return;
+        }
+
+        // Cap the heavy mask writes at ~60fps (velocity already integrated).
+        if (now - lastWrite < MIN_FRAME_MS) return;
+        lastWrite = now;
+
+        // Faster movement = more turbulent, watery displacement (gentler on
+        // WebKit). Only touch the attribute when the rounded value changes.
+        const nextScale = Math.round(DISP_BASE + Math.min(speed * DISP_K, DISP_MAX));
+        if (dispRef.current && nextScale !== lastScale) {
+          dispRef.current.setAttribute("scale", String(nextScale));
+          lastScale = nextScale;
+        }
+
+        writeVars(vx, vy);
+      };
+
+      gsap.ticker.add(render);
+
+      // Smoothed cursor follow — the signature trailing lag.
+      const xTo = gsap.quickTo(S, "mx", { duration: 0.45, ease: "power3.out" });
+      const yTo = gsap.quickTo(S, "my", { duration: 0.45, ease: "power3.out" });
+
+      // Start fully idle: freeze the loops and drop the filter until the
+      // first pointer interaction wakes the portal.
+      loops.forEach((l) => l.pause());
+      if (fw) {
+        fw.style.filter = "none";
+        fw.style.setProperty("-webkit-filter", "none");
+        fw.style.willChange = "auto";
       }
 
       let idleCall: gsap.core.Tween | null = null;
@@ -233,11 +331,13 @@ function RevealLayer() {
         idleCall?.kill();
         idleCall = gsap.delayedCall(IDLE_HIDE, sleep);
         awake = true;
+        setActive(true);
       };
 
-      const onEnter = (e: PointerEvent) => {
+      // Begin a reveal (mouse hover-enter OR touch press). Snap to the
+      // entry/press point so the blob doesn't sweep across, then wake.
+      const begin = (e: PointerEvent) => {
         const rect = el.getBoundingClientRect();
-        // Snap to the entry point so the blob doesn't sweep across.
         S.mx = e.clientX - rect.left;
         S.my = e.clientY - rect.top;
         xTo(S.mx);
@@ -246,11 +346,13 @@ function RevealLayer() {
         lastPy = S.my;
         rawVx = rawVy = 0;
         S.velx = S.vely = 0;
+        lastTick = 0; // fresh frame clock so the resume step isn't a catch-up
         awake = false;
         wake();
       };
 
-      const onMove = (e: PointerEvent) => {
+      // Follow the pointer and integrate raw velocity for the watery trail.
+      const move = (e: PointerEvent) => {
         const rect = el.getBoundingClientRect();
         const px = e.clientX - rect.left;
         const py = e.clientY - rect.top;
@@ -265,21 +367,54 @@ function RevealLayer() {
         wake();
       };
 
-      const onLeave = () => {
+      // End a reveal (mouse hover-leave OR touch lift/cancel). The ticker
+      // eases the radius to 0 once `awake` is false, so the blob dissolves.
+      const end = () => {
         idleCall?.kill();
         awake = false;
         rawVx = rawVy = 0;
         lastPx = lastPy = null;
       };
 
+      // Mouse/pen reveal on hover; touch reveals on press-drag-lift. The
+      // touch-only guards on up/cancel are critical: without them a desktop
+      // mouse-up would dissolve the portal on every click.
+      const onEnter = (e: PointerEvent) => begin(e);
+      const onDown = (e: PointerEvent) => {
+        if (e.pointerType !== "touch") return;
+        try {
+          el.setPointerCapture(e.pointerId);
+        } catch {
+          // capture unsupported — moves still fire while the finger is on the card
+        }
+        begin(e);
+      };
+      const onMove = (e: PointerEvent) => move(e);
+      const onLeave = () => end();
+      const onUp = (e: PointerEvent) => {
+        if (e.pointerType !== "touch") return;
+        try {
+          el.releasePointerCapture(e.pointerId);
+        } catch {
+          // pointer was not captured — non-fatal
+        }
+        end();
+      };
+
       el.addEventListener("pointerenter", onEnter);
+      el.addEventListener("pointerdown", onDown);
       el.addEventListener("pointermove", onMove);
       el.addEventListener("pointerleave", onLeave);
+      el.addEventListener("pointerup", onUp);
+      el.addEventListener("pointercancel", onUp);
 
       return () => {
         el.removeEventListener("pointerenter", onEnter);
+        el.removeEventListener("pointerdown", onDown);
         el.removeEventListener("pointermove", onMove);
         el.removeEventListener("pointerleave", onLeave);
+        el.removeEventListener("pointerup", onUp);
+        el.removeEventListener("pointercancel", onUp);
         gsap.ticker.remove(render);
         loops.forEach((t) => t.kill());
         idleCall?.kill();
@@ -289,9 +424,22 @@ function RevealLayer() {
   );
 
   return (
-    <div ref={rootRef} className="absolute inset-0 z-[22] pointer-events-auto" style={initialVars}>
+    <div
+      ref={rootRef}
+      className="absolute inset-0 z-[22] pointer-events-auto"
+      style={{
+        ...initialVars,
+        // Own touch gestures so a drag drives the portal instead of
+        // scrolling / selecting / raising a long-press callout. Swipes that
+        // start on the card won't scroll the page (scroll starts below it).
+        touchAction: "none",
+        WebkitUserSelect: "none",
+        userSelect: "none",
+        WebkitTouchCallout: "none",
+      }}
+    >
       {/* Filter wrapper — the goo/water filter runs on the already-masked children. */}
-      <div className="absolute inset-0 pointer-events-none" style={{ filter: "url(#hero-reveal-goo)", WebkitFilter: "url(#hero-reveal-goo)" }}>
+      <div ref={filterRef} className="absolute inset-0 pointer-events-none" style={{ filter: "url(#hero-reveal-goo)", WebkitFilter: "url(#hero-reveal-goo)" }}>
         {/* LIGHT MODE → reveals the DARK statue on a GOLD portal. */}
         <div className="block dark:hidden absolute inset-0 isolate" style={maskStyle}>
           <div className="absolute inset-0" style={{ background: "radial-gradient(circle at 50% 42%, #d9ad46 0%, #a9791f 52%, #6f4d12 100%)" }} />
@@ -319,6 +467,10 @@ function RevealLayer() {
       <svg aria-hidden="true" className="absolute" width="0" height="0" style={{ position: "absolute", width: 0, height: 0 }}>
         <defs>
           <filter id="hero-reveal-goo" x="-20%" y="-20%" width="140%" height="140%" colorInterpolationFilters="sRGB">
+            {/* Chrome/Firefox: 2 octaves + a slow ~15fps baseFrequency
+                shimmer (noise stays cached between refreshes). WebKit/Safari:
+                the render loop drops this to 1 octave with STATIC noise — the
+                per-frame reseed is exactly what its CPU filter can't afford. */}
             <feTurbulence ref={turbRef} type="fractalNoise" baseFrequency="0.014" numOctaves={2} seed={7} result="noise" />
             <feDisplacementMap ref={dispRef} in="SourceGraphic" in2="noise" scale={24} xChannelSelector="R" yChannelSelector="G" />
           </filter>
@@ -326,28 +478,44 @@ function RevealLayer() {
       </svg>
     </div>
   );
-}
+});
 
 /**
- * Gate: only mount the interactive layer on fine-pointer devices with
- * motion allowed. On touch / coarse pointer / reduced-motion we render
- * nothing (zero filter cost, hero untouched). Rendering `null` on the
- * server and first client paint keeps hydration clean.
+ * Feature flag (build-time, inlined by Next.js): set
+ *   NEXT_PUBLIC_MOBILE_REVEAL="disable"
+ * in `.env.local` to turn the reveal OFF on touch / coarse-pointer devices
+ * (phones, most tablets). Any other value — or leaving it unset — keeps it ON.
+ * Desktop (fine pointer) is never affected by this flag. Changing it requires
+ * a rebuild, since NEXT_PUBLIC_ vars are baked into the client bundle.
+ */
+const MOBILE_REVEAL_DISABLED =
+  (process.env.NEXT_PUBLIC_MOBILE_REVEAL ?? "").toLowerCase() === "disable";
+
+/**
+ * Gate: mount the interactive layer on fine AND coarse pointers whenever
+ * motion is allowed. Fine pointers drive it by hover; touch drives it by
+ * press-drag-lift (see the pointer handlers above). Reduced-motion always
+ * renders nothing; coarse pointers additionally honour the env flag above.
+ * Rendering `null` on the server and first client paint keeps hydration clean.
  */
 export default function StatueHoverReveal() {
   const [enabled, setEnabled] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined" || !window.matchMedia) return;
-    const fine = window.matchMedia("(pointer: fine)");
     const motionOk = window.matchMedia("(prefers-reduced-motion: no-preference)");
-    const update = () => setEnabled(fine.matches && motionOk.matches);
+    const coarse = window.matchMedia("(pointer: coarse)");
+    const update = () => {
+      // Reduced motion → off everywhere. Coarse (mobile) → off when the flag
+      // disables it. Fine pointer (desktop) ignores the flag.
+      setEnabled(motionOk.matches && !(coarse.matches && MOBILE_REVEAL_DISABLED));
+    };
     update();
-    fine.addEventListener("change", update);
     motionOk.addEventListener("change", update);
+    coarse.addEventListener("change", update);
     return () => {
-      fine.removeEventListener("change", update);
       motionOk.removeEventListener("change", update);
+      coarse.removeEventListener("change", update);
     };
   }, []);
 

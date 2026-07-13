@@ -406,38 +406,48 @@ export default function GsapHero({ hp, locale }: GsapHeroProps) {
               <div className="relative w-[280px] h-[340px] z-20 flex items-center justify-center scale-105">
                 
                 {/* ─── LIGHT MODE STATUE SLICES (Transparent BG Statue) ─── */}
-                <div className="block dark:hidden absolute inset-0 w-full h-full">
+                {/* Blend is on the GROUP, not each slice: per-slice multiply
+                    doubles up on the anti-aliased clip seams and darkens them
+                    into a visible black cut line. Blending once on the wrapper
+                    lets the seams composite cleanly, then knocks out the white
+                    statue backdrop in a single pass.
+                    The clip bands also OVERLAP by ~1% (37/35-69/67 instead of
+                    hard 36/68 splits) to cover the sub-pixel gap Safari leaves
+                    at clip-path edges — that gap was the black line that showed
+                    only in Safari. Overlap is safe here precisely because the
+                    blend is grouped, so the doubled band doesn't darken. */}
+                <div className="block dark:hidden absolute inset-0 w-full h-full mix-blend-multiply">
                   {/* LEFT SLICE */}
-                  <div className="hero-statue-slice-left absolute inset-0 w-full h-full select-none will-change-transform" style={{ clipPath: "polygon(0 0, 36% 0, 36% 100%, 0 100%)" }}>
+                  <div className="hero-statue-slice-left absolute inset-0 w-full h-full select-none will-change-transform" style={{ clipPath: "polygon(0 0, 37% 0, 37% 100%, 0 100%)" }}>
                     <CImage
                       src="/images/hero-statue-clean.webp"
                       alt="Left slice of Classical Statue artwork"
                       fill
-                      className="object-contain mix-blend-multiply"
+                      className="object-contain"
                       sizes="280px"
                       preload
                     />
                   </div>
 
                   {/* CENTER SLICE */}
-                  <div className="hero-statue-slice-center absolute inset-0 w-full h-full select-none translate-y-3 will-change-transform" style={{ clipPath: "polygon(36% 0, 68% 0, 68% 100%, 36% 100%)" }}>
+                  <div className="hero-statue-slice-center absolute inset-0 w-full h-full select-none translate-y-3 will-change-transform" style={{ clipPath: "polygon(35% 0, 69% 0, 69% 100%, 35% 100%)" }}>
                     <CImage
                       src="/images/hero-statue-clean.webp"
                       alt="Center slice of Classical Statue artwork"
                       fill
-                      className="object-contain mix-blend-multiply"
+                      className="object-contain"
                       sizes="280px"
                       preload
                     />
                   </div>
 
                   {/* RIGHT SLICE */}
-                  <div className="hero-statue-slice-right absolute inset-0 w-full h-full select-none -translate-y-1.5 will-change-transform" style={{ clipPath: "polygon(68% 0, 100% 0, 100% 100%, 68% 100%)" }}>
+                  <div className="hero-statue-slice-right absolute inset-0 w-full h-full select-none -translate-y-1.5 will-change-transform" style={{ clipPath: "polygon(67% 0, 100% 0, 100% 100%, 67% 100%)" }}>
                     <CImage
                       src="/images/hero-statue-clean.webp"
                       alt="Right slice of Classical Statue artwork"
                       fill
-                      className="object-contain mix-blend-multiply"
+                      className="object-contain"
                       sizes="280px"
                       preload
                     />
@@ -445,38 +455,41 @@ export default function GsapHero({ hp, locale }: GsapHeroProps) {
                 </div>
 
                 {/* ─── DARK MODE STATUE SLICES (Dark BG Statue for Perfect Contrast) ─── */}
-                <div className="hidden dark:block absolute inset-0 w-full h-full">
+                {/* Same grouped-blend trick as light mode (screen here) so the
+                    slice seams stay clean and the black statue backdrop drops
+                    out in one pass. */}
+                <div className="hidden dark:block absolute inset-0 w-full h-full mix-blend-screen">
                   {/* LEFT SLICE */}
-                  <div className="hero-statue-slice-left absolute inset-0 w-full h-full select-none will-change-transform" style={{ clipPath: "polygon(0 0, 36% 0, 36% 100%, 0 100%)" }}>
+                  <div className="hero-statue-slice-left absolute inset-0 w-full h-full select-none will-change-transform" style={{ clipPath: "polygon(0 0, 37% 0, 37% 100%, 0 100%)" }}>
                     <CImage
                       src="/images/hero-statue.webp"
                       alt="Left slice of Classical Statue artwork"
                       fill
-                      className="object-contain mix-blend-screen"
+                      className="object-contain"
                       sizes="280px"
                       loading="eager"
                     />
                   </div>
 
                   {/* CENTER SLICE */}
-                  <div className="hero-statue-slice-center absolute inset-0 w-full h-full select-none translate-y-3 will-change-transform" style={{ clipPath: "polygon(36% 0, 68% 0, 68% 100%, 36% 100%)" }}>
+                  <div className="hero-statue-slice-center absolute inset-0 w-full h-full select-none translate-y-3 will-change-transform" style={{ clipPath: "polygon(35% 0, 69% 0, 69% 100%, 35% 100%)" }}>
                     <CImage
                       src="/images/hero-statue.webp"
                       alt="Center slice of Classical Statue artwork"
                       fill
-                      className="object-contain mix-blend-screen"
+                      className="object-contain"
                       sizes="280px"
                       loading="eager"
                     />
                   </div>
 
                   {/* RIGHT SLICE */}
-                  <div className="hero-statue-slice-right absolute inset-0 w-full h-full select-none -translate-y-1.5 will-change-transform" style={{ clipPath: "polygon(68% 0, 100% 0, 100% 100%, 68% 100%)" }}>
+                  <div className="hero-statue-slice-right absolute inset-0 w-full h-full select-none -translate-y-1.5 will-change-transform" style={{ clipPath: "polygon(67% 0, 100% 0, 100% 100%, 67% 100%)" }}>
                     <CImage
                       src="/images/hero-statue.webp"
                       alt="Right slice of Classical Statue artwork"
                       fill
-                      className="object-contain mix-blend-screen"
+                      className="object-contain"
                       sizes="280px"
                       loading="eager"
                     />
