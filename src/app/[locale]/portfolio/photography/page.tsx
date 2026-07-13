@@ -9,6 +9,21 @@ interface PhotographyPageProps {
   params: Promise<{ locale: string }>;
 }
 
+/**
+ * Fisher–Yates shuffle. Runs per request on the server so every visitor gets a
+ * unique order that is baked into the SSR HTML — the client renders it as-is
+ * (no post-hydration reshuffle, no reflow). The underlying photo data is cached,
+ * so this stays fast despite the render being dynamic.
+ */
+function shuffleArray<T>(array: readonly T[]): T[] {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
 export async function generateMetadata(
   props: PhotographyPageProps
 ): Promise<Metadata> {
@@ -45,6 +60,9 @@ export default async function PhotographyPage(props: PhotographyPageProps) {
 
   const { photos, pageCount, error } = await fetchAllPhotography(locale as 'en' | 'zh', { pageSize: 100 });
 
+  // Shuffle server-side so each visitor gets a unique order rendered into the HTML.
+  const shuffledPhotos = shuffleArray(photos);
+
   const breadcrumbItems = [
     { label: t.photography.breadcrumbs.home, href: basePath || '/' },
     { label: t.photography.breadcrumbs.portfolio, href: `${basePath}/portfolio` },
@@ -73,7 +91,7 @@ export default async function PhotographyPage(props: PhotographyPageProps) {
             </p>
           </div>
         ) : photos.length > 0 ? (
-          <PhotographyGallery initialPhotos={photos} language={locale as 'en' | 'zh'} initialPageCount={pageCount} />
+          <PhotographyGallery initialPhotos={shuffledPhotos} language={locale as 'en' | 'zh'} initialPageCount={pageCount} />
         ) : (
           <div className="flex flex-col items-center justify-center py-24 text-center">
             <p className="text-gray-400 dark:text-gray-500 font-medium">

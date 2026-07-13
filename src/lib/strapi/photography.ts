@@ -14,6 +14,9 @@ export interface Photo {
   location: string;
   category?: string;   // always a plain string — never an object
   image: string | null;
+  width?: number;      // intrinsic pixel width  — reserves aspect ratio (no CLS)
+  height?: number;     // intrinsic pixel height — reserves aspect ratio (no CLS)
+  altText?: string;    // dedicated CMS alt text (falls back to title downstream)
   tags?: string[];     // always string[] — never objects
   language: 'en' | 'zh';
   createdAt: string;
@@ -88,6 +91,9 @@ function mapPhoto(p: Record<string, any>): Photo {
     // Defensively extract — p.category may be a string (from route.ts) or still an object
     category: toStringField(p.category),
     image: (p.image as string | null) ?? null,
+    width: typeof p.width === 'number' && p.width > 0 ? p.width : undefined,
+    height: typeof p.height === 'number' && p.height > 0 ? p.height : undefined,
+    altText: typeof p.altText === 'string' && p.altText ? p.altText : undefined,
     tags: toTagsArray(p.tags),
     language: (p.language as 'en' | 'zh') ?? 'en',
     createdAt: (p.createdAt as string) ?? new Date().toISOString(),

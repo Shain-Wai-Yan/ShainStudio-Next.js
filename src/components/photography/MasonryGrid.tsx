@@ -1,5 +1,6 @@
 'use client';
 
+import Masonry from 'react-masonry-css';
 import { Photo } from '@/lib/strapi/photography';
 import { PhotoCard } from './PhotoCard';
 
@@ -9,41 +10,44 @@ interface MasonryGridProps {
 }
 
 /**
- * Pure CSS column masonry — no library, no JS measurement.
+ * Masonry via react-masonry-css.
  *
- * How it works:
- *   `columns` makes the browser flow items top-to-bottom into N equal-width
- *   columns, automatically placing each item in the shortest column.
- *   This is literally the algorithm `react-masonry-css` tries to approximate
- *   but the browser does it perfectly using real rendered heights.
+ * Why not CSS `columns`: `columns` re-balances the WHOLE grid whenever items
+ * are appended, so already-visible photos jump between columns during infinite
+ * scroll. react-masonry-css assigns each item to a column by its index
+ * (round-robin), so a new batch only extends the bottom of each column —
+ * existing photos never move.
  *
- * `break-inside: avoid` on each card (via PhotoCard) prevents a single card
- * from being split across two columns.
+ * react-masonry-css uses `windowWidth <= key` semantics, so these upper-bound
+ * keys mirror the previous Tailwind breakpoints exactly:
+ *   <640 → 1 · 640–1023 → 2 · 1024–1279 → 3 · ≥1280 → 4
  *
- * The responsive column counts match the previous breakpoints exactly so
- * nothing else needs to change.
+ * Gutter + column CSS lives in globals.css (`.photo-masonry-grid*`).
  */
+const breakpointCols = {
+  default: 4,
+  1279: 3,
+  1023: 2,
+  639: 1,
+};
+
 export function MasonryGrid({ photos, onPhotoClick }: MasonryGridProps) {
   return (
-    <div
-      className={[
-        // CSS multi-column layout
-        'columns-1',           // <480px  → 1 column
-        'sm:columns-2',        // ≥640px  → 2 columns
-        'lg:columns-3',        // ≥1024px → 3 columns
-        'xl:columns-4',        // ≥1280px → 4 columns
-        // Gap between columns (vertical gap is handled by mb-3 on PhotoCard)
-        'gap-3',
-      ].join(' ')}
+    <Masonry
+      breakpointCols={breakpointCols}
+      className="photo-masonry-grid"
+      columnClassName="photo-masonry-grid_column"
     >
       {photos.map((photo, index) => (
         <PhotoCard
           key={photo.id}
           photo={photo}
           onClick={() => onPhotoClick(photo)}
-          priority={index < 12}
+          // Only the top row (one per column) is above the fold — keep the
+          // eager/priority set small so they don't contend for bandwidth.
+          priority={index < 5}
         />
       ))}
-    </div>
+    </Masonry>
   );
 }

@@ -23,9 +23,9 @@ function shuffleArray<T>(array: T[]): T[] {
 const PAGE_SIZE = 16; // slightly larger batch for smoother infinite scroll
 
 export function PhotographyGallery({ initialPhotos, language, initialPageCount = 1 }: PhotographyGalleryProps) {
-  // HYDRATION FIX: render unshuffled on server, shuffle client-side only
+  // Photos arrive already shuffled from the server (unique per visitor, baked into
+  // the SSR HTML), so we render them as-is — no client reshuffle, no reflow.
   const [photos, setPhotos]           = useState<Photo[]>(initialPhotos);
-  const [isClient, setIsClient]       = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [displayedCount, setDisplayedCount]     = useState(PAGE_SIZE);
@@ -38,17 +38,22 @@ export function PhotographyGallery({ initialPhotos, language, initialPageCount =
   const searchRef   = useRef<HTMLInputElement>(null);
   const sentinelRef = useRef<HTMLDivElement>(null); // bottom sentinel for IntersectionObserver
 
-  // Client-only shuffle (avoids SSR/client mismatch = hydration error)
+  // Re-sync if the server delivers a fresh set (e.g. locale change / revalidation).
+  // On first mount the values are identical, so React bails out — no reflow.
   useEffect(() => {
-    setIsClient(true);
-    setPhotos(shuffleArray(initialPhotos));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialPhotos.length, initialPhotos[0]?.id]);
+    setPhotos(initialPhotos);
+    setCurrentPage(1);
+    setDisplayedCount(PAGE_SIZE);
+    setHasMorePages(initialPageCount > 1);
+  }, [initialPhotos, initialPageCount]);
 
-  const categories = useMemo(() => {
-    const cats = new Set<string>();
-    photos.forEach((p) => { if (p.category) cats.add(p.category); });
-    return Array.from(cats).sort();
+  // Categories + their counts, computed in a single pass (was O(categories × photos)).
+  const { categories, categoryCounts } = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const p of photos) {
+      if (p.category) counts.set(p.category, (counts.get(p.category) ?? 0) + 1);
+    }
+    return { categories: Array.from(counts.keys()).sort(), categoryCounts: counts };
   }, [photos]);
 
   const filteredPhotos = useMemo(() => {
@@ -220,7 +225,7 @@ export function PhotographyGallery({ initialPhotos, language, initialPageCount =
           </button>
 
           {categories.map((cat) => {
-            const count = photos.filter((p) => p.category === cat).length;
+            const count = categoryCounts.get(cat) ?? 0;
             return (
               <button
                 key={cat}
@@ -252,14 +257,12 @@ export function PhotographyGallery({ initialPhotos, language, initialPageCount =
           )}
         </div>
 
-        {/* Results count — only rendered client-side to avoid hydration mismatch */}
-        {isClient && (
-          <p className="text-xs text-gray-400 dark:text-gray-500">
-            {activeFilters
-              ? `${filteredPhotos.length} of ${photos.length} photos`
-              : `${photos.length} photos`}
-          </p>
-        )}
+        {/* Results count */}
+        <p className="text-xs text-gray-400 dark:text-gray-500">
+          {activeFilters
+            ? `${filteredPhotos.length} of ${photos.length} photos`
+            : `${photos.length} photos`}
+        </p>
       </div>
 
       {/* ── Gallery ─────────────────────────────────────────────────────── */}
@@ -281,7 +284,7 @@ export function PhotographyGallery({ initialPhotos, language, initialPageCount =
           )}
 
           {/* End-of-gallery message */}
-          {!hasMore && !hasMorePages && isClient && filteredPhotos.length > PAGE_SIZE && (
+          {!hasMore && !hasMorePages && filteredPhotos.length > PAGE_SIZE && (
             <p className="text-center text-xs text-gray-300 dark:text-gray-600 py-6">
               All {filteredPhotos.length} photos loaded
             </p>

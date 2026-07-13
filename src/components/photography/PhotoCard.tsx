@@ -18,12 +18,32 @@ function buildBlurSrc(url: string | null): string | undefined {
   return url.replace('/upload/', '/upload/c_scale,w_20,q_10,f_auto,e_blur:400/');
 }
 
+// Representative column width used only for the content-visibility height hint
+// (the real height is driven by the image's intrinsic ratio once on screen).
+const INTRINSIC_HINT_WIDTH = 340;
+
 export function PhotoCard({ photo, onClick, priority = false }: PhotoCardProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
 
-  const src     = photo.image ?? '';
-  const blurSrc = useMemo(() => buildBlurSrc(photo.image), [photo.image]);
+  const src = photo.image ?? '';
+
+  // Only build the (network-fetched) blur placeholder for the few priority
+  // cards — otherwise ~100 tiny blur requests fire on load for no benefit.
+  const blurSrc = useMemo(
+    () => (priority ? buildBlurSrc(photo.image) : undefined),
+    [photo.image, priority]
+  );
+
+  // Real intrinsic dimensions → the card reserves its true aspect ratio, so the
+  // image appears at its own size with no layout shift. Fallback keeps old 3:2.
+  const imgWidth  = photo.width  ?? 600;
+  const imgHeight = photo.height ?? 400;
+
+  // Off-screen cards skip layout/paint for smoother scrolling; the height hint
+  // is proportional to the real ratio, and `auto` lets the browser remember the
+  // true size after first render so scrolling back never jumps.
+  const intrinsicHint = `auto ${Math.round(INTRINSIC_HINT_WIDTH * (imgHeight / imgWidth))}px`;
 
   // ── Error / no image ────────────────────────────────────────────────────────
   if (!photo.image || hasError) {
@@ -63,7 +83,14 @@ export function PhotoCard({ photo, onClick, priority = false }: PhotoCardProps) 
         'relative rounded-xl overflow-hidden cursor-pointer group',
         'bg-gray-100 dark:bg-gray-800',
       ].join(' ')}
-      style={{ boxShadow: '0 1px 8px rgba(25,25,112,0.07)' }}
+      style={{
+        boxShadow: '0 1px 8px rgba(25,25,112,0.07)',
+        // Skip rendering work for off-screen cards; priority (above-the-fold)
+        // cards always render so they never defer.
+        ...(priority
+          ? {}
+          : { contentVisibility: 'auto', containIntrinsicSize: intrinsicHint }),
+      }}
       onClick={onClick}
       role="button"
       tabIndex={0}
@@ -72,9 +99,9 @@ export function PhotoCard({ photo, onClick, priority = false }: PhotoCardProps) 
     >
       <CImage
         src={src}
-        alt={photo.title}
-        width={600}
-        height={400}
+        alt={photo.altText || photo.title}
+        width={imgWidth}
+        height={imgHeight}
         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
         // w-full h-auto: image fills the column width at its natural aspect ratio.
         // This is what gives the browser real varying heights to balance columns with.
