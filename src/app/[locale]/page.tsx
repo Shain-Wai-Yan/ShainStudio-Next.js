@@ -1,4 +1,6 @@
 import React from 'react';
+import fs from 'fs';
+import path from 'path';
 import { Metadata } from 'next';
 import { getDictionary } from '@/lib/getDictionary';
 import type { Dictionary } from '@/lib/getDictionary';
@@ -21,6 +23,32 @@ const GsapCta      = dynamic(() => import('@/components/landing/GsapCta'));
 /* ─────────────────────────────────────────────────────────── */
 interface StatDef { value: number; suffix: string; label: string }
 interface ProjectDef { tag: string; award?: string; title: string; desc: string; href: string }
+interface ClientLogoDef { src: string; alt: string }
+
+/* ─────────────────────────────────────────────────────────── */
+/*  CLIENT LOGOS                                                */
+/* ─────────────────────────────────────────────────────────── */
+const CLIENT_IMAGE_RE = /\.(png|jpe?g|webp|avif|svg)$/i;
+
+// The hero's "clients" strip is sourced from the filesystem, so adding a
+// client is just dropping an image into public/images/Clients — the next
+// build picks it up with no code change.
+function getClientLogos(): ClientLogoDef[] {
+  try {
+    const dir = path.join(process.cwd(), 'public', 'images', 'Clients');
+    return fs
+      .readdirSync(dir)
+      .filter((file) => CLIENT_IMAGE_RE.test(file))
+      .sort((a, b) => a.localeCompare(b))
+      .map((file) => ({
+        src: `/images/Clients/${file}`,
+        alt: file.replace(CLIENT_IMAGE_RE, ''),
+      }));
+  } catch {
+    // Folder missing or unreadable — the hero simply renders without the strip
+    return [];
+  }
+}
 
 interface HomePage {
   badge: string;
@@ -32,6 +60,7 @@ interface HomePage {
   metaDescription?: string;
   viewPortfolio: string;
   getInTouch: string;
+  clientsLabel?: string;
   marqueeItems?: string[];
   stats?: StatDef[];
   projects?: ProjectDef[];
@@ -92,7 +121,7 @@ export default async function Page({ params }: { params: { locale: string } }) {
   return (
     <>
       <main className="font-sans antialiased text-slate-900 dark:text-slate-50 bg-white dark:bg-black selection:bg-amber-500/30">
-        <GsapHero hp={hp} locale={locale} />
+        <GsapHero hp={hp} locale={locale} clientLogos={getClientLogos()} />
         <GsapMarquee items={resolvedMarqueeItems} />
         <GsapStats stats={resolvedStats} />
         <GsapBento projects={resolvedProjects} locale={locale} />

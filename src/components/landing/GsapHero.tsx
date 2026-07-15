@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import { gsap, ScrollTrigger } from "@/lib/gsapSetup";
 import { Play, ArrowRight, Sparkles } from "lucide-react";
@@ -17,14 +17,177 @@ interface HeroHomePageSchema {
   description?: string;
   viewPortfolio?: string;
   getInTouch?: string;
+  clientsLabel?: string;
+}
+
+interface ClientLogo {
+  src: string;
+  alt: string;
 }
 
 interface GsapHeroProps {
   hp: HeroHomePageSchema;
   locale: string;
+  clientLogos?: ClientLogo[];
 }
 
-export default function GsapHero({ hp, locale }: GsapHeroProps) {
+/* Full-color logo marquee: small mono label + one straight row of logos
+   that loops sideways forever. The track renders the logo list twice, so
+   wrapping at half the track width is seamless; the duplicate half is
+   aria-hidden. Edge fade via mask keeps the loop ends from cutting logos.
+
+   Interaction: the row is drag/swipe-able in both directions (pointer
+   events + a rAF loop drive the position); auto-scroll stops while held
+   and resumes a beat after release. Until hydration the CSS keyframe
+   animation moves it, and the JS loop reads the animated position on
+   takeover so there is no visible jump. */
+const MARQUEE_RESUME_MS = 1500;
+const MARQUEE_SECONDS_PER_LOGO = 3.5;
+
+function ClientsStrip({
+  label,
+  logos,
+  className = "",
+}: {
+  label: string;
+  logos: ClientLogo[];
+  className?: string;
+}) {
+  const trackRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const track = trackRef.current;
+    const viewport = track?.parentElement;
+    if (!track || !viewport) return;
+
+    const st = {
+      x: 0,
+      half: 0,
+      dragging: false,
+      pointerId: -1,
+      startX: 0,
+      startOffset: 0,
+      resumeAt: 0,
+      lastTime: 0,
+    };
+
+    // Take over from the pre-hydration CSS animation without a jump
+    const cssTransform = getComputedStyle(track).transform;
+    if (cssTransform && cssTransform !== "none") {
+      st.x = new DOMMatrixReadOnly(cssTransform).m41;
+    }
+    track.classList.remove("animate-clients-marquee");
+
+    const measure = () => {
+      st.half = track.scrollWidth / 2;
+    };
+    measure();
+
+    // The track repeats every half width, so keep x in (-half, 0]
+    const wrap = (v: number) => {
+      if (st.half <= 0) return v;
+      v %= st.half;
+      if (v > 0) v -= st.half;
+      return v;
+    };
+
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    let raf = 0;
+    const tick = (t: number) => {
+      const dt = Math.min((t - (st.lastTime || t)) / 1000, 0.1);
+      st.lastTime = t;
+      if (!st.dragging && t >= st.resumeAt && !reduceMotion.matches && st.half > 0) {
+        st.x -= (st.half / (logos.length * MARQUEE_SECONDS_PER_LOGO)) * dt;
+      }
+      const rendered = wrap(st.x);
+      if (!st.dragging) st.x = rendered;
+      track.style.transform = `translate3d(${rendered}px, 0, 0)`;
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+
+    const onDown = (e: PointerEvent) => {
+      st.dragging = true;
+      st.pointerId = e.pointerId;
+      st.startX = e.clientX;
+      st.startOffset = wrap(st.x);
+      viewport.setPointerCapture(e.pointerId);
+    };
+    const onMove = (e: PointerEvent) => {
+      if (!st.dragging || e.pointerId !== st.pointerId) return;
+      st.x = st.startOffset + (e.clientX - st.startX);
+    };
+    const onUp = (e: PointerEvent) => {
+      if (!st.dragging || e.pointerId !== st.pointerId) return;
+      st.dragging = false;
+      st.x = wrap(st.x);
+      st.resumeAt = performance.now() + MARQUEE_RESUME_MS;
+    };
+    // Native image dragging would hijack the pointer gesture on desktop
+    const onDragStart = (e: Event) => e.preventDefault();
+
+    viewport.addEventListener("pointerdown", onDown);
+    viewport.addEventListener("pointermove", onMove);
+    viewport.addEventListener("pointerup", onUp);
+    viewport.addEventListener("pointercancel", onUp);
+    viewport.addEventListener("dragstart", onDragStart);
+    window.addEventListener("resize", measure);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      viewport.removeEventListener("pointerdown", onDown);
+      viewport.removeEventListener("pointermove", onMove);
+      viewport.removeEventListener("pointerup", onUp);
+      viewport.removeEventListener("pointercancel", onUp);
+      viewport.removeEventListener("dragstart", onDragStart);
+      window.removeEventListener("resize", measure);
+    };
+  }, [logos.length]);
+
+  return (
+    <div className={className}>
+      <p className="text-[9px] tracking-[0.3em] text-gray-400 dark:text-gray-500 uppercase font-mono mb-3">
+        {label}
+      </p>
+      <div
+        role="group"
+        aria-label={label}
+        className="relative overflow-hidden cursor-grab active:cursor-grabbing select-none touch-pan-y [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]"
+      >
+        <div
+          ref={trackRef}
+          className="animate-clients-marquee flex w-max items-center will-change-transform"
+          style={{ animationDuration: `${Math.max(logos.length * MARQUEE_SECONDS_PER_LOGO, 12)}s` }}
+        >
+          {[...logos, ...logos].map((logo, i) => {
+            const isClone = i >= logos.length;
+            return (
+              <div
+                key={i}
+                className="relative h-10 w-24 sm:h-11 sm:w-28 shrink-0 mx-4"
+                aria-hidden={isClone}
+                title={isClone ? undefined : logo.alt}
+              >
+                <CImage
+                  src={logo.src}
+                  alt={isClone ? "" : logo.alt}
+                  fill
+                  draggable={false}
+                  className="object-contain"
+                  sizes="112px"
+                  loading="lazy"
+                />
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function GsapHero({ hp, locale, clientLogos = [] }: GsapHeroProps) {
   const containerRef = useRef<HTMLElement>(null);
 
   useGSAP(
@@ -321,6 +484,16 @@ export default function GsapHero({ hp, locale }: GsapHeroProps) {
                 "Standing on the shoulders of teams shipping digital marketing systems. I translate complex AI capabilities into visceral, premium brand realities."}
             </p>
 
+            {/* Clients strip — mobile/tablet: sits above the CTA buttons;
+                on lg+ it renders under the statue collage instead */}
+            {clientLogos.length > 0 && (
+              <ClientsStrip
+                label={hp.clientsLabel || "Clients I Work With"}
+                logos={clientLogos}
+                className="hero-fade-up-2 lg:hidden mb-8"
+              />
+            )}
+
             {/* Actions Panel */}
             <div className="hero-fade-up-2 flex flex-wrap items-center gap-6">
               <Link
@@ -355,8 +528,15 @@ export default function GsapHero({ hp, locale }: GsapHeroProps) {
 
             {/* Profile Citation Badge */}
             <div className="hero-fade-up-2 flex items-center gap-4 mt-12 pt-6 border-t border-gray-100 dark:border-gray-800/70">
-              <div className="w-11 h-11 rounded-full bg-[#191970] dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex items-center justify-center text-white font-bold font-serif shadow-sm text-sm">
-                S
+              <div className="relative w-11 h-11 rounded-full overflow-hidden border border-gray-100 dark:border-gray-700 shadow-sm bg-[#191970] dark:bg-gray-800">
+                <CImage
+                  src="/images/Profile Landing.webp"
+                  alt="Shain Wai Yan"
+                  fill
+                  className="object-cover"
+                  sizes="44px"
+                  loading="lazy"
+                />
               </div>
               <div>
                 <h4 className="font-bold text-xs sm:text-sm text-[#191970] dark:text-white leading-none">
@@ -371,7 +551,7 @@ export default function GsapHero({ hp, locale }: GsapHeroProps) {
           </div>
 
           {/* Right Column: image — appears FIRST on mobile, LAST on desktop */}
-          <div className="lg:col-span-5 flex items-center justify-center lg:justify-end relative order-first lg:order-last">
+          <div className="lg:col-span-5 flex flex-col items-center justify-center lg:items-end relative order-first lg:order-last">
             <div className="w-full max-w-[390px] sm:max-w-[430px] aspect-[4/5] relative rounded-2xl p-6 overflow-hidden bg-gray-50/80 dark:bg-gray-900/30 border border-gray-200/60 dark:border-gray-800/80 shadow-[0_16px_40px_rgba(25,25,112,0.04)] dark:shadow-2xl flex items-center justify-center group/collage">
               
               {/* Grid dot pattern behind collage */}
@@ -508,6 +688,15 @@ export default function GsapHero({ hp, locale }: GsapHeroProps) {
               <div className="absolute bottom-3 right-3 w-[1px] h-4 bg-gray-300 dark:bg-gray-700"></div>
 
             </div>
+
+            {/* Clients strip — desktop only, filling the space below the collage */}
+            {clientLogos.length > 0 && (
+              <ClientsStrip
+                label={hp.clientsLabel || "Clients I Work With"}
+                logos={clientLogos}
+                className="hero-fade-up-2 hidden lg:block w-full max-w-[430px] mt-8"
+              />
+            )}
           </div>
 
         </div>

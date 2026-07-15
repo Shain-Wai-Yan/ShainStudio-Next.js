@@ -396,6 +396,27 @@
     animation: goldShimmer 2s ease-in-out infinite;
   }
 
+  /* Clients logo marquee (hero) — track holds two copies of the logo row,
+     so sliding -50% loops seamlessly */
+  @keyframes clientsMarquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  .animate-clients-marquee {
+    animation: clientsMarquee 30s linear infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-clients-marquee {
+      animation: none;
+    }
+  }
+
   /* .animate-rotate-y uses the rotateY @keyframes defined above (line ~334) */
   /* Duplicate rotateY and goldShimmer definitions removed — kept the originals above */
 

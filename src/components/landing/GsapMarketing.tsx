@@ -82,8 +82,7 @@ function PillarCard({
   return (
     <div
       ref={cardRef}
-      className={`mkt-card will-change-transform relative w-full rounded-[2rem] border border-[#1e1e48]/10 dark:border-[#d4af37]/15 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.15)] dark:shadow-[0_30px_80px_-20px_rgba(0,0,0,0.6)] overflow-hidden ${style.bg}`}
-      style={{ height: "clamp(420px, 65vh, 680px)" }}
+      className={`mkt-card will-change-transform relative w-full flex flex-col rounded-3xl md:rounded-[2rem] border border-[#1e1e48]/10 dark:border-[#d4af37]/15 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.15)] dark:shadow-[0_30px_80px_-20px_rgba(0,0,0,0.6)] overflow-hidden min-h-[clamp(340px,55svh,520px)] md:min-h-0 md:h-[clamp(420px,65vh,680px)] ${style.bg}`}
     >
       {/* Radial-gradient glows instead of blur() filters — same look, far cheaper paint */}
       <div
@@ -99,27 +98,27 @@ function PillarCard({
         style={{ background: "radial-gradient(circle, rgba(212, 175, 55, 0.05) 0%, rgba(212, 175, 55, 0) 60%)" }}
       />
 
-      <div className="relative z-10 flex flex-col h-full justify-between p-8 md:p-14">
+      <div className="relative z-10 flex-1 flex flex-col justify-between p-5 sm:p-8 md:p-14">
         <div className="flex items-start justify-between">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full border border-[#1e1e48]/20 dark:border-[#d4af37]/30 flex items-center justify-center backdrop-blur-sm bg-white/50 dark:bg-black/40">
-              <Icon className="w-5 h-5 text-[#1e1e48] dark:text-[#d4af37]" />
+          <div className="flex items-center gap-3 md:gap-4 min-w-0">
+            <div className="w-9 h-9 md:w-12 md:h-12 shrink-0 rounded-full border border-[#1e1e48]/20 dark:border-[#d4af37]/30 flex items-center justify-center backdrop-blur-sm bg-white/50 dark:bg-black/40">
+              <Icon className="w-4 h-4 md:w-5 md:h-5 text-[#1e1e48] dark:text-[#d4af37]" />
             </div>
-            <p className="text-xs font-mono tracking-[0.25em] uppercase text-[#d4af37]">
+            <p className="text-[10px] md:text-xs font-mono tracking-[0.15em] md:tracking-[0.25em] uppercase text-[#d4af37]">
               {pillar.eyebrow}
             </p>
           </div>
-          <span className="text-[6rem] md:text-[8rem] font-serif font-bold leading-none text-[#1e1e48]/5 dark:text-white/5 select-none -mt-4">
+          <span className="text-[2.75rem] sm:text-[5rem] md:text-[8rem] font-serif font-bold leading-none text-[#1e1e48]/5 dark:text-white/5 select-none shrink-0 pl-3 -mt-1 md:-mt-4">
             {pillar.index}
           </span>
         </div>
 
-        <div>
-          <h3 className="text-4xl md:text-6xl font-serif tracking-tighter text-[#1e1e48] dark:text-white mb-8 leading-[1.05]">
+        <div className="mt-5 md:mt-0">
+          <h3 className="text-3xl sm:text-4xl md:text-6xl font-serif tracking-tighter text-[#1e1e48] dark:text-white mb-3 md:mb-8 leading-[1.1] md:leading-[1.05]">
             {pillar.title}
           </h3>
-          <div className="border-l-2 border-[#d4af37]/50 pl-6">
-            <p className="text-base md:text-lg text-[#1e1e48]/65 dark:text-gray-300 font-light leading-relaxed max-w-2xl">
+          <div className="border-l-2 border-[#d4af37]/50 pl-3 sm:pl-4 md:pl-6">
+            <p className="text-[13px] sm:text-base md:text-lg text-[#1e1e48]/65 dark:text-gray-300 font-light leading-[1.65] md:leading-relaxed max-w-2xl">
               {pillar.body}
             </p>
           </div>
@@ -173,7 +172,9 @@ export default function GsapMarketing({ data }: GsapMarketingProps) {
 
         ScrollTrigger.create({
           trigger: card,
-          start: "top 10%",
+          // Below md the fixed header (80px) is proportionally taller than
+          // 10% of the viewport, so pin below it instead of under it.
+          start: () => (window.innerWidth < 768 ? "top 88px" : "top 10%"),
           endTrigger: stackRef.current,
           end: "bottom bottom",
           pin: true,
@@ -189,7 +190,8 @@ export default function GsapMarketing({ data }: GsapMarketingProps) {
             ease: "none",
             scrollTrigger: {
               trigger: card,
-              start: "top 10%",
+              // Keep in sync with the pin start above.
+              start: () => (window.innerWidth < 768 ? "top 88px" : "top 10%"),
               end: () => `+=${window.innerHeight * 0.85}`,
               scrub: 1.2,
             },
@@ -311,7 +313,7 @@ export default function GsapMarketing({ data }: GsapMarketingProps) {
       </div>
 
       {/* ── THE INTERSECTION (Punchy Kinetics) ── */}
-      <div ref={intersectionRef} className="px-6 md:px-12 max-w-6xl mx-auto pb-32 md:pb-48 mt-[-8vh]">
+      <div ref={intersectionRef} className="px-6 md:px-12 max-w-6xl mx-auto pb-24 md:pb-48 mt-[-8vh]">
         <div className="relative text-center flex flex-col items-center justify-center space-y-6 md:space-y-8">
           
           {/* Subtle background glow */}
@@ -328,7 +330,7 @@ export default function GsapMarketing({ data }: GsapMarketingProps) {
           </p>
           
           <div className="pt-8 intersect-line-3 relative">
-            <h3 className="text-4xl md:text-7xl lg:text-[5.5rem] font-serif font-bold tracking-tighter leading-none text-transparent bg-clip-text bg-gradient-to-r from-[#bf953f] via-[#fcf6ba] to-[#b38728] drop-shadow-[0_0_30px_rgba(212,175,55,0.4)]">
+            <h3 className="text-3xl sm:text-4xl md:text-7xl lg:text-[5.5rem] font-serif font-bold tracking-tighter leading-[1.1] md:leading-none text-transparent bg-clip-text bg-gradient-to-r from-[#bf953f] via-[#fcf6ba] to-[#b38728] drop-shadow-[0_0_30px_rgba(212,175,55,0.4)]">
               {intersection.line3.split(" ").map((word, i, arr) => (
                 <React.Fragment key={i}>
                   {word}{" "}
@@ -345,14 +347,14 @@ export default function GsapMarketing({ data }: GsapMarketingProps) {
       </div>
 
       {/* ── THE VERDICT (Enhanced Animation) ── */}
-      <div ref={verdictRef} className="px-6 md:px-12 max-w-6xl mx-auto pb-32 md:pb-40 border-t border-[#1e1e48]/8 dark:border-[#d4af37]/10 pt-20">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-24 items-center">
+      <div ref={verdictRef} className="px-6 md:px-12 max-w-6xl mx-auto pb-24 md:pb-40 border-t border-[#1e1e48]/8 dark:border-[#d4af37]/10 pt-14 md:pt-20">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-12 lg:gap-24 items-center">
           
           <div>
-            <p className="verdict-eyebrow text-xs font-mono tracking-[0.25em] uppercase text-[#d4af37] mb-8 will-change-transform flex items-center gap-4">
+            <p className="verdict-eyebrow text-xs font-mono tracking-[0.25em] uppercase text-[#d4af37] mb-5 md:mb-8 will-change-transform flex items-center gap-4">
                <span className="w-8 h-[1px] bg-[#d4af37]"></span> {verdict.eyebrow}
             </p>
-            <p className="text-3xl md:text-5xl font-serif text-[#1e1e48] dark:text-white tracking-tight leading-[1.1] md:leading-[1.15]" style={{ perspective: "1000px" }}>
+            <p className="text-2xl sm:text-3xl md:text-5xl font-serif text-[#1e1e48] dark:text-white tracking-tight leading-[1.15]" style={{ perspective: "1000px" }}>
               {/* Word by word split for animation */}
               {verdict.text1.split(" ").map((w,i)=>(
                  <span key={i} className="verdict-word inline-block mr-[0.25em] will-change-transform">{w}</span>
@@ -370,11 +372,11 @@ export default function GsapMarketing({ data }: GsapMarketingProps) {
             </p>
           </div>
           
-          <div className="space-y-6 md:space-y-8 pl-0 md:pl-8 border-l border-transparent md:border-[#1e1e48]/5 dark:md:border-[#d4af37]/10">
+          <div className="space-y-5 md:space-y-8 pl-0 md:pl-8 border-l border-transparent md:border-[#1e1e48]/5 dark:md:border-[#d4af37]/10">
             {verdict.items.map((line, i) => (
-              <div key={i} className="flex items-center gap-6 group cursor-default">
-                <span className="verdict-item-line h-[2px] bg-[#d4af37]/50 group-hover:w-16 group-hover:bg-[#d4af37] transition-all duration-500 ease-out-expo will-change-[width]" />
-                <span className="verdict-item-text text-lg md:text-2xl text-[#1e1e48]/70 dark:text-gray-300 font-light group-hover:text-[#1e1e48] dark:group-hover:text-white transition-colors duration-300 will-change-transform">
+              <div key={i} className="flex items-center gap-4 md:gap-6 group cursor-default">
+                <span className="verdict-item-line h-[2px] shrink-0 bg-[#d4af37]/50 group-hover:w-16 group-hover:bg-[#d4af37] transition-all duration-500 ease-out-expo will-change-[width]" />
+                <span className="verdict-item-text text-base sm:text-lg md:text-2xl text-[#1e1e48]/70 dark:text-gray-300 font-light group-hover:text-[#1e1e48] dark:group-hover:text-white transition-colors duration-300 will-change-transform">
                   {line}
                 </span>
               </div>
