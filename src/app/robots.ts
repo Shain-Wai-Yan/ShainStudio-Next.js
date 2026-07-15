@@ -47,15 +47,8 @@ export default function robots(): MetadataRoute.Robots {
           '/zh/certificate',
         ],
       },
-
-      // ── Block AI training bots ────────────────────────────────────────────
-      {
-        userAgent: ['GPTBot', 'ChatGPT-User', 'CCBot', 'anthropic-ai', 'Google-Extended'],
-        disallow: ['/'],
-      },
     ],
 
     sitemap: `${baseUrl}/sitemap.xml`,
-    host: baseUrl,
   };
 }

@@ -18,6 +18,7 @@ interface HeroHomePageSchema {
   viewPortfolio?: string;
   getInTouch?: string;
   clientsLabel?: string;
+  citationRole?: string;
 }
 
 interface ClientLogo {
@@ -543,7 +544,7 @@ export default function GsapHero({ hp, locale, clientLogos = [] }: GsapHeroProps
                   Shain Wai Yan
                 </h4>
                 <p className="text-[10px] sm:text-[11px] font-semibold text-gray-500 dark:text-gray-400 mt-1 uppercase tracking-wider">
-                  Systems Architect & Digital Strategist
+                  {hp.citationRole || "Digital Marketing & Brand Strategist"}
                 </p>
               </div>
             </div>

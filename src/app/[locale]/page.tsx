@@ -5,6 +5,7 @@ import { Metadata } from 'next';
 import { getDictionary } from '@/lib/getDictionary';
 import type { Dictionary } from '@/lib/getDictionary';
 import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
+import { SITE_URL, DEFAULT_OG_IMAGE, absoluteUrl, languageAlternates } from '@/lib/seo';
 import dynamic from 'next/dynamic';
 
 // GsapHero is above-the-fold — direct import so it ships with the initial bundle
@@ -53,6 +54,7 @@ function getClientLogos(): ClientLogoDef[] {
 interface HomePage {
   badge: string;
   eyebrow: string;
+  citationRole?: string;
   title: string;
   titleHighlight: string;
   subtitle: string;
@@ -83,9 +85,37 @@ export async function generateMetadata({ params }: { params: { locale: string } 
   // Assert type for typescript
   const hp = t.homePage as unknown as HomePage;
 
+  const title = hp.title ? `Shain Studio | ${hp.title} ${hp.titleHighlight}` : 'Shain Studio';
+  const description = hp.metaDescription || hp.description || 'Shain Wai Yan Portfolio';
+  const url = absoluteUrl(locale);
+
   return {
-    title: hp.title ? { absolute: `Shain Studio | ${hp.title} ${hp.titleHighlight}` } : { absolute: 'Shain Studio' },
-    description: hp.metaDescription || hp.description || 'Shain Wai Yan Portfolio',
+    title: { absolute: title },
+    description,
+    alternates: {
+      canonical: url,
+      languages: languageAlternates(),
+      // Re-declare RSS discovery: a page-level `alternates` replaces the
+      // layout's wholesale, and home is where feed readers look first.
+      types: { 'application/rss+xml': `${SITE_URL}/feed.xml` },
+    },
+    // Explicit OG so og:title matches the absolute page title above
+    // (otherwise the layout's og:title leaks through and mismatches).
+    openGraph: {
+      title,
+      description,
+      url,
+      type: 'website',
+      images: [DEFAULT_OG_IMAGE],
+      siteName: locale === 'zh' ? 'Shain的作品集' : "Shain's Portfolio",
+      locale: locale === 'zh' ? 'zh_CN' : 'en_US',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [DEFAULT_OG_IMAGE],
+    },
   };
 }
 

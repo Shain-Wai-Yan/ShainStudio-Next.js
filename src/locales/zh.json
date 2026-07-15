@@ -421,8 +421,8 @@
   "aboutPage": {
     "heroTitle": "关于",
     "heroTitleHighlight": "我",
-    "heroSubtitle": "营销专家与数字叙事者",
-    "profileAltText": "Shain Wai Yan - 营销专家",
+    "heroSubtitle": "数字营销与品牌策略师",
+    "profileAltText": "Shain Wai Yan - 数字营销与品牌策略师",
     "myName": "Shain Wai Yan",
     "alsoKnownAs": "又名 Xolbine | 明元易",
     "motto": "有志者事竟成",
@@ -480,6 +480,7 @@
   "homePage": {
     "badge": "开放合作中",
     "eyebrow": "Shain Wai Yan · Xolbine · 明元易",
+    "citationRole": "数字营销与品牌策略师",
     "title": "架构",
     "titleHighlight": "数字身份.",
     "subtitle": "我不只是使用工具，我创造它们。",

@@ -3,6 +3,7 @@ import { fetchCertificates, transformCertificate } from '@/lib/strapi/certificat
 import { CertificateVaultClient } from '@/components/certificates/CertificateVaultClient';
 import { Breadcrumb } from '@/components/Breadcrumb';
 import { getDictionary } from '@/lib/getDictionary';
+import { SITE_URL, PERSON_ID } from '@/lib/seo';
 
 interface CertificatePageProps {
   params: Promise<{ locale: string }>;
@@ -15,7 +16,7 @@ export async function generateMetadata(
   const locale = rawLocale as 'en' | 'zh';
   const t = await getDictionary(locale);
 
-  const domain = 'https://www.shainwaiyan.com';
+  const domain = SITE_URL;
   const urlPath = locale === 'zh' ? '/zh/certificate' : '/certificate';
   const baseUrl = `${domain}${urlPath}`;
 
@@ -73,8 +74,6 @@ export async function generateMetadata(
       card: 'summary_large_image',
       title: ogTitle,
       description: ogDescription,
-      site: '@shainwaiyan',
-      creator: '@shainwaiyan',
       images: [`${domain}/images/neoclassical_statue_collage.png`],
     },
   };
@@ -99,7 +98,7 @@ export default async function CertificatePage(props: CertificatePageProps) {
   const { locale } = await props.params;
   const t = await getDictionary(locale as 'en' | 'zh');
   const basePath = locale === 'en' ? '' : `/${locale}`;
-  const domain = 'https://www.shainwaiyan.com';
+  const domain = SITE_URL;
 
   const { certificates, error } = await fetchCertificates();
 
@@ -123,27 +122,18 @@ export default async function CertificatePage(props: CertificatePageProps) {
     '@context': 'https://schema.org',
     '@graph': [
       {
-        '@type': 'ProfilePage',
-        '@id': `${domain}/certificate`,
+        '@type': 'WebPage',
+        '@id': `${domain}/certificate#webpage`,
         'url': `${domain}/certificate`,
         'name': 'Verified Professional Certifications | Shain Wai Yan',
         'description': 'A curated vault of verified credentials from Google, Meta, HubSpot, and leading global platforms — spanning SEO, digital marketing, e-commerce, and strategy.',
         'inLanguage': 'en-US',
+        // Reference-only Person: credentials merge into the canonical #person
+        // entity (defined in the root layout) instead of redefining it here.
         'mainEntity': {
           '@type': 'Person',
-          '@id': `${domain}/#person`,
+          '@id': PERSON_ID,
           'name': 'Shain Wai Yan',
-          'alternateName': ['xolbine', '明元易'],
-          'url': domain,
-          'jobTitle': 'Digital Marketing Specialist & Brand Strategist',
-          'knowsAbout': [
-            'Digital Marketing',
-            'SEO',
-            'Social Media Marketing',
-            'E-Commerce',
-            'Brand Strategy',
-            'Business Development',
-          ],
           'hasCredential': credentialItems.length > 0 ? credentialItems : [
             {
               '@type': 'EducationalOccupationalCredential',
@@ -157,10 +147,6 @@ export default async function CertificatePage(props: CertificatePageProps) {
               'credentialCategory': 'Professional Certificate',
               'recognizedBy': { '@type': 'Organization', 'name': 'Meta' },
             },
-          ],
-          'sameAs': [
-            'https://www.linkedin.com/in/shainwaiyan',
-            'https://github.com/shainwaiyan',
           ],
         },
       },

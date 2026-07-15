@@ -22,6 +22,7 @@ export async function generateMetadata(props: MarketingPlanPageProps): Promise<M
       languages: {
         'en': 'https://www.shainwaiyan.com/portfolio/marketing-plans',
         'zh': 'https://www.shainwaiyan.com/zh/portfolio/marketing-plans',
+        'x-default': 'https://www.shainwaiyan.com/portfolio/marketing-plans',
       },
     },
     openGraph: {

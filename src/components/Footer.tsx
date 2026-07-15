@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { FaLinkedin, FaGithub, FaEnvelope } from 'react-icons/fa';
+import { FaLinkedin, FaGithub, FaYoutube, FaEnvelope } from 'react-icons/fa';
 import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
 import { getDictionarySync } from '@/lib/getDictionary';
 
@@ -49,6 +49,7 @@ const Footer = () => {
   const socialLinks = [
     { href: 'https://www.linkedin.com/in/shainwaiyan/', label: 'LinkedIn', icon: FaLinkedin },
     { href: 'https://github.com/Shain-Wai-Yan', label: 'GitHub', icon: FaGithub },
+    { href: 'https://www.youtube.com/@shaineditamv', label: 'YouTube', icon: FaYoutube },
     { href: 'mailto:mail@shainwaiyan.com', label: 'Email', icon: FaEnvelope },
   ];
 

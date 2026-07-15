@@ -4,6 +4,7 @@ import { getDictionary } from '@/lib/getDictionary';
 import { isSupportedLocale } from '@/lib/locales';
 import { GithubGallery } from '@/components/coding-project/GithubGallery';
 import { fetchCodingProjects, type CodingProject } from '@/lib/strapi/coding-projects';
+import { SITE_URL, DEFAULT_OG_IMAGE } from '@/lib/seo';
 
 export const revalidate = 3600; // Revalidate every hour
 
@@ -19,8 +20,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const seo = dict.codingProjects.seo;
 
   const basePath = locale === 'en' ? '' : `/${locale}`;
-  const url = `https://shainwaiyan.com${basePath}/portfolio/coding-projects`;
-  const defaultOgImage = 'https://shainwaiyan.com/images/Shain%20Studio.png'; 
+  const url = `${SITE_URL}${basePath}/portfolio/coding-projects`;
+  const defaultOgImage = DEFAULT_OG_IMAGE; 
 
   return {
     title: seo.title,
@@ -29,9 +30,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     alternates: {
       canonical: url,
       languages: {
-        'en': `https://shainwaiyan.com/portfolio/coding-projects`,
-        'zh': `https://shainwaiyan.com/zh/portfolio/coding-projects`,
-        'x-default': `https://shainwaiyan.com/portfolio/coding-projects`,
+        'en': `${SITE_URL}/portfolio/coding-projects`,
+        'zh': `${SITE_URL}/zh/portfolio/coding-projects`,
+        'x-default': `${SITE_URL}/portfolio/coding-projects`,
       },
     },
     openGraph: {
@@ -55,7 +56,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function CodingProjectsPage({ params }: Props) {
   const { locale } = await params;
   const basePath = locale === 'en' ? '' : `/${locale}`;
-  const defaultOgImage = 'https://shainwaiyan.com/images/Shain%20Studio.png';
+  const defaultOgImage = DEFAULT_OG_IMAGE;
 
   if (!isSupportedLocale(locale)) {
     notFound();
@@ -74,7 +75,7 @@ export default async function CodingProjectsPage({ params }: Props) {
     '@type': 'CollectionPage',
     'name': dict.codingProjects.seo.title,
     'description': dict.codingProjects.seo.description,
-    'url': `https://shainwaiyan.com${basePath}/portfolio/coding-projects`,
+    'url': `${SITE_URL}${basePath}/portfolio/coding-projects`,
     'mainEntity': {
       '@type': 'ItemList',
       'itemListElement': topProjectsForSeo.map((project: CodingProject, index: number) => ({
@@ -87,7 +88,7 @@ export default async function CodingProjectsPage({ params }: Props) {
           'image': project.coverImage || defaultOgImage,
           'applicationCategory': 'DeveloperApplication',
           'operatingSystem': 'Web, Cross-platform',
-          'url': `https://shainwaiyan.com${basePath}/portfolio/coding-projects/${project.slug}`
+          'url': `${SITE_URL}${basePath}/portfolio/coding-projects/${project.slug}`
         }
       }))
     }
@@ -101,19 +102,19 @@ export default async function CodingProjectsPage({ params }: Props) {
         "@type": "ListItem",
         "position": 1,
         "name": dict.marketingInMotion.breadcrumbs.home,
-        "item": `https://shainwaiyan.com${basePath}/`
+        "item": `${SITE_URL}${basePath}/`
       },
       {
         "@type": "ListItem",
         "position": 2,
         "name": dict.marketingInMotion.breadcrumbs.portfolio,
-        "item": `https://shainwaiyan.com${basePath}/portfolio`
+        "item": `${SITE_URL}${basePath}/portfolio`
       },
       {
         "@type": "ListItem",
         "position": 3,
         "name": dict.codingProjects.title,
-        "item": `https://shainwaiyan.com${basePath}/portfolio/coding-projects`
+        "item": `${SITE_URL}${basePath}/portfolio/coding-projects`
       }
     ]
   };

@@ -421,8 +421,8 @@
   "aboutPage": {
     "heroTitle": "About",
     "heroTitleHighlight": "Me",
-    "heroSubtitle": "Marketing Specialist & Digital Storyteller",
-    "profileAltText": "Shain Wai Yan - Marketing Specialist",
+    "heroSubtitle": "Digital Marketing & Brand Strategist",
+    "profileAltText": "Shain Wai Yan - Digital Marketing & Brand Strategist",
     "myName": "Shain Wai Yan",
     "alsoKnownAs": "also known as Xolbine | 明元易",
     "motto": "有志者事竟成",
@@ -480,6 +480,7 @@
   "homePage": {
     "badge": "Available for Collaboration",
     "eyebrow": "Shain Wai Yan · Xolbine · 明元易",
+    "citationRole": "Digital Marketing & Brand Strategist",
     "title": "Architecting",
     "titleHighlight": "Digital Identities.",
     "subtitle": "I don't just use tools — I build them.",

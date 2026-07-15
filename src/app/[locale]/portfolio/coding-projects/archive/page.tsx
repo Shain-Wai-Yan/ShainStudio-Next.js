@@ -4,6 +4,7 @@ import { getDictionary } from '@/lib/getDictionary';
 import { isSupportedLocale } from '@/lib/locales';
 import { CodingProjectArchiveClient } from '@/components/coding-project/CodingProjectArchiveClient';
 import { fetchCodingProjects, type CodingProject } from '@/lib/strapi/coding-projects';
+import { SITE_URL, DEFAULT_OG_IMAGE } from '@/lib/seo';
 
 interface Props {
   params: Promise<{ locale: string }>;
@@ -18,8 +19,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const archiveDescription = dict.codingProjects.archive?.description || 'Browse the complete database of my software engineering projects.';
 
   const basePath = locale === 'en' ? '' : `/${locale}`;
-  const url = `https://shainwaiyan.com${basePath}/portfolio/coding-projects/archive`;
-  const defaultOgImage = 'https://shainwaiyan.com/images/Shain%20Studio.png';
+  const url = `${SITE_URL}${basePath}/portfolio/coding-projects/archive`;
+  const defaultOgImage = DEFAULT_OG_IMAGE;
 
   return {
     title: `${archiveTitle} | Shain Studio`,
@@ -28,9 +29,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     alternates: {
       canonical: url,
       languages: {
-        'en': `https://shainwaiyan.com/portfolio/coding-projects/archive`,
-        'zh': `https://shainwaiyan.com/zh/portfolio/coding-projects/archive`,
-        'x-default': `https://shainwaiyan.com/portfolio/coding-projects/archive`,
+        'en': `${SITE_URL}/portfolio/coding-projects/archive`,
+        'zh': `${SITE_URL}/zh/portfolio/coding-projects/archive`,
+        'x-default': `${SITE_URL}/portfolio/coding-projects/archive`,
       },
     },
     openGraph: {
@@ -54,7 +55,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function CodingProjectsArchivePage({ params }: Props) {
   const { locale } = await params;
   const basePath = locale === 'en' ? '' : `/${locale}`;
-  const defaultOgImage = 'https://shainwaiyan.com/images/Shain%20Studio.png';
+  const defaultOgImage = DEFAULT_OG_IMAGE;
 
   if (!isSupportedLocale(locale)) {
     notFound();
@@ -72,7 +73,7 @@ export default async function CodingProjectsArchivePage({ params }: Props) {
     '@type': 'CollectionPage',
     'name': archiveTitle,
     'description': archiveDescription,
-    'url': `https://shainwaiyan.com${basePath}/portfolio/coding-projects/archive`,
+    'url': `${SITE_URL}${basePath}/portfolio/coding-projects/archive`,
     'mainEntity': {
       '@type': 'ItemList',
       'itemListElement': strapiProjects.map((project: CodingProject, index: number) => ({
@@ -85,7 +86,7 @@ export default async function CodingProjectsArchivePage({ params }: Props) {
           'image': project.coverImage || defaultOgImage,
           'applicationCategory': 'DeveloperApplication',
           'operatingSystem': 'Web, Cross-platform',
-          'url': `https://shainwaiyan.com${basePath}/portfolio/coding-projects/${project.slug}`
+          'url': `${SITE_URL}${basePath}/portfolio/coding-projects/${project.slug}`
         }
       }))
     }
@@ -99,25 +100,25 @@ export default async function CodingProjectsArchivePage({ params }: Props) {
         "@type": "ListItem",
         "position": 1,
         "name": dict.marketingInMotion.breadcrumbs.home,
-        "item": `https://shainwaiyan.com${basePath}/`
+        "item": `${SITE_URL}${basePath}/`
       },
       {
         "@type": "ListItem",
         "position": 2,
         "name": dict.marketingInMotion.breadcrumbs.portfolio,
-        "item": `https://shainwaiyan.com${basePath}/portfolio`
+        "item": `${SITE_URL}${basePath}/portfolio`
       },
       {
         "@type": "ListItem",
         "position": 3,
         "name": dict.codingProjects.title,
-        "item": `https://shainwaiyan.com${basePath}/portfolio/coding-projects`
+        "item": `${SITE_URL}${basePath}/portfolio/coding-projects`
       },
       {
         "@type": "ListItem",
         "position": 4,
         "name": archiveTitle,
-        "item": `https://shainwaiyan.com${basePath}/portfolio/coding-projects/archive`
+        "item": `${SITE_URL}${basePath}/portfolio/coding-projects/archive`
       }
     ]
   };

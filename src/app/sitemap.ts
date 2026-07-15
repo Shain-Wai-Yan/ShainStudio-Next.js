@@ -45,16 +45,18 @@ const staticRoutes = {
     { path: '/blog',        priority: 0.9, changeFrequency: 'daily'   as const },
     { path: '/certificate', priority: 0.7, changeFrequency: 'monthly' as const },
     { path: '/contact',     priority: 0.8, changeFrequency: 'yearly'  as const },
+    // /privacy and /terms are intentionally noindex — keep them out of the sitemap
   ],
   // English portfolio pages
   portfolio: [
-    { path: '/portfolio',                     priority: 0.9, changeFrequency: 'weekly'  as const },
-    { path: '/portfolio/amv-editing',         priority: 0.7, changeFrequency: 'monthly' as const },
-    { path: '/portfolio/business-plans',      priority: 0.7, changeFrequency: 'monthly' as const },
-    { path: '/portfolio/coding-projects',     priority: 0.8, changeFrequency: 'weekly'  as const },
-    { path: '/portfolio/marketing-in-motion', priority: 0.8, changeFrequency: 'weekly'  as const },
-    { path: '/portfolio/marketing-plans',     priority: 0.7, changeFrequency: 'monthly' as const },
-    { path: '/portfolio/photography',         priority: 0.7, changeFrequency: 'monthly' as const },
+    { path: '/portfolio',                             priority: 0.9, changeFrequency: 'weekly'  as const },
+    { path: '/portfolio/amv-editing',                 priority: 0.7, changeFrequency: 'monthly' as const },
+    { path: '/portfolio/business-plans',              priority: 0.7, changeFrequency: 'monthly' as const },
+    { path: '/portfolio/coding-projects',             priority: 0.8, changeFrequency: 'weekly'  as const },
+    { path: '/portfolio/coding-projects/archive',     priority: 0.5, changeFrequency: 'monthly' as const },
+    { path: '/portfolio/marketing-in-motion',         priority: 0.8, changeFrequency: 'weekly'  as const },
+    { path: '/portfolio/marketing-plans',             priority: 0.7, changeFrequency: 'monthly' as const },
+    { path: '/portfolio/photography',                 priority: 0.7, changeFrequency: 'monthly' as const },
   ],
   // Chinese STATIC pages only — pages with genuine translations
   // Excluded: /zh/blog, /zh/blog/[slug], /zh/portfolio/*, /zh/certificate
@@ -81,6 +83,7 @@ async function fetchAllBlogSlugs(): Promise<BlogPost[]> {
         'fields[2]': 'publishDate',
         'sort': 'publishDate:desc',
       },
+      timeout: 10000, // Strapi cold starts exceed the 3s default
     });
 
     if (res.error) {
@@ -107,6 +110,7 @@ async function fetchAllMarketingProjectSlugs(): Promise<MarketingProject[]> {
         'fields[2]': 'projectDate',
         'sort': 'projectDate:desc',
       },
+      timeout: 10000, // Strapi cold starts exceed the 3s default
     });
 
     if (res.error) {
@@ -133,6 +137,7 @@ async function fetchAllCodingProjectSlugs(): Promise<CodingProjectSlug[]> {
         'fields[2]': 'projectDate',
         'sort': 'projectDate:desc',
       },
+      timeout: 10000, // Strapi cold starts exceed the 3s default
     });
 
     if (res.error) {

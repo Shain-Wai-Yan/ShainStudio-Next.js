@@ -102,7 +102,7 @@ export default function ChannelInfo({ data, isLoading }: ChannelInfoProps) {
 
             {/* YouTube link button */}
             <a
-              href="https://www.youtube.com/@ShainStudioAMV"
+              href="https://www.youtube.com/@shaineditamv"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#FF0000] text-white text-sm font-semibold rounded-full hover:bg-[#cc0000] transition-colors shadow-md shrink-0 self-start"

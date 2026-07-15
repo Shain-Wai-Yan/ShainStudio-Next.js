@@ -9,6 +9,7 @@ import ScrollAnimator from '@/components/ScrollAnimator';
 import ScrollRevealText from '@/components/about/ScrollRevealText';
 import AgeDisplay from '@/components/about/AgeDisplay';
 import { calculateAge } from '@/lib/calculateAge';
+import { SITE_URL, WEBSITE_ID, DEFAULT_OG_IMAGE, absoluteUrl, personJsonLd, PERSON } from '@/lib/seo';
 
 interface AboutProps {
   params: Promise<{ locale: string }>;
@@ -18,7 +19,7 @@ export async function generateMetadata({ params }: AboutProps): Promise<Metadata
   const { locale: rawLocale } = await params;
   const locale = isSupportedLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
   const t = await getDictionary(locale);
-  const domain = 'https://www.shainwaiyan.com';
+  const domain = SITE_URL;
   const urlPath = locale === 'zh' ? '/zh/about' : '/about';
   const baseUrl = `${domain}${urlPath}`;
 
@@ -48,11 +49,13 @@ export async function generateMetadata({ params }: AboutProps): Promise<Metadata
       firstName: 'Shain',
       lastName: 'Wai Yan',
       username: 'xolbine',
+      images: [DEFAULT_OG_IMAGE],
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
+      images: [DEFAULT_OG_IMAGE],
     },
   };
 }
@@ -75,8 +78,25 @@ export default async function AboutPage({ params }: AboutProps) {
 
   const age = calculateAge();
 
+  // /about is the entity's authoritative biography page: emit the FULL Person
+  // node here (everywhere else references it by @id).
+  const profilePageJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ProfilePage',
+    '@id': `${absoluteUrl(locale, '/about')}#profilepage`,
+    url: absoluteUrl(locale, '/about'),
+    name: `${t.aboutPage.myName} — ${PERSON.jobTitle[locale]}`,
+    inLanguage: locale === 'zh' ? 'zh-CN' : 'en-US',
+    mainEntity: personJsonLd(locale),
+    isPartOf: { '@id': WEBSITE_ID },
+  };
+
   return (
     <main className="bg-background dark:bg-[#0a0a0a] min-h-screen text-text dark:text-gray-200">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(profilePageJsonLd) }}
+      />
       <ScrollAnimator />
       
       {/* ── Premium Hero ── */}

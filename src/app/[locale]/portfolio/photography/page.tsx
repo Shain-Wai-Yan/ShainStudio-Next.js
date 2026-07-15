@@ -40,6 +40,7 @@ export async function generateMetadata(
       languages: {
         en: 'https://www.shainwaiyan.com/portfolio/photography',
         zh: 'https://www.shainwaiyan.com/zh/portfolio/photography',
+        'x-default': 'https://www.shainwaiyan.com/portfolio/photography',
       },
     },
     openGraph: {

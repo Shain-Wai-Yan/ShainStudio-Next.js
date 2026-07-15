@@ -18,13 +18,13 @@ export async function generateMetadata({ params }: ContactPageProps): Promise<Me
 
   const title = isZh
     ? `${t.contactPage.heroTitle} ${t.contactPage.heroTitleHighlight} | 明元易 (Shain Wai Yan)`
-    : 'Contact | Shain Wai Yan - Digital Marketer & Brand Strategist';
+    : 'Contact | Shain Wai Yan - Digital Marketing & Brand Strategist';
 
   return {
     title,
     description: isZh
       ? t.contactPage.heroSubtitle
-      : 'Contact Shain Wai Yan (xolbine, 明元易), professional digital marketer and brand strategist. Get in touch for marketing consultations.',
+      : 'Contact Shain Wai Yan (xolbine, 明元易), Digital Marketing & Brand Strategist. Get in touch for marketing consultations.',
     alternates: {
       canonical: `${domain}${urlPath}`,
       languages: {

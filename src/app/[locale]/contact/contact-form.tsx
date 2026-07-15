@@ -247,7 +247,7 @@ export function ContactForm() {
                   {t.collaboratorsBadge || "COLLABORATORS • Nº 06"}
                 </span>
                 
-                <h2 className="text-[28px] xs:text-[32px] sm:text-5xl md:text-[54px] font-extrabold tracking-tight text-stone-950 dark:text-white leading-[1.1] sm:leading-[1.08] mb-6">
+                <h1 className="text-[28px] xs:text-[32px] sm:text-5xl md:text-[54px] font-extrabold tracking-tight text-stone-950 dark:text-white leading-[1.1] sm:leading-[1.08] mb-6">
                   &ldquo;{t.headlinePart1} <br className="block sm:hidden" />
                   <span className="font-serif italic font-normal text-[#191970] dark:text-[#ffd700]">{t.headlinePart2}</span>{' '}
                   {t.headlinePart3}{' '}
@@ -255,7 +255,7 @@ export function ContactForm() {
                     {t.headlinePart4} <br className="block sm:hidden" /> {t.headlinePart5}
                   </span>
                   &rdquo;
-                </h2>
+                </h1>
               </div>
 
               <p className="text-sm sm:text-base text-stone-500 dark:text-stone-400 max-w-xl leading-relaxed font-medium order-3 lg:order-none">

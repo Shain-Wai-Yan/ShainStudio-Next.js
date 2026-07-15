@@ -8,8 +8,7 @@ import BlogPostContent from '@/components/blog/BlogPostContent';
 import RelatedPosts from '@/components/blog/RelatedPosts';
 import TableOfContents from '@/components/shared/TableOfContents';
 import { getDictionary } from '@/lib/getDictionary';
-
-const SITE_URL = 'https://www.shainwaiyan.com';
+import { SITE_URL, PERSON_ID, orgRef } from '@/lib/seo';
 
 interface BlogPostPageProps {
   params: Promise<{ slug: string; locale?: string }>;
@@ -88,19 +87,21 @@ export default async function BlogPostPage(props: BlogPostPageProps) {
     }] : [],
     datePublished: blog.PublishedDate || blog.createdAt || new Date().toISOString(),
     dateModified: blog.updatedAt || new Date().toISOString(),
-    author: [{
-        '@type': 'Person',
-        name: blog.Author || 'Shain Wai Yan',
-        url: `${SITE_URL}${locale === 'zh' ? '/zh' : ''}/about`
-    }],
-    publisher: {
-        '@type': 'Organization',
-        name: 'Shain Studio',
-        logo: {
-          '@type': 'ImageObject',
-          url: 'https://www.shainwaiyan.com/images/Shain Studio.png'
-        }
-    },
+    author: [
+      !blog.Author || blog.Author === 'Shain Wai Yan'
+        ? {
+            '@type': 'Person',
+            '@id': PERSON_ID,
+            name: 'Shain Wai Yan',
+            url: `${SITE_URL}/about`,
+          }
+        : {
+            '@type': 'Person',
+            name: blog.Author,
+            url: `${SITE_URL}${locale === 'zh' ? '/zh' : ''}/about`,
+          },
+    ],
+    publisher: orgRef(),
     description: blog.Seo?.metaDescription || blog.Description || blog.Title,
     isPartOf: {
       '@type': 'CollectionPage',

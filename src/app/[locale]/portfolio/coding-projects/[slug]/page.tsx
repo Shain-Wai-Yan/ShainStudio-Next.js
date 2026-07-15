@@ -15,6 +15,7 @@ import RelatedCodingProjects from '@/components/coding-project/RelatedCodingProj
 import TableOfContents from '@/components/shared/TableOfContents';
 import { getDictionary } from '@/lib/getDictionary';
 import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
+import { SITE_URL, DEFAULT_OG_IMAGE, PERSON_ID, orgRef } from '@/lib/seo';
 
 export const revalidate = 3600; // Revalidate every hour
 export const dynamicParams = true; // Allow new projects to be fetched at runtime
@@ -60,16 +61,16 @@ export async function generateMetadata(
 
     keywords: safeKeywords,
     alternates: {
-      canonical: `https://shainwaiyan.com${basePath}/portfolio/coding-projects/${project.slug}`,
+      canonical: `${SITE_URL}${basePath}/portfolio/coding-projects/${project.slug}`,
       languages: {
-        en: `https://shainwaiyan.com/portfolio/coding-projects/${project.slug}`,
-        zh: `https://shainwaiyan.com/zh/portfolio/coding-projects/${project.slug}`,
-        'x-default': `https://shainwaiyan.com/portfolio/coding-projects/${project.slug}`,
+        en: `${SITE_URL}/portfolio/coding-projects/${project.slug}`,
+        zh: `${SITE_URL}/zh/portfolio/coding-projects/${project.slug}`,
+        'x-default': `${SITE_URL}/portfolio/coding-projects/${project.slug}`,
       },
     },
     openGraph: {
       type: 'article',
-      url: `https://shainwaiyan.com${basePath}/portfolio/coding-projects/${project.slug}`,
+      url: `${SITE_URL}${basePath}/portfolio/coding-projects/${project.slug}`,
       title: project.seo?.metaTitle || project.title,
       description: project.seo?.metaDescription || project.summary,
       images: project.seo?.ogImage ? [project.seo.ogImage] : project.coverImage ? [project.coverImage] : [],
@@ -121,24 +122,18 @@ export default async function CodingProjectDetailPage({ params }: CodingProjectP
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
     'name': project.title,
-    'image': project.seo?.ogImage || project.coverImage || 'https://shainwaiyan.com/images/Shain Studio.png',
+    'image': project.seo?.ogImage || project.coverImage || DEFAULT_OG_IMAGE,
     'description': project.summary,
     'applicationCategory': 'DeveloperApplication',
     'operatingSystem': 'Web, Cross-platform',
-    'url': `https://shainwaiyan.com${basePath}/portfolio/coding-projects/${project.slug}`,
+    'url': `${SITE_URL}${basePath}/portfolio/coding-projects/${project.slug}`,
     'author': {
       '@type': 'Person',
+      '@id': PERSON_ID,
       'name': 'Shain Wai Yan',
-      'url': 'https://shainwaiyan.com'
+      'url': SITE_URL
     },
-    'publisher': {
-      '@type': 'Organization',
-      'name': 'Shain Studio',
-      'logo': {
-        '@type': 'ImageObject',
-        'url': 'https://shainwaiyan.com/logo.png' 
-      }
-    },
+    'publisher': orgRef(),
     'datePublished': project.projectDate ? new Date(project.projectDate).toISOString() : undefined,
     'dateModified': project.updatedAt ? new Date(project.updatedAt).toISOString() : undefined,
     'keywords': [...(project.tags || []), ...(project.toolsUsed || [])].filter(Boolean).join(', '),
@@ -149,7 +144,7 @@ export default async function CodingProjectDetailPage({ params }: CodingProjectP
     },
     'mainEntityOfPage': {
       '@type': 'WebPage',
-      '@id': `https://shainwaiyan.com${basePath}/portfolio/coding-projects/${project.slug}`
+      '@id': `${SITE_URL}${basePath}/portfolio/coding-projects/${project.slug}`
     }
   };
 
@@ -161,25 +156,25 @@ export default async function CodingProjectDetailPage({ params }: CodingProjectP
         "@type": "ListItem",
         "position": 1,
         "name": t.marketingInMotion.breadcrumbs.home, // Reuse home breadcrumb
-        "item": `https://shainwaiyan.com${basePath}/`
+        "item": `${SITE_URL}${basePath}/`
       },
       {
         "@type": "ListItem",
         "position": 2,
         "name": t.marketingInMotion.breadcrumbs.portfolio,
-        "item": `https://shainwaiyan.com${basePath}/portfolio`
+        "item": `${SITE_URL}${basePath}/portfolio`
       },
       {
         "@type": "ListItem",
         "position": 3,
         "name": t.nav.codingProjects,
-        "item": `https://shainwaiyan.com${basePath}/portfolio/coding-projects`
+        "item": `${SITE_URL}${basePath}/portfolio/coding-projects`
       },
       {
         "@type": "ListItem",
         "position": 4,
         "name": project.title,
-        "item": `https://shainwaiyan.com${basePath}/portfolio/coding-projects/${project.slug}`
+        "item": `${SITE_URL}${basePath}/portfolio/coding-projects/${project.slug}`
       }
     ]
   };

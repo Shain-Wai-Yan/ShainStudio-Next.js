@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { getDictionary } from '@/lib/getDictionary';
 import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
 import BusinessPlanClient from '@/components/business-plans/BusinessPlanClient';
+import { DEFAULT_OG_IMAGE, absoluteUrl, languageAlternates } from '@/lib/seo';
 
 interface Props {
   params: Promise<{ locale: string }>;
@@ -12,14 +13,24 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const locale = isSupportedLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
   const t = await getDictionary(locale);
 
+  const title = `${t.businessPlans.title} | Shain Wai Yan`;
+  const description = t.businessPlans.description.substring(0, 160);
+  const url = absoluteUrl(locale, '/portfolio/business-plans');
+
   return {
-    title: `${t.businessPlans.title} | Shain Wai Yan`,
-    description: t.businessPlans.description.substring(0, 160),
+    title,
+    description,
     alternates: {
-      languages: {
-        'en': 'https://www.shainwaiyan.com/portfolio/business-plans',
-        'zh': 'https://www.shainwaiyan.com/zh/portfolio/business-plans',
-      },
+      canonical: url,
+      languages: languageAlternates('/portfolio/business-plans'),
+    },
+    openGraph: {
+      title,
+      description,
+      url,
+      type: 'website',
+      images: [DEFAULT_OG_IMAGE],
+      locale: locale === 'zh' ? 'zh_CN' : 'en_US',
     },
   };
 }
