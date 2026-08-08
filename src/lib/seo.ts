@@ -23,8 +23,8 @@ export const PERSON = {
   name: 'Shain Wai Yan',
   alternateName: ['xolbine', 'Xolbine', '明元易'],
   jobTitle: {
-    en: 'Digital Marketing & Brand Strategist',
-    zh: '数字营销与品牌策略师',
+    en: 'Technical Marketer',
+    zh: '技术营销从业者',
   } satisfies Record<Locale, string>,
   email: 'contact@shainwaiyan.com',
   sameAs: [
@@ -40,8 +40,8 @@ export const ORGANIZATION = {
 } as const;
 
 const PERSON_DESCRIPTION: Record<Locale, string> = {
-  en: 'AI-powered digital marketing & brand strategy expert specialising in content strategy and market analysis.',
-  zh: 'AI驱动的数字营销与品牌策略专家，专注于内容策略与市场分析。',
+  en: 'Technical marketer and creative technologist specialising in MarTech, content strategy, and market analysis.',
+  zh: '技术营销从业者与创意科技实践者，专注于MarTech、内容策略与市场分析。',
 };
 
 /** Locale-prefixed path: ('zh', '/about') → '/zh/about'; ('en', '/about') → '/about'. */
@@ -123,6 +123,9 @@ export function personJsonLd(locale: Locale) {
       },
     ],
     knowsAbout: [
+      'Technical Marketing',
+      'MarTech',
+      'Creative Technology',
       'Digital Marketing',
       'Brand Strategy',
       'AI Marketing',
@@ -161,8 +164,8 @@ export function websiteJsonLd(locale: Locale) {
     url: SITE_URL,
     name: isZh ? 'Shain的作品集' : "Shain's Portfolio",
     description: isZh
-      ? 'Shain Wai Yan (xolbine) 的数字营销与品牌策略作品集。'
-      : 'Digital Marketing & Brand Strategy portfolio of Shain Wai Yan (xolbine).',
+      ? 'Shain Wai Yan (xolbine) 的作品集 — 技术营销从业者、MarTech 爱好者、创意科技实践者。探索我在数字营销、技术、数据与AI领域的作品。'
+      : 'Portfolio of Shain Wai Yan (xolbine) — Technical Marketer, MarTech Enthusiast, and Creative Technologist. Explore my work in digital marketing, technology, data, and AI.',
     inLanguage: isZh ? 'zh-CN' : 'en-US',
     publisher: { '@id': PERSON_ID },
   };

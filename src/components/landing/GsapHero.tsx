@@ -544,7 +544,7 @@ export default function GsapHero({ hp, locale, clientLogos = [] }: GsapHeroProps
                   Shain Wai Yan
                 </h4>
                 <p className="text-[10px] sm:text-[11px] font-semibold text-gray-500 dark:text-gray-400 mt-1 uppercase tracking-wider">
-                  {hp.citationRole || "Digital Marketing & Brand Strategist"}
+                  {hp.citationRole || "Technical Marketer | MarTech Enthusiast | Creative Technologist"}
                 </p>
               </div>
             </div>

@@ -35,14 +35,14 @@ export async function generateMetadata({ params }: Omit<LocaleLayoutProps, 'chil
 
   return {
     title: {
-      default: isZh 
-        ? "数字营销与品牌策略师 | Shain Wai Yan (xolbine)"
-        : "Digital Marketing & Brand Strategist | Shain Wai Yan (xolbine)",
+      default: isZh
+        ? "技术营销从业者 | Shain Wai Yan (xolbine)"
+        : "Technical Marketer | Shain Wai Yan (xolbine)",
       template: `%s | Shain Wai Yan (xolbine)`,
     },
     description: isZh
-      ? "Shain Wai Yan (xolbine、明元易) 的数字营销与品牌策略作品集。探索AI驱动的营销活动、内容策略和市场分析。"
-      : "Digital Marketing & Brand Strategy portfolio of Shain Wai Yan (aka xolbine, 明元易). Explore AI‑powered campaigns, content strategy, & market analysis.",
+      ? "Shain Wai Yan (xolbine、明元易) 的作品集 — 技术营销从业者、MarTech 爱好者、创意科技实践者。探索我在数字营销、技术、数据与AI领域的作品。"
+      : "Portfolio of Shain Wai Yan (aka xolbine, 明元易) — Technical Marketer, MarTech Enthusiast, and Creative Technologist. Explore my work in digital marketing, technology, data, and AI.",
     authors: [{ name: "Shain Wai Yan" }],
     robots: "index, follow, max-image-preview:large",
     metadataBase: new URL(SITE_URL),
@@ -61,8 +61,8 @@ export async function generateMetadata({ params }: Omit<LocaleLayoutProps, 'chil
       type: 'website',
       url: baseUrl,
       title: isZh
-        ? '数字营销与品牌策略师 | Shain Wai Yan'
-        : 'Digital Marketing & Brand Strategist | Shain Wai Yan',
+        ? '技术营销从业者 | Shain Wai Yan'
+        : 'Technical Marketer | Shain Wai Yan',
       description: isZh
         ? '在Shain Wai Yan (xolbine)的作品集中探索AI驱动的营销活动、内容策略和市场分析。'
         : 'Explore AI‑powered campaigns, content strategy, & market analysis in the portfolio of Shain Wai Yan (xolbine).',
@@ -74,8 +74,8 @@ export async function generateMetadata({ params }: Omit<LocaleLayoutProps, 'chil
     twitter: {
       card: 'summary_large_image',
       title: isZh
-        ? '数字营销与品牌策略师 | Shain Wai Yan'
-        : 'Digital Marketing & Brand Strategist | Shain Wai Yan',
+        ? '技术营销从业者 | Shain Wai Yan'
+        : 'Technical Marketer | Shain Wai Yan',
       description: isZh
         ? '在Shain Wai Yan (xolbine)的作品集中探索AI驱动的营销活动、内容策略和市场分析。'
         : 'Explore AI‑powered campaigns, content strategy, & market analysis in the portfolio of Shain Wai Yan (xolbine).',

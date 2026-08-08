@@ -143,7 +143,7 @@
   },
   "codingProjects": {
     "title": "Coding Projects",
-    "description": "As a digital marketer and brand strategist with a passion for technology, I've developed coding skills to enhance my marketing capabilities and create interactive tools. While I'm not a professional programmer or CS major graduate by trade, coding has become an invaluable complement to my business and marketing expertise, allowing me to build custom solutions that bridge strategy and implementation.",
+    "description": "As a technical marketer with a passion for technology, I've developed coding skills to enhance my marketing capabilities and create interactive tools. While I'm not a professional programmer or CS major graduate by trade, coding has become an invaluable complement to my business and marketing expertise, allowing me to build custom solutions that bridge strategy and implementation.",
     "myGitHub": "My GitHub Gallery",
     "loading": "Loading...",
     "loadingPinned": "Loading pinned repositories...",
@@ -192,7 +192,7 @@
     "loadMore": "Load More",
     "labels": {
       "heroTitle": "Coding Projects: Bridging Strategy & Implementation",
-      "heroDescription": "As a digital marketer and brand strategist with a passion for technology, I've developed coding skills to enhance my marketing capabilities and create interactive tools. While I'm not a professional programmer or CS major graduate by trade, coding has become an invaluable complement to my business and marketing expertise, allowing me to build custom solutions that bridge strategy and implementation.",
+      "heroDescription": "As a technical marketer with a passion for technology, I've developed coding skills to enhance my marketing capabilities and create interactive tools. While I'm not a professional programmer or CS major graduate by trade, coding has become an invaluable complement to my business and marketing expertise, allowing me to build custom solutions that bridge strategy and implementation.",
       "featuredTitle": "Featured Projects",
       "searchPlaceholder": "Search projects...",
       "allCategories": "All Categories",
@@ -319,8 +319,8 @@
   },
   "about": {
     "title": "About Me",
-    "subtitle": "Digital Marketing & Brand Strategist",
-    "description": "Learn more about my journey, expertise, and approach to digital marketing and brand strategy."
+    "subtitle": "Technical Marketer | MarTech Enthusiast | Creative Technologist",
+    "description": "Learn more about my journey, expertise, and approach to technical marketing and creative technology."
   },
   "contact": {
     "title": "Contact Me",
@@ -421,8 +421,8 @@
   "aboutPage": {
     "heroTitle": "About",
     "heroTitleHighlight": "Me",
-    "heroSubtitle": "Digital Marketing & Brand Strategist",
-    "profileAltText": "Shain Wai Yan - Digital Marketing & Brand Strategist",
+    "heroSubtitle": "Technical Marketer | MarTech Enthusiast | Creative Technologist",
+    "profileAltText": "Shain Wai Yan - Technical Marketer",
     "myName": "Shain Wai Yan",
     "alsoKnownAs": "also known as Xolbine | 明元易",
     "motto": "有志者事竟成",
@@ -480,11 +480,11 @@
   "homePage": {
     "badge": "Available for Collaboration",
     "eyebrow": "Shain Wai Yan · Xolbine · 明元易",
-    "citationRole": "Digital Marketing & Brand Strategist",
+    "citationRole": "Technical Marketer | MarTech Enthusiast | Creative Technologist",
     "title": "Architecting",
     "titleHighlight": "Digital Identities.",
     "subtitle": "I don't just use tools — I build them.",
-    "description": "Digital Marketer. Vibe Coder. Systems Architect. I am a marketer who understands the technology that powers modern marketing. I don't just know how to use the tools; I know how to build them. I can bridge the gap between the marketing team's vision and the engineering team's execution.",
+    "description": "Technical Marketer. MarTech Enthusiast. Creative Technologist. I am a marketer who understands the technology that powers modern marketing. I don't just know how to use the tools; I know how to build them. I can bridge the gap between the marketing team's vision and the engineering team's execution.",
     "metaDescription": "Shain Studio: Bridging the gap between creative marketing vision and technical execution to build remarkable digital experiences.",
     "viewPortfolio": "View My Work",
     "getInTouch": "Let's Talk",

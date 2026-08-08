@@ -143,7 +143,7 @@
   },
   "codingProjects": {
     "title": "编程项目",
-    "description": "作为一名数字营销和品牌策略专家，我对技术充满热情，并通过编程技能来增强我的营销能力并创建交互式工具。虽然我并非专业程序员或计算机科学专业毕业生，但编程已成为我商业和营销专长的重要补充，使我能够构建将战略与实施相结合的定制解决方案。",
+    "description": "作为一名技术营销从业者，我对技术充满热情，并通过编程技能来增强我的营销能力并创建交互式工具。虽然我并非专业程序员或计算机科学专业毕业生，但编程已成为我商业和营销专长的重要补充，使我能够构建将战略与实施相结合的定制解决方案。",
     "myGitHub": "我的代码展示",
     "loading": "加载中...",
     "loadingPinned": "加载精选仓库中...",
@@ -192,7 +192,7 @@
     "loadMore": "加载更多",
     "labels": {
       "heroTitle": "编程项目：连接战略与实施",
-      "heroDescription": "作为一名对技术充满热情的数字营销人员和品牌战略家，我掌握了编程技能，以增强我的营销能力并创建交互式工具。虽然我不是一名职业程序员或计算机专业毕业生，但编程已成为我业务和营销专长的宝贵补充，使我能够构建连接战略和实施的定制解决方案。",
+      "heroDescription": "作为一名对技术充满热情的技术营销从业者，我掌握了编程技能，以增强我的营销能力并创建交互式工具。虽然我不是一名职业程序员或计算机专业毕业生，但编程已成为我业务和营销专长的宝贵补充，使我能够构建连接战略和实施的定制解决方案。",
       "featuredTitle": "精选项目",
       "searchPlaceholder": "搜索项目...",
       "allCategories": "全部分类",
@@ -319,8 +319,8 @@
   },
   "about": {
     "title": "关于我",
-    "subtitle": "数字营销与品牌策略专家",
-    "description": "了解我的职业历程、专业知识和数字营销及品牌策略的方法论。"
+    "subtitle": "技术营销从业者 | MarTech 爱好者 | 创意科技实践者",
+    "description": "了解我的职业历程、专业知识和技术营销及创意科技的方法论。"
   },
   "contact": {
     "title": "联系我",
@@ -421,8 +421,8 @@
   "aboutPage": {
     "heroTitle": "关于",
     "heroTitleHighlight": "我",
-    "heroSubtitle": "数字营销与品牌策略师",
-    "profileAltText": "Shain Wai Yan - 数字营销与品牌策略师",
+    "heroSubtitle": "技术营销从业者 | MarTech 爱好者 | 创意科技实践者",
+    "profileAltText": "Shain Wai Yan - 技术营销从业者",
     "myName": "Shain Wai Yan",
     "alsoKnownAs": "又名 Xolbine | 明元易",
     "motto": "有志者事竟成",
@@ -480,11 +480,11 @@
   "homePage": {
     "badge": "开放合作中",
     "eyebrow": "Shain Wai Yan · Xolbine · 明元易",
-    "citationRole": "数字营销与品牌策略师",
+    "citationRole": "技术营销从业者 | MarTech 爱好者 | 创意科技实践者",
     "title": "架构",
     "titleHighlight": "数字身份.",
     "subtitle": "我不只是使用工具，我创造它们。",
-    "description": "数字营销专家。代码达人。系统架构师。我是一位深谙现代营销底层技术的营销专家。我不只是懂得如何使用工具，更懂得如何构建它们。我能够完美桥接营销团队的愿景与工程团队的执行。",
+    "description": "技术营销从业者。MarTech 爱好者。创意科技实践者。我是一位深谙现代营销底层技术的营销专家。我不只是懂得如何使用工具，更懂得如何构建它们。我能够完美桥接营销团队的愿景与工程团队的执行。",
     "metaDescription": "明元易 (Shain Studio)：完美桥接营销创意愿景与底层技术执行，打造非凡的数字体验。",
     "viewPortfolio": "查看作品",
     "getInTouch": "联系我",

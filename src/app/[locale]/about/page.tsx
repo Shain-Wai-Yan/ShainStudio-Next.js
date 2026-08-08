@@ -28,7 +28,9 @@ export async function generateMetadata({ params }: AboutProps): Promise<Metadata
     ? fullText.substring(0, 155).replace(/\s+\S*$/, '') + '...' 
     : fullText;
 
-  const title = `${t.aboutPage.myName} - ${t.aboutPage.heroSubtitle}`;
+  // heroSubtitle holds the full LinkedIn-style positioning line for on-page display;
+  // the concise PERSON.jobTitle keeps <title>/OG/Twitter from ballooning.
+  const title = `${t.aboutPage.myName} - ${PERSON.jobTitle[locale]}`;
 
   return {
     title,
