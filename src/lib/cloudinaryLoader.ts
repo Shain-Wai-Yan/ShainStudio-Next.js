@@ -33,37 +33,21 @@ export default function cloudinaryLoader({
   width: number;
   quality?: number;
 }): string {
-  // Safety guard: if a non-Cloudinary URL is passed, return raw src to prevent a crash
-  if (!src.includes('cloudinary.com')) return src;
-
-  const urlParts = src.split('/upload/');
-  if (urlParts.length !== 2) return src;
-
-  const [baseUrl, fileAndParams] = urlParts;
-
-  /**
-   * Strip any pre-existing Cloudinary transformation segment so transforms
-   * don't stack. Guards against URLs already processed by optimizeCloudinaryUrl
-   * or optimizeCloudinaryUrlWithWidth utilities in cloudinary-optimizer.ts.
-   *
-   * Cloudinary URL patterns after /upload/:
-   *   1. Raw:              v1234567890/folder/image.jpg
-   *   2. Transforms only:  f_auto,q_auto/folder/image.jpg
-   *   3. Transforms+ver:   c_scale,w_800,q_auto,f_auto/v1234567890/folder/image.jpg
-   *
-   * A transform segment contains Cloudinary param chars (_ , :) and is NOT
-   * a version token (v<digits>).
-   */
-  const segments = fileAndParams.split('/');
-  const isVersionToken = (s: string) => /^v\d+$/.test(s);
-  const isTransformSegment = (s: string) => /[_,:]/.test(s) && !isVersionToken(s);
-
-  const cleanSegments = isTransformSegment(segments[0])
-    ? segments.slice(1)
-    : segments;
-
-  const cleanFile = cleanSegments.join('/');
-  const q = quality ?? 'auto';
-
-  return `${baseUrl}/upload/c_limit,w_${width},q_${q},f_auto/${cleanFile}`;
+  let url: URL;
+  try { url = new URL(src); } catch { return src; }
+  if (url.hostname !== 'res.cloudinary.com') return src;
+  const marker = '/image/upload/';
+  const offset = url.pathname.indexOf(marker);
+  if (offset === -1) return src;
+  const prefix = url.pathname.slice(0, offset + marker.length);
+  const segments = url.pathname.slice(offset + marker.length).split('/');
+  // Recognize transformation syntax, never arbitrary underscores in a public ID.
+  const transform = /^(?:a|ar|b|bo|c|co|d|dn|dpr|e|f|fl|g|h|l|o|q|r|t|u|w|x|y|z)_/;
+  let index = 0;
+  while (index < segments.length - 1 && transform.test(segments[index])) index++;
+  // Signed delivery URLs cannot be rewritten without invalidating the signature.
+  if (/^s--/.test(segments[0])) return src;
+  segments.splice(index, 0, `c_limit,w_${Math.max(1, Math.round(width))},q_${quality ?? 'auto'},f_auto`);
+  url.pathname = prefix + segments.join('/');
+  return url.toString();
 }

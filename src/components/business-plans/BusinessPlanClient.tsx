@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { transformBusinessPlan, type BusinessPlan } from '@/lib/strapi/business-plans';
 import { DocumentGrid } from '@/components/DocumentGrid';
-import { DocumentViewer } from '@/components/DocumentViewer';
+import dynamic from 'next/dynamic';
+const DocumentViewer = dynamic(() => import('@/components/DocumentViewer').then(m => m.DocumentViewer), { ssr: false });
 import { Breadcrumb } from '@/components/Breadcrumb';
 
 // Match the Document interface from DocumentGrid
@@ -30,20 +31,18 @@ interface BusinessPlanDictionary {
 
 interface Props {
   locale: 'en' | 'zh';
+  initialPlans: TransformedPlan[];
+  initialError: string | null;
   t: BusinessPlanDictionary;
 }
 
-export default function BusinessPlanClient({ locale, t }: Props) {
+export default function BusinessPlanClient({ locale, t, initialPlans, initialError }: Props) {
 
-  const [plans, setPlans] = useState<TransformedPlan[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [plans, setPlans] = useState<TransformedPlan[]>(initialPlans);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(initialError);
   const [selectedDocument, setSelectedDocument] = useState<TransformedPlan | null>(null);
   const [isViewerOpen, setIsViewerOpen] = useState(false);
-
-  useEffect(() => {
-    loadBusinessPlans();
-  }, []);
 
   const loadBusinessPlans = async () => {
     setIsLoading(true);
@@ -84,7 +83,7 @@ export default function BusinessPlanClient({ locale, t }: Props) {
 
   return (
     <>
-      <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-[#121212] dark:to-[#1e1e1e]">
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-[#121212] dark:to-[#1e1e1e]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-8 md:py-12">
           {/* Breadcrumb Navigation */}
           <Breadcrumb items={breadcrumbItems} />
@@ -114,7 +113,7 @@ export default function BusinessPlanClient({ locale, t }: Props) {
             />
           </section>
         </div>
-      </main>
+      </div>
 
       {/* Document Viewer Modal */}
       {selectedDocument && (

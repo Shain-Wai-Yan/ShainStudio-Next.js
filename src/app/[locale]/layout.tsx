@@ -1,6 +1,7 @@
+import { serializeJsonLd } from '@/lib/utils/json-ld';
 import { Inter, Playfair_Display } from "next/font/google";
 import type { Metadata } from "next";
-import { use } from "react";
+import { getDictionary } from '@/lib/getDictionary';
 import "@/app/globals.css";
 import { getHtmlLang, isSupportedLocale, DEFAULT_LOCALE } from "@/lib/locales";
 import { SITE_URL, DEFAULT_OG_IMAGE, LOGO_IMAGE, personJsonLd, organizationJsonLd, websiteJsonLd } from "@/lib/seo";
@@ -97,10 +98,11 @@ export async function generateMetadata({ params }: Omit<LocaleLayoutProps, 'chil
 /**
  * LocaleLayout component
  */
-export default function LocaleLayout({ children, params }: LocaleLayoutProps) {
-  const { locale: rawLocale } = use(params);
+export default async function LocaleLayout({ children, params }: LocaleLayoutProps) {
+  const { locale: rawLocale } = await params;
   const locale = isSupportedLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
   const htmlLang = getHtmlLang(locale);
+  const t = await getDictionary(locale);
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -114,10 +116,6 @@ export default function LocaleLayout({ children, params }: LocaleLayoutProps) {
   return (
     <html lang={htmlLang} suppressHydrationWarning dir="ltr" data-scroll-behavior="smooth" className={`${inter.variable} ${playfair.variable}`}>
       <head>
-        {/* Resource hints — pre-warm connections to Google Fonts & Cloudinary CDN
-            These fire before the browser discovers font requests, saving ~200-300 ms FCP */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://res.cloudinary.com" />
         <link rel="dns-prefetch" href="https://res.cloudinary.com" />
       </head>
@@ -125,13 +123,13 @@ export default function LocaleLayout({ children, params }: LocaleLayoutProps) {
         <ThemeProvider attribute="class" disableTransitionOnChange>
           <script
             type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+            dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
           />
-          <Header />
+          <Header translations={{ nav: t.nav }} />
           <main className="min-h-screen">
             {children}
           </main>
-          <Footer />
+          <Footer t={{ footer: t.footer }} />
           <SyntaxWidget />
           <ClarityAnalytics />
           {process.env.NEXT_PUBLIC_GA_ID && (

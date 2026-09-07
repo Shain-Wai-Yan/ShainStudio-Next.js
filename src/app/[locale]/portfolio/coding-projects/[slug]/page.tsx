@@ -1,3 +1,5 @@
+import { cache } from 'react';
+import { serializeJsonLd } from '@/lib/utils/json-ld';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -16,6 +18,8 @@ import TableOfContents from '@/components/shared/TableOfContents';
 import { getDictionary } from '@/lib/getDictionary';
 import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
 import { SITE_URL, DEFAULT_OG_IMAGE, PERSON_ID, orgRef } from '@/lib/seo';
+
+const getProject = cache(fetchCodingProjectBySlug);
 
 export const revalidate = 3600; // Revalidate every hour
 export const dynamicParams = true; // Allow new projects to be fetched at runtime
@@ -41,9 +45,10 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const { locale: rawLocale, slug } = await params;
   const locale = isSupportedLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
-  const { project, error } = await fetchCodingProjectBySlug(slug);
+  const { project, error } = await getProject(slug);
 
-  if (error || !project) {
+  if (error) throw new Error(error);
+  if (!project) {
     return { title: 'Project Not Found | Shain Studio' };
   }
 
@@ -92,11 +97,12 @@ export default async function CodingProjectDetailPage({ params }: CodingProjectP
   const { locale: rawLocale, slug } = await params;
   const locale = isSupportedLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
   const [ { project, error }, t ] = await Promise.all([
-    fetchCodingProjectBySlug(slug),
+    getProject(slug),
     getDictionary(locale)
   ]);
 
-  if (error || !project) {
+  if (error) throw new Error(error);
+  if (!project) {
     notFound();
   }
 
@@ -183,7 +189,7 @@ export default async function CodingProjectDetailPage({ params }: CodingProjectP
     <main className="min-h-screen bg-white dark:bg-[#121212]">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify([jsonLdProject, jsonLdBreadcrumb]) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd([jsonLdProject, jsonLdBreadcrumb]) }}
       />
       
       {/* Breadcrumb */}

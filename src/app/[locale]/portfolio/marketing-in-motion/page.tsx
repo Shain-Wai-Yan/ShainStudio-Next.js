@@ -1,3 +1,4 @@
+import { serializeJsonLd } from '@/lib/utils/json-ld';
 import { Suspense } from 'react';
 import { Metadata } from 'next';
 
@@ -101,7 +102,7 @@ export default async function MarketingInMotionPage(props: MarketingInMotionPage
     <div className="min-h-screen bg-white dark:bg-[#121212] transition-colors duration-300">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
       />
       <Suspense fallback={<div className="py-20 text-center text-[#666] dark:text-[#b0b0b0]">Loading projects...</div>}>
         <MarketingInMotionClient

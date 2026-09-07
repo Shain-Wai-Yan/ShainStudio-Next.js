@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { CertificateRow } from './CertificateRow';
-import { CertificateModal } from './CertificateModal';
+import dynamic from 'next/dynamic';
+const CertificateModal = dynamic(() => import('./CertificateModal').then(m => m.CertificateModal), { ssr: false });
 import { Certificate, transformCertificate } from '@/lib/strapi/certificates';
 
 interface CertificateMarqueeProps {

@@ -1,3 +1,5 @@
+import { cache } from 'react';
+import { serializeJsonLd } from '@/lib/utils/json-ld';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -14,6 +16,8 @@ import RelatedProjects from '@/components/marketing-in-motion/RelatedProjects';
 import TableOfContents from '@/components/shared/TableOfContents';
 import { getDictionary } from '@/lib/getDictionary';
 import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
+
+const getProject = cache(fetchMarketingProjectBySlug);
 
 export const revalidate = 3600; // Revalidate every hour
 export const dynamicParams = true; // Allow new projects to be fetched at runtime
@@ -39,10 +43,11 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const { locale: rawLocale, slug } = await props.params;
   const locale = isSupportedLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
-  const { project, error } = await fetchMarketingProjectBySlug(slug);
+  const { project, error } = await getProject(slug);
   const t = await getDictionary(locale); // ✅ CHANGE: async
 
-  if (error || !project) {
+  if (error) throw new Error(error);
+  if (!project) {
     return { title: t.marketingInMotion.seo.projectNotFoundTitle || 'Project Not Found | Shain Studio' };
   }
 
@@ -91,11 +96,12 @@ export default async function MarketingProjectPage(
   const { locale: rawLocale, slug } = await props.params;
   const locale = isSupportedLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
   const [ { project, error }, t ] = await Promise.all([
-    fetchMarketingProjectBySlug(slug),
+    getProject(slug),
     getDictionary(locale)
   ]);
 
-  if (error || !project) {
+  if (error) throw new Error(error);
+  if (!project) {
     notFound();
   }
 
@@ -192,7 +198,7 @@ export default async function MarketingProjectPage(
     <main className="min-h-screen bg-white dark:bg-[#121212]">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify([jsonLdArticle, jsonLdBreadcrumb]) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd([jsonLdArticle, jsonLdBreadcrumb]) }}
       />
       {/* Breadcrumb */}
       <nav className="bg-[#f8f9fa] dark:bg-[#1e1e1e] px-4 sm:px-6 lg:px-8 py-3 border-b border-[#d0d0d0] dark:border-[#444]">

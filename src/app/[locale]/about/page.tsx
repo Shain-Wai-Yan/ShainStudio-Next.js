@@ -1,3 +1,4 @@
+import { serializeJsonLd } from '@/lib/utils/json-ld';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Metadata } from 'next';
@@ -97,7 +98,7 @@ export default async function AboutPage({ params }: AboutProps) {
     <main className="bg-background dark:bg-[#0a0a0a] min-h-screen text-text dark:text-gray-200">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(profilePageJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(profilePageJsonLd) }}
       />
       <ScrollAnimator />
       

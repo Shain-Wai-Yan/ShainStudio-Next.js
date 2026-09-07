@@ -6,10 +6,10 @@ import { usePathname } from 'next/navigation';
 import { FaBars, FaTimes, FaChevronDown } from 'react-icons/fa';
 import LanguageSwitcher from './LanguageSwitcher';
 import ThemeToggle from './ThemeToggle';
-import { getDictionarySync } from '@/lib/getDictionary';
+import type { Dictionary } from '@/lib/getDictionary';
 import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
 
-const Header = () => {
+const Header = ({ translations }: { translations: Pick<Dictionary, 'nav'> }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isPortfolioOpen, setIsPortfolioOpen] = useState(false);
   const pathname = usePathname();
@@ -27,7 +27,6 @@ const Header = () => {
     }
   }
   
-  const translations = getDictionarySync(locale);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const togglePortfolio = () => setIsPortfolioOpen(!isPortfolioOpen);

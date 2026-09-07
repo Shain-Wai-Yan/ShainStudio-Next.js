@@ -10,6 +10,7 @@ const ResponsiveVideo = ({ src }: { src: string }) => (
       src={src}
       className="absolute top-0 left-0 w-full h-full border-0"
       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+      loading="lazy"
       allowFullScreen
       title="Embedded video content"
     />
@@ -94,6 +95,8 @@ export const intelligentImagePlugin: RichTextPlugin = (element) => {
     const props = attributesToProps(element.attribs as Record<string, string>);
     
     return (
+      // CMS embeds may use arbitrary hosts and omit dimensions; keep native lazy loading.
+      // eslint-disable-next-line @next/next/no-img-element
       <img 
         {...props} 
         src={src} 

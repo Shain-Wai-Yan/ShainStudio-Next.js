@@ -269,8 +269,9 @@ export default function GsapMarketing({ data }: GsapMarketingProps) {
         "<+0.2"
       );
       });
+      return () => mm.revert();
     },
-    { scope: containerRef, dependencies: [pillars] }
+    { scope: containerRef, dependencies: [pillars], revertOnUpdate: true }
   );
 
   return (

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useSyncExternalStore } from 'react';
 import { calculateAge } from '@/lib/calculateAge';
 
 interface AgeDisplayProps {
@@ -9,14 +9,10 @@ interface AgeDisplayProps {
   suffix: string;
 }
 
-export default function AgeDisplay({ initialAge, suffix }: AgeDisplayProps) {
-  const [age, setAge] = useState(initialAge);
+const subscribe = () => () => {};
 
-  // Recompute in the browser so the value reflects the current date for every
-  // visitor, even if the page was statically built long ago.
-  useEffect(() => {
-    setAge(calculateAge());
-  }, []);
+export default function AgeDisplay({ initialAge, suffix }: AgeDisplayProps) {
+  const age = useSyncExternalStore(subscribe, calculateAge, () => initialAge);
 
   return (
     <>

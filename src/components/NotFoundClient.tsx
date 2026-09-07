@@ -228,7 +228,7 @@ try {
   } else {
     drawFallbackAnimated(ctx, cols, rows);
   }
-} catch (e) {
+} catch {
   drawFallbackAnimated(ctx, cols, rows);
 }
 

@@ -349,7 +349,7 @@ export async function fetchMarketingProjectBySlug(
     }
 
     const raw = response.data?.data?.[0];
-    if (!raw) return { project: null, error: 'Project not found' };
+    if (!raw) return { project: null, error: null };
 
     const project = transformMarketingProject(raw);
     return { project, error: null };

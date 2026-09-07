@@ -1,3 +1,4 @@
+import { serializeJsonLd } from '@/lib/utils/json-ld';
 import type { Metadata, Viewport } from 'next';
 import { fetchCertificates, transformCertificate } from '@/lib/strapi/certificates';
 import { CertificateVaultClient } from '@/components/certificates/CertificateVaultClient';
@@ -175,7 +176,7 @@ export default async function CertificatePage(props: CertificatePageProps) {
       {/* JSON-LD Structured Data */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
       />
 
       <Breadcrumb

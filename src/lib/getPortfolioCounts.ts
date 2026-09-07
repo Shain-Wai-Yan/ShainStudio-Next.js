@@ -1,6 +1,3 @@
-import { fetchBusinessPlans } from './strapi/business-plans';
-import { fetchMarketingPlans } from './strapi/marketing-plans';
-import { fetchMarketingProjects } from './strapi/marketing-in-motion';
 import { fetchFromStrapi } from './strapi/client';
 
 const GITHUB_USERNAME = 'Shain-Wai-Yan';
@@ -15,7 +12,7 @@ const GITHUB_TOKEN = process.env.GITHUB_TOKEN || '';
 async function fetchGithubRepoCount(): Promise<number> {
   // Authenticated GraphQL path (preferred)
   if (GITHUB_TOKEN) {
-    const query = `query($login: String!) { user(login: $login) { repositories { totalCount } } }`;
+    const query = `query($login: String!) { user(login: $login) { repositories(privacy: PUBLIC) { totalCount } } }`;
     const res = await fetch('https://api.github.com/graphql', {
       method: 'POST',
       headers: {
@@ -24,8 +21,8 @@ async function fetchGithubRepoCount(): Promise<number> {
         'User-Agent': 'Portfolio-Counter',
       },
       body: JSON.stringify({ query, variables: { login: GITHUB_USERNAME } }),
-      // Note: next.revalidate only works on GET fetches — use cache: 'force-cache' instead
-      cache: 'force-cache',
+      next: { revalidate: 3600 },
+      signal: AbortSignal.timeout(5000),
     });
     if (res.ok) {
       const json = await res.json() as { data?: { user?: { repositories?: { totalCount?: number } } }; errors?: unknown[] };
@@ -39,7 +36,8 @@ async function fetchGithubRepoCount(): Promise<number> {
   // Unauthenticated REST fallback (works without a token, 60 req/hour limit)
   const res = await fetch(`https://api.github.com/users/${GITHUB_USERNAME}`, {
     headers: { 'User-Agent': 'Portfolio-Counter', Accept: 'application/vnd.github.v3+json' },
-    cache: 'force-cache',
+    next: { revalidate: 3600 },
+    signal: AbortSignal.timeout(5000),
   });
   if (!res.ok) throw new Error(`GitHub REST error: ${res.status}`);
   const user = await res.json() as { public_repos?: number };
@@ -58,21 +56,25 @@ export interface PortfolioCounts {
   amvEditing: number;
 }
 
+function fetchCount(endpoint: string) {
+  return fetchFromStrapi<Record<string, unknown>>(endpoint, { queryParams: { 'pagination[pageSize]': 1, 'fields[0]': 'createdAt' } });
+}
+
 export async function getPortfolioCounts(): Promise<PortfolioCounts> {
   const results = await Promise.allSettled([
-    fetchBusinessPlans(1, 1),
-    fetchMarketingPlans(1, 1),
-    fetchMarketingProjects(1, 1),
+    fetchCount('business-plans'),
+    fetchCount('marketing-plans'),
+    fetchCount('marketing-projects'),
     // Ping Strapi directly for photography count (Safer than local API route)
-    fetchFromStrapi<Record<string, unknown>>('photographies', { queryParams: { 'pagination[pageSize]': 1 } }),
+    fetchCount('photographies'),
     fetchGithubRepoCount(),
     fetchYouTubeCount(),
   ]);
 
   return {
-    businessPlans: getNestedValue(results[0], 'total'),
-    marketingPlans: getNestedValue(results[1], 'total'),
-    marketingInMotion: getNestedValue(results[2], 'total'),
+    businessPlans: getStrapiTotal(results[0]),
+    marketingPlans: getStrapiTotal(results[1]),
+    marketingInMotion: getStrapiTotal(results[2]),
     // Photography is now a direct Strapi response (has .meta.pagination.total)
     photography: getStrapiTotal(results[3]),
     // GitHub: direct count (plain number)
@@ -84,7 +86,7 @@ export async function getPortfolioCounts(): Promise<PortfolioCounts> {
 async function fetchYouTubeCount(): Promise<number> {
   try {
     const url = `${YOUTUBE_WORKER_URL}/api/youtube/channel?channelId=${YOUTUBE_CHANNEL_ID}`;
-    const response = await fetch(url, { next: { revalidate: 3600 } });
+    const response = await fetch(url, { next: { revalidate: 3600 }, signal: AbortSignal.timeout(5000) });
     if (!response.ok) return 0;
     
     interface YouTubeResponse {
@@ -105,19 +107,6 @@ async function fetchYouTubeCount(): Promise<number> {
   } catch {
     return 0;
   }
-}
-
-/**
- * Extracts 'total' from root of result.value (Used by high-level fetchers)
- */
-function getNestedValue(result: PromiseSettledResult<unknown>, key: string): number {
-  if (result.status === 'fulfilled' && result.value && typeof result.value === 'object') {
-    const val = result.value as Record<string, unknown>;
-    if (typeof val[key] === 'number') return val[key] as number;
-    // Fallback for different casing if needed
-    if (typeof val.total === 'number') return val.total as number;
-  }
-  return 0;
 }
 
 /**
@@ -151,25 +140,3 @@ function getSimpleValue(result: PromiseSettledResult<number>): number {
   }
   return 0;
 }
-
-// Special for GitHub
-function getGithubValue(result: PromiseSettledResult<unknown>): number {
-  if (result.status === 'fulfilled' && result.value && typeof result.value === 'object') {
-    interface GithubCountResult {
-      repositories?: {
-        totalCount?: number;
-      };
-    }
-    const val = result.value as GithubCountResult;
-    if (val.repositories) {
-      const count = val.repositories.totalCount;
-      return typeof count === 'number' ? count : 0;
-    }
-  }
-  return 0;
-}
-
-
-
-
-

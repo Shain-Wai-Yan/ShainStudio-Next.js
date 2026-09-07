@@ -1,3 +1,4 @@
+import { fetchBusinessPlans, transformBusinessPlan } from '@/lib/strapi/business-plans';
 import { Metadata } from 'next';
 import { getDictionary } from '@/lib/getDictionary';
 import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
@@ -48,7 +49,7 @@ export async function generateStaticParams() {
 export default async function BusinessPlansPage({ params }: Props) {
   const { locale: rawLocale } = await params;
   const locale = isSupportedLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
-  const t = await getDictionary(locale);
+  const [t, result] = await Promise.all([getDictionary(locale), fetchBusinessPlans(1, 100)]);
 
-  return <BusinessPlanClient locale={locale as 'en' | 'zh'} t={t} />;
+  return <BusinessPlanClient initialPlans={result.plans.map(transformBusinessPlan)} initialError={result.error} locale={locale as 'en' | 'zh'} t={{ nav: t.nav, businessPlans: t.businessPlans }} />;
 }

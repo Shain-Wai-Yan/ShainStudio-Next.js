@@ -77,7 +77,7 @@ interface HomePage {
 /* ─────────────────────────────────────────────────────────── */
 /*  METADATA                                                    */
 /* ─────────────────────────────────────────────────────────── */
-export async function generateMetadata({ params }: { params: { locale: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const resolvedParams = await params;
   const locale = isSupportedLocale(resolvedParams.locale) ? resolvedParams.locale : DEFAULT_LOCALE;
   const t = await getDictionary(locale);
@@ -122,7 +122,7 @@ export async function generateMetadata({ params }: { params: { locale: string } 
 /* ─────────────────────────────────────────────────────────── */
 /*  PAGE COMPONENT                                              */
 /* ─────────────────────────────────────────────────────────── */
-export default async function Page({ params }: { params: { locale: string } }) {
+export default async function Page({ params }: { params: Promise<{ locale: string }> }) {
   const resolvedParams = await params;
   const locale = isSupportedLocale(resolvedParams.locale) ? resolvedParams.locale : DEFAULT_LOCALE;
   const t: Dictionary = await getDictionary(locale);
@@ -150,14 +150,18 @@ export default async function Page({ params }: { params: { locale: string } }) {
 
   return (
     <>
-      <main className="font-sans antialiased text-slate-900 dark:text-slate-50 bg-white dark:bg-black selection:bg-amber-500/30">
+      <div className="font-sans antialiased text-slate-900 dark:text-slate-50 bg-white dark:bg-black selection:bg-amber-500/30">
         <GsapHero hp={hp} locale={locale} clientLogos={getClientLogos()} />
         <GsapMarquee items={resolvedMarqueeItems} />
         <GsapStats stats={resolvedStats} />
         <GsapBento projects={resolvedProjects} locale={locale} />
         <GsapMarketing data={t.gsapMarketing} />
         <GsapCta hp={hp} locale={locale} />
-      </main>
+      </div>
     </>
   );
+}
+
+export function generateStaticParams() {
+  return [{ locale: "en" }, { locale: "zh" }];
 }

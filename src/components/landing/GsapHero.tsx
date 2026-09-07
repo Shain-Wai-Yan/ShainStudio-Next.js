@@ -3,7 +3,7 @@
 import React, { useEffect, useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import { gsap, ScrollTrigger } from "@/lib/gsapSetup";
-import { Play, ArrowRight, Sparkles } from "lucide-react";
+import { Play, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import HeroTypewriter from "../HeroTypewriter";
 import CImage from "@/components/ui/CImage";
@@ -351,6 +351,7 @@ export default function GsapHero({ hp, locale, clientLogos = [] }: GsapHeroProps
         cancelled = true;
       };
       });
+      return () => mm.revert();
     },
     { scope: containerRef }
   );

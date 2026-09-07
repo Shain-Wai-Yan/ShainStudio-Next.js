@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+import sanitizeHtml from 'sanitize-html';
 import CImage from '@/components/ui/CImage';
 
-const PLACEHOLDER_IMAGE = '/images/shain studio.png';
+const PLACEHOLDER_IMAGE = '/images/Shain Studio.webp';
 
 interface DocumentCardProps {
   title: string;
@@ -16,12 +17,16 @@ interface DocumentCardProps {
   isLoading?: boolean;
 }
 
-// Simple function to make <a> tags in description open in new tab safely
+// CMS descriptions are untrusted HTML, including when truncated mid-tag.
 function sanitizeDescription(html: string): string {
-  return html.replace(
-    /<a\s+href="([^"]+)"[^>]*>(.*?)<\/a>/gi,
-    '<a href="$1" target="_blank" rel="noopener noreferrer" class="desc-link">$2</a>'
-  );
+  return sanitizeHtml(html, {
+    allowedTags: ['p', 'br', 'strong', 'em', 'b', 'i', 'ul', 'ol', 'li', 'a'],
+    allowedAttributes: { a: ['href', 'target', 'rel', 'class'] },
+    allowedSchemes: ['http', 'https', 'mailto'],
+    transformTags: { a: sanitizeHtml.simpleTransform('a', {
+      target: '_blank', rel: 'noopener noreferrer', class: 'desc-link',
+    }) },
+  });
 }
 
 export function DocumentCard({
@@ -44,10 +49,9 @@ export function DocumentCard({
     ? description.substring(0, 150) + '...'
     : description;
 
-  const sanitizedFull = sanitizeDescription(description);
-  const sanitizedTruncated = !showMore && description.length > 150
-    ? sanitizeDescription(description.substring(0, 150)) + '...'
-    : sanitizedFull;
+  const sanitizedTruncated = useMemo(() => sanitizeDescription(
+    !showMore && description.length > 150 ? description.substring(0, 150) + '...' : description
+  ), [description, showMore]);
 
   const displayImage = (!coverImage || imageError) ? PLACEHOLDER_IMAGE : coverImage;
 

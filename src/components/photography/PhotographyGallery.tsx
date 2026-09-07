@@ -3,7 +3,8 @@
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { Photo } from '@/lib/strapi/photography';
 import { MasonryGrid } from './MasonryGrid';
-import { PhotoLightbox } from './PhotoLightbox';
+import dynamic from 'next/dynamic';
+const PhotoLightbox = dynamic(() => import('./PhotoLightbox').then(m => m.PhotoLightbox), { ssr: false });
 
 interface PhotographyGalleryProps {
   initialPhotos: Photo[];

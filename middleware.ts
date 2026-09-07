@@ -19,6 +19,12 @@ function detectLocaleFromHeader(acceptLanguage: string | null): string {
 
 
 
+function localeUrl(request: NextRequest, pathname: string) {
+  const url = request.nextUrl.clone();
+  url.pathname = pathname;
+  return url;
+}
+
 export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const searchParams = request.nextUrl.searchParams;
@@ -206,7 +212,7 @@ export function middleware(request: NextRequest) {
   // LOCALE ROUTING WITH /[locale]/ STRUCTURE
   // ============================================
 
-  if (pathname.startsWith('/zh')) {
+  if (pathname === '/zh' || pathname.startsWith('/zh/')) {
     return NextResponse.next();
   }
 
@@ -216,15 +222,15 @@ export function middleware(request: NextRequest) {
 
     // User has saved preference
     if (languageCookie === 'zh') {
-      return NextResponse.redirect(new URL('/zh', request.url));
+      return NextResponse.redirect(localeUrl(request, '/zh'));
     }
 
     // Try to detect from browser language
     const acceptLanguage = request.headers.get('accept-language');
     const detectedLocale = detectLocaleFromHeader(acceptLanguage);
 
-    if (detectedLocale === 'zh') {
-      const response = NextResponse.redirect(new URL('/zh', request.url));
+    if (languageCookie !== 'en' && detectedLocale === 'zh') {
+      const response = NextResponse.redirect(localeUrl(request, '/zh'));
       response.cookies.set('NEXT_LOCALE', 'zh', {
         maxAge: 365 * 24 * 60 * 60,
         path: '/',
@@ -233,19 +239,12 @@ export function middleware(request: NextRequest) {
       return response;
     }
 
-    // Default to English
-    const response = NextResponse.rewrite(new URL('/en', request.url));
-    response.cookies.set('NEXT_LOCALE', 'en', {
-      maxAge: 365 * 24 * 60 * 60,
-      path: '/',
-      sameSite: 'lax',
-    });
-    return response;
+    return NextResponse.rewrite(localeUrl(request, '/en'));
   }
 
   // Handle any other non-locale paths
   if (pathname !== '/' && !pathname.startsWith('/.')) {
-    return NextResponse.rewrite(new URL(`/en${pathname}`, request.url));
+    return NextResponse.rewrite(localeUrl(request, `/en${pathname}`));
   }
 
   return NextResponse.next();

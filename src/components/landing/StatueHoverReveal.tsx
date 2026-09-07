@@ -199,6 +199,8 @@ const RevealLayer = React.memo(function RevealLayer() {
       const setActive = (on: boolean) => {
         if (on === active) return;
         active = on;
+        if (on) gsap.ticker.add(render);
+        else gsap.ticker.remove(render);
         if (fw) {
           const f = on ? "url(#hero-reveal-goo)" : "none";
           fw.style.filter = f;
@@ -302,8 +304,6 @@ const RevealLayer = React.memo(function RevealLayer() {
 
         writeVars(vx, vy);
       };
-
-      gsap.ticker.add(render);
 
       // Smoothed cursor follow — the signature trailing lag.
       const xTo = gsap.quickTo(S, "mx", { duration: 0.45, ease: "power3.out" });

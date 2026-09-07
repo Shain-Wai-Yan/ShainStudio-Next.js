@@ -1,9 +1,7 @@
 /**
  * Centralised GSAP plugin registration.
  * Import gsap & ScrollTrigger from here — never call gsap.registerPlugin()
- * directly in individual components.  Calling registerPlugin multiple times
- * forces GSAP to re-process its internal map on every import, wasting ~200 ms
- * of main-thread time at startup.
+ * directly in individual components, so plugin configuration stays consistent.
  */
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";

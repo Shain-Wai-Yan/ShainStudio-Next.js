@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { FaLinkedin, FaGithub, FaEnvelope } from 'react-icons/fa';
 import { usePathname } from 'next/navigation';
 import { getDictionarySync } from '@/lib/getDictionary';
@@ -168,7 +168,7 @@ export function ContactForm() {
       } else {
         throw new Error(responseData.error || 'Form submission failed');
       }
-    } catch (error) {
+    } catch {
       setSubmitMessage(t.submitError || 'Oops! Something went wrong. Please try again.');
       setSubmitStatus('error');
     } finally {

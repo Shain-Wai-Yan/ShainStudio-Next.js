@@ -2,7 +2,7 @@
 
 import React, { useRef } from "react";
 import { useGSAP } from "@gsap/react";
-import { gsap, ScrollTrigger } from "@/lib/gsapSetup";
+import { gsap } from "@/lib/gsapSetup";
 
 interface StatDef { value: number; suffix: string; label: string; }
 interface GsapStatsProps {
@@ -59,6 +59,7 @@ export default function GsapStats({ stats }: GsapStatsProps) {
         });
       });
       });
+      return () => mm.revert();
     },
     { scope: containerRef }
   );

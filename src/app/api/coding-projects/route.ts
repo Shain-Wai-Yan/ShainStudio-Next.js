@@ -1,3 +1,4 @@
+import { boundedInteger } from '@/lib/utils/pagination';
 /**
  * Coding Projects API Route
  * Proxies requests to the Strapi CMS so the frontend never exposes the API token directly.
@@ -14,8 +15,8 @@ export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
 
   const slug = searchParams.get('slug');
-  const page = Number(searchParams.get('page') ?? '1');
-  const pageSize = Number(searchParams.get('pageSize') ?? '100');
+  const page = boundedInteger(searchParams.get('page'), 1, 10000);
+  const pageSize = boundedInteger(searchParams.get('pageSize'), 100, 100);
 
   // ─── Single project by slug ───────────────────────────────────────────────
   if (slug) {

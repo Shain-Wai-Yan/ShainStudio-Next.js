@@ -22,7 +22,6 @@ export default function SyntaxWidget() {
           // Load the iframe if they click (Mobile)
           setHasInteracted(true); 
           setIsOpen(prev => {
-            if (!prev) setIsLoading(false); 
             return !prev;
           });
         }}
@@ -32,6 +31,8 @@ export default function SyntaxWidget() {
           hover:scale-110 transition-all duration-300 z-[9999] 
           flex items-center justify-center group pointer-events-auto`}
         aria-label="Toggle Syntax AI Chat"
+        aria-expanded={isOpen}
+        aria-controls="syntax-chat"
       >
         <div className="absolute inset-0 rounded-full bg-gold/10 opacity-0 group-hover:opacity-100 animate-pulse transition-opacity pointer-events-none" />
         {isOpen ? (
@@ -46,7 +47,10 @@ export default function SyntaxWidget() {
         Once rendered, it stays mounted for persistence, toggling visibility via CSS.
       */}
       {hasInteracted && (
-        <div 
+        <div
+          id="syntax-chat"
+          inert={!isOpen}
+          aria-hidden={!isOpen}
           className={`fixed bottom-20 right-4 md:bottom-24 md:right-6 
             w-[calc(100vw-2rem)] md:w-[400px] 
             h-[85dvh] md:h-[650px] max-h-[800px] 

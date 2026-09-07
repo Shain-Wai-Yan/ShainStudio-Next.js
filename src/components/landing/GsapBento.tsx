@@ -111,6 +111,7 @@ export default function GsapBento({ projects, locale }: GsapBentoProps) {
           scrollParent.style.overflowX = prev;
         };
       });
+      return () => mm.revert();
     },
     { scope: containerRef }
   );

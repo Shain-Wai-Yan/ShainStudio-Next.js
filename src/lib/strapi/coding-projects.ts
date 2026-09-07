@@ -305,7 +305,7 @@ export async function fetchCodingProjectBySlug(
     if (!responseData) return { project: null, error: 'No data received from Strapi' };
     
     const raw = responseData.data;
-    if (!raw || raw.length === 0) return { project: null, error: 'Project not found' };
+    if (!raw || raw.length === 0) return { project: null, error: null };
 
     // Slug uniqueness guard
     if (raw.length > 1) {

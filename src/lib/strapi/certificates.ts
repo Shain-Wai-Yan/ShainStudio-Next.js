@@ -50,8 +50,6 @@ export async function fetchCertificates(): Promise<{
     }
 
     const certificates = response.data?.data || [];
-    console.log('[v0] Raw certificates response:', JSON.stringify(certificates.slice(0, 1), null, 2));
-    console.log('[Certificates] Fetched:', certificates.length, 'certificates');
 
     return {
       certificates,
@@ -70,12 +68,6 @@ export async function fetchCertificates(): Promise<{
 export function transformCertificate(certificate: Certificate) {
   const imageUrl = extractUrl(certificate.Image); // Fixed: was certificate.CertificateImage
 
-  console.log('[v0] Certificate transform:', {
-    id: certificate.id,
-    title: certificate.Title,
-    image: certificate.Image,
-    extractedImageUrl: imageUrl,
-  });
 
   // Parse date
   const date = new Date(certificate.Date);

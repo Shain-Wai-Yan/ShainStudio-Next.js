@@ -5,12 +5,12 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { FaLinkedin, FaGithub, FaYoutube, FaEnvelope } from 'react-icons/fa';
 import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
-import { getDictionarySync } from '@/lib/getDictionary';
+import type { Dictionary } from '@/lib/getDictionary';
 
 /* ─── animated verbs ──────────────────────────────────────────────────── */
 const VERB_INTERVAL = 2200; // ms between swaps
 
-const Footer = () => {
+const Footer = ({ t }: { t: Pick<Dictionary, 'footer'> }) => {
   const pathname = usePathname();
 
   /* locale resolution */
@@ -25,7 +25,6 @@ const Footer = () => {
   }
 
   /* ── localization ── */
-  const t = getDictionarySync(locale);
   const basePath = locale === 'en' ? '' : `/${locale}`;
   const currentYear = new Date().getFullYear();
 

@@ -1,6 +1,7 @@
+import { serializeJsonLd } from '@/lib/utils/json-ld';
 import { Suspense } from 'react';
 import { Metadata } from 'next';
-import { fetchAllBlogs, fetchBlogCategories, fetchBlogTags } from '@/lib/strapi/blogs';
+import { fetchAllBlogs, fetchBlogCategories, fetchBlogTags } from '@/lib/server/blogs';
 import BlogHero from '@/components/blog/BlogHero';
 import BlogListingClient from '@/components/blog/BlogListingClient';
 import { getDictionary } from '@/lib/getDictionary';
@@ -97,7 +98,7 @@ export default async function BlogPage(props: BlogPageProps) {
     <main className="min-h-screen bg-white dark:bg-[#121212]">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
       />
       <BlogHero
         title={t.blog.subtitle}

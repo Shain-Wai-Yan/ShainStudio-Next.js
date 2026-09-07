@@ -1,3 +1,4 @@
+import { boundedInteger } from '@/lib/utils/pagination';
 /**
  * AMV Editing API Route
  * Proxies YouTube API requests through Cloudflare Worker.
@@ -31,7 +32,7 @@ export async function GET(request: NextRequest) {
         break;
 
       case 'videos': {
-        const maxResults = searchParams.get('maxResults') || '50';
+        const maxResults = boundedInteger(searchParams.get('maxResults'), 50, 50);
         const pageToken = searchParams.get('pageToken') || '';
         workerUrl = `${WORKER_BASE_URL}/api/youtube/videos?channelId=${CHANNEL_ID}&maxResults=${maxResults}`;
         if (pageToken) {
@@ -48,7 +49,7 @@ export async function GET(request: NextRequest) {
             { status: 400 }
           );
         }
-        workerUrl = `${WORKER_BASE_URL}/api/youtube/video-details?videoId=${videoId}`;
+        workerUrl = `${WORKER_BASE_URL}/api/youtube/video-details?videoId=${encodeURIComponent(videoId)}`;
         break;
       }
 
@@ -57,8 +58,8 @@ export async function GET(request: NextRequest) {
     }
 
     const response = await fetch(workerUrl, {
-      // Avoid stale worker cache during pagination
-      headers: { 'Cache-Control': 'no-cache' },
+      next: { revalidate: 300 },
+      signal: AbortSignal.timeout(8000),
     });
 
     if (!response.ok) {
@@ -107,6 +108,7 @@ export async function POST(request: NextRequest) {
     const analyticsUrl = `${WORKER_BASE_URL}/api/analytics/track`;
 
     const response = await fetch(analyticsUrl, {
+      signal: AbortSignal.timeout(8000),
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

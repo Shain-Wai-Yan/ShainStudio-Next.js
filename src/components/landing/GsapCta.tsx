@@ -2,7 +2,7 @@
 
 import React, { useRef } from "react";
 import { useGSAP } from "@gsap/react";
-import { gsap, ScrollTrigger } from "@/lib/gsapSetup";
+import { gsap } from "@/lib/gsapSetup";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
@@ -71,6 +71,7 @@ export default function GsapCta({ hp, locale }: GsapCtaProps) {
           gsap.set(solidTextRef.current, { clipPath: "inset(0% 0% 0% 0%)" });
         }
       });
+      return () => mm.revert();
     },
     { scope: containerRef }
   );

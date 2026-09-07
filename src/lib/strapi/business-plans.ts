@@ -57,7 +57,6 @@ export async function fetchBusinessPlans(
 
     const plans = response.data?.data || [];
     const total = response.data?.meta?.pagination?.total ?? plans.length;
-    console.log('[Business Plans] Fetched:', plans.length, 'plans, total:', total);
 
     return {
       plans,

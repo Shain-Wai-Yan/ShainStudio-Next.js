@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Breadcrumb } from '@/components/Breadcrumb';
 import { PhotographyGallery } from '@/components/photography/PhotographyGallery';
-import { fetchAllPhotography } from '@/lib/strapi/photography';
+import { fetchAllPhotography } from '@/lib/server/photography';
 import { getDictionary } from '@/lib/getDictionary'; // ✅ Use async
 import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
 

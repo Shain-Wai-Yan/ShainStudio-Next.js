@@ -8,7 +8,8 @@ import { PrestigeStats } from './PrestigeStats';
 import { CertificateCard } from './CertificateCard';
 import { CertificateTimelineRow } from './CertificateTimelineRow';
 import { ShowcaseCarousel3D } from './ShowcaseCarousel3D';
-import { CertificateModal } from './CertificateModal';
+import dynamic from 'next/dynamic';
+const CertificateModal = dynamic(() => import('./CertificateModal').then(m => m.CertificateModal), { ssr: false });
 import { Certificate, transformCertificate } from '@/lib/strapi/certificates';
 
 interface CertificateVaultClientProps {

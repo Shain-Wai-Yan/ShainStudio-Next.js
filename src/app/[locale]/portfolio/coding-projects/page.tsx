@@ -1,3 +1,4 @@
+import { serializeJsonLd } from '@/lib/utils/json-ld';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getDictionary } from '@/lib/getDictionary';
@@ -123,7 +124,7 @@ export default async function CodingProjectsPage({ params }: Props) {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify([jsonLd, jsonLdBreadcrumb]) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd([jsonLd, jsonLdBreadcrumb]) }}
       />
       
       <main className="min-h-screen pt-24 pb-16 px-4 md:px-8 max-w-7xl mx-auto">

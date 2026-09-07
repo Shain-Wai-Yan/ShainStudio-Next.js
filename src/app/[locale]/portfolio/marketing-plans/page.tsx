@@ -1,3 +1,4 @@
+import { fetchMarketingPlans, transformMarketingPlan } from '@/lib/strapi/marketing-plans';
 import { Metadata } from 'next';
 import { getDictionary } from '@/lib/getDictionary';
 import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
@@ -45,7 +46,7 @@ export async function generateStaticParams() {
 export default async function MarketingPlanPage(props: MarketingPlanPageProps) {
   const params = await props.params;
   const locale = isSupportedLocale(params?.locale) ? params.locale : DEFAULT_LOCALE;
-  const dict = await getDictionary(locale);
+  const [dict, result] = await Promise.all([getDictionary(locale), fetchMarketingPlans(1, 100)]);
 
-  return <MarketingPlanClient locale={locale as 'en' | 'zh'} dict={dict} />;
+  return <MarketingPlanClient initialPlans={result.plans.map(transformMarketingPlan)} initialError={result.error} locale={locale as 'en' | 'zh'} dict={{ nav: dict.nav, marketingPlans: dict.marketingPlans }} />;
 }

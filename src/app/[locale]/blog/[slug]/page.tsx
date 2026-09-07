@@ -1,8 +1,9 @@
+import { serializeJsonLd } from '@/lib/utils/json-ld';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Script from 'next/script';
 import { notFound } from 'next/navigation';
-import { fetchBlogBySlug, fetchRelatedBlogs } from '@/lib/strapi/blogs';
+import { fetchBlogBySlug, fetchRelatedBlogs } from '@/lib/server/blogs';
 import BlogPostHeader from '@/components/blog/BlogPostHeader';
 import BlogPostContent from '@/components/blog/BlogPostContent';
 import RelatedPosts from '@/components/blog/RelatedPosts';
@@ -66,7 +67,8 @@ export default async function BlogPostPage(props: BlogPostPageProps) {
   const t = await getDictionary(locale);
   const { blog, error } = await fetchBlogBySlug(slug);
 
-  if (error || !blog) notFound();
+  if (error) throw new Error(error);
+  if (!blog) notFound();
 
   const { blogs: relatedBlogs } = await fetchRelatedBlogs(blog.Category, blog.Slug, lang, 3);
   const basePath = locale === 'en' ? '' : `/${locale}`;
@@ -141,7 +143,7 @@ export default async function BlogPostPage(props: BlogPostPageProps) {
       <Script
         id="schema-org"
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify([jsonLd, breadcrumbLd]) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd([jsonLd, breadcrumbLd]) }}
       />
 
       {/* ── Breadcrumb — matches vanilla .breadcrumb ── */}

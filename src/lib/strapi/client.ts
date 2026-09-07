@@ -8,7 +8,7 @@ const STRAPI_API_URL = (process.env.NEXT_PUBLIC_STRAPI_API_URL || 'https://api.s
 
 const STRAPI_API_TOKEN = process.env.STRAPI_API_TOKEN;
 
-const API_TIMEOUT = 3000; // 3 seconds
+const API_TIMEOUT = 10000; // Allow CMS cold starts while bounding stalled requests.
 
 interface FetchOptions {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
@@ -64,11 +64,9 @@ export async function fetchFromStrapi<T>(
         method,
         headers,
         signal: controller.signal,
-        // Ensure Next.js caches bypass VIP requests correctly if needed,
-        // though typically Strapi fetch caching is handled elsewhere.
+        ...(method === 'GET' ? { next: { revalidate: 300 } } : { cache: 'no-store' as const }),
       });
 
-      clearTimeout(timeoutId);
 
       // Handle common HTTP error codes
       if (response.status === 403) {
@@ -102,6 +100,8 @@ export async function fetchFromStrapi<T>(
         };
       }
       throw fetchError;
+    } finally {
+      clearTimeout(timeoutId);
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
@@ -175,8 +175,7 @@ export function extractUrl(
 
   // Ensure URL is absolute
   if (url && !url.startsWith('http') && !url.startsWith('data:')) {
-    const baseUrl = STRAPI_API_URL.replace('/api/', '');
-    url = `${baseUrl}${url}`;
+    url = new URL(url, `${STRAPI_API_URL.replace(/\/api$/, '')}/`).toString();
   }
 
   return url || fallbackUrl;

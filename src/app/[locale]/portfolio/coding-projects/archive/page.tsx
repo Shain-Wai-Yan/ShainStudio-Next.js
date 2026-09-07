@@ -1,3 +1,4 @@
+import { serializeJsonLd } from '@/lib/utils/json-ld';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getDictionary } from '@/lib/getDictionary';
@@ -134,7 +135,7 @@ export default async function CodingProjectsArchivePage({ params }: Props) {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify([jsonLd, jsonLdBreadcrumb]) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd([jsonLd, jsonLdBreadcrumb]) }}
       />
       
       <CodingProjectArchiveClient

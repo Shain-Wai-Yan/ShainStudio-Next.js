@@ -2,7 +2,7 @@
 
 import React, { useRef } from "react";
 import { useGSAP } from "@gsap/react";
-import { gsap, ScrollTrigger } from "@/lib/gsapSetup";
+import { gsap } from "@/lib/gsapSetup";
 
 interface GsapMarqueeProps {
   items: string[];
@@ -56,6 +56,7 @@ export default function GsapMarquee({ items }: GsapMarqueeProps) {
       mm.add("(prefers-reduced-motion: reduce)", () => {
         gsap.set(bandRef.current, { opacity: 1, rotate: -2 });
       });
+      return () => mm.revert();
     },
     { scope: containerRef }
   );
@@ -72,7 +73,7 @@ export default function GsapMarquee({ items }: GsapMarqueeProps) {
       <div
         ref={bandRef}
         className="relative -mx-4 pb-4 md:mx-0 w-[110%] -left-[5%] bg-gradient-to-r from-[#bf953f] via-[#fcf6ba] to-[#b38728] text-[#1e1e48] border-y-2 border-[#1e1e48] dark:border-[#d4af37] shadow-2xl z-20 will-change-transform"
-        style={{ opacity: 0 }}
+        style={{ opacity: 1 }}
       >
         <div 
           ref={marqueeInnerRef}
