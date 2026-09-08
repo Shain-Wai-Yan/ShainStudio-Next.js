@@ -1,5 +1,6 @@
 import 'server-only';
 import { fetchFromStrapi } from '@/lib/strapi/client';
+import { STRAPI_ORIGIN_URL } from '@/lib/strapi/config';
 import { boundedInteger } from '@/lib/utils/pagination';
 
 function calculateReadingTime(content: string): string {
@@ -15,20 +16,17 @@ function calculateReadingTime(content: string): string {
  */
 function resolveMediaUrl(media: Record<string, unknown> | null | undefined): string | null {
   if (!media) return null;
-  // Strapi v5 flat shape
-  if (media.url) return media.url as string;
-  // Strapi v4 nested shape
-  if (media.data && (media.data as Record<string, unknown>).attributes) {
-    return ((media.data as Record<string, unknown>).attributes as Record<string, unknown>).url as string;
-  }
-  // Fallback through format sizes
-  if (media.formats) {
-    const fmts = media.formats as Record<string, { url: string }>;
-    for (const fmt of ['large', 'medium', 'small', 'thumbnail']) {
-      if (fmts[fmt]?.url) return fmts[fmt].url;
+  const nested = media.data as Record<string, unknown> | null | undefined;
+  const file = (nested?.attributes as Record<string, unknown> | undefined) ?? nested ?? media;
+  let url = typeof file.url === 'string' ? file.url : undefined;
+  if (!url && file.formats) {
+    const formats = file.formats as Record<string, { url?: string }>;
+    for (const size of ['large', 'medium', 'small', 'thumbnail']) {
+      if (formats[size]?.url) { url = formats[size].url; break; }
     }
   }
-  return null;
+  if (!url) return null;
+  return new URL(url, `${STRAPI_ORIGIN_URL}/`).toString();
 }
 
 /**
@@ -145,7 +143,7 @@ export async function getBlogPosts(sp: URLSearchParams) {
   const { data, error } = await fetchFromStrapi<{
     data: Record<string, unknown>[];
     meta?: { pagination?: { total?: number; pageCount?: number } };
-  }>('blogs', { queryParams });
+  }>('blogs', { tags: ['strapi', 'blogs'], queryParams });
   if (error || !data) throw new Error(error || 'CMS unavailable');
   const posts = (data.data ?? []).map(transformPost).filter(p => p !== null).map(post => (
     sp.get('minimal') === 'true' ? { ...post, content: undefined } : post
@@ -157,6 +155,7 @@ export async function getBlogPosts(sp: URLSearchParams) {
 export async function getBlogPost(slug: string) {
   if (!/^[a-z0-9-]+$/i.test(slug) || slug.length > 200) return null;
   const { data, error } = await fetchFromStrapi<{ data: Record<string, unknown>[] }>('blogs', {
+    tags: ['strapi', 'blogs'],
     queryParams: { 'filters[slug][$eq]': slug, populate: '*', 'pagination[pageSize]': 1 },
   });
   if (error || !data) throw new Error(error || 'CMS unavailable');

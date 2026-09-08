@@ -4,7 +4,7 @@ import { fetchCertificates, transformCertificate } from '@/lib/strapi/certificat
 import { CertificateVaultClient } from '@/components/certificates/CertificateVaultClient';
 import { Breadcrumb } from '@/components/Breadcrumb';
 import { getDictionary } from '@/lib/getDictionary';
-import { SITE_URL, PERSON_ID } from '@/lib/seo';
+import { SITE_NAME, SITE_URL, PERSON_ID, brandedTitle } from '@/lib/seo';
 
 interface CertificatePageProps {
   params: Promise<{ locale: string }>;
@@ -29,17 +29,17 @@ export async function generateMetadata(
   const ogDescription = seo.ogDescription ?? description;
 
   return {
-    title,
+    title: { absolute: brandedTitle(title) },
     description,
     keywords,
     authors: [{ name: 'Shain Wai Yan', url: domain }],
     creator: 'Shain Wai Yan',
     publisher: 'Shain Wai Yan',
     robots: {
-      index: true,
+      index: locale !== 'zh',
       follow: true,
       googleBot: {
-        index: true,
+        index: locale !== 'zh',
         follow: true,
         'max-snippet': -1,
         'max-image-preview': 'large',
@@ -47,18 +47,13 @@ export async function generateMetadata(
       },
     },
     alternates: {
-      canonical: baseUrl,
-      languages: {
-        en: `${domain}/certificate`,
-        zh: `${domain}/zh/certificate`,
-        'x-default': `${domain}/certificate`,
-      },
+      canonical: `${domain}/certificate`,
     },
     openGraph: {
       title: ogTitle,
       description: ogDescription,
       url: baseUrl,
-      siteName: 'Shain Wai Yan Portfolio',
+      siteName: SITE_NAME,
       type: 'profile',
       locale: locale === 'zh' ? 'zh_CN' : 'en_US',
       images: [

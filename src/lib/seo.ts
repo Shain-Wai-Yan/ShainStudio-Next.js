@@ -1,18 +1,19 @@
 import type { Locale } from '@/lib/locales';
 
 /**
- * Single source of truth for the site's entity graph (Person / Organization / WebSite)
+ * Single source of truth for the site's entity graph (Person / WebSite)
  * and canonical URL helpers. Every page must import these instead of hardcoding
  * URLs, job titles, or social profiles — inconsistent copies of this data are what
  * break entity reconciliation in Google's Knowledge Graph.
  */
 
 export const SITE_URL = 'https://www.shainwaiyan.com';
+export const SITE_NAME = 'Shain Studio';
+export const SITE_ALTERNATE_NAME = 'Shain Wai Yan Portfolio';
 export const PERSON_ID = `${SITE_URL}/#person`;
-export const ORG_ID = `${SITE_URL}/#organization`;
 export const WEBSITE_ID = `${SITE_URL}/#website`;
 
-/** Square brand logo — used for icons, manifest, and Organization.logo. */
+/** Square portfolio logo — used for icons and the web app manifest. */
 export const LOGO_IMAGE = `${SITE_URL}/images/Shain%20Studio.png`;
 /** Default social share image (1200×630 cover: face + name + title + domain). */
 export const DEFAULT_OG_IMAGE = `${SITE_URL}/images/og-cover.png`;
@@ -21,7 +22,7 @@ export const PERSON_IMAGE = `${SITE_URL}/images/profile.avif`;
 
 export const PERSON = {
   name: 'Shain Wai Yan',
-  alternateName: ['xolbine', 'Xolbine', '明元易'],
+  alternateName: ['Xolbine', '明元易'],
   jobTitle: {
     en: 'Technical Marketer',
     zh: '技术营销从业者',
@@ -35,9 +36,25 @@ export const PERSON = {
   ],
 } as const;
 
-export const ORGANIZATION = {
-  name: 'Shain Studio',
-} as const;
+/** Produce one stable SERP title without duplicating the brand via a layout template. */
+export function brandedTitle(title: string, brand = 'Shain Wai Yan'): string {
+  const cleanTitle = title.trim();
+  const escapedBrand = brand.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(`(?:^|[|—–-]\\s*)${escapedBrand}\\s*$`, 'i').test(cleanTitle)
+    ? cleanTitle
+    : `${cleanTitle} | ${brand}`;
+}
+
+/** Accept CMS canonicals only when they point back to the public portfolio origin. */
+export function safeCanonicalUrl(candidate: string | null | undefined, fallback: string): string {
+  if (!candidate) return fallback;
+  try {
+    const parsed = new URL(candidate, SITE_URL);
+    return parsed.origin === SITE_URL ? parsed.toString() : fallback;
+  } catch {
+    return fallback;
+  }
+}
 
 const PERSON_DESCRIPTION: Record<Locale, string> = {
   en: 'Technical marketer and creative technologist specialising in MarTech, content strategy, and market analysis.',
@@ -71,11 +88,6 @@ export function personRef() {
   return { '@id': PERSON_ID };
 }
 
-/** Reference-only Organization node for publisher fields. */
-export function orgRef() {
-  return { '@id': ORG_ID };
-}
-
 /**
  * The canonical, enriched Person entity. Emitted in full in the root layout and on
  * /about (its authoritative biography page); everywhere else reference it via personRef().
@@ -92,7 +104,6 @@ export function personJsonLd(locale: Locale) {
     jobTitle: PERSON.jobTitle[locale],
     description: PERSON_DESCRIPTION[locale],
     email: `mailto:${PERSON.email}`,
-    worksFor: { '@id': ORG_ID },
     alumniOf: [
       { '@type': 'CollegeOrUniversity', name: 'Taunggyi University' },
       { '@type': 'EducationalOrganization', name: 'Strategy First University' },
@@ -143,30 +154,19 @@ export function personJsonLd(locale: Locale) {
   };
 }
 
-export function organizationJsonLd() {
-  return {
-    '@type': 'Organization',
-    '@id': ORG_ID,
-    name: ORGANIZATION.name,
-    url: SITE_URL,
-    logo: { '@type': 'ImageObject', url: LOGO_IMAGE, width: 1024, height: 1024 },
-    founder: { '@id': PERSON_ID },
-    email: PERSON.email,
-    sameAs: [...PERSON.sameAs],
-  };
-}
-
 export function websiteJsonLd(locale: Locale) {
   const isZh = locale === 'zh';
   return {
     '@type': 'WebSite',
     '@id': WEBSITE_ID,
     url: SITE_URL,
-    name: isZh ? 'Shain的作品集' : "Shain's Portfolio",
+    name: SITE_NAME,
+    alternateName: isZh ? [SITE_ALTERNATE_NAME, 'Shain Wai Yan 个人作品集'] : SITE_ALTERNATE_NAME,
     description: isZh
-      ? 'Shain Wai Yan (xolbine) 的作品集 — 技术营销从业者、MarTech 爱好者、创意科技实践者。探索我在数字营销、技术、数据与AI领域的作品。'
-      : 'Portfolio of Shain Wai Yan (xolbine) — Technical Marketer, MarTech Enthusiast, and Creative Technologist. Explore my work in digital marketing, technology, data, and AI.',
+      ? 'Shain Wai Yan（Xolbine、明元易）的个人作品集，以 Shain Studio 呈现技术营销、MarTech 与创意科技作品。'
+      : 'Shain Studio is the personal portfolio of Shain Wai Yan (Xolbine, 明元易), presenting work in technical marketing, MarTech, and creative technology.',
     inLanguage: isZh ? 'zh-CN' : 'en-US',
     publisher: { '@id': PERSON_ID },
+    creator: { '@id': PERSON_ID },
   };
 }

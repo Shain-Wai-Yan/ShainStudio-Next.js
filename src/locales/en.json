@@ -104,7 +104,7 @@
       "description": "Explore Shain Studio's marketing strategies, campaigns, and case studies. From coursework to self-initiated experiments, see how I think, plan, and execute as a modern marketer.",
       "keywords": "marketing campaigns, marketing strategy, case studies, digital marketing, brand strategy, Shain Wai Yan, Shain Studio",
       "projectNotFoundTitle": "Project Not Found | Shain Studio",
-      "siteName": "Shain Wai Yan Portfolio",
+      "siteName": "Shain Studio",
       "twitterTitle": "Marketing in Motion | Shain Studio",
       "twitterDescription": "Explore marketing strategies, campaigns, and case studies by Shain Wai Yan."
     },
@@ -231,7 +231,7 @@
     },
     "seo": {
       "title": "Coding Projects & Software Architecture | Shain Studio",
-      "description": "Explore full-stack development, AI microservices, and serverless architectures engineered by Shain Wai Yan (xolbine)."
+      "description": "Explore full-stack development, AI microservices, and serverless architectures engineered by Shain Wai Yan (Xolbine)."
     }
   },
   "businessPlans": {
@@ -247,7 +247,7 @@
     "documentsHeading": "Marketing Plan Documents",
     "emptyMessage": "No marketing plans available at this time.",
     "seo": {
-      "title": "Marketing Plans | Shain Wai Yan",
+      "title": "Marketing Plans | Shain Studio",
       "description": "Explore innovative marketing tactics designed to engage audiences and boost brand visibility with comprehensive marketing strategies."
     }
   },
@@ -256,9 +256,9 @@
     "subtitle": "Visual Storytelling Through the Lens",
     "description": "A curated collection of photography exploring composition, light, and emotion. Each shot captures a decisive moment with intentional storytelling.",
     "seo": {
-      "title": "Photography Portfolio | Shain Wai Yan",
+      "title": "Photography Portfolio | Shain Studio",
       "description": "Explore Shain Wai Yan's photography portfolio featuring stunning images of landscapes, architecture, and more.",
-      "openGraphTitle": "Photography Portfolio | Shain Wai Yan",
+      "openGraphTitle": "Photography Portfolio | Shain Studio",
       "openGraphDesc": "Stunning photography showcasing landscapes, architecture, and beautiful moments."
     },
     "labels": {
@@ -278,12 +278,12 @@
     "subtitle": "Motion Graphics & Video Editing",
     "description": "Creative video edits and motion graphics where every frame is crafted with precision. Combining music, visuals, and timing to tell compelling stories.",
     "seo": {
-      "title": "AMV Editing Portfolio | Shain Wai Yan (xolbine)",
-      "description": "Explore Shain Wai Yan's (xolbine, 明元易) AMV (Anime Music Video) editing portfolio featuring dynamic video edits that blend storytelling with impactful visuals.",
-      "keywords": "Shain Wai Yan, xolbine, 明元易, AMV, anime music video, video editing, portfolio, animation, music videos",
-      "openGraphTitle": "AMV Editing Portfolio | Shain Wai Yan",
+      "title": "AMV Editing Portfolio | Shain Studio",
+      "description": "Explore Shain Wai Yan's (Xolbine, 明元易) AMV (Anime Music Video) editing portfolio featuring dynamic video edits that blend storytelling with impactful visuals.",
+      "keywords": "Shain Wai Yan, Xolbine, 明元易, AMV, anime music video, video editing, portfolio, animation, music videos",
+      "openGraphTitle": "AMV Editing Portfolio | Shain Studio",
       "openGraphDesc": "Dynamic video edits that blend storytelling with impactful visuals.",
-      "siteName": "Shain Wai Yan Portfolio"
+      "siteName": "Shain Studio"
     },
     "labels": {
       "headerTitle": "AMV Editing",

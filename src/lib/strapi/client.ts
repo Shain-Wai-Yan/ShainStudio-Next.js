@@ -4,7 +4,7 @@
  * Supports both Strapi v5 flat structure and v4 nested structure
  */
 
-const STRAPI_API_URL = (process.env.NEXT_PUBLIC_STRAPI_API_URL || 'https://api.shainwaiyan.com/api').replace(/\/$/, '');
+import { STRAPI_API_URL, STRAPI_ORIGIN_URL } from '@/lib/strapi/config';
 
 const STRAPI_API_TOKEN = process.env.STRAPI_API_TOKEN;
 
@@ -14,6 +14,8 @@ interface FetchOptions {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
   queryParams?: Record<string, string | number | boolean>;
   timeout?: number;
+  revalidate?: number;
+  tags?: string[];
 }
 
 interface FetchResponse<T> {
@@ -29,7 +31,10 @@ export async function fetchFromStrapi<T>(
   options: FetchOptions = {}
 ): Promise<FetchResponse<T>> {
   try {
-    const { method = 'GET', queryParams = {}, timeout = API_TIMEOUT } = options;
+    const {
+      method = 'GET', queryParams = {}, timeout = API_TIMEOUT,
+      revalidate = 300, tags = [],
+    } = options;
 
     // Build query string from params object
     const queryString = Object.keys(queryParams)
@@ -64,7 +69,9 @@ export async function fetchFromStrapi<T>(
         method,
         headers,
         signal: controller.signal,
-        ...(method === 'GET' ? { next: { revalidate: 300 } } : { cache: 'no-store' as const }),
+        ...(method === 'GET'
+          ? { next: { revalidate, ...(tags.length > 0 ? { tags } : {}) } }
+          : { cache: 'no-store' as const }),
       });
 
 
@@ -175,7 +182,7 @@ export function extractUrl(
 
   // Ensure URL is absolute
   if (url && !url.startsWith('http') && !url.startsWith('data:')) {
-    url = new URL(url, `${STRAPI_API_URL.replace(/\/api$/, '')}/`).toString();
+    url = new URL(url, `${STRAPI_ORIGIN_URL}/`).toString();
   }
 
   return url || fallbackUrl;

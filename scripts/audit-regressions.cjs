@@ -59,25 +59,25 @@ const responses = {
   redirect: url => ({ kind: 'redirect', url, cookies: { set() {} } }),
   rewrite: url => ({ kind: 'rewrite', url }),
 };
-const { middleware } = load('middleware.ts', { 'next/server': { NextResponse: responses } });
+const { proxy } = load('src/proxy.ts', { 'next/server': { NextResponse: responses } });
 function request(url, preference, language = 'en') {
   const nextUrl = new URL(url);
   nextUrl.clone = () => new URL(url);
   return { url, nextUrl, cookies: { get: () => preference ? { value: preference } : undefined }, headers: new Headers({ 'accept-language': language }) };
 }
 test('locale rewrites preserve searches and pagination', () => {
-  const response = middleware(request('https://example.test/blog?page=2&search=hello'));
+  const response = proxy(request('https://example.test/blog?page=2&search=hello'));
   assert.equal(response.url.pathname, '/en/blog');
   assert.equal(response.url.search, '?page=2&search=hello');
 });
 test('saved English preference overrides browser Chinese preference', () => {
-  const response = middleware(request('https://example.test/?utm_source=test', 'en', 'zh-CN'));
+  const response = proxy(request('https://example.test/?utm_source=test', 'en', 'zh-CN'));
   assert.equal(response.kind, 'rewrite');
-  assert.equal(response.url.pathname, '/en');
+  assert.equal(response.url.pathname, '/en/');
   assert.equal(response.url.search, '?utm_source=test');
 });
 test('Chinese redirect retains attribution parameters', () => {
-  const response = middleware(request('https://example.test/?utm_source=test', 'zh'));
+  const response = proxy(request('https://example.test/?utm_source=test', 'zh'));
   assert.equal(response.url.pathname, '/zh');
   assert.equal(response.url.search, '?utm_source=test');
 });
@@ -153,4 +153,140 @@ test('project lookups distinguish missing content from CMS outages', async () =>
     const offline = load(`src/lib/strapi/${file}.ts`, { './client': { fetchFromStrapi: async () => ({ data: null, error: 'Request timed out' }) } });
     assert.deepEqual(await offline[name]('real-project'), { project: null, error: 'Request timed out' });
   }
+});
+
+test('project collection queries exclude detail-only bodies and galleries', async () => {
+  for (const [file, name] of [['coding-projects', 'fetchCodingProjects'], ['marketing-in-motion', 'fetchMarketingProjects']]) {
+    let query;
+    const projectModule = load(`src/lib/strapi/${file}.ts`, { './client': {
+      extractUrl: () => '',
+      fetchFromStrapi: async (_endpoint, options) => {
+        query = options.queryParams;
+        return { data: { data: [], meta: { pagination: { total: 0 } } }, error: null };
+      },
+    } });
+    await projectModule[name](1, 100);
+    assert.equal(query.populate, undefined);
+    assert.equal(Object.values(query).includes('content'), false);
+    assert.equal(Object.values(query).includes('imageGallery'), false);
+    assert.equal(query['populate[coverImage][fields][0]'], 'url');
+    assert.equal(query['populate[category][fields][0]'], 'name');
+  }
+});
+
+test('marketing and coding projects normalize Strapi v4 and v5 entry shapes', () => {
+  for (const [file, transform] of [['coding-projects', 'transformCodingProject'], ['marketing-in-motion', 'transformMarketingProject']]) {
+    const projectModule = load(`src/lib/strapi/${file}.ts`, { './client': { extractUrl: () => '' } });
+    const fields = { title: 'Project', slug: 'project', summary: 'Summary', content: '<p>Body</p>', category: { name: 'Web' } };
+    const v5 = projectModule[transform]({ id: 1, ...fields });
+    const v4 = projectModule[transform]({ id: 1, attributes: fields });
+    assert.equal(v4.title, v5.title);
+    assert.equal(v4.slug, v5.slug);
+    assert.equal(v4.category, v5.category);
+  }
+});
+
+test('document descriptions preserve supported content and reject executable HTML', () => {
+  const { sanitizeDescription } = load('src/lib/utils/sanitize-description.ts');
+  const safe = sanitizeDescription('<p>Plan <strong>summary</strong> <a href="https://example.test/file">source</a></p>');
+  assert.match(safe, /<strong>summary<\/strong>/);
+  assert.match(safe, /href="https:\/\/example.test\/file"/);
+  assert.match(safe, /rel="noopener noreferrer"/);
+  const unsafe = sanitizeDescription('<script>alert(1)</script><img src=x onerror=alert(1)><iframe src="https://example.test"></iframe><a href="javascript:alert(1)" onclick="alert(1)">link</a><h2>Heading text</h2>');
+  assert.doesNotMatch(unsafe, /<script|<img|<iframe|javascript:|onclick|<h2/);
+  assert.match(unsafe, /Heading text/);
+});
+
+test('blog v4/v5 fixtures produce the same frontend contract and absolute media URLs', async () => {
+  const fields = {
+    Title: 'Fixture blog', slug: 'fixture-blog', excerpt: 'Summary', content: '<p>Body</p>',
+    publishDate: '2026-01-01T00:00:00.000Z', updatedAt: '2026-01-02T00:00:00.000Z',
+    featuredImage: { url: '/uploads/blog.jpg' }, categories: [{ name: 'Strategy' }], tags: [{ name: 'CMS' }],
+    Seo: { metaTitle: 'SEO title', ogImage: { url: '/uploads/og.jpg' } },
+  };
+  const v4 = { ...fields, featuredImage: { data: { attributes: fields.featuredImage } },
+    categories: { data: [{ attributes: { name: 'Strategy' } }] }, tags: { data: [{ attributes: { name: 'CMS' } }] },
+    Seo: { ...fields.Seo, ogImage: { data: { attributes: fields.Seo.ogImage } } },
+  };
+  const outputs = [];
+  for (const record of [{ id: 7, ...fields }, { id: 7, attributes: v4 }]) {
+    const { getBlogPosts, getBlogPost } = load('src/lib/server/blog-data.ts', {
+      '@/lib/strapi/client': { fetchFromStrapi: async () => ({ data: { data: [record], meta: { pagination: { total: 1, pageCount: 1 } } }, error: null }) },
+    });
+    const full = await getBlogPost('fixture-blog');
+    const minimal = await getBlogPosts(new URLSearchParams('minimal=true&language=en'));
+    assert.equal(minimal.posts[0].content, undefined);
+    assert.equal(minimal.posts[0].readingTime, '1 min read');
+    assert.equal(full.content, '<p>Body</p>');
+    assert.equal(new URL(full.featuredImage).pathname, '/uploads/blog.jpg');
+    assert.equal(new URL(full.seo.ogImageUrl).pathname, '/uploads/og.jpg');
+    outputs.push(full);
+  }
+  assert.deepEqual(outputs[0], outputs[1]);
+});
+
+test('photography v4/v5 fixtures preserve flattened fields, dimensions, relations and dates', async () => {
+  const originalFetch = global.fetch;
+  const fields = { title: 'Photo', location: 'Yangon', description: 'Example',
+    image: { url: '/uploads/photo.jpg', width: 1200, height: 800 }, category: { name: 'Street' },
+    tags: [{ name: 'Travel' }], language: 'en', alt_text: 'A street',
+    createdAt: '2026-01-01T00:00:00.000Z', updatedAt: '2026-01-02T00:00:00.000Z' };
+  const v4 = { ...fields, image: { data: { attributes: fields.image } },
+    category: { data: { attributes: fields.category } }, tags: { data: [{ attributes: { name: 'Travel' } }] } };
+  const outputs = [];
+  try {
+    for (const record of [{ id: 8, ...fields }, { id: 8, attributes: v4 }]) {
+      global.fetch = async () => Response.json({ data: [record], meta: { pagination: { total: 1, pageCount: 1 } } });
+      const { getPhotography } = load('src/lib/server/photography-data.ts');
+      const result = await getPhotography(new URLSearchParams('page=1&pageSize=20'));
+      const photo = result.photos[0];
+      assert.equal(result.total, 1);
+      assert.equal(photo.title, 'Photo');
+      assert.equal(photo.category, 'Street');
+      assert.deepEqual(photo.tags, ['Travel']);
+      assert.equal(photo.width, 1200);
+      assert.equal(photo.height, 800);
+      assert.equal(photo.createdAt, fields.createdAt);
+      assert.equal(photo.updatedAt, fields.updatedAt);
+      assert.equal(new URL(photo.image).pathname, '/uploads/photo.jpg');
+      outputs.push(photo);
+    }
+    assert.deepEqual(outputs[0], outputs[1]);
+  } finally { global.fetch = originalFetch; }
+});
+
+test('photography seed buckets produce stable duplicate-free page orders', () => {
+  const { seededPageOrder, normalizeSeed, slugifyCollection } = load('src/lib/server/photography-data.ts');
+  const first = seededPageOrder(42, 17);
+  const again = seededPageOrder(42, 17);
+  const different = seededPageOrder(42, 18);
+  assert.deepEqual(first, again);
+  assert.equal(new Set(first).size, 42);
+  assert.deepEqual([...first].sort((a, b) => a - b), Array.from({ length: 42 }, (_, index) => index + 1));
+  assert.notDeepEqual(first, different);
+  assert.equal(first.at(-1), 42, 'partial final page must stay last');
+  assert.equal(normalizeSeed(145), 17);
+  assert.equal(slugifyCollection('Sunset & Sunrise'), 'sunset-and-sunrise');
+});
+
+test('SEO helpers prevent duplicated brands and reject foreign CMS canonicals', () => {
+  const { brandedTitle, safeCanonicalUrl, personJsonLd, websiteJsonLd } = load('src/lib/seo.ts');
+  assert.equal(brandedTitle('Portfolio'), 'Portfolio | Shain Wai Yan');
+  assert.equal(brandedTitle('Portfolio | Shain Studio', 'Shain Studio'), 'Portfolio | Shain Studio');
+  assert.equal(
+    safeCanonicalUrl('/portfolio/project', 'https://www.shainwaiyan.com/fallback'),
+    'https://www.shainwaiyan.com/portfolio/project',
+  );
+  assert.equal(
+    safeCanonicalUrl('https://malicious.example/project', 'https://www.shainwaiyan.com/fallback'),
+    'https://www.shainwaiyan.com/fallback',
+  );
+  const person = personJsonLd('en');
+  const website = websiteJsonLd('en');
+  assert.deepEqual(person.alternateName, ['Xolbine', '明元易']);
+  assert.equal('worksFor' in person, false);
+  assert.equal('founder' in person, false);
+  assert.equal(website.name, 'Shain Studio');
+  assert.deepEqual(website.creator, { '@id': 'https://www.shainwaiyan.com/#person' });
+  assert.deepEqual(website.publisher, { '@id': 'https://www.shainwaiyan.com/#person' });
 });

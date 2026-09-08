@@ -1,7 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import sanitizeHtml from 'sanitize-html';
+import { useState } from 'react';
 import CImage from '@/components/ui/CImage';
 
 const PLACEHOLDER_IMAGE = '/images/Shain Studio.webp';
@@ -15,18 +14,6 @@ interface DocumentCardProps {
   documentUrl: string;
   onViewClick: () => void;
   isLoading?: boolean;
-}
-
-// CMS descriptions are untrusted HTML, including when truncated mid-tag.
-function sanitizeDescription(html: string): string {
-  return sanitizeHtml(html, {
-    allowedTags: ['p', 'br', 'strong', 'em', 'b', 'i', 'ul', 'ol', 'li', 'a'],
-    allowedAttributes: { a: ['href', 'target', 'rel', 'class'] },
-    allowedSchemes: ['http', 'https', 'mailto'],
-    transformTags: { a: sanitizeHtml.simpleTransform('a', {
-      target: '_blank', rel: 'noopener noreferrer', class: 'desc-link',
-    }) },
-  });
 }
 
 export function DocumentCard({
@@ -48,10 +35,6 @@ export function DocumentCard({
   const truncatedDescription = description.length > 150 && !showMore
     ? description.substring(0, 150) + '...'
     : description;
-
-  const sanitizedTruncated = useMemo(() => sanitizeDescription(
-    !showMore && description.length > 150 ? description.substring(0, 150) + '...' : description
-  ), [description, showMore]);
 
   const displayImage = (!coverImage || imageError) ? PLACEHOLDER_IMAGE : coverImage;
 
@@ -126,7 +109,7 @@ export function DocumentCard({
               {hasHtml ? (
                 <p
                   className="leading-relaxed"
-                  dangerouslySetInnerHTML={{ __html: sanitizedTruncated }}
+                  dangerouslySetInnerHTML={{ __html: truncatedDescription }}
                 />
               ) : (
                 <p className="leading-relaxed">{truncatedDescription}</p>

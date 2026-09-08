@@ -111,6 +111,29 @@ export interface FilterOptions {
   types: string[];
 }
 
+function listQueryParams(page: number, pageSize: number): Record<string, string | number | boolean> {
+  return {
+    'pagination[page]': page,
+    'pagination[pageSize]': pageSize,
+    'sort': 'projectDate:desc',
+    'fields[0]': 'title',
+    'fields[1]': 'slug',
+    'fields[2]': 'summary',
+    'fields[3]': 'projectDate',
+    'fields[4]': 'isFeatured',
+    'fields[5]': 'updatedAt',
+    'fields[6]': 'githubUrl',
+    'fields[7]': 'liveDemoUrl',
+    'populate[coverImage][fields][0]': 'url',
+    'populate[coverImage][fields][1]': 'width',
+    'populate[coverImage][fields][2]': 'height',
+    'populate[coverImage][fields][3]': 'alternativeText',
+    'populate[category][fields][0]': 'name',
+    'populate[tags][fields][0]': 'name',
+    'populate[tools_useds][fields][0]': 'Tool',
+  };
+}
+
 // ─── Utils ───────────────────────────────────────────────────────────────────
 
 function calculateReadingTime(html: string): string {
@@ -143,6 +166,8 @@ export function transformCodingProject(raw: StrapiCodingProject): CodingProject 
   if (!raw) return null;
 
   try {
+    const attributes = (raw as StrapiCodingProject & { attributes?: StrapiCodingProject }).attributes;
+    if (attributes) raw = { ...attributes, id: raw.id };
     const title = raw.Title || raw.title || 'Untitled Project';
     const slug = raw.slug || `project-${raw.id}`;
     const summary = raw.summary || '';
@@ -246,12 +271,10 @@ export async function fetchCodingProjects(
     const response = await fetchFromStrapi<StrapiResponse<StrapiCodingProject[]>>(
       CODING_PROJECTS_ENDPOINT,
       {
-        queryParams: {
-          'pagination[page]': page,
-          'pagination[pageSize]': pageSize,
-          populate: '*',
-          'sort': 'projectDate:desc',
-        },
+        tags: ['strapi', 'coding-projects'],
+        // Collection pages only need card and filter data. Detail content and
+        // galleries are fetched by slug when a project is opened.
+        queryParams: listQueryParams(page, pageSize),
       },
     );
 
@@ -290,6 +313,7 @@ export async function fetchCodingProjectBySlug(
     const response = await fetchFromStrapi<StrapiCodingProjectsResponse>(
       'coding-projects',
       {
+        tags: ['strapi', 'coding-projects'],
         queryParams: {
           'filters[slug][$eq]': slug,
           populate: '*',
@@ -334,12 +358,11 @@ export async function fetchRelatedCodingProjects(
     const response = await fetchFromStrapi<StrapiCodingProjectsResponse>(
       'coding-projects',
       {
+        tags: ['strapi', 'coding-projects'],
         queryParams: {
+          ...listQueryParams(1, limit),
           'filters[category][name][$eq]': category,
           'filters[slug][$ne]': currentSlug,
-          'pagination[pageSize]': limit,
-          populate: '*',
-          'sort': 'projectDate:desc',
         },
         timeout,
       },

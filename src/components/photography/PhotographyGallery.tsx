@@ -1,325 +1,424 @@
 'use client';
 
-import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
-import { Photo } from '@/lib/strapi/photography';
-import { MasonryGrid } from './MasonryGrid';
 import dynamic from 'next/dynamic';
-const PhotoLightbox = dynamic(() => import('./PhotoLightbox').then(m => m.PhotoLightbox), { ssr: false });
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { Photo, PhotoCollection, PhotoFeedPage } from '@/lib/strapi/photography';
+import { MasonryGrid } from './MasonryGrid';
 
-interface PhotographyGalleryProps {
-  initialPhotos: Photo[];
-  language: 'en' | 'zh';
-  initialPageCount?: number;
+const PhotoLightbox = dynamic(() => import('./PhotoLightbox').then((module) => module.PhotoLightbox), { ssr: false });
+const PAGE_SIZE = 24;
+const SEED_KEY = 'shain-photography-seed';
+
+type Connection = { saveData?: boolean; effectiveType?: string };
+type NetworkMode = 'manual' | 'near' | 'prefetch';
+
+function networkMode(): NetworkMode {
+  const connection = (navigator as Navigator & { connection?: Connection }).connection;
+  if (connection?.saveData || connection?.effectiveType === 'slow-2g' || connection?.effectiveType === '2g') return 'manual';
+  if (connection?.effectiveType === '3g') return 'near';
+  return 'prefetch';
 }
 
-function shuffleArray<T>(array: T[]): T[] {
-  const shuffled = [...array];
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-  }
-  return shuffled;
+function photoKey(photo: Photo): string {
+  return photo.documentId ?? String(photo.id);
 }
 
-const PAGE_SIZE = 16; // slightly larger batch for smoother infinite scroll
+function appendUnique(current: Photo[], incoming: Photo[]): Photo[] {
+  const existing = new Set(current.map(photoKey));
+  return [...current, ...incoming.filter((photo) => !existing.has(photoKey(photo)))];
+}
 
-export function PhotographyGallery({ initialPhotos, language, initialPageCount = 1 }: PhotographyGalleryProps) {
-  // Photos arrive already shuffled from the server (unique per visitor, baked into
-  // the SSR HTML), so we render them as-is — no client reshuffle, no reflow.
-  const [photos, setPhotos]           = useState<Photo[]>(initialPhotos);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [displayedCount, setDisplayedCount]     = useState(PAGE_SIZE);
-  const [lightboxPhoto, setLightboxPhoto]       = useState<Photo | null>(null);
-  const [isLoadingMore, setIsLoadingMore]       = useState(false);
-  const [currentPage, setCurrentPage]           = useState(1);
-  const [hasMorePages, setHasMorePages]         = useState(initialPageCount > 1);
-  const [isFetchingPage, setIsFetchingPage]     = useState(false);
-
-  const searchRef   = useRef<HTMLInputElement>(null);
-  const sentinelRef = useRef<HTMLDivElement>(null); // bottom sentinel for IntersectionObserver
-
-  // Re-sync if the server delivers a fresh set (e.g. locale change / revalidation).
-  // On first mount the values are identical, so React bails out — no reflow.
-  useEffect(() => {
-    setPhotos(initialPhotos);
-    setCurrentPage(1);
-    setDisplayedCount(PAGE_SIZE);
-    setHasMorePages(initialPageCount > 1);
-  }, [initialPhotos, initialPageCount]);
-
-  // Categories + their counts, computed in a single pass (was O(categories × photos)).
-  const { categories, categoryCounts } = useMemo(() => {
-    const counts = new Map<string, number>();
-    for (const p of photos) {
-      if (p.category) counts.set(p.category, (counts.get(p.category) ?? 0) + 1);
-    }
-    return { categories: Array.from(counts.keys()).sort(), categoryCounts: counts };
-  }, [photos]);
-
-  const filteredPhotos = useMemo(() => {
-    return photos.filter((photo) => {
-      if (selectedCategory && photo.category !== selectedCategory) return false;
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase();
-        return (
-          photo.title.toLowerCase().includes(q) ||
-          photo.location.toLowerCase().includes(q) ||
-          (photo.tags ?? []).some((t) => t.toLowerCase().includes(q))
-        );
-      }
-      return true;
-    });
-  }, [photos, selectedCategory, searchQuery]);
-
-  const displayedPhotos = useMemo(
-    () => filteredPhotos.slice(0, displayedCount),
-    [filteredPhotos, displayedCount]
+function GallerySkeleton() {
+  const heights = [260, 190, 330, 230, 300, 210, 280, 350, 220, 310, 200, 270];
+  return (
+    <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-3" aria-label="Loading photography">
+      {heights.map((height, index) => <div key={index} className="mb-3 break-inside-avoid rounded-xl bg-gray-200 dark:bg-gray-800 animate-pulse" style={{ height }} />)}
+    </div>
   );
+}
 
-  const hasMore = displayedCount < filteredPhotos.length;
+export function PhotographyGallery({ language }: { language: 'en' | 'zh' }) {
+  const [seed, setSeed] = useState<number | null>(null);
+  const [photos, setPhotos] = useState<Photo[]>([]);
+  const [collections, setCollections] = useState<PhotoCollection[]>([]);
+  const [selectedCollection, setSelectedCollection] = useState('');
+  const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [page, setPage] = useState(0);
+  const [pageCount, setPageCount] = useState(0);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [error, setError] = useState('');
+  const [buffered, setBuffered] = useState<PhotoFeedPage | null>(null);
+  const [lightboxPhoto, setLightboxPhoto] = useState<Photo | null>(null);
+  const [isToolbarOpen, setIsToolbarOpen] = useState(true);
+  const prefetchRef = useRef<HTMLDivElement>(null);
+  const appendRef = useRef<HTMLDivElement>(null);
+  const nextAbortRef = useRef<AbortController | null>(null);
+  const nextInFlightRef = useRef(false);
+  const requestKeyRef = useRef('');
+  const activeTriggerRef = useRef<HTMLButtonElement | null>(null);
 
-  // ── Infinite scroll via IntersectionObserver ──────────────────────────────
-  const loadMore = useCallback(async () => {
-    if (isLoadingMore || isFetchingPage) return;
-    
-    if (hasMore) {
-      setIsLoadingMore(true);
-      // Small timeout gives the browser a frame to paint existing cards first
-      setTimeout(() => {
-        setDisplayedCount((prev) => Math.min(prev + PAGE_SIZE, filteredPhotos.length));
-        setIsLoadingMore(false);
-      }, 150);
-    } else if (hasMorePages) {
-      setIsFetchingPage(true);
-      const nextPage = currentPage + 1;
-      
-      try {
-        const res = await fetch(`/api/photography?page=${nextPage}&pageSize=100&language=${language}`);
-        const data = await res.json();
-        
-        if (data.photos && Array.isArray(data.photos) && data.photos.length > 0) {
-          const newPhotos = shuffleArray<Photo>(data.photos);
-          setPhotos((prev) => [...prev, ...newPhotos]);
-          setCurrentPage(nextPage);
-          if (nextPage >= data.pageCount) {
-            setHasMorePages(false);
-          }
-          setDisplayedCount((prev) => prev + PAGE_SIZE);
-        } else {
-          setHasMorePages(false);
-        }
-      } catch (error) {
-        console.error("Failed to load more photos", error);
-      } finally {
-        setIsFetchingPage(false);
-      }
-    }
-  }, [hasMore, hasMorePages, isLoadingMore, isFetchingPage, filteredPhotos.length, currentPage, language]);
+  const labels = language === 'zh'
+    ? { search: '搜索标题、地点、分类或标签…', all: '探索全部', loading: '正在加载照片…', more: '加载更多', retry: '重试', empty: '没有找到照片。', results: '张照片', collections: '作品集', hide: '收起筛选', show: '筛选' }
+    : { search: 'Search titles, places, collections, or tags…', all: 'Explore all', loading: 'Loading photography…', more: 'Load more', retry: 'Try again', empty: 'No photos found.', results: 'photos', collections: 'Collections', hide: 'Hide toolbar', show: 'Filters' };
 
   useEffect(() => {
-    const sentinel = sentinelRef.current;
-    if (!sentinel) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) loadMore();
-      },
-      {
-        // Start loading 400px before the sentinel enters the viewport
-        // so photos appear before the user reaches the bottom
-        rootMargin: '0px 0px 400px 0px',
-        threshold: 0,
-      }
-    );
-
-    observer.observe(sentinel);
-    return () => observer.disconnect();
-  }, [loadMore]);
-
-  // Reset displayed count when filter/search changes
-  useEffect(() => {
-    setDisplayedCount(PAGE_SIZE);
-  }, [selectedCategory, searchQuery]);
-
-  const handleResetFilters = useCallback(() => {
-    setSearchQuery('');
-    setSelectedCategory(null);
-    searchRef.current?.focus();
+    const stored = sessionStorage.getItem(SEED_KEY);
+    const nextSeed = stored == null ? crypto.getRandomValues(new Uint32Array(1))[0] % 64 : Number(stored) % 64;
+    sessionStorage.setItem(SEED_KEY, String(nextSeed));
+    const query = new URLSearchParams(window.location.search);
+    setSelectedCollection(query.get('collection') ?? '');
+    setSearch((query.get('q') ?? '').slice(0, 80));
+    setSeed(nextSeed);
   }, []);
 
-  const handlePhotoClick  = useCallback((photo: Photo) => setLightboxPhoto(photo), []);
-  const handleNavigateTo  = useCallback((photo: Photo) => setLightboxPhoto(photo), []);
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch(`/api/photography/collections?language=${language}`, { signal: controller.signal })
+      .then((response) => response.ok ? response.json() : Promise.reject(new Error('Collections unavailable')))
+      .then((data) => setCollections(Array.isArray(data.collections) ? data.collections : []))
+      .catch((reason) => { if (reason instanceof Error && reason.name !== 'AbortError') console.warn(reason.message); });
+    return () => controller.abort();
+  }, [language]);
 
-  const handlePrevPhoto = useCallback(() => {
-    if (!lightboxPhoto) return;
-    const i = filteredPhotos.findIndex((p) => p.id === lightboxPhoto.id);
-    if (i > 0) setLightboxPhoto(filteredPhotos[i - 1]);
-  }, [lightboxPhoto, filteredPhotos]);
+  useEffect(() => {
+    const timeout = window.setTimeout(() => setDebouncedSearch(search.trim().length >= 2 ? search.trim() : ''), 300);
+    return () => window.clearTimeout(timeout);
+  }, [search]);
 
-  const handleNextPhoto = useCallback(() => {
-    if (!lightboxPhoto) return;
-    const i = filteredPhotos.findIndex((p) => p.id === lightboxPhoto.id);
-    if (i < filteredPhotos.length - 1) setLightboxPhoto(filteredPhotos[i + 1]);
-  }, [lightboxPhoto, filteredPhotos]);
+  const requestPage = useCallback(async (targetPage: number, signal: AbortSignal): Promise<PhotoFeedPage> => {
+    const params = new URLSearchParams({ page: String(targetPage), pageSize: String(PAGE_SIZE), seed: String(seed ?? 0), language });
+    if (selectedCollection) params.set('collection', selectedCollection);
+    if (debouncedSearch) params.set('search', debouncedSearch);
+    const response = await fetch(`/api/photography?${params}`, { signal });
+    if (!response.ok) throw new Error('Photography is temporarily unavailable.');
+    return await response.json() as PhotoFeedPage;
+  }, [debouncedSearch, language, seed, selectedCollection]);
 
-  const lightboxIndex = lightboxPhoto
-    ? filteredPhotos.findIndex((p) => p.id === lightboxPhoto.id)
-    : -1;
+  useEffect(() => {
+    if (seed == null) return;
+    const controller = new AbortController();
+    nextAbortRef.current?.abort();
+    setBuffered(null);
+    setLoading(true);
+    setError('');
+    setPhotos([]);
+    setPage(0);
+    requestKeyRef.current = `${seed}:${language}:${selectedCollection}:${debouncedSearch}`;
+    requestPage(1, controller.signal)
+      .then((data) => {
+        setPhotos(data.photos);
+        setPage(data.page);
+        setPageCount(data.pageCount);
+        setTotal(data.total);
+      })
+      .catch((reason) => { if (reason instanceof Error && reason.name !== 'AbortError') setError(reason.message); })
+      .finally(() => { if (!controller.signal.aborted) setLoading(false); });
+    return () => controller.abort();
+  }, [debouncedSearch, language, requestPage, seed, selectedCollection]);
 
-  const t = language === 'zh'
-    ? { placeholder: '按标题或位置搜索...', all: '所有照片', reset: '重置', noPhotos: '未找到匹配的照片。' }
-    : { placeholder: 'Search by title or location...', all: 'All', reset: 'Reset', noPhotos: 'No photos match your search.' };
+  useEffect(() => {
+    if (seed == null) return;
+    const params = new URLSearchParams();
+    if (selectedCollection) params.set('collection', selectedCollection);
+    if (search.trim()) params.set('q', search.trim().slice(0, 80));
+    const next = `${window.location.pathname}${params.size ? `?${params}` : ''}`;
+    window.history.replaceState(window.history.state, '', next);
+  }, [search, seed, selectedCollection]);
 
-  const activeFilters = searchQuery || selectedCategory;
+  const hasMore = page > 0 && page < pageCount;
 
-  return (
-    <div className="w-full">
+  const prefetchNext = useCallback(async () => {
+    if (!hasMore || nextInFlightRef.current || buffered || document.visibilityState !== 'visible' || networkMode() !== 'prefetch') return;
+    const targetPage = page + 1;
+    const key = requestKeyRef.current;
+    const controller = new AbortController();
+    nextAbortRef.current = controller;
+    nextInFlightRef.current = true;
+    setLoadingMore(true);
+    try {
+      const data = await requestPage(targetPage, controller.signal);
+      if (key === requestKeyRef.current && data.page === targetPage) setBuffered(data);
+    } catch (reason) {
+      if (reason instanceof Error && reason.name !== 'AbortError') console.warn(reason.message);
+    } finally {
+      nextInFlightRef.current = false;
+      if (!controller.signal.aborted) setLoadingMore(false);
+    }
+  }, [buffered, hasMore, page, requestPage]);
 
-      {/* ── Search + filter bar ─────────────────────────────────────────── */}
-      <div className="mb-6 space-y-3">
+  const appendNext = useCallback(async (manual = false) => {
+    if (!hasMore || nextInFlightRef.current || (!manual && networkMode() === 'manual')) return;
+    const targetPage = page + 1;
+    if (buffered?.page === targetPage) {
+      setPhotos((current) => appendUnique(current, buffered.photos));
+      setPage(buffered.page);
+      setPageCount(buffered.pageCount);
+      setTotal(buffered.total);
+      setBuffered(null);
+      return;
+    }
+    const key = requestKeyRef.current;
+    const controller = new AbortController();
+    nextAbortRef.current = controller;
+    nextInFlightRef.current = true;
+    setLoadingMore(true);
+    try {
+      const data = await requestPage(targetPage, controller.signal);
+      if (key !== requestKeyRef.current) return;
+      setPhotos((current) => appendUnique(current, data.photos));
+      setPage(data.page);
+      setPageCount(data.pageCount);
+      setTotal(data.total);
+    } catch (reason) {
+      if (reason instanceof Error && reason.name !== 'AbortError') setError(reason.message);
+    } finally {
+      nextInFlightRef.current = false;
+      if (!controller.signal.aborted) setLoadingMore(false);
+    }
+  }, [buffered, hasMore, page, requestPage]);
 
-        {/* Search */}
-        <div className="relative group">
-          <svg
-            className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-[#191970] dark:group-focus-within:text-[#ffd700] transition-colors pointer-events-none"
-            fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-          <input
-            ref={searchRef}
-            type="text"
-            placeholder={t.placeholder}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-11 pr-10 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-[#191970]/30 dark:focus:ring-[#ffd700]/30 focus:border-[#191970]/50 dark:focus:border-[#ffd700]/50 transition-all"
-            aria-label="Search photos"
-          />
-          {searchQuery && (
-            <button
-              onClick={() => setSearchQuery('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-500 flex items-center justify-center hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
-              aria-label="Clear search"
-            >
-              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          )}
-        </div>
+  useEffect(() => {
+    const target = prefetchRef.current;
+    if (!target) return;
+    const observer = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) void prefetchNext(); }, { rootMargin: '0px 0px 800px 0px' });
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [prefetchNext]);
 
-        {/* Category pills */}
-        <div className="flex flex-wrap items-center gap-2">
+  useEffect(() => {
+    const target = appendRef.current;
+    if (!target) return;
+    const observer = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) void appendNext(false); }, { rootMargin: '0px 0px 200px 0px' });
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [appendNext]);
+
+  useEffect(() => () => nextAbortRef.current?.abort(), []);
+
+  const lightboxIndex = lightboxPhoto ? photos.findIndex((photo) => photoKey(photo) === photoKey(lightboxPhoto)) : -1;
+  const openPhoto = useCallback((photo: Photo) => {
+    activeTriggerRef.current = document.activeElement instanceof HTMLButtonElement ? document.activeElement : null;
+    setLightboxPhoto(photo);
+  }, []);
+  const closePhoto = useCallback(() => {
+    setLightboxPhoto(null);
+    requestAnimationFrame(() => activeTriggerRef.current?.focus());
+  }, []);
+  const currentCollection = useMemo(() => collections.find((collection) => collection.slug === selectedCollection), [collections, selectedCollection]);
+
+  const renderCollectionPills = () => (
+    <>
+      <button
+        type="button"
+        onClick={() => setSelectedCollection('')}
+        aria-pressed={!selectedCollection}
+        className={`inline-flex items-center gap-1.5 shrink-0 rounded-full px-3 sm:px-3.5 py-1 sm:py-1.5 text-xs sm:text-[13px] font-medium transition-all ${
+          !selectedCollection
+            ? 'bg-[#191970] text-white shadow-xs dark:bg-[#ffd700] dark:text-[#191970]'
+            : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 border border-gray-200/80 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
+        }`}
+      >
+        <span>{labels.all}</span>
+        {!selectedCollection && total > 0 && (
+          <span className="rounded-full bg-white/20 px-1.5 py-0.2 text-[10px] sm:text-[11px] font-semibold dark:bg-black/15">
+            {total}
+          </span>
+        )}
+      </button>
+      {collections.map((collection) => {
+        const isActive = selectedCollection === collection.slug;
+        return (
           <button
-            onClick={() => setSelectedCategory(null)}
-            className={`px-3.5 py-1.5 rounded-full text-sm font-medium transition-all duration-200 border ${
-              selectedCategory === null
-                ? 'bg-[#191970] text-white border-[#191970] dark:bg-[#ffd700] dark:text-[#191970] dark:border-[#ffd700] shadow-sm'
-                : 'bg-transparent text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:border-[#191970]/40 dark:hover:border-[#ffd700]/40 hover:text-[#191970] dark:hover:text-[#ffd700]'
+            key={collection.slug}
+            type="button"
+            onClick={() => setSelectedCollection(collection.slug)}
+            aria-pressed={isActive}
+            className={`inline-flex items-center gap-1.5 shrink-0 rounded-full px-3 sm:px-3.5 py-1 sm:py-1.5 text-xs sm:text-[13px] font-medium transition-all ${
+              isActive
+                ? 'bg-[#191970] text-white shadow-xs dark:bg-[#ffd700] dark:text-[#191970]'
+                : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 border border-gray-200/80 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
             }`}
           >
-            {t.all}
-            <span className={`ml-1.5 text-xs px-1.5 py-0.5 rounded-full ${selectedCategory === null ? 'bg-white/20 dark:bg-[#191970]/20' : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'}`}>
-              {photos.length}
+            <span>{collection.name}</span>
+            <span
+              className={`rounded-full px-1.5 py-0.2 text-[10px] sm:text-[11px] font-medium ${
+                isActive
+                  ? 'bg-white/20 dark:bg-black/15'
+                  : 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400'
+              }`}
+            >
+              {collection.count}
             </span>
           </button>
+        );
+      })}
+    </>
+  );
 
-          {categories.map((cat) => {
-            const count = categoryCounts.get(cat) ?? 0;
-            return (
-              <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={`px-3.5 py-1.5 rounded-full text-sm font-medium transition-all duration-200 border ${
-                  selectedCategory === cat
-                    ? 'bg-[#191970] text-white border-[#191970] dark:bg-[#ffd700] dark:text-[#191970] dark:border-[#ffd700] shadow-sm'
-                    : 'bg-transparent text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:border-[#191970]/40 dark:hover:border-[#ffd700]/40 hover:text-[#191970] dark:hover:text-[#ffd700]'
-                }`}
-              >
-                {cat}
-                <span className={`ml-1.5 text-xs px-1.5 py-0.5 rounded-full ${selectedCategory === cat ? 'bg-white/20 dark:bg-[#191970]/20' : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'}`}>
-                  {count}
-                </span>
-              </button>
-            );
-          })}
-
-          {activeFilters && (
-            <button
-              onClick={handleResetFilters}
-              className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 border border-gray-200 dark:border-gray-700 hover:border-red-300 dark:hover:border-red-600 transition-all duration-200"
-            >
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-              {t.reset}
-            </button>
-          )}
+  return (
+    <section className="w-full" aria-labelledby="photography-collections">
+      {/* ── Collapsible Gallery Toolbar ── */}
+      {!isToolbarOpen ? (
+        <div className="sticky top-[80px] sm:top-[86px] z-20 mb-3 flex items-center justify-end">
+          <button
+            type="button"
+            onClick={() => setIsToolbarOpen(true)}
+            aria-label={labels.show}
+            className="inline-flex items-center gap-1.5 rounded-full border border-gray-200/80 dark:border-gray-800 bg-white/95 dark:bg-gray-950/95 px-3 py-1 text-xs font-medium text-gray-600 dark:text-gray-300 shadow-xs backdrop-blur-md transition-all hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-[#191970] dark:hover:text-[#ffd700]"
+          >
+            <svg className="h-3.5 w-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+            </svg>
+            <span>{currentCollection ? currentCollection.name : labels.show}</span>
+            <span className="opacity-60">· {total}</span>
+            <svg className="h-3 w-3 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
         </div>
-
-        {/* Results count */}
-        <p className="text-xs text-gray-400 dark:text-gray-500">
-          {activeFilters
-            ? `${filteredPhotos.length} of ${photos.length} photos`
-            : `${photos.length} photos`}
-        </p>
-      </div>
-
-      {/* ── Gallery ─────────────────────────────────────────────────────── */}
-      {displayedPhotos.length > 0 ? (
-        <>
-          <MasonryGrid photos={displayedPhotos} onPhotoClick={handlePhotoClick} />
-
-          {/* Invisible sentinel — IntersectionObserver watches this */}
-          <div ref={sentinelRef} className="w-full h-px" aria-hidden="true" />
-
-          {/* Subtle loading indicator while next batch is appended */}
-          {(isLoadingMore || isFetchingPage) && (
-            <div className="flex justify-center py-8">
-              <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500 text-sm">
-                <div className="w-4 h-4 rounded-full border-2 border-gray-300 dark:border-gray-600 border-t-[#191970] dark:border-t-[#ffd700] animate-spin" />
-                Loading more photos…
-              </div>
-            </div>
-          )}
-
-          {/* End-of-gallery message */}
-          {!hasMore && !hasMorePages && filteredPhotos.length > PAGE_SIZE && (
-            <p className="text-center text-xs text-gray-300 dark:text-gray-600 py-6">
-              All {filteredPhotos.length} photos loaded
-            </p>
-          )}
-        </>
       ) : (
-        initialPhotos.length > 0 && (
-          <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="w-16 h-16 rounded-2xl bg-[#191970]/5 dark:bg-[#ffd700]/5 flex items-center justify-center mb-4">
-              <svg className="w-8 h-8 text-[#191970]/30 dark:text-[#ffd700]/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
+        <div className="sticky top-[80px] sm:top-[86px] z-20 mb-4 -mx-2 px-2 sm:-mx-3 sm:px-3 py-1.5 sm:py-2 bg-gray-50/95 dark:bg-gray-950/95 backdrop-blur-md border-b border-gray-200/60 dark:border-gray-800/60 transition-colors">
+          {/* Mobile & Tablet Layout (2 Lines) */}
+          <div className="lg:hidden space-y-1.5">
+            {/* Line 1: Search + Count + Low-key Hide Button */}
+            <div className="flex items-center gap-2">
+              <label className="relative flex-1 block">
+                <span className="sr-only">{labels.search}</span>
+                <svg
+                  className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gray-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <input
+                  value={search}
+                  maxLength={80}
+                  onChange={(event) => setSearch(event.target.value)}
+                  placeholder={labels.search}
+                  className="h-8 w-full rounded-full border border-gray-200/90 bg-white pl-8 pr-7 text-xs text-gray-900 placeholder-gray-400 outline-none transition-all focus:border-[#191970] focus:ring-2 focus:ring-[#191970]/15 dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:placeholder-gray-500 dark:focus:border-[#ffd700] dark:focus:ring-[#ffd700]/20"
+                />
+                {search && (
+                  <button
+                    type="button"
+                    onClick={() => setSearch('')}
+                    aria-label="Clear search"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-0.5 text-gray-400 hover:text-gray-700 dark:hover:text-white"
+                  >
+                    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                )}
+              </label>
+
+              <span className="text-xs text-gray-400 dark:text-gray-500 whitespace-nowrap shrink-0">
+                {loading ? '…' : `${total}`}
+              </span>
+
+              <button
+                type="button"
+                onClick={() => setIsToolbarOpen(false)}
+                aria-label={labels.hide}
+                title={labels.hide}
+                className="h-7 w-7 shrink-0 flex items-center justify-center rounded-full text-gray-400 hover:text-gray-700 dark:hover:text-white hover:bg-gray-200/60 dark:hover:bg-gray-800 transition-colors"
+              >
+                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
+                </svg>
+              </button>
             </div>
-            <p className="text-gray-500 dark:text-gray-400 font-medium">{t.noPhotos}</p>
-            <button onClick={handleResetFilters} className="mt-4 text-sm text-[#191970] dark:text-[#ffd700] hover:underline font-medium">
-              {t.reset} filters
-            </button>
+
+            {/* Line 2: Category Quick Press (Horizontally Scrollable across all columns) */}
+            <div
+              className="flex items-center gap-1.5 overflow-x-auto py-0.5 min-w-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              role="list"
+              aria-label={labels.collections}
+            >
+              {renderCollectionPills()}
+            </div>
           </div>
-        )
+
+          {/* Desktop Layout (1 Line - spanning all columns) */}
+          <div className="hidden lg:flex lg:items-center lg:justify-between lg:gap-3 min-w-0">
+            {/* Collection Pills (Spanning full left space across all columns) */}
+            <div
+              className="flex items-center gap-2 overflow-x-auto py-0.5 flex-1 min-w-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              role="list"
+              aria-label={labels.collections}
+            >
+              {renderCollectionPills()}
+            </div>
+
+            {/* Right side: Compact Search + Low-key Hide Button */}
+            <div className="flex items-center gap-2 shrink-0">
+              <label className="relative block w-32 xl:w-40 focus-within:w-48 xl:focus-within:w-56 transition-all duration-200">
+                <span className="sr-only">{labels.search}</span>
+                <svg
+                  className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gray-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <input
+                  value={search}
+                  maxLength={80}
+                  onChange={(event) => setSearch(event.target.value)}
+                  placeholder={language === 'zh' ? '搜索…' : 'Search…'}
+                  className="h-8 sm:h-8.5 w-full rounded-full border border-gray-200/90 bg-white pl-8 pr-7 text-xs sm:text-sm text-gray-900 placeholder-gray-400 outline-none transition-all focus:border-[#191970] focus:ring-2 focus:ring-[#191970]/15 dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:placeholder-gray-500 dark:focus:border-[#ffd700] dark:focus:ring-[#ffd700]/20"
+                />
+                {search && (
+                  <button
+                    type="button"
+                    onClick={() => setSearch('')}
+                    aria-label="Clear search"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-0.5 text-gray-400 hover:text-gray-700 dark:hover:text-white"
+                  >
+                    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                )}
+              </label>
+
+              <button
+                type="button"
+                onClick={() => setIsToolbarOpen(false)}
+                aria-label={labels.hide}
+                title={labels.hide}
+                className="h-7 w-7 shrink-0 flex items-center justify-center rounded-full text-gray-400 hover:text-gray-700 dark:hover:text-white hover:bg-gray-200/60 dark:hover:bg-gray-800 transition-colors"
+              >
+                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
-      {/* ── Lightbox ─────────────────────────────────────────────────────── */}
-      {lightboxPhoto && (
-        <PhotoLightbox
-          photo={lightboxPhoto}
-          allPhotos={filteredPhotos}
-          onClose={() => setLightboxPhoto(null)}
-          onPrevious={handlePrevPhoto}
-          onNext={handleNextPhoto}
-          hasPrevious={lightboxIndex > 0}
-          hasNext={lightboxIndex < filteredPhotos.length - 1}
-          onNavigateTo={handleNavigateTo}
-        />
+      {loading ? <GallerySkeleton /> : error && photos.length === 0 ? (
+        <div className="rounded-2xl border border-red-200 bg-red-50 p-8 text-center dark:border-red-900/50 dark:bg-red-950/20"><p className="mb-4 text-sm text-red-600 dark:text-red-400">{error}</p><button type="button" onClick={() => window.location.reload()} className="rounded-full bg-[#191970] px-5 py-2 text-sm font-semibold text-white">{labels.retry}</button></div>
+      ) : photos.length === 0 ? <p className="py-24 text-center text-gray-500">{labels.empty}</p> : (
+        <>
+          <MasonryGrid photos={photos} onPhotoClick={openPhoto} />
+          <div ref={prefetchRef} className="h-px" aria-hidden="true" />
+          <div ref={appendRef} className="h-px" aria-hidden="true" />
+          <div className="flex min-h-24 items-center justify-center py-6">
+            {hasMore ? <button type="button" disabled={loadingMore} onClick={() => void appendNext(true)} className="rounded-full border border-[#191970]/30 bg-white px-6 py-2.5 text-sm font-semibold text-[#191970] transition hover:bg-[#191970] hover:text-white disabled:opacity-50 dark:border-[#ffd700]/40 dark:bg-gray-900 dark:text-[#ffd700] dark:hover:bg-[#ffd700] dark:hover:text-[#191970]">{loadingMore ? labels.loading : labels.more}</button> : <p className="text-xs text-gray-400">{total} {labels.results}</p>}
+          </div>
+        </>
       )}
-    </div>
+
+      {lightboxPhoto && <PhotoLightbox language={language} photo={lightboxPhoto} allPhotos={photos} onClose={closePhoto} onPrevious={() => lightboxIndex > 0 && setLightboxPhoto(photos[lightboxIndex - 1])} onNext={() => lightboxIndex < photos.length - 1 && setLightboxPhoto(photos[lightboxIndex + 1])} hasPrevious={lightboxIndex > 0} hasNext={lightboxIndex < photos.length - 1} onNavigateTo={setLightboxPhoto} />}
+    </section>
   );
 }

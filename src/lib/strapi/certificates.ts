@@ -39,6 +39,8 @@ export async function fetchCertificates(): Promise<{
 }> {
   try {
     const response = await fetchFromStrapi<CertificatesResponse>('certificates', {
+      revalidate: 3600,
+      tags: ['strapi', 'certificates'],
       queryParams: {
         'populate': '*',
         'sort': 'createdAt:desc',

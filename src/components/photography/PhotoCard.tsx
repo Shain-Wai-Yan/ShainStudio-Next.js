@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import CImage from '@/components/ui/CImage';
 import { Photo } from '@/lib/strapi/photography';
 
@@ -10,40 +10,16 @@ interface PhotoCardProps {
   priority?: boolean;
 }
 
-// buildSrc replaced by cloudinaryLoader — the loader generates the srcset per breakpoint
-
-function buildBlurSrc(url: string | null): string | undefined {
-  if (!url?.includes('cloudinary.com')) return undefined;
-  if (url.includes('/upload/c_') || url.includes('/upload/w_')) return undefined;
-  return url.replace('/upload/', '/upload/c_scale,w_20,q_10,f_auto,e_blur:400/');
-}
-
-// Representative column width used only for the content-visibility height hint
-// (the real height is driven by the image's intrinsic ratio once on screen).
-const INTRINSIC_HINT_WIDTH = 340;
-
 export function PhotoCard({ photo, onClick, priority = false }: PhotoCardProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
 
   const src = photo.image ?? '';
 
-  // Only build the (network-fetched) blur placeholder for the few priority
-  // cards — otherwise ~100 tiny blur requests fire on load for no benefit.
-  const blurSrc = useMemo(
-    () => (priority ? buildBlurSrc(photo.image) : undefined),
-    [photo.image, priority]
-  );
-
   // Real intrinsic dimensions → the card reserves its true aspect ratio, so the
   // image appears at its own size with no layout shift. Fallback keeps old 3:2.
   const imgWidth  = photo.width  ?? 600;
   const imgHeight = photo.height ?? 400;
-
-  // Off-screen cards skip layout/paint for smoother scrolling; the height hint
-  // is proportional to the real ratio, and `auto` lets the browser remember the
-  // true size after first render so scrolling back never jumps.
-  const intrinsicHint = `auto ${Math.round(INTRINSIC_HINT_WIDTH * (imgHeight / imgWidth))}px`;
 
   // ── Error / no image ────────────────────────────────────────────────────────
   if (!photo.image || hasError) {
@@ -77,19 +53,12 @@ export function PhotoCard({ photo, onClick, priority = false }: PhotoCardProps) 
         // break-inside-avoid is THE key CSS columns property.
         // Without it the browser can slice a card in half across columns.
         'break-inside-avoid',
-        // mb-3 = vertical spacing between cards stacked in the same column
-        'mb-3',
         // Visual
         'relative rounded-xl overflow-hidden cursor-pointer group',
         'bg-gray-100 dark:bg-gray-800',
       ].join(' ')}
       style={{
         boxShadow: '0 1px 8px rgba(25,25,112,0.07)',
-        // Skip rendering work for off-screen cards; priority (above-the-fold)
-        // cards always render so they never defer.
-        ...(priority
-          ? {}
-          : { contentVisibility: 'auto', containIntrinsicSize: intrinsicHint }),
       }}
       onClick={onClick}
       role="button"
@@ -102,7 +71,8 @@ export function PhotoCard({ photo, onClick, priority = false }: PhotoCardProps) 
         alt={photo.altText || photo.title}
         width={imgWidth}
         height={imgHeight}
-        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
+        sizes="(max-width: 639px) calc(100vw - 32px), (max-width: 1023px) calc(50vw - 30px), (max-width: 1279px) calc(33vw - 26px), 300px"
+        quality={65}
         // w-full h-auto: image fills the column width at its natural aspect ratio.
         // This is what gives the browser real varying heights to balance columns with.
         className={`w-full h-auto block transition-all duration-500 group-hover:scale-[1.04] ${
@@ -110,11 +80,7 @@ export function PhotoCard({ photo, onClick, priority = false }: PhotoCardProps) 
         }`}
         loading={priority ? 'eager' : 'lazy'}
         priority={priority}
-        decoding={priority ? 'sync' : 'async'}
-        {...(blurSrc
-          ? { placeholder: 'blur' as const, blurDataURL: blurSrc }
-          : {}
-        )}
+        decoding="async"
         onLoad={() => setIsLoaded(true)}
         onError={() => { setHasError(true); setIsLoaded(true); }}
       />

@@ -2,6 +2,7 @@ import { fetchMarketingPlans, transformMarketingPlan } from '@/lib/strapi/market
 import { Metadata } from 'next';
 import { getDictionary } from '@/lib/getDictionary';
 import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
+import { DEFAULT_OG_IMAGE, SITE_URL, brandedTitle } from '@/lib/seo';
 import { MarketingPlanClient } from '@/components/marketing-plans/MarketingPlanClient';
 
 interface MarketingPlanPageProps {
@@ -16,20 +17,25 @@ export async function generateMetadata(props: MarketingPlanPageProps): Promise<M
   const basePath = locale === 'en' ? '' : `/${locale}`;
 
   return {
-    title: dict.marketingPlans.seo.title,
+    title: { absolute: brandedTitle(dict.marketingPlans.seo.title, 'Shain Studio') },
     description: dict.marketingPlans.seo.description,
+    robots: locale === 'zh' ? { index: false, follow: true } : { index: true, follow: true },
     alternates: {
-      canonical: `https://www.shainwaiyan.com${basePath}/portfolio/marketing-plans`,
-      languages: {
-        'en': 'https://www.shainwaiyan.com/portfolio/marketing-plans',
-        'zh': 'https://www.shainwaiyan.com/zh/portfolio/marketing-plans',
-        'x-default': 'https://www.shainwaiyan.com/portfolio/marketing-plans',
-      },
+      canonical: `${SITE_URL}/portfolio/marketing-plans`,
     },
     openGraph: {
       title: dict.marketingPlans.seo.title,
       description: dict.marketingPlans.seo.description,
       url: `https://www.shainwaiyan.com${basePath}/portfolio/marketing-plans`,
+      type: 'website',
+      images: [{ url: DEFAULT_OG_IMAGE, width: 1200, height: 630 }],
+      locale: locale === 'zh' ? 'zh_CN' : 'en_US',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: dict.marketingPlans.seo.title,
+      description: dict.marketingPlans.seo.description,
+      images: [DEFAULT_OG_IMAGE],
     },
   };
 }

@@ -6,10 +6,9 @@ import { boundedInteger } from '@/lib/utils/pagination';
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import {
-  fetchCodingProjects,
-  fetchCodingProjectBySlug,
-} from '@/lib/strapi/coding-projects';
+import { getCodingProject, getCodingProjects } from '@/lib/server/project-data';
+
+const CACHE_HEADERS = { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600' };
 
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
@@ -20,18 +19,18 @@ export async function GET(request: NextRequest) {
 
   // ─── Single project by slug ───────────────────────────────────────────────
   if (slug) {
-    const { project, error } = await fetchCodingProjectBySlug(slug);
+    const { project, error } = await getCodingProject(slug);
     if (error) {
       return NextResponse.json({ error }, { status: 500 });
     }
     if (!project) {
       return NextResponse.json({ error: 'Not found' }, { status: 404 });
     }
-    return NextResponse.json({ data: project });
+    return NextResponse.json({ data: project }, { headers: CACHE_HEADERS });
   }
 
   // ─── List with pagination ─────────────────────────────────────────────────
-  const { projects, total, error } = await fetchCodingProjects(page, pageSize);
+  const { projects, total, error } = await getCodingProjects(page, pageSize);
   if (error) {
     return NextResponse.json({ error }, { status: 500 });
   }
@@ -46,5 +45,5 @@ export async function GET(request: NextRequest) {
         pageCount: Math.ceil(total / pageSize),
       },
     },
-  });
+  }, { headers: CACHE_HEADERS });
 }

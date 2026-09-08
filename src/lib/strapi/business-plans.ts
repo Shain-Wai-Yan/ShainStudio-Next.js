@@ -5,6 +5,7 @@
 
 import { fetchFromStrapi, extractUrl } from './client';
 import { StrapiFile } from '@/types/strapi';
+import { sanitizeDescription } from '@/lib/utils/sanitize-description';
 
 
 export interface BusinessPlan {
@@ -43,6 +44,8 @@ export async function fetchBusinessPlans(
 }> {
   try {
     const response = await fetchFromStrapi<BusinessPlansResponse>('business-plans', {
+      revalidate: 3600,
+      tags: ['strapi', 'business-plans'],
       queryParams: {
         'pagination[page]': page,
         'pagination[pageSize]': pageSize,
@@ -93,6 +96,7 @@ export function transformBusinessPlan(plan: BusinessPlan) {
 
   return {
     ...plan,
+    Description: sanitizeDescription(plan.Description || ''),
     documentUrl,
     coverImageUrl,
     fileType,

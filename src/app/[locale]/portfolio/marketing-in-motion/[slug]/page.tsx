@@ -1,14 +1,13 @@
-import { cache } from 'react';
 import { serializeJsonLd } from '@/lib/utils/json-ld';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import type { MarketingProject } from '@/lib/strapi/marketing-in-motion';
 import {
-  fetchMarketingProjectBySlug,
-  fetchMarketingProjects,
-  fetchRelatedMarketingProjects,
-  type MarketingProject,
-} from '@/lib/strapi/marketing-in-motion';
+  getMarketingProject,
+  getMarketingProjects,
+  getRelatedMarketingProjects,
+} from '@/lib/server/project-data';
 import ProjectHeader from '@/components/marketing-in-motion/ProjectHeader';
 import ProjectContent from '@/components/marketing-in-motion/ProjectContent';
 import ProjectGallery from '@/components/marketing-in-motion/ProjectGallery';
@@ -16,14 +15,13 @@ import RelatedProjects from '@/components/marketing-in-motion/RelatedProjects';
 import TableOfContents from '@/components/shared/TableOfContents';
 import { getDictionary } from '@/lib/getDictionary';
 import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
-
-const getProject = cache(fetchMarketingProjectBySlug);
+import { DEFAULT_OG_IMAGE, PERSON_ID, SITE_URL, brandedTitle, personRef, safeCanonicalUrl } from '@/lib/seo';
 
 export const revalidate = 3600; // Revalidate every hour
 export const dynamicParams = true; // Allow new projects to be fetched at runtime
 
 export async function generateStaticParams() {
-  const { projects } = await fetchMarketingProjects(1, 100);
+  const { projects } = await getMarketingProjects(1, 100);
   const locales = ['en', 'zh'];
 
   return locales.flatMap((locale) =>
@@ -43,7 +41,7 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const { locale: rawLocale, slug } = await props.params;
   const locale = isSupportedLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
-  const { project, error } = await getProject(slug);
+  const { project, error } = await getMarketingProject(slug);
   const t = await getDictionary(locale); // ✅ CHANGE: async
 
   if (error) throw new Error(error);
@@ -52,27 +50,28 @@ export async function generateMetadata(
   }
 
   const basePath = locale === 'en' ? '' : `/${locale}`;
+  const englishCanonical = safeCanonicalUrl(
+    project.seo.canonicalUrl,
+    `${SITE_URL}/portfolio/marketing-in-motion/${project.slug}`,
+  );
 
   return {
-    title: project.seo.metaTitle,
+    title: { absolute: brandedTitle(project.seo.metaTitle || project.title, 'Shain Studio') },
     description: project.seo.metaDescription,
+    robots: locale === 'zh' ? { index: false, follow: true } : { index: true, follow: true },
     keywords: project.tags && project.toolsUsed && project.category 
       ? [...project.tags, ...project.toolsUsed, project.category].join(', ')
       : t.marketingInMotion.seo.keywords,
     alternates: {
-      canonical: `https://www.shainwaiyan.com${basePath}/portfolio/marketing-in-motion/${project.slug}`,
-      languages: {
-        en: `https://www.shainwaiyan.com/portfolio/marketing-in-motion/${project.slug}`,
-        zh: `https://www.shainwaiyan.com/zh/portfolio/marketing-in-motion/${project.slug}`,
-        'x-default': `https://www.shainwaiyan.com/portfolio/marketing-in-motion/${project.slug}`,
-      },
+      canonical: englishCanonical,
     },
     openGraph: {
       type: 'article',
       url: `https://www.shainwaiyan.com${basePath}/portfolio/marketing-in-motion/${project.slug}`,
-      title: project.seo.metaTitle,
-      description: project.seo.metaDescription,
-      images: project.seo.ogImage ? [project.seo.ogImage] : [],
+      title: project.seo.metaTitle || project.title,
+      description: project.seo.metaDescription || project.summary,
+      images: [project.seo.ogImage || project.coverImage || DEFAULT_OG_IMAGE],
+      siteName: 'Shain Studio',
       authors: ['Shain Wai Yan'],
       publishedTime: project.projectDate,
       modifiedTime: project.updatedAt,
@@ -81,9 +80,9 @@ export async function generateMetadata(
     },
     twitter: {
       card: 'summary_large_image',
-      title: project.seo.metaTitle,
-      description: project.seo.metaDescription,
-      images: project.seo.ogImage ? [project.seo.ogImage] : [],
+      title: project.seo.metaTitle || project.title,
+      description: project.seo.metaDescription || project.summary,
+      images: [project.seo.ogImage || project.coverImage || DEFAULT_OG_IMAGE],
     },
   };
 }
@@ -96,7 +95,7 @@ export default async function MarketingProjectPage(
   const { locale: rawLocale, slug } = await props.params;
   const locale = isSupportedLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
   const [ { project, error }, t ] = await Promise.all([
-    getProject(slug),
+    getMarketingProject(slug),
     getDictionary(locale)
   ]);
 
@@ -107,11 +106,10 @@ export default async function MarketingProjectPage(
 
   let relatedProjects: MarketingProject[] = [];
   try {
-    const { projects, error: relatedError } = await fetchRelatedMarketingProjects(
+    const { projects, error: relatedError } = await getRelatedMarketingProjects(
       project.category,
       project.slug,
       3,
-      1500 // 1.5s timeout for related content
     );
     if (!relatedError) {
       relatedProjects = projects;
@@ -126,27 +124,16 @@ export default async function MarketingProjectPage(
   const jsonLdArticle = {
     '@context': 'https://schema.org',
     '@type': 'CreativeWork',
-    '@id': `https://www.shainwaiyan.com${basePath}/portfolio/marketing-in-motion/${project.slug}#creativework`,
+    '@id': `${SITE_URL}${basePath}/portfolio/marketing-in-motion/${project.slug}#creativework`,
     headline: project.seo.metaTitle || project.title,
     image: project.seo.ogImage ? [{
       '@type': 'ImageObject',
       url: project.seo.ogImage
     }] : [],
-    datePublished: project.projectDate || new Date().toISOString(),
-    dateModified: project.updatedAt || new Date().toISOString(),
-    author: [{
-      '@type': 'Person',
-      name: 'Shain Wai Yan',
-      url: `https://www.shainwaiyan.com${basePath}/about`
-    }],
-    publisher: {
-      '@type': 'Organization',
-      name: 'Shain Studio',
-      logo: {
-        '@type': 'ImageObject',
-        url: 'https://www.shainwaiyan.com/images/Shain Studio.png'
-      }
-    },
+    datePublished: project.projectDate || undefined,
+    dateModified: project.updatedAt || undefined,
+    author: [{ '@type': 'Person', '@id': PERSON_ID }],
+    publisher: personRef(),
     description: project.seo.metaDescription || project.summary,
     mainEntityOfPage: {
       '@type': 'WebPage',

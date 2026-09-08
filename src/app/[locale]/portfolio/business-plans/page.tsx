@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 import { getDictionary } from '@/lib/getDictionary';
 import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
 import BusinessPlanClient from '@/components/business-plans/BusinessPlanClient';
-import { DEFAULT_OG_IMAGE, absoluteUrl, languageAlternates } from '@/lib/seo';
+import { DEFAULT_OG_IMAGE, absoluteUrl, brandedTitle } from '@/lib/seo';
 
 interface Props {
   params: Promise<{ locale: string }>;
@@ -14,16 +14,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const locale = isSupportedLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
   const t = await getDictionary(locale);
 
-  const title = `${t.businessPlans.title} | Shain Wai Yan`;
+  const title = `${t.businessPlans.title} | Shain Studio`;
   const description = t.businessPlans.description.substring(0, 160);
   const url = absoluteUrl(locale, '/portfolio/business-plans');
 
   return {
-    title,
+    title: { absolute: brandedTitle(title, 'Shain Studio') },
     description,
+    robots: locale === 'zh' ? { index: false, follow: true } : { index: true, follow: true },
     alternates: {
-      canonical: url,
-      languages: languageAlternates('/portfolio/business-plans'),
+      canonical: absoluteUrl('en', '/portfolio/business-plans'),
     },
     openGraph: {
       title,
@@ -32,6 +32,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       type: 'website',
       images: [DEFAULT_OG_IMAGE],
       locale: locale === 'zh' ? 'zh_CN' : 'en_US',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [DEFAULT_OG_IMAGE],
     },
   };
 }

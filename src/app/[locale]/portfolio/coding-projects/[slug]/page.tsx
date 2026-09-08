@@ -1,14 +1,13 @@
-import { cache } from 'react';
 import { serializeJsonLd } from '@/lib/utils/json-ld';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import type { CodingProject } from '@/lib/strapi/coding-projects';
 import {
-  fetchCodingProjectBySlug,
-  fetchCodingProjects,
-  fetchRelatedCodingProjects,
-  type CodingProject,
-} from '@/lib/strapi/coding-projects';
+  getCodingProject,
+  getCodingProjects,
+  getRelatedCodingProjects,
+} from '@/lib/server/project-data';
 
 import CodingProjectHeader from '@/components/coding-project/CodingProjectHeader';
 import CodingProjectContent from '@/components/coding-project/CodingProjectContent';
@@ -17,15 +16,13 @@ import RelatedCodingProjects from '@/components/coding-project/RelatedCodingProj
 import TableOfContents from '@/components/shared/TableOfContents';
 import { getDictionary } from '@/lib/getDictionary';
 import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
-import { SITE_URL, DEFAULT_OG_IMAGE, PERSON_ID, orgRef } from '@/lib/seo';
-
-const getProject = cache(fetchCodingProjectBySlug);
+import { SITE_URL, DEFAULT_OG_IMAGE, PERSON_ID, brandedTitle, personRef, safeCanonicalUrl } from '@/lib/seo';
 
 export const revalidate = 3600; // Revalidate every hour
 export const dynamicParams = true; // Allow new projects to be fetched at runtime
 
 export async function generateStaticParams() {
-  const { projects } = await fetchCodingProjects(1, 100);
+  const { projects } = await getCodingProjects(1, 100);
   const locales = ['en', 'zh'];
 
   return locales.flatMap((locale) =>
@@ -45,7 +42,7 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const { locale: rawLocale, slug } = await params;
   const locale = isSupportedLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
-  const { project, error } = await getProject(slug);
+  const { project, error } = await getCodingProject(slug);
 
   if (error) throw new Error(error);
   if (!project) {
@@ -53,6 +50,10 @@ export async function generateMetadata(
   }
 
   const basePath = locale === 'en' ? '' : `/${locale}`;
+  const englishCanonical = safeCanonicalUrl(
+    project.seo?.canonicalUrl,
+    `${SITE_URL}/portfolio/coding-projects/${project.slug}`,
+  );
 
   const safeKeywords = [
     ...(project.tags || []),
@@ -61,24 +62,21 @@ export async function generateMetadata(
   ].filter(Boolean).join(', ');
 
   return {
-    title: project.seo?.metaTitle || `${project.title} | Software Architecture | Shain Studio`,
+    title: { absolute: brandedTitle(project.seo?.metaTitle || `${project.title} | Software Architecture`, 'Shain Studio') },
     description: project.seo?.metaDescription || project.summary,
+    robots: locale === 'zh' ? { index: false, follow: true } : { index: true, follow: true },
 
     keywords: safeKeywords,
     alternates: {
-      canonical: `${SITE_URL}${basePath}/portfolio/coding-projects/${project.slug}`,
-      languages: {
-        en: `${SITE_URL}/portfolio/coding-projects/${project.slug}`,
-        zh: `${SITE_URL}/zh/portfolio/coding-projects/${project.slug}`,
-        'x-default': `${SITE_URL}/portfolio/coding-projects/${project.slug}`,
-      },
+      canonical: englishCanonical,
     },
     openGraph: {
       type: 'article',
       url: `${SITE_URL}${basePath}/portfolio/coding-projects/${project.slug}`,
       title: project.seo?.metaTitle || project.title,
       description: project.seo?.metaDescription || project.summary,
-      images: project.seo?.ogImage ? [project.seo.ogImage] : project.coverImage ? [project.coverImage] : [],
+      images: [project.seo?.ogImage || project.coverImage || DEFAULT_OG_IMAGE],
+      siteName: 'Shain Studio',
       authors: ['Shain Wai Yan'],
       publishedTime: project.projectDate ? new Date(project.projectDate).toISOString() : undefined,
       modifiedTime: project.updatedAt ? new Date(project.updatedAt).toISOString() : undefined,
@@ -88,7 +86,7 @@ export async function generateMetadata(
       card: 'summary_large_image',
       title: project.seo?.metaTitle || project.title,
       description: project.seo?.metaDescription || project.summary,
-      images: project.seo?.ogImage ? [project.seo.ogImage] : project.coverImage ? [project.coverImage] : [],
+      images: [project.seo?.ogImage || project.coverImage || DEFAULT_OG_IMAGE],
     },
   };
 }
@@ -97,7 +95,7 @@ export default async function CodingProjectDetailPage({ params }: CodingProjectP
   const { locale: rawLocale, slug } = await params;
   const locale = isSupportedLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
   const [ { project, error }, t ] = await Promise.all([
-    getProject(slug),
+    getCodingProject(slug),
     getDictionary(locale)
   ]);
 
@@ -108,11 +106,10 @@ export default async function CodingProjectDetailPage({ params }: CodingProjectP
 
   let relatedProjects: CodingProject[] = [];
   try {
-    const { projects, error: relatedError } = await fetchRelatedCodingProjects(
+    const { projects, error: relatedError } = await getRelatedCodingProjects(
       project.category,
       project.slug,
       3,
-      1500 // 1.5s timeout for related content
     );
     if (!relatedError) {
       relatedProjects = projects;
@@ -139,7 +136,7 @@ export default async function CodingProjectDetailPage({ params }: CodingProjectP
       'name': 'Shain Wai Yan',
       'url': SITE_URL
     },
-    'publisher': orgRef(),
+    'publisher': personRef(),
     'datePublished': project.projectDate ? new Date(project.projectDate).toISOString() : undefined,
     'dateModified': project.updatedAt ? new Date(project.updatedAt).toISOString() : undefined,
     'keywords': [...(project.tags || []), ...(project.toolsUsed || [])].filter(Boolean).join(', '),

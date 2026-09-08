@@ -1,53 +1,68 @@
 'use client';
 
-import Masonry from 'react-masonry-css';
-import { Photo } from '@/lib/strapi/photography';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useWindowVirtualizer } from '@tanstack/react-virtual';
+import type { Photo } from '@/lib/strapi/photography';
 import { PhotoCard } from './PhotoCard';
 
-interface MasonryGridProps {
-  photos: Photo[];
-  onPhotoClick: (photo: Photo) => void;
-}
-
-/**
- * Masonry via react-masonry-css.
- *
- * Why not CSS `columns`: `columns` re-balances the WHOLE grid whenever items
- * are appended, so already-visible photos jump between columns during infinite
- * scroll. react-masonry-css assigns each item to a column by its index
- * (round-robin), so a new batch only extends the bottom of each column —
- * existing photos never move.
- *
- * react-masonry-css uses `windowWidth <= key` semantics, so these upper-bound
- * keys mirror the previous Tailwind breakpoints exactly:
- *   <640 → 1 · 640–1023 → 2 · 1024–1279 → 3 · ≥1280 → 4
- *
- * Gutter + column CSS lives in globals.css (`.photo-masonry-grid*`).
- */
-const breakpointCols = {
-  default: 4,
-  1279: 3,
-  1023: 2,
-  639: 1,
-};
+interface MasonryGridProps { photos: Photo[]; onPhotoClick: (photo: Photo) => void }
+const GAP = 12;
+const columnsForWidth = (width: number) => width < 640 ? 1 : width < 1024 ? 2 : width < 1280 ? 3 : 4;
 
 export function MasonryGrid({ photos, onPhotoClick }: MasonryGridProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState(0);
+  const [scrollMargin, setScrollMargin] = useState(0);
+  const columns = columnsForWidth(width);
+  const columnWidth = Math.max(1, (width - GAP * (columns - 1)) / columns);
+
+  useEffect(() => {
+    const element = containerRef.current;
+    if (!element) return;
+    const update = () => {
+      setWidth(element.clientWidth);
+      setScrollMargin(element.getBoundingClientRect().top + window.scrollY);
+    };
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(element);
+    window.addEventListener('resize', update, { passive: true });
+    return () => { observer.disconnect(); window.removeEventListener('resize', update); };
+  }, []);
+
+  const estimates = useMemo(() => photos.map((photo) => {
+    const imageWidth = photo.width ?? 600;
+    const imageHeight = photo.height ?? 400;
+    return Math.max(120, Math.round(columnWidth * imageHeight / imageWidth));
+  }), [photos, columnWidth]);
+
+  const virtualizer = useWindowVirtualizer({
+    count: photos.length,
+    lanes: columns,
+    gap: GAP,
+    overscan: columns * 6,
+    scrollMargin,
+    estimateSize: (index) => estimates[index] ?? 240,
+    getItemKey: (index) => photos[index]?.documentId ?? photos[index]?.id ?? index,
+  });
+
   return (
-    <Masonry
-      breakpointCols={breakpointCols}
-      className="photo-masonry-grid"
-      columnClassName="photo-masonry-grid_column"
-    >
-      {photos.map((photo, index) => (
-        <PhotoCard
-          key={photo.id}
-          photo={photo}
-          onClick={() => onPhotoClick(photo)}
-          // Only the top row (one per column) is above the fold — keep the
-          // eager/priority set small so they don't contend for bandwidth.
-          priority={index < 5}
-        />
-      ))}
-    </Masonry>
+    <div ref={containerRef} className="relative w-full" style={{ height: virtualizer.getTotalSize() }}>
+      {width > 0 && virtualizer.getVirtualItems().map((item) => {
+        const photo = photos[item.index];
+        if (!photo) return null;
+        return (
+          <div
+            key={item.key}
+            ref={virtualizer.measureElement}
+            data-index={item.index}
+            className="absolute left-0 top-0"
+            style={{ width: columnWidth, transform: `translate3d(${item.lane * (columnWidth + GAP)}px, ${item.start - scrollMargin}px, 0)` }}
+          >
+            <PhotoCard photo={photo} onClick={() => onPhotoClick(photo)} priority={item.index === 0} />
+          </div>
+        );
+      })}
+    </div>
   );
 }

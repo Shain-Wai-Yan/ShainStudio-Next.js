@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { getDictionarySync } from '@/lib/getDictionary';
+import { DEFAULT_OG_IMAGE, SITE_URL, brandedTitle } from '@/lib/seo';
 
 interface AMVEditingLayoutProps {
   children: React.ReactNode;
@@ -13,8 +14,9 @@ export async function generateMetadata(
   const t = getDictionarySync(locale as 'en' | 'zh');
 
   return {
-    title: t.amvEditing.seo.title,
+    title: { absolute: brandedTitle(t.amvEditing.seo.title, 'Shain Studio') },
     description: t.amvEditing.seo.description,
+    robots: locale === 'zh' ? { index: false, follow: true } : { index: true, follow: true },
     keywords: t.amvEditing.seo.keywords,
     authors: [{ name: locale === 'zh' ? '明元易' : 'Shain Wai Yan' }],
     openGraph: {
@@ -25,13 +27,16 @@ export async function generateMetadata(
       siteName: t.amvEditing.seo.siteName,
       locale: locale === 'zh' ? 'zh_CN' : 'en_US',
       alternateLocale: locale === 'zh' ? 'en_US' : 'zh_CN',
+      images: [{ url: DEFAULT_OG_IMAGE, width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: t.amvEditing.seo.openGraphTitle,
+      description: t.amvEditing.seo.openGraphDesc,
+      images: [DEFAULT_OG_IMAGE],
     },
     alternates: {
-      canonical: locale === 'en' ? '/portfolio/amv-editing' : `/${locale}/portfolio/amv-editing`,
-      languages: {
-        en: '/portfolio/amv-editing',
-        zh: '/zh/portfolio/amv-editing',
-      },
+      canonical: `${SITE_URL}/portfolio/amv-editing`,
     },
   };
 }

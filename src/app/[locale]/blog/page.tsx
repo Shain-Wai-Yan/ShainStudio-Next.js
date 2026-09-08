@@ -6,9 +6,16 @@ import BlogHero from '@/components/blog/BlogHero';
 import BlogListingClient from '@/components/blog/BlogListingClient';
 import { getDictionary } from '@/lib/getDictionary';
 import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
+import { DEFAULT_OG_IMAGE, SITE_URL, brandedTitle, personRef } from '@/lib/seo';
 
 interface BlogPageProps {
   params: Promise<{ locale: string }>;
+}
+
+export const revalidate = 300;
+
+export function generateStaticParams() {
+  return [{ locale: 'en' }, { locale: 'zh' }];
 }
 
 export async function generateMetadata(props: BlogPageProps): Promise<Metadata> {
@@ -18,29 +25,25 @@ export async function generateMetadata(props: BlogPageProps): Promise<Metadata> 
 
   const isZh = locale === 'zh';
   const urlPath = isZh ? '/zh/blog' : '/blog';
-  const domain = 'https://www.shainwaiyan.com';
+  const domain = SITE_URL;
 
   const title = isZh
     ? '数字营销博客与案例分析'
     : 'Digital Marketing Blog & Case Studies';
 
   return {
-    title,
+    title: { absolute: brandedTitle(title, 'Shain Studio') },
     description: t.blog.description,
+    robots: isZh ? { index: false, follow: true } : { index: true, follow: true },
     alternates: {
-      canonical: `${domain}${urlPath}`,
-      languages: {
-        en: `${domain}/blog`,
-        zh: `${domain}/zh/blog`,
-        'x-default': `${domain}/blog`
-      },
+      canonical: `${domain}/blog`,
     },
     openGraph: {
       type: 'website',
       url: `${domain}${urlPath}`,
       title,
       description: t.blog.description,
-      images: `${domain}/images/Shain Studio.png`,
+      images: [DEFAULT_OG_IMAGE],
       locale: isZh ? 'zh_CN' : 'en_US',
       alternateLocale: isZh ? 'en_US' : 'zh_CN',
     },
@@ -48,7 +51,7 @@ export async function generateMetadata(props: BlogPageProps): Promise<Metadata> 
       card: 'summary_large_image',
       title,
       description: t.blog.description,
-      images: [`${domain}/images/Shain Studio.png`],
+      images: [DEFAULT_OG_IMAGE],
     },
   };
 }
@@ -59,12 +62,14 @@ export default async function BlogPage(props: BlogPageProps) {
   const t = await getDictionary(locale);
 
   // Fetch all posts server-side (100 max) so client filtering works on the full dataset
-  const { blogs, error } = await fetchAllBlogs(locale, { pageSize: 100 });
-  const { categories } = await fetchBlogCategories(locale);
-  const { tags } = await fetchBlogTags(locale);
+  const [{ blogs, error }, { categories }, { tags }] = await Promise.all([
+    fetchAllBlogs(locale, { pageSize: 100 }),
+    fetchBlogCategories(locale),
+    fetchBlogTags(locale),
+  ]);
 
   const isZh = locale === 'zh';
-  const domain = 'https://www.shainwaiyan.com';
+  const domain = SITE_URL;
 
   // Dynamic JSON-LD structured as CollectionPage -> ItemList
   const jsonLd = {
@@ -74,14 +79,7 @@ export default async function BlogPage(props: BlogPageProps) {
     name: isZh ? '数字营销博客' : 'Digital Marketing Blog',
     description: t.blog.description,
     url: `${domain}${isZh ? '/zh/blog' : '/blog'}`,
-    publisher: {
-      '@type': 'Organization',
-      name: 'Shain Studio',
-      logo: {
-        '@type': 'ImageObject',
-        url: 'https://www.shainwaiyan.com/images/Shain Studio.png'
-      }
-    },
+    publisher: personRef(),
     mainEntity: {
       '@type': 'ItemList',
       '@id': `${domain}${isZh ? '/zh/blog' : '/blog'}#itemlist`,

@@ -1,24 +1,16 @@
 import { NextResponse } from 'next/server';
-import { fetchFromStrapi } from '@/lib/strapi/client';
-
-interface MarketingPlansResponse {
-  data: unknown[];
-  meta?: object;
-}
+import { fetchMarketingPlans, transformMarketingPlan } from '@/lib/strapi/marketing-plans';
 
 export async function GET() {
-  const response = await fetchFromStrapi<MarketingPlansResponse>('marketing-plans', {
-    queryParams: {
-      populate: '*',
-      sort: 'createdAt:desc',
-    },
-  });
-
-  if (response.error) {
-    return NextResponse.json({ error: response.error }, { status: 500 });
+  const result = await fetchMarketingPlans(1, 100);
+  if (result.error) {
+    return NextResponse.json({ error: result.error }, { status: 500 });
   }
 
-  return NextResponse.json(response.data, {
-    headers: { 'Cache-Control': 's-maxage=60, stale-while-revalidate=300' },
+  return NextResponse.json({
+    data: result.plans.map(transformMarketingPlan),
+    meta: { pagination: { total: result.total } },
+  }, {
+    headers: { 'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400' },
   });
 }

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { transformBusinessPlan, type BusinessPlan } from '@/lib/strapi/business-plans';
 import { DocumentGrid } from '@/components/DocumentGrid';
 import dynamic from 'next/dynamic';
 const DocumentViewer = dynamic(() => import('@/components/DocumentViewer').then(m => m.DocumentViewer), { ssr: false });
@@ -52,9 +51,7 @@ export default function BusinessPlanClient({ locale, t, initialPlans, initialErr
       const res = await fetch('/api/business-plans');
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
-      const rawPlans: BusinessPlan[] = json?.data || [];
-      const transformedPlans = rawPlans.map(transformBusinessPlan) as TransformedPlan[];
-      setPlans(transformedPlans);
+      setPlans((json?.data || []) as TransformedPlan[]);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load plans');
       setPlans([]);

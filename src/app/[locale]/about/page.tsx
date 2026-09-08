@@ -31,10 +31,12 @@ export async function generateMetadata({ params }: AboutProps): Promise<Metadata
 
   // heroSubtitle holds the full LinkedIn-style positioning line for on-page display;
   // the concise PERSON.jobTitle keeps <title>/OG/Twitter from ballooning.
-  const title = `${t.aboutPage.myName} - ${PERSON.jobTitle[locale]}`;
+  const title = locale === 'zh'
+    ? `关于${t.aboutPage.myName} | ${PERSON.jobTitle[locale]}`
+    : 'About Shain Wai Yan | Technical Marketer';
 
   return {
-    title,
+    title: { absolute: title },
     description,
     alternates: {
       canonical: baseUrl,
@@ -51,7 +53,6 @@ export async function generateMetadata({ params }: AboutProps): Promise<Metadata
       type: 'profile',
       firstName: 'Shain',
       lastName: 'Wai Yan',
-      username: 'xolbine',
       images: [DEFAULT_OG_IMAGE],
     },
     twitter: {

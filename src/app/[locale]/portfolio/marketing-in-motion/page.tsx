@@ -5,10 +5,17 @@ import { Metadata } from 'next';
 import { MarketingInMotionClient } from '@/components/marketing-in-motion/MarketingInMotionClient';
 import { getDictionary } from '@/lib/getDictionary';
 import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
-import { fetchMarketingProjects } from '@/lib/strapi/marketing-in-motion';
+import { getMarketingProjects } from '@/lib/server/project-data';
+import { DEFAULT_OG_IMAGE, SITE_NAME, SITE_URL, brandedTitle, personRef } from '@/lib/seo';
 
 interface MarketingInMotionPageProps {
   params: Promise<{ locale: string }>;
+}
+
+export const revalidate = 300;
+
+export function generateStaticParams() {
+  return [{ locale: 'en' }, { locale: 'zh' }];
 }
 
 export async function generateMetadata(
@@ -21,24 +28,20 @@ export async function generateMetadata(
   const basePath = locale === 'en' ? '' : `/${locale}`;
 
   return {
-    title: t.marketingInMotion.seo.title,
+    title: { absolute: brandedTitle(t.marketingInMotion.seo.title, 'Shain Studio') },
     description: t.marketingInMotion.seo.description,
     keywords: t.marketingInMotion.seo.keywords,
+    robots: locale === 'zh' ? { index: false, follow: true } : { index: true, follow: true },
     alternates: {
-      canonical: `https://www.shainwaiyan.com${basePath}/portfolio/marketing-in-motion`,
-      languages: {
-        en: 'https://www.shainwaiyan.com/portfolio/marketing-in-motion',
-        zh: 'https://www.shainwaiyan.com/zh/portfolio/marketing-in-motion',
-        'x-default': 'https://www.shainwaiyan.com/portfolio/marketing-in-motion',
-      },
+      canonical: `${SITE_URL}/portfolio/marketing-in-motion`,
     },
     openGraph: {
       type: 'website',
       url: `https://www.shainwaiyan.com${basePath}/portfolio/marketing-in-motion`,
       title: t.marketingInMotion.seo.title,
       description: t.marketingInMotion.seo.description,
-      images: [{ url: '/images/Shain Studio.png' }],
-      siteName: t.marketingInMotion.seo.siteName || 'Shain Wai Yan Portfolio',
+      images: [{ url: DEFAULT_OG_IMAGE, width: 1200, height: 630 }],
+      siteName: t.marketingInMotion.seo.siteName || SITE_NAME,
       locale: locale === 'zh' ? 'zh_CN' : 'en_US',
       alternateLocale: locale === 'zh' ? 'en_US' : 'zh_CN',
     },
@@ -46,7 +49,7 @@ export async function generateMetadata(
       card: 'summary_large_image',
       title: t.marketingInMotion.seo.twitterTitle || t.marketingInMotion.seo.title,
       description: t.marketingInMotion.seo.twitterDescription || t.marketingInMotion.seo.description,
-      images: ['/images/Shain Studio.png'],
+      images: [DEFAULT_OG_IMAGE],
     },
   };
 }
@@ -57,7 +60,7 @@ export default async function MarketingInMotionPage(props: MarketingInMotionPage
   const t = await getDictionary(locale);
 
   // Pre-fetch data dynamically server-side for maximum SEO availability
-  const { projects } = await fetchMarketingProjects(1, 100);
+  const { projects } = await getMarketingProjects(1, 100);
 
   const basePath = locale === 'en' ? '' : `/${locale}`;
 
@@ -74,14 +77,7 @@ export default async function MarketingInMotionPage(props: MarketingInMotionPage
     name: t.marketingInMotion.seo.title,
     description: t.marketingInMotion.seo.description,
     url: `https://www.shainwaiyan.com${basePath}/portfolio/marketing-in-motion`,
-    publisher: {
-      '@type': 'Organization',
-      name: 'Shain Studio',
-      logo: {
-        '@type': 'ImageObject',
-        url: 'https://www.shainwaiyan.com/images/Shain Studio.png'
-      }
-    },
+    publisher: personRef(),
     mainEntity: {
       '@type': 'ItemList',
       '@id': `https://www.shainwaiyan.com${basePath}/portfolio/marketing-in-motion#itemlist`,

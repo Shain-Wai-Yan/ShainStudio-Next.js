@@ -95,6 +95,28 @@ export interface FilterOptions {
   types: string[];
 }
 
+function listQueryParams(page: number, pageSize: number): Record<string, string | number | boolean> {
+  return {
+    'pagination[page]': page,
+    'pagination[pageSize]': pageSize,
+    'sort': 'projectDate:desc',
+    'fields[0]': 'title',
+    'fields[1]': 'slug',
+    'fields[2]': 'summary',
+    'fields[3]': 'projectDate',
+    'fields[4]': 'isFeatured',
+    'fields[5]': 'updatedAt',
+    'populate[coverImage][fields][0]': 'url',
+    'populate[coverImage][fields][1]': 'width',
+    'populate[coverImage][fields][2]': 'height',
+    'populate[coverImage][fields][3]': 'alternativeText',
+    'populate[category][fields][0]': 'name',
+    'populate[tags][fields][0]': 'name',
+    'populate[tools_useds][fields][0]': 'Tool',
+    'populate[project_type][fields][0]': 'ProjectType',
+  };
+}
+
 // ─── Rich-text ────────────────────────────────────────────────────────────────
 
 function convertInlineElement(el: Record<string, unknown>): string {
@@ -199,6 +221,8 @@ export function transformMarketingProject(raw: StrapiMarketingProject): Marketin
   if (!raw) return null;
 
   try {
+    const attributes = (raw as StrapiMarketingProject & { attributes?: StrapiMarketingProject }).attributes;
+    if (attributes) raw = { ...attributes, id: raw.id };
     const title = raw.Title || raw.title || 'Untitled Project';
     const slug = raw.slug || `project-${raw.id}`;
     const summary = raw.summary || '';
@@ -303,12 +327,10 @@ export async function fetchMarketingProjects(
     const response = await fetchFromStrapi<StrapiMarketingProjectsResponse>(
       'marketing-projects',
       {
-        queryParams: {
-          'pagination[page]': page,
-          'pagination[pageSize]': pageSize,
-          populate: '*',
-          'sort': 'projectDate:desc',
-        },
+        tags: ['strapi', 'marketing-projects'],
+        // Cards and filters do not use the article body or gallery. Avoid
+        // transferring them for every project on collection pages.
+        queryParams: listQueryParams(page, pageSize),
       },
     );
 
@@ -337,6 +359,7 @@ export async function fetchMarketingProjectBySlug(
     const response = await fetchFromStrapi<StrapiMarketingProjectsResponse>(
       'marketing-projects',
       {
+        tags: ['strapi', 'marketing-projects'],
         queryParams: {
           'filters[slug][$eq]': slug,
           populate: '*',
@@ -373,12 +396,11 @@ export async function fetchRelatedMarketingProjects(
     const response = await fetchFromStrapi<StrapiMarketingProjectsResponse>(
       'marketing-projects',
       {
+        tags: ['strapi', 'marketing-projects'],
         queryParams: {
+          ...listQueryParams(1, limit),
           'filters[category][name][$eq]': category,
           'filters[slug][$ne]': currentSlug,
-          'pagination[pageSize]': limit,
-          populate: '*',
-          'sort': 'projectDate:desc',
         },
         timeout,
       },

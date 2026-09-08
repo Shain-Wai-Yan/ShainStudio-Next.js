@@ -50,6 +50,7 @@ NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
 NEXT_PUBLIC_CLARITY_ID=xxxxxxxxxx
 STRAPI_API_URL=https://your-strapi-url
 STRAPI_API_TOKEN=your-strapi-token
+STRAPI_REVALIDATION_SECRET=generate-a-long-random-secret
 GITHUB_TOKEN=your-github-token
 ```
 
@@ -98,3 +99,16 @@ Deployed on **Vercel** with automatic deploys on push to `main`.
 
 - Production: `https://www.shainwaiyan.com`
 - CMS API: `https://api.shainwaiyan.com`
+
+### Publish revalidation
+
+Public Strapi data is cached to protect the CMS. To publish changes immediately,
+add the same `STRAPI_REVALIDATION_SECRET` value to Vercel and configure a Strapi
+webhook for create, update, publish, unpublish, and delete events.
+
+- URL: `https://www.shainwaiyan.com/api/revalidate`
+- Method: `POST`
+- Header: `Authorization: Bearer <STRAPI_REVALIDATION_SECRET>`
+
+The endpoint accepts Strapi's standard webhook body and revalidates the affected
+blog, portfolio collection, photography page, plan list, or certificate page.

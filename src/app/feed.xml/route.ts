@@ -1,5 +1,5 @@
 import { fetchFromStrapi } from '@/lib/strapi/client';
-import { SITE_URL, PERSON } from '@/lib/seo';
+import { SITE_NAME, SITE_URL, PERSON } from '@/lib/seo';
 
 // NOTE: this route MUST live at a dotted path (/feed.xml) — middleware rewrites
 // non-dotted, non-locale paths to /en/*, so a plain /feed would 404.
@@ -69,9 +69,9 @@ export async function GET() {
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>${escapeXml(`${PERSON.name} — Digital Marketing Blog`)}</title>
+    <title>${escapeXml(`Digital Marketing Blog | ${SITE_NAME}`)}</title>
     <link>${SITE_URL}/blog</link>
-    <description>Digital marketing, brand strategy, and marketing technology articles by ${escapeXml(PERSON.name)} (xolbine).</description>
+    <description>Digital marketing, brand strategy, and marketing technology articles by ${escapeXml(PERSON.name)} (Xolbine).</description>
     <language>en-us</language>
     <atom:link href="${SITE_URL}/feed.xml" rel="self" type="application/rss+xml"/>
 ${items}

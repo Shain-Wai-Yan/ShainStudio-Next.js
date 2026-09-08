@@ -2200,17 +2200,3 @@
 
 .dark .section-headline { color: #f0f0ff; }
 
-/* ── Photography masonry (react-masonry-css) ──────────────────────────────
-   Index-based columns: appending a batch never re-flows visible photos.
-   12px gutter matches the previous `gap-3`; the vertical gap is the mb-3
-   on each PhotoCard. */
-.photo-masonry-grid {
-  display: flex;
-  width: auto;
-  margin-left: -12px; /* offsets the per-column left padding */
-}
-.photo-masonry-grid_column {
-  padding-left: 12px; /* gutter between columns */
-  background-clip: padding-box;
-}
-

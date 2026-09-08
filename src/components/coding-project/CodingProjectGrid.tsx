@@ -73,8 +73,8 @@ export function CodingProjectGrid({
           project={project}
           locale={locale}
           viewDetailsLabel={viewDetailsLabel}
-          // LCP optimization: eagerly load the first couple of images
-          priority={index < 4}
+          // One likely LCP image gets preload bandwidth; the rest lazy-load.
+          priority={index === 0}
         />
       ))}
 

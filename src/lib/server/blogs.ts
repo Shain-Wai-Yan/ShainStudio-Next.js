@@ -30,8 +30,8 @@ function mapPost(p: Record<string, unknown>): BlogPost {
     Author:        String(p.author ?? ''),
     Language:      (p.language as 'en' | 'zh')      ?? 'en',
     PublishedDate: (p.publishDate as string)         ?? '',
-    createdAt:     (p.publishDate as string)         ?? new Date().toISOString(),
-    updatedAt:     (p.updatedAt   as string)         ?? new Date().toISOString(),
+    createdAt:     (p.publishDate as string)         ?? '',
+    updatedAt:     (p.updatedAt   as string)         ?? '',
     Seo:           seo,
   };
 }

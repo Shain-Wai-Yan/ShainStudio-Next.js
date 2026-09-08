@@ -1,7 +1,5 @@
-'use client';
-
 import Link from 'next/link';
-import { CodingProject } from '@/lib/strapi/coding-projects';
+import type { CodingProject } from '@/lib/strapi/coding-projects';
 import RichTextRenderer from '../shared/RichTextRenderer';
 
 interface CodingProjectContentProps {

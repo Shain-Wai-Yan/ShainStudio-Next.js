@@ -3,6 +3,7 @@ import { getDictionary } from '@/lib/getDictionary';
 import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
 import PortfolioClient, { PortfolioDictionary } from '@/components/portfolio/PortfolioClient';
 import { getPortfolioCounts } from '@/lib/getPortfolioCounts';
+import { DEFAULT_OG_IMAGE, SITE_URL } from '@/lib/seo';
 
 interface PortfolioProps {
   params: Promise<{ locale: string }>;
@@ -14,15 +15,15 @@ export async function generateMetadata({ params }: PortfolioProps): Promise<Meta
   const translations = await getDictionary(locale);
   const t = translations.portfolioPage;
   
-  const domain = 'https://www.shainwaiyan.com';
+  const domain = SITE_URL;
   const urlPath = locale === 'zh' ? '/zh/portfolio' : '/portfolio';
   const baseUrl = `${domain}${urlPath}`;
 
-  const title = `${t.cards.headline} | Shain Wai Yan (xolbine)`;
+  const title = locale === 'zh' ? '精选作品 | Shain Studio' : 'Selected Work | Shain Studio';
   const description = t.cta.p;
 
   return {
-    title,
+    title: { absolute: title },
     description,
     alternates: {
       canonical: baseUrl,
@@ -37,11 +38,13 @@ export async function generateMetadata({ params }: PortfolioProps): Promise<Meta
       description,
       url: baseUrl,
       type: 'website',
+      images: [{ url: DEFAULT_OG_IMAGE, width: 1200, height: 630 }],
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
+      images: [DEFAULT_OG_IMAGE],
     },
   };
 }

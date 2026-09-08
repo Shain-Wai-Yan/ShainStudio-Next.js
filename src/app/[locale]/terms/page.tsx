@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { getDictionary } from '@/lib/getDictionary';
 import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
+import { brandedTitle } from '@/lib/seo';
 
 export function generateStaticParams() {
   return [{ locale: 'en' }, { locale: 'zh' }];
@@ -17,7 +18,7 @@ export async function generateMetadata(props: TermsPageProps): Promise<Metadata>
   const t = await getDictionary(locale);
   const basePath = locale === 'en' ? '' : `/${locale}`;
   return {
-    title: `${t.terms.title} | Shain Studio`,
+    title: { absolute: brandedTitle(t.terms.title, 'Shain Studio') },
     description: t.terms.introduction,
     robots: {
       index: false,

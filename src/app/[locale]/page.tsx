@@ -5,7 +5,7 @@ import { Metadata } from 'next';
 import { getDictionary } from '@/lib/getDictionary';
 import type { Dictionary } from '@/lib/getDictionary';
 import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
-import { SITE_URL, DEFAULT_OG_IMAGE, absoluteUrl, languageAlternates } from '@/lib/seo';
+import { SITE_URL, SITE_NAME, DEFAULT_OG_IMAGE, absoluteUrl, languageAlternates } from '@/lib/seo';
 import dynamic from 'next/dynamic';
 
 // GsapHero is above-the-fold — direct import so it ships with the initial bundle
@@ -85,8 +85,10 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   // Assert type for typescript
   const hp = t.homePage as unknown as HomePage;
 
-  const title = hp.title ? `Shain Studio | ${hp.title} ${hp.titleHighlight}` : 'Shain Studio';
-  const description = hp.metaDescription || hp.description || 'Shain Wai Yan Portfolio';
+  const title = locale === 'zh'
+    ? '技术营销作品集 | Shain Wai Yan'
+    : 'Technical Marketing Portfolio | Shain Wai Yan';
+  const description = hp.metaDescription || hp.description || 'The Shain Studio portfolio of Shain Wai Yan.';
   const url = absoluteUrl(locale);
 
   return {
@@ -107,7 +109,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       url,
       type: 'website',
       images: [DEFAULT_OG_IMAGE],
-      siteName: locale === 'zh' ? 'Shain的作品集' : "Shain's Portfolio",
+      siteName: SITE_NAME,
       locale: locale === 'zh' ? 'zh_CN' : 'en_US',
     },
     twitter: {

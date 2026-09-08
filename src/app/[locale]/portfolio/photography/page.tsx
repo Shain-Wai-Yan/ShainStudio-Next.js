@@ -1,27 +1,18 @@
 import type { Metadata } from 'next';
 import { Breadcrumb } from '@/components/Breadcrumb';
 import { PhotographyGallery } from '@/components/photography/PhotographyGallery';
-import { fetchAllPhotography } from '@/lib/server/photography';
 import { getDictionary } from '@/lib/getDictionary'; // ✅ Use async
 import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
+import { DEFAULT_OG_IMAGE, SITE_URL, brandedTitle } from '@/lib/seo';
 
 interface PhotographyPageProps {
   params: Promise<{ locale: string }>;
 }
 
-/**
- * Fisher–Yates shuffle. Runs per request on the server so every visitor gets a
- * unique order that is baked into the SSR HTML — the client renders it as-is
- * (no post-hydration reshuffle, no reflow). The underlying photo data is cached,
- * so this stays fast despite the render being dynamic.
- */
-function shuffleArray<T>(array: readonly T[]): T[] {
-  const shuffled = [...array];
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-  }
-  return shuffled;
+export const revalidate = 3600;
+
+export function generateStaticParams() {
+  return [{ locale: 'en' }, { locale: 'zh' }];
 }
 
 export async function generateMetadata(
@@ -33,15 +24,11 @@ export async function generateMetadata(
   const basePath = locale === 'en' ? '' : `/${locale}`;
 
   return {
-    title: t.photography.seo.title,
+    title: { absolute: brandedTitle(t.photography.seo.title, 'Shain Studio') },
     description: t.photography.seo.description,
+    robots: locale === 'zh' ? { index: false, follow: true } : { index: true, follow: true },
     alternates: {
-      canonical: `https://www.shainwaiyan.com${basePath}/portfolio/photography`,
-      languages: {
-        en: 'https://www.shainwaiyan.com/portfolio/photography',
-        zh: 'https://www.shainwaiyan.com/zh/portfolio/photography',
-        'x-default': 'https://www.shainwaiyan.com/portfolio/photography',
-      },
+      canonical: `${SITE_URL}/portfolio/photography`,
     },
     openGraph: {
       title: t.photography.seo.openGraphTitle,
@@ -49,6 +36,14 @@ export async function generateMetadata(
       url: `https://www.shainwaiyan.com${basePath}/portfolio/photography`,
       locale: locale === 'zh' ? 'zh_CN' : 'en_US',
       alternateLocale: locale === 'zh' ? 'en_US' : 'zh_CN',
+      type: 'website',
+      images: [{ url: DEFAULT_OG_IMAGE, width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: t.photography.seo.openGraphTitle,
+      description: t.photography.seo.openGraphDesc,
+      images: [DEFAULT_OG_IMAGE],
     },
   };
 }
@@ -58,11 +53,6 @@ export default async function PhotographyPage(props: PhotographyPageProps) {
   const locale = isSupportedLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
   const t = await getDictionary(locale); // ✅ Use async
   const basePath = locale === 'en' ? '' : `/${locale}`;
-
-  const { photos, pageCount, error } = await fetchAllPhotography(locale as 'en' | 'zh', { pageSize: 100 });
-
-  // Shuffle server-side so each visitor gets a unique order rendered into the HTML.
-  const shuffledPhotos = shuffleArray(photos);
 
   const breadcrumbItems = [
     { label: t.photography.breadcrumbs.home, href: basePath || '/' },
@@ -85,21 +75,7 @@ export default async function PhotographyPage(props: PhotographyPageProps) {
           </p>
         </div>
 
-        {error ? (
-          <div className="rounded-2xl border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/20 p-8 text-center">
-            <p className="text-red-600 dark:text-red-400 font-medium text-sm">
-              {t.photography.labels.errorText}
-            </p>
-          </div>
-        ) : photos.length > 0 ? (
-          <PhotographyGallery initialPhotos={shuffledPhotos} language={locale as 'en' | 'zh'} initialPageCount={pageCount} />
-        ) : (
-          <div className="flex flex-col items-center justify-center py-24 text-center">
-            <p className="text-gray-400 dark:text-gray-500 font-medium">
-              {t.photography.labels.noPhotos}
-            </p>
-          </div>
-        )}
+        <PhotographyGallery language={locale as 'en' | 'zh'} />
       </div>
     </main>
   );

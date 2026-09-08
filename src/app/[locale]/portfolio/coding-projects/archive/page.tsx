@@ -1,14 +1,22 @@
 import { serializeJsonLd } from '@/lib/utils/json-ld';
+import { Suspense } from 'react';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getDictionary } from '@/lib/getDictionary';
 import { isSupportedLocale } from '@/lib/locales';
 import { CodingProjectArchiveClient } from '@/components/coding-project/CodingProjectArchiveClient';
-import { fetchCodingProjects, type CodingProject } from '@/lib/strapi/coding-projects';
-import { SITE_URL, DEFAULT_OG_IMAGE } from '@/lib/seo';
+import type { CodingProject } from '@/lib/strapi/coding-projects';
+import { getCodingProjects } from '@/lib/server/project-data';
+import { SITE_URL, DEFAULT_OG_IMAGE, brandedTitle } from '@/lib/seo';
 
 interface Props {
   params: Promise<{ locale: string }>;
+}
+
+export const revalidate = 300;
+
+export function generateStaticParams() {
+  return [{ locale: 'en' }, { locale: 'zh' }];
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -24,16 +32,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const defaultOgImage = DEFAULT_OG_IMAGE;
 
   return {
-    title: `${archiveTitle} | Shain Studio`,
+    title: { absolute: brandedTitle(archiveTitle, 'Shain Studio') },
     description: archiveDescription,
-    robots: { index: true, follow: true },
+    robots: locale === 'zh' ? { index: false, follow: true } : { index: true, follow: true },
     alternates: {
-      canonical: url,
-      languages: {
-        'en': `${SITE_URL}/portfolio/coding-projects/archive`,
-        'zh': `${SITE_URL}/zh/portfolio/coding-projects/archive`,
-        'x-default': `${SITE_URL}/portfolio/coding-projects/archive`,
-      },
+      canonical: `${SITE_URL}/portfolio/coding-projects/archive`,
     },
     openGraph: {
       title: archiveTitle,
@@ -67,7 +70,7 @@ export default async function CodingProjectsArchivePage({ params }: Props) {
   const archiveDescription = dict.codingProjects.archive?.description || 'Browse the complete database of my software engineering projects.';
 
   // Fetch coding projects from Strapi
-  const { projects: strapiProjects } = await fetchCodingProjects();
+  const { projects: strapiProjects } = await getCodingProjects();
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -138,11 +141,12 @@ export default async function CodingProjectsArchivePage({ params }: Props) {
         dangerouslySetInnerHTML={{ __html: serializeJsonLd([jsonLd, jsonLdBreadcrumb]) }}
       />
       
-      <CodingProjectArchiveClient
-        locale={locale as 'en' | 'zh'}
-        breadcrumbItems={breadcrumbItems}
-        initialProjects={strapiProjects}
-        labels={{
+      <Suspense fallback={<div className="min-h-screen" aria-hidden="true" />}>
+        <CodingProjectArchiveClient
+          locale={locale as 'en' | 'zh'}
+          breadcrumbItems={breadcrumbItems}
+          initialProjects={strapiProjects}
+          labels={{
           heroTitle: archiveTitle,
           heroDescription: archiveDescription,
           searchPlaceholder: dict.codingProjects.labels.searchPlaceholder,
@@ -161,8 +165,9 @@ export default async function CodingProjectsArchivePage({ params }: Props) {
           retryText: dict.codingProjects.labels.retryText,
           noProjects: dict.codingProjects.labels.noProjects,
           noProjectsHint: dict.codingProjects.labels.noProjectsHint,
-        }}
-      />
+          }}
+        />
+      </Suspense>
     </>
   );
 }

@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { getDictionary } from '@/lib/getDictionary';
 import "@/app/globals.css";
 import { getHtmlLang, isSupportedLocale, DEFAULT_LOCALE } from "@/lib/locales";
-import { SITE_URL, DEFAULT_OG_IMAGE, LOGO_IMAGE, personJsonLd, organizationJsonLd, websiteJsonLd } from "@/lib/seo";
+import { SITE_URL, SITE_NAME, DEFAULT_OG_IMAGE, LOGO_IMAGE, personJsonLd, websiteJsonLd } from "@/lib/seo";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { GoogleAnalytics } from '@next/third-parties/google';
@@ -37,13 +37,13 @@ export async function generateMetadata({ params }: Omit<LocaleLayoutProps, 'chil
   return {
     title: {
       default: isZh
-        ? "技术营销从业者 | Shain Wai Yan (xolbine)"
-        : "Technical Marketer | Shain Wai Yan (xolbine)",
-      template: `%s | Shain Wai Yan (xolbine)`,
+        ? "技术营销作品集 | Shain Wai Yan"
+        : "Technical Marketing Portfolio | Shain Wai Yan",
+      template: `%s | ${SITE_NAME}`,
     },
     description: isZh
-      ? "Shain Wai Yan (xolbine、明元易) 的作品集 — 技术营销从业者、MarTech 爱好者、创意科技实践者。探索我在数字营销、技术、数据与AI领域的作品。"
-      : "Portfolio of Shain Wai Yan (aka xolbine, 明元易) — Technical Marketer, MarTech Enthusiast, and Creative Technologist. Explore my work in digital marketing, technology, data, and AI.",
+      ? "Shain Wai Yan（Xolbine、明元易）的个人作品集，以 Shain Studio 呈现技术营销、MarTech 与创意科技作品。"
+      : "Shain Studio is the personal portfolio of Shain Wai Yan (Xolbine, 明元易), presenting technical marketing, MarTech, and creative technology work.",
     authors: [{ name: "Shain Wai Yan" }],
     robots: "index, follow, max-image-preview:large",
     metadataBase: new URL(SITE_URL),
@@ -65,10 +65,10 @@ export async function generateMetadata({ params }: Omit<LocaleLayoutProps, 'chil
         ? '技术营销从业者 | Shain Wai Yan'
         : 'Technical Marketer | Shain Wai Yan',
       description: isZh
-        ? '在Shain Wai Yan (xolbine)的作品集中探索AI驱动的营销活动、内容策略和市场分析。'
-        : 'Explore AI‑powered campaigns, content strategy, & market analysis in the portfolio of Shain Wai Yan (xolbine).',
+        ? '在 Shain Wai Yan（Xolbine、明元易）的作品集中探索AI驱动的营销活动、内容策略和市场分析。'
+        : 'Explore AI-powered campaigns, content strategy, and market analysis in the portfolio of Shain Wai Yan (Xolbine).',
       images: DEFAULT_OG_IMAGE,
-      siteName: isZh ? "Shain的作品集" : "Shain's Portfolio",
+      siteName: SITE_NAME,
       locale: isZh ? "zh_CN" : "en_US",
       alternateLocale: isZh ? "en_US" : "zh_CN",
     },
@@ -78,8 +78,8 @@ export async function generateMetadata({ params }: Omit<LocaleLayoutProps, 'chil
         ? '技术营销从业者 | Shain Wai Yan'
         : 'Technical Marketer | Shain Wai Yan',
       description: isZh
-        ? '在Shain Wai Yan (xolbine)的作品集中探索AI驱动的营销活动、内容策略和市场分析。'
-        : 'Explore AI‑powered campaigns, content strategy, & market analysis in the portfolio of Shain Wai Yan (xolbine).',
+        ? '在 Shain Wai Yan（Xolbine、明元易）的作品集中探索AI驱动的营销活动、内容策略和市场分析。'
+        : 'Explore AI-powered campaigns, content strategy, and market analysis in the portfolio of Shain Wai Yan (Xolbine).',
       images: [DEFAULT_OG_IMAGE],
     },
     icons: {
@@ -108,7 +108,6 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
     '@context': 'https://schema.org',
     '@graph': [
       personJsonLd(locale),
-      organizationJsonLd(),
       websiteJsonLd(locale),
     ],
   };

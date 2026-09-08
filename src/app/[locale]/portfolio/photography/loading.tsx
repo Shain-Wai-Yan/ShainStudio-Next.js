@@ -1,9 +1,8 @@
 /**
  * Instant skeleton for the photography route.
  *
- * The page render is dynamic (per-visitor shuffle), so this Suspense fallback
- * paints immediately while the photo data resolves — steady perceived
- * performance even when the CMS is slow to respond.
+ * The route renders a lightweight static shell. This fallback keeps its layout
+ * stable until the session-seeded client feed receives its first 24 records.
  */
 
 // Staggered heights so the placeholder reads as a masonry grid.

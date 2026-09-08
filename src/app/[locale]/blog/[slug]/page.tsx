@@ -3,16 +3,30 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Script from 'next/script';
 import { notFound } from 'next/navigation';
-import { fetchBlogBySlug, fetchRelatedBlogs } from '@/lib/server/blogs';
+import { fetchAllBlogs, fetchBlogBySlug, fetchRelatedBlogs } from '@/lib/server/blogs';
 import BlogPostHeader from '@/components/blog/BlogPostHeader';
 import BlogPostContent from '@/components/blog/BlogPostContent';
 import RelatedPosts from '@/components/blog/RelatedPosts';
 import TableOfContents from '@/components/shared/TableOfContents';
 import { getDictionary } from '@/lib/getDictionary';
-import { SITE_URL, PERSON_ID, orgRef } from '@/lib/seo';
+import { SITE_URL, DEFAULT_OG_IMAGE, PERSON_ID, brandedTitle, personRef } from '@/lib/seo';
 
 interface BlogPostPageProps {
   params: Promise<{ slug: string; locale?: string }>;
+}
+
+export const revalidate = 300;
+export const dynamicParams = true;
+
+export async function generateStaticParams() {
+  const [english, chinese] = await Promise.all([
+    fetchAllBlogs('en', { pageSize: 100 }),
+    fetchAllBlogs('zh', { pageSize: 100 }),
+  ]);
+  return [
+    ...english.blogs.map(blog => ({ locale: 'en', slug: blog.Slug })),
+    ...chinese.blogs.map(blog => ({ locale: 'zh', slug: blog.Slug })),
+  ];
 }
 
 export async function generateMetadata(props: BlogPostPageProps): Promise<Metadata> {
@@ -26,22 +40,18 @@ export async function generateMetadata(props: BlogPostPageProps): Promise<Metada
   const metaTitle       = blog.Seo?.metaTitle       || blog.Title;
   const metaDescription = blog.Seo?.metaDescription || blog.Description;
   // ogImage: prefer dedicated SEO ogImage, then fall back to featuredImage
-  const ogImage         = blog.Seo?.ogImageUrl       || blog.FeaturedImage;
+  const ogImage         = blog.Seo?.ogImageUrl       || blog.FeaturedImage || DEFAULT_OG_IMAGE;
 
   const urlPath = locale === 'en' ? `/blog/${blog.Slug}` : `/${locale}/blog/${blog.Slug}`;
 
   return {
-    title: `${metaTitle} | Shain Studio`,
+    title: { absolute: brandedTitle(metaTitle, 'Shain Studio') },
     description: metaDescription,
+    robots: locale === 'zh' ? { index: false, follow: true } : { index: true, follow: true },
     authors: blog.Author ? [{ name: blog.Author }] : undefined,
     keywords: blog.Tags?.join(', '),
     alternates: {
-      canonical: `${SITE_URL}${urlPath}`,
-      languages: {
-        en: `${SITE_URL}/blog/${blog.Slug}`,
-        zh: `${SITE_URL}/zh/blog/${blog.Slug}`,
-        'x-default': `${SITE_URL}/blog/${blog.Slug}`,
-      },
+      canonical: `${SITE_URL}/blog/${blog.Slug}`,
     },
     openGraph: {
       type: 'article',
@@ -50,6 +60,9 @@ export async function generateMetadata(props: BlogPostPageProps): Promise<Metada
       description: metaDescription,
       images: ogImage ? [{ url: ogImage }] : [],
       authors: blog.Author ? [blog.Author] : undefined,
+      publishedTime: blog.PublishedDate || blog.createdAt || undefined,
+      modifiedTime: blog.updatedAt || undefined,
+      locale: locale === 'zh' ? 'zh_CN' : 'en_US',
     },
     twitter: {
       card: 'summary_large_image',
@@ -87,8 +100,8 @@ export default async function BlogPostPage(props: BlogPostPageProps) {
       '@type': 'ImageObject',
       url: blog.Seo?.ogImageUrl || blog.FeaturedImage
     }] : [],
-    datePublished: blog.PublishedDate || blog.createdAt || new Date().toISOString(),
-    dateModified: blog.updatedAt || new Date().toISOString(),
+    datePublished: blog.PublishedDate || blog.createdAt || undefined,
+    dateModified: blog.updatedAt || undefined,
     author: [
       !blog.Author || blog.Author === 'Shain Wai Yan'
         ? {
@@ -103,7 +116,7 @@ export default async function BlogPostPage(props: BlogPostPageProps) {
             url: `${SITE_URL}${locale === 'zh' ? '/zh' : ''}/about`,
           },
     ],
-    publisher: orgRef(),
+    publisher: personRef(),
     description: blog.Seo?.metaDescription || blog.Description || blog.Title,
     isPartOf: {
       '@type': 'CollectionPage',

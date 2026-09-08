@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import { Photo } from '@/lib/strapi/photography';
 
 interface PhotoLightboxProps {
+  language: 'en' | 'zh';
   photo: Photo;
   allPhotos: Photo[];
   onClose: () => void;
@@ -124,6 +125,7 @@ function preloadAdjacent(photos: Photo[], currentId: number) {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export function PhotoLightbox({
+  language,
   photo,
   allPhotos,
   onClose,
@@ -134,6 +136,9 @@ export function PhotoLightbox({
   onNavigateTo,
 }: PhotoLightboxProps) {
   const [isVisible, setIsVisible] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
 
   const { activeSrc, blurClass, stage } = useProgressiveImage(photo.id, photo.image);
 
@@ -153,12 +158,27 @@ export function PhotoLightbox({
   // Lock scroll
   useEffect(() => {
     document.body.style.overflow = 'hidden';
+    closeButtonRef.current?.focus();
     return () => { document.body.style.overflow = ''; };
   }, []);
 
   // Keyboard
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if (e.key === 'Escape')                     onClose();
+    if (e.key === 'Tab') {
+      const focusable = Array.from(dialogRef.current?.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), a[href], input:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      ) ?? []).filter((element) => element.offsetParent !== null);
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    } else if (e.key === 'Escape')              onClose();
     else if (e.key === 'ArrowLeft' && hasPrevious) onPrevious();
     else if (e.key === 'ArrowRight' && hasNext)    onNext();
   }, [onClose, onPrevious, onNext, hasPrevious, hasNext]);
@@ -167,6 +187,16 @@ export function PhotoLightbox({
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleKeyDown]);
+
+  const detailUrl = `${window.location.origin}${language === 'en' ? '' : `/${language}`}/portfolio/photography/photo/${photo.documentId ?? photo.id}`;
+  const sharePhoto = useCallback(async () => {
+    try {
+      if (navigator.share) await navigator.share({ title: photo.title, url: detailUrl });
+      else { await navigator.clipboard.writeText(detailUrl); setCopied(true); window.setTimeout(() => setCopied(false), 1800); }
+    } catch (error) {
+      if (error instanceof Error && error.name !== 'AbortError') console.warn('Unable to share photo');
+    }
+  }, [detailUrl, photo.title]);
 
   // ── Shared image element ──────────────────────────────────────────────────
   const imageEl = (maxHeightClass: string) => (
@@ -208,6 +238,7 @@ export function PhotoLightbox({
         <h2 className="text-white font-semibold text-base leading-tight truncate">
           {photo.title}
         </h2>
+        <button type="button" onClick={() => void sharePhoto()} className="mt-3 rounded-full border border-white/20 px-3 py-1.5 text-xs font-medium text-white/80 transition hover:border-[#ffd700]/60 hover:text-[#ffd700]">{copied ? 'Link copied' : 'Share photo'}</button>
         {photo.location && (
           <p className="text-white/50 text-sm mt-1 flex items-center gap-1.5">
             <svg className="w-3.5 h-3.5 shrink-0 text-[#ffd700]/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -237,6 +268,7 @@ export function PhotoLightbox({
 
   return (
     <div
+      ref={dialogRef}
       className={`fixed inset-0 z-[9999] flex transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
       role="dialog"
       aria-modal="true"
@@ -247,6 +279,7 @@ export function PhotoLightbox({
 
       {/* Close */}
       <button
+        ref={closeButtonRef}
         onClick={onClose}
         className="absolute top-4 right-4 z-20 w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all duration-200 hover:scale-110 border border-white/10"
         aria-label="Close"

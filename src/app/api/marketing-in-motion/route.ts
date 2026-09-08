@@ -5,10 +5,9 @@ import { boundedInteger } from '@/lib/utils/pagination';
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import {
-  fetchMarketingProjects,
-  fetchMarketingProjectBySlug,
-} from '@/lib/strapi/marketing-in-motion';
+import { getMarketingProject, getMarketingProjects } from '@/lib/server/project-data';
+
+const CACHE_HEADERS = { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600' };
 
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
@@ -19,18 +18,18 @@ export async function GET(request: NextRequest) {
 
   // ─── Single project by slug ───────────────────────────────────────────────
   if (slug) {
-    const { project, error } = await fetchMarketingProjectBySlug(slug);
+    const { project, error } = await getMarketingProject(slug);
     if (error) {
       return NextResponse.json({ error }, { status: 500 });
     }
     if (!project) {
       return NextResponse.json({ error: 'Not found' }, { status: 404 });
     }
-    return NextResponse.json({ data: project });
+    return NextResponse.json({ data: project }, { headers: CACHE_HEADERS });
   }
 
   // ─── List with pagination ─────────────────────────────────────────────────
-  const { projects, total, error } = await fetchMarketingProjects(page, pageSize);
+  const { projects, total, error } = await getMarketingProjects(page, pageSize);
   if (error) {
     return NextResponse.json({ error }, { status: 500 });
   }
@@ -45,5 +44,5 @@ export async function GET(request: NextRequest) {
         pageCount: Math.ceil(total / pageSize),
       },
     },
-  });
+  }, { headers: CACHE_HEADERS });
 }

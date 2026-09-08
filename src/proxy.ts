@@ -25,7 +25,7 @@ function localeUrl(request: NextRequest, pathname: string) {
   return url;
 }
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const searchParams = request.nextUrl.searchParams;
 
@@ -239,7 +239,7 @@ export function middleware(request: NextRequest) {
       return response;
     }
 
-    return NextResponse.rewrite(localeUrl(request, '/en'));
+    return NextResponse.rewrite(localeUrl(request, '/en/'));
   }
 
   // Handle any other non-locale paths

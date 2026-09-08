@@ -1,6 +1,5 @@
-'use client';
 import Link from 'next/link';
-import { MarketingProject } from '@/lib/strapi/marketing-in-motion';
+import type { MarketingProject } from '@/lib/strapi/marketing-in-motion';
 import RichTextRenderer from '../shared/RichTextRenderer';
 
 interface ProjectContentProps {

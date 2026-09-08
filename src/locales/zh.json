@@ -104,7 +104,7 @@
       "description": "探索 Shain Studio 的营销策略、活动与案例研究。从课程作业到自主实验，了解我作为现代营销人如何思考、规划和执行。",
       "keywords": "营销活动, 营销策略, 案例研究, 数字营销, 品牌策略, Shain Wai Yan, Shain Studio",
       "projectNotFoundTitle": "项目未找到 | Shain Studio",
-      "siteName": "Shain Wai Yan 作品集",
+      "siteName": "Shain Studio",
       "twitterTitle": "营销实战 | Shain Studio",
       "twitterDescription": "探索 Shain Wai Yan 的营销策略、活动与案例研究。"
     },
@@ -247,7 +247,7 @@
     "documentsHeading": "营销方案文档",
     "emptyMessage": "暂无可用的营销方案文档。",
     "seo": {
-      "title": "营销方案 | 明元易",
+      "title": "营销方案 | Shain Studio",
       "description": "探索创新的营销策略与全面方案，旨在提升品牌知名度与市场影响力。"
     }
   },
@@ -256,9 +256,9 @@
     "subtitle": "通过镜头讲述视觉故事",
     "description": "精选的摄影作品集，探索构图、光线和情感。每一张照片都捕捉了一个决定性时刻与有意的叙事。",
     "seo": {
-      "title": "摄影作品集 | Shain Wai Yan",
+      "title": "摄影作品集 | Shain Studio",
       "description": "探索 Shain Wai Yan 的摄影作品集，包含风景、建筑等精彩影像。",
-      "openGraphTitle": "摄影作品集 | Shain Wai Yan",
+      "openGraphTitle": "摄影作品集 | Shain Studio",
       "openGraphDesc": "探索我的摄影作品集，包含风景、人像、建筑等多种风格的摄影作品。"
     },
     "labels": {
@@ -278,12 +278,12 @@
     "subtitle": "动画图形与视频编辑",
     "description": "创意视频编辑和动画图形，每一帧都精心制作。结合音乐、视觉和时机讲述引人入胜的故事。",
     "seo": {
-      "title": "动漫视频剪辑 | 明元易工作室 (xolbine)",
-      "description": "探索明元易（又名 xolbine，Shain Wai Yan）的 AMV（动画音乐视频）剪辑作品集，展示结合故事讲述与震撼视觉效果的动态视频剪辑。",
-      "keywords": "明元易, xolbine, Shain Wai Yan, AMV, 动画音乐视频, 视频剪辑, 作品集, 动画, 音乐视频",
-      "openGraphTitle": "动漫视频剪辑 | 明元易工作室",
+      "title": "动漫视频剪辑 | Shain Studio",
+      "description": "探索明元易（又名 Xolbine，Shain Wai Yan）的 AMV（动画音乐视频）剪辑作品集，展示结合故事讲述与震撼视觉效果的动态视频剪辑。",
+      "keywords": "明元易, Xolbine, Shain Wai Yan, AMV, 动画音乐视频, 视频剪辑, 作品集, 动画, 音乐视频",
+      "openGraphTitle": "动漫视频剪辑 | Shain Studio",
       "openGraphDesc": "动态视频剪辑，融合故事叙述与震撼视觉效果",
-      "siteName": "明元易工作室"
+      "siteName": "Shain Studio"
     },
     "labels": {
       "headerTitle": "动漫视频剪辑",
@@ -297,7 +297,7 @@
       "amvEditing": "动漫视频剪辑"
     },
     "mockChannel": {
-      "title": "明元易工作室 AMV",
+      "title": "Shain Studio AMV",
       "description": "欢迎来到我的 AMV 剪辑频道！创作融合故事叙述与震撼视觉的动态动画音乐视频。",
       "subscriberCount": "1.2千",
       "videoCount": "25"

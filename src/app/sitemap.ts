@@ -1,5 +1,6 @@
 import { MetadataRoute } from 'next';
 import { fetchFromStrapi } from '@/lib/strapi/client';
+import { repository as photographyRepository } from '@/lib/server/photography-data';
 
 const SITE_URL = 'https://www.shainwaiyan.com';
 
@@ -30,6 +31,10 @@ interface StrapiSitemapResponse<T> {
       total: number;
     };
   };
+}
+
+function normalizeEntry<T extends { slug: string }>(entry: T & { attributes?: Partial<T> }): T {
+  return { ...entry, ...(entry.attributes ?? {}) } as T;
 }
 
 // ─── Static Routes Configuration ──────────────────────────────────────────────
@@ -91,7 +96,7 @@ async function fetchAllBlogSlugs(): Promise<BlogPost[]> {
       return [];
     }
 
-    const posts = res.data?.data ?? [];
+    const posts = (res.data?.data ?? []).map(normalizeEntry).filter((post) => Boolean(post.slug));
     console.log(`[Sitemap] Fetched ${posts.length} blog posts from Strapi`);
     return posts;
   } catch (error) {
@@ -118,7 +123,7 @@ async function fetchAllMarketingProjectSlugs(): Promise<MarketingProject[]> {
       return [];
     }
 
-    const projects = res.data?.data ?? [];
+    const projects = (res.data?.data ?? []).map(normalizeEntry).filter((project) => Boolean(project.slug));
     console.log(`[Sitemap] Fetched ${projects.length} marketing projects from Strapi`);
     return projects;
   } catch (error) {
@@ -145,7 +150,7 @@ async function fetchAllCodingProjectSlugs(): Promise<CodingProjectSlug[]> {
       return [];
     }
 
-    const projects = res.data?.data ?? [];
+    const projects = (res.data?.data ?? []).map(normalizeEntry).filter((project) => Boolean(project.slug));
     console.log(`[Sitemap] Fetched ${projects.length} coding projects from Strapi`);
     return projects;
   } catch (error) {
@@ -157,30 +162,34 @@ async function fetchAllCodingProjectSlugs(): Promise<CodingProjectSlug[]> {
 // ─── Sitemap Generator ────────────────────────────────────────────────────────
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const now = new Date().toISOString();
+  const translatedPaths = new Set(['/', '/about', '/portfolio', '/contact']);
 
   // ── Static pages ──────────────────────────────────────────────────────────
   const staticPages: MetadataRoute.Sitemap = [
     ...staticRoutes.main,
     ...staticRoutes.portfolio,
     ...staticRoutes.zhMain,
-  ].map((route) => ({
-    url: `${SITE_URL}${route.path}`,
-    lastModified: now,
-    changeFrequency: route.changeFrequency,
-    priority: route.priority,
-    alternates: {
-      languages: route.path.startsWith('/zh')
-        ? {
-            zh: `${SITE_URL}${route.path}`,
-            en: `${SITE_URL}${route.path.replace('/zh', '') || '/'}`,
-          }
-        : {
-            en: `${SITE_URL}${route.path}`,
-            zh: `${SITE_URL}/zh${route.path === '/' ? '' : route.path}`,
+  ].map((route) => {
+    const englishPath = route.path.startsWith('/zh')
+      ? route.path.replace('/zh', '') || '/'
+      : route.path;
+    const translated = translatedPaths.has(englishPath);
+
+    return {
+      url: `${SITE_URL}${route.path}`,
+      changeFrequency: route.changeFrequency,
+      priority: route.priority,
+      ...(translated && {
+        alternates: {
+          languages: {
+            en: `${SITE_URL}${englishPath}`,
+            zh: `${SITE_URL}/zh${englishPath === '/' ? '' : englishPath}`,
+            'x-default': `${SITE_URL}${englishPath}`,
           },
-    },
-  }));
+        },
+      }),
+    };
+  });
 
   // ── English blog posts ONLY ───────────────────────────────────────────────
   // zh/blog/[slug] pages are NOT included — same Strapi content, not translated
@@ -189,17 +198,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const blogPages: MetadataRoute.Sitemap = blogPosts.map((post) => ({
     url: `${SITE_URL}/blog/${post.slug}`,
-    lastModified: post.updatedAt || post.publishDate || now,
+    lastModified: post.updatedAt || post.publishDate,
     changeFrequency: 'weekly' as const,
     priority: 0.8,
-    alternates: {
-      languages: {
-        en: `${SITE_URL}/blog/${post.slug}`,
-        // hreflang zh kept so Google knows zh version exists
-        // but /zh/blog/[slug] is blocked in robots.ts
-        zh: `${SITE_URL}/zh/blog/${post.slug}`,
-      },
-    },
   }));
 
   // ── English marketing projects ONLY ──────────────────────────────────────
@@ -209,15 +210,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const marketingPages: MetadataRoute.Sitemap = marketingProjects.map((project) => ({
     url: `${SITE_URL}/portfolio/marketing-in-motion/${project.slug}`,
-    lastModified: project.updatedAt || project.projectDate || now,
+    lastModified: project.updatedAt || project.projectDate,
     changeFrequency: 'monthly' as const,
     priority: 0.7,
-    alternates: {
-      languages: {
-        en: `${SITE_URL}/portfolio/marketing-in-motion/${project.slug}`,
-        zh: `${SITE_URL}/zh/portfolio/marketing-in-motion/${project.slug}`,
-      },
-    },
   }));
 
   // ── English coding projects ONLY ─────────────────────────────────────────
@@ -226,16 +221,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const codingPages: MetadataRoute.Sitemap = codingProjects.map((project) => ({
     url: `${SITE_URL}/portfolio/coding-projects/${project.slug}`,
-    lastModified: project.updatedAt || project.projectDate || now,
+    lastModified: project.updatedAt || project.projectDate,
     changeFrequency: 'monthly' as const,
     priority: 0.7,
-    alternates: {
-      languages: {
-        en: `${SITE_URL}/portfolio/coding-projects/${project.slug}`,
-        zh: `${SITE_URL}/zh/portfolio/coding-projects/${project.slug}`,
-      },
-    },
   }));
+
+  let photoPages: MetadataRoute.Sitemap = [];
+  try {
+    const photos = await photographyRepository.getSitemapPhotos();
+    photoPages = photos.flatMap((photo) => photo.documentId ? [{
+      url: `${SITE_URL}/portfolio/photography/photo/${photo.documentId}`,
+      lastModified: photo.updatedAt || undefined,
+      changeFrequency: 'monthly' as const,
+      priority: 0.6,
+    }] : []);
+  } catch (error) {
+    console.error('[Sitemap] Failed to fetch photography records:', error);
+  }
 
   // ── Combine all pages ─────────────────────────────────────────────────────
   const allPages = [
@@ -243,6 +245,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...blogPages,
     ...marketingPages,
     ...codingPages,
+    ...photoPages,
   ];
 
   console.log(`[Sitemap] Generated sitemap with ${allPages.length} URLs:`);
@@ -250,6 +253,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   console.log(`  - Blog posts (EN only): ${blogPages.length}`);
   console.log(`  - Marketing projects (EN only): ${marketingPages.length}`);
   console.log(`  - Coding projects (EN only): ${codingPages.length}`);
+  console.log(`  - Photography details (EN only): ${photoPages.length}`);
 
   return allPages;
 }

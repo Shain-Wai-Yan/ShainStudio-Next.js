@@ -4,10 +4,15 @@ import { notFound } from 'next/navigation';
 import { getDictionary } from '@/lib/getDictionary';
 import { isSupportedLocale } from '@/lib/locales';
 import { GithubGallery } from '@/components/coding-project/GithubGallery';
-import { fetchCodingProjects, type CodingProject } from '@/lib/strapi/coding-projects';
-import { SITE_URL, DEFAULT_OG_IMAGE } from '@/lib/seo';
+import type { CodingProject } from '@/lib/strapi/coding-projects';
+import { getCodingProjects } from '@/lib/server/project-data';
+import { SITE_URL, DEFAULT_OG_IMAGE, brandedTitle } from '@/lib/seo';
 
 export const revalidate = 3600; // Revalidate every hour
+
+export function generateStaticParams() {
+  return [{ locale: 'en' }, { locale: 'zh' }];
+}
 
 interface Props {
   params: Promise<{ locale: string }>;
@@ -25,16 +30,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const defaultOgImage = DEFAULT_OG_IMAGE; 
 
   return {
-    title: seo.title,
+    title: { absolute: brandedTitle(seo.title, 'Shain Studio') },
     description: seo.description,
-    robots: { index: true, follow: true },
+    robots: locale === 'zh' ? { index: false, follow: true } : { index: true, follow: true },
     alternates: {
-      canonical: url,
-      languages: {
-        'en': `${SITE_URL}/portfolio/coding-projects`,
-        'zh': `${SITE_URL}/zh/portfolio/coding-projects`,
-        'x-default': `${SITE_URL}/portfolio/coding-projects`,
-      },
+      canonical: `${SITE_URL}/portfolio/coding-projects`,
     },
     openGraph: {
       title: seo.title,
@@ -66,7 +66,7 @@ export default async function CodingProjectsPage({ params }: Props) {
   const dict = await getDictionary(locale);
   
   // Fetch coding projects from Strapi
-  const { projects: strapiProjects } = await fetchCodingProjects();
+  const { projects: strapiProjects } = await getCodingProjects();
 
   // Prepare structured data
   const topProjectsForSeo = strapiProjects.slice(0, 10);

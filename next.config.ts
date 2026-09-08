@@ -45,20 +45,8 @@ const nextConfig: NextConfig = {
     ];
   },
 
-  async rewrites() {
-    return [
-      {
-        source: '/:path((?!en$|en/|zh$|zh/|api/|_next/|images/|favicon.ico)[^/]+.*)',
-        destination: '/en/:path',
-      },
-      {
-        source: '/',
-        destination: '/en',
-      },
-    ];
-  },
-
   images: {
+    qualities: [65, 75, 88],
     // Next.js built-in optimizer handles local public assets (logo, profile, etc.)
     // Cloudinary images use the custom loader via prop on individual <Image> components.
     remotePatterns: [
