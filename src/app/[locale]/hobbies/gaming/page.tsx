@@ -8,8 +8,8 @@ import ChannelInfo, { type ChannelData } from '@/components/video-channel/Channe
 import FeaturedVideo from '@/components/video-channel/FeaturedVideo';
 import VideoGrid from '@/components/video-channel/VideoGrid';
 import { transformVideoData, formatViewCount, type TransformedVideo } from '@/lib/youtube-utils';
-import { getDictionarySync } from '@/lib/getDictionary';
 import { YOUTUBE_CHANNELS } from '@/lib/youtube-channels';
+import { getDictionarySync } from '@/lib/getDictionary';
 import { YouTubeVideo } from '@/types/youtube';
 
 interface YouTubeApiResponse {
@@ -17,7 +17,9 @@ interface YouTubeApiResponse {
   nextPageToken?: string;
 }
 
-export default function AMVEditingPage() {
+const GAMING_CONFIG = YOUTUBE_CHANNELS.gaming;
+
+export default function GamingPage() {
   const pathname = usePathname();
   const locale = pathname.startsWith('/zh') ? 'zh' : 'en';
   const t = getDictionarySync(locale);
@@ -28,76 +30,76 @@ export default function AMVEditingPage() {
   const [error, setError] = useState<string | null>(null);
 
   const mockChannelData: ChannelData = useMemo(() => ({
-    title: t.amvEditing.mockChannel.title,
-    description: t.amvEditing.mockChannel.description,
-    subscriberCount: t.amvEditing.mockChannel.subscriberCount || '262',
-    videoCount: t.amvEditing.mockChannel.videoCount || '25',
-    viewCount: '134K',
-    customUrl: YOUTUBE_CHANNELS.amv.handle || '@shaineditamv',
-    bannerUrl: YOUTUBE_CHANNELS.amv.bannerUrl,
-    avatarUrl: YOUTUBE_CHANNELS.amv.fallbackAvatar,
+    title: t.gaming.mockChannel.title,
+    description: t.gaming.mockChannel.description,
+    subscriberCount: t.gaming.mockChannel.subscriberCount || '891',
+    videoCount: t.gaming.mockChannel.videoCount || '20',
+    viewCount: '120K',
+    customUrl: GAMING_CONFIG.handle || '@shainplaygame',
+    bannerUrl: GAMING_CONFIG.bannerUrl,
+    avatarUrl: GAMING_CONFIG.fallbackAvatar,
   }), [t]);
 
   const mockVideos = useMemo<YouTubeVideo[]>(() => [
     {
       kind: 'youtube#video',
       etag: '',
-      id: 'video1',
+      id: 'Iv4PM0YN5V8',
       snippet: {
-        publishedAt: '2022-01-01T00:00:00Z',
-        channelId: '',
-        title: t.amvEditing.mockVideos[0].title,
-        description: t.amvEditing.mockVideos[0].description,
-        thumbnails: { high: { url: 'https://via.placeholder.com/640x360/191970/ffffff?text=Puss+in+Boots', width: 640, height: 360 } },
-        channelTitle: t.amvEditing.mockChannel.title,
-        resourceId: { kind: 'youtube#video', videoId: '8aIsh6rfW4U' },
+        publishedAt: '2022-12-12T06:00:21Z',
+        channelId: GAMING_CONFIG.channelId,
+        title: t.gaming.mockVideos[0].title,
+        description: t.gaming.mockVideos[0].description,
+        thumbnails: { high: { url: 'https://i.ytimg.com/vi/Iv4PM0YN5V8/hqdefault.jpg', width: 480, height: 360 } },
+        channelTitle: t.gaming.mockChannel.title,
+        resourceId: { kind: 'youtube#video', videoId: 'Iv4PM0YN5V8' },
       },
-      statistics: { viewCount: '6200' },
-      contentDetails: { duration: 'PT1M' },
+      statistics: { viewCount: '400' },
+      contentDetails: { duration: 'PT5M57S' },
     },
     {
       kind: 'youtube#video',
       etag: '',
-      id: 'video2',
+      id: 'CHW-ioqAvIs',
       snippet: {
-        publishedAt: '2022-02-01T00:00:00Z',
-        channelId: '',
-        title: t.amvEditing.mockVideos[1].title,
-        description: t.amvEditing.mockVideos[1].description,
-        thumbnails: { high: { url: 'https://via.placeholder.com/640x360/191970/ffffff?text=Best+Waifu', width: 640, height: 360 } },
-        channelTitle: t.amvEditing.mockChannel.title,
-        resourceId: { kind: 'youtube#video', videoId: 'dQw4w9WgXcQ' },
+        publishedAt: '2023-07-07T04:23:26Z',
+        channelId: GAMING_CONFIG.channelId,
+        title: t.gaming.mockVideos[1].title,
+        description: t.gaming.mockVideos[1].description,
+        thumbnails: { high: { url: 'https://i.ytimg.com/vi/CHW-ioqAvIs/hqdefault.jpg', width: 480, height: 360 } },
+        channelTitle: t.gaming.mockChannel.title,
+        resourceId: { kind: 'youtube#video', videoId: 'CHW-ioqAvIs' },
       },
-      statistics: { viewCount: '542' },
-      contentDetails: { duration: 'PT12S' },
+      statistics: { viewCount: '680' },
+      contentDetails: { duration: 'PT50S' },
     },
     {
       kind: 'youtube#video',
       etag: '',
-      id: 'video3',
+      id: 'F-HsDRJyb-g',
       snippet: {
-        publishedAt: '2022-03-01T00:00:00Z',
-        channelId: '',
-        title: t.amvEditing.mockVideos[2].title,
-        description: t.amvEditing.mockVideos[2].description,
-        thumbnails: { high: { url: 'https://via.placeholder.com/640x360/191970/ffffff?text=Levi+Ackerman', width: 640, height: 360 } },
-        channelTitle: t.amvEditing.mockChannel.title,
-        resourceId: { kind: 'youtube#video', videoId: 'LLdGSTceP8c' },
+        publishedAt: '2022-11-08T03:40:02Z',
+        channelId: GAMING_CONFIG.channelId,
+        title: t.gaming.mockVideos[2].title,
+        description: t.gaming.mockVideos[2].description,
+        thumbnails: { high: { url: 'https://i.ytimg.com/vi/F-HsDRJyb-g/hqdefault.jpg', width: 480, height: 360 } },
+        channelTitle: t.gaming.mockChannel.title,
+        resourceId: { kind: 'youtube#video', videoId: 'F-HsDRJyb-g' },
       },
-      statistics: { viewCount: '1200' },
-      contentDetails: { duration: 'PT8S' },
+      statistics: { viewCount: '2280' },
+      contentDetails: { duration: 'PT6M34S' },
     },
   ], [t]);
 
-  // ─── Fetch ALL pages from the paginated YouTube API
+  // ─── Fetch ALL pages from the paginated YouTube API for Gaming channel
   const fetchAllVideos = useCallback(async (): Promise<YouTubeApiResponse['items']> => {
     const allItems: YouTubeApiResponse['items'] = [];
     let pageToken: string | null = null;
 
     do {
       const url: string = pageToken
-        ? `/api/youtube?channel=amv&endpoint=videos&maxResults=50&pageToken=${encodeURIComponent(pageToken)}`
-        : `/api/youtube?channel=amv&endpoint=videos&maxResults=50`;
+        ? `/api/youtube?channel=gaming&endpoint=videos&maxResults=50&pageToken=${encodeURIComponent(pageToken)}`
+        : `/api/youtube?channel=gaming&endpoint=videos&maxResults=50`;
 
       const res: Response = await fetch(url);
       if (!res.ok) throw new Error(`Videos API error: ${res.status}`);
@@ -120,7 +122,7 @@ export default function AMVEditingPage() {
 
     try {
       const [channelRes, allVideoItems] = await Promise.all([
-        fetch('/api/youtube?channel=amv&endpoint=channel'),
+        fetch('/api/youtube?channel=gaming&endpoint=channel'),
         fetchAllVideos(),
       ]);
 
@@ -151,22 +153,24 @@ export default function AMVEditingPage() {
         setChannelData(mockChannelData);
       }
 
-      // Transform ALL video data
+      // Transform ALL video data with gaming tags
       if (allVideoItems.length > 0) {
-        const transformedVideos = allVideoItems.map((video) => transformVideoData(video));
+        const transformedVideos = allVideoItems.map((v) =>
+          transformVideoData(v, GAMING_CONFIG.tags)
+        );
         setVideos(transformedVideos);
       } else {
-        setVideos(mockVideos.map((video) => transformVideoData(video)));
+        setVideos(mockVideos.map((v) => transformVideoData(v, GAMING_CONFIG.tags)));
       }
     } catch (err) {
-      console.error('Failed to load data:', err);
-      setError(t.amvEditing.labels.errorText);
+      console.error('Failed to load gaming data:', err);
+      setError(t.gaming.labels.errorText);
       setChannelData(mockChannelData);
-      setVideos(mockVideos.map((video) => transformVideoData(video)));
+      setVideos(mockVideos.map((v) => transformVideoData(v, GAMING_CONFIG.tags)));
     } finally {
       setIsLoading(false);
     }
-  }, [fetchAllVideos, mockChannelData, mockVideos, t.amvEditing.labels.errorText]);
+  }, [fetchAllVideos, mockChannelData, mockVideos, t.gaming.labels.errorText]);
 
   useEffect(() => {
     loadData();
@@ -175,12 +179,28 @@ export default function AMVEditingPage() {
   const basePath = locale === 'en' ? '' : `/${locale}`;
 
   const breadcrumbItems = [
-    { label: t.amvEditing.breadcrumbs.home, href: basePath || '/' },
+    { label: t.gaming.breadcrumbs.home, href: basePath || '/' },
     { label: locale === 'zh' ? '工作之外' : 'Beyond Work', href: `${basePath}/hobbies` },
-    { label: t.amvEditing.breadcrumbs.amvEditing, href: `${basePath}/hobbies/amv-editing` },
+    { label: t.gaming.breadcrumbs.gaming, href: `${basePath}/hobbies/gaming` },
   ];
 
-  const featuredVideo = videos[0];
+  // Specific featured video priority:
+  // If GAMING_CONFIG.featuredVideoId is set (Iv4PM0YN5V8), find and prioritize that video as featured.
+  const featuredVideo = useMemo(() => {
+    if (videos.length === 0) return null;
+    const targetId = GAMING_CONFIG.featuredVideoId;
+    if (targetId) {
+      const match = videos.find((v) => v.videoId === targetId || v.id === targetId);
+      if (match) return match;
+    }
+    return videos[0];
+  }, [videos]);
+
+  // Gallery videos: all videos except the one chosen as featured
+  const galleryVideos = useMemo(() => {
+    if (!featuredVideo) return videos;
+    return videos.filter((v) => v.videoId !== featuredVideo.videoId);
+  }, [videos, featuredVideo]);
 
   return (
     <main className="min-h-screen bg-white dark:bg-[#121212] overflow-x-hidden">
@@ -190,10 +210,11 @@ export default function AMVEditingPage() {
 
         {/* Header */}
         <ChannelHeader
-          title={t.amvEditing.labels.headerTitle}
-          description={t.amvEditing.labels.headerDescription}
+          title={t.gaming.labels.headerTitle}
+          description={t.gaming.labels.headerDescription}
           totalVideos={videos.length}
           eyebrow={locale === 'zh' ? '工作之外' : 'Beyond Work'}
+          badgeChannelName={GAMING_CONFIG.name}
           videosLabel={locale === 'zh' ? '个视频' : 'Videos'}
         />
 
@@ -205,7 +226,7 @@ export default function AMVEditingPage() {
               onClick={loadData}
               className="mt-2 px-5 py-2 bg-[#191970] dark:bg-[#a67c00] text-white dark:text-[#0f0f45] text-sm rounded-full hover:bg-[#0f0f4d] dark:hover:bg-[#c9a236] transition-colors"
             >
-              {t.amvEditing.labels.retry}
+              {t.gaming.labels.retry}
             </button>
           </div>
         )}
@@ -214,12 +235,12 @@ export default function AMVEditingPage() {
         <ChannelInfo
           data={channelData || undefined}
           isLoading={isLoading}
-          channelUrl={YOUTUBE_CHANNELS.amv.channelUrl}
+          channelUrl={GAMING_CONFIG.channelUrl}
           subscribersLabel={locale === 'zh' ? '位订阅者' : 'Subscribers'}
           videosLabel={locale === 'zh' ? '个公开视频' : 'Videos'}
           viewsLabel={locale === 'zh' ? '次总观看' : 'Total Views'}
           subscribeLabel={locale === 'zh' ? '订阅频道' : 'Subscribe'}
-          verifiedLabel={locale === 'zh' ? '官方频道' : 'Official Channel'}
+          verifiedLabel={locale === 'zh' ? '官方游戏频道' : 'Gaming Channel'}
           copyLabel={locale === 'zh' ? '复制频道链接' : 'Copy channel link'}
           copiedLabel={locale === 'zh' ? '已复制！' : 'Copied!'}
           readMoreLabel={locale === 'zh' ? '展开' : 'See more'}
@@ -236,14 +257,20 @@ export default function AMVEditingPage() {
             thumbnailUrl={featuredVideo.thumbnailUrl}
             videoId={featuredVideo.videoId}
             tags={featuredVideo.tags}
+            sectionTitle={locale === 'zh' ? '精选视频' : 'Featured Work'}
+            badgeLabel={locale === 'zh' ? '站长推荐' : "Editor's Pick"}
+            releaseLabel={locale === 'zh' ? '经典回顾' : 'Featured Highlight'}
+            viewsLabel={locale === 'zh' ? '次播放' : 'views'}
           />
         )}
 
         {/* Video Grid — pass ALL videos except the featured one */}
         <VideoGrid
-          videos={videos.slice(1)}
+          videos={galleryVideos}
           isLoading={isLoading}
           hasMore={false}
+          title={locale === 'zh' ? '视频集锦' : 'Video Gallery'}
+          searchPlaceholder={locale === 'zh' ? '搜索视频…' : 'Search videos…'}
           locale={locale}
         />
       </div>

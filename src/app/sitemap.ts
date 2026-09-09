@@ -52,6 +52,7 @@ const staticRoutes = {
     { path: '/contact',     priority: 0.8, changeFrequency: 'yearly'  as const },
     { path: '/hobbies',     priority: 0.7, changeFrequency: 'monthly' as const },
     { path: '/hobbies/amv-editing', priority: 0.6, changeFrequency: 'monthly' as const },
+    { path: '/hobbies/gaming', priority: 0.6, changeFrequency: 'monthly' as const },
     { path: '/hobbies/photography', priority: 0.7, changeFrequency: 'monthly' as const },
     // /privacy and /terms are intentionally noindex — keep them out of the sitemap
   ],

@@ -130,8 +130,8 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
           </main>
           <Footer t={{ footer: t.footer }} />
           <SyntaxWidget />
-          <ClarityAnalytics />
-          {process.env.NEXT_PUBLIC_GA_ID && (
+          {process.env.NODE_ENV === 'production' && <ClarityAnalytics />}
+          {process.env.NODE_ENV === 'production' && process.env.NEXT_PUBLIC_GA_ID && (
             <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
           )}
         </ThemeProvider>

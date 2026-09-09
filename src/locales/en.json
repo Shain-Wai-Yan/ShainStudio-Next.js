@@ -10,6 +10,7 @@
     "codingProjects": "Coding Projects",
     "photography": "Photography",
     "amvEditing": "AMV Editing",
+    "gaming": "Gaming",
     "certificate": "Certificate",
     "blog": "Blog",
     "contact": "Contact Me"
@@ -315,6 +316,50 @@
       {
         "title": "Levi Ackerman (a side character who steal the show) AMV/edit",
         "description": "An epic tribute to Levi Ackerman from Attack on Titan."
+      }
+    ]
+  },
+  "gaming": {
+    "title": "Gaming",
+    "subtitle": "Walkthroughs, Guides & Soundtrack",
+    "description": "Gameplay playthroughs, walkthrough guides, and gaming moments featuring piano background music and game strategies.",
+    "seo": {
+      "title": "Gaming | Shain Studio",
+      "description": "Explore Shain Wai Yan's (Shain Plays Games) gaming walkthroughs, gift code guides, and video game highlights.",
+      "keywords": "Shain Wai Yan, Shain Plays Games, gaming, playthrough, walkthrough, Ragnarok Mobile, Clash of Zombies, gaming channel, portfolio",
+      "openGraphTitle": "Gaming | Shain Studio",
+      "openGraphDesc": "Gameplay playthroughs, guides, and gaming moments by Shain Wai Yan.",
+      "siteName": "Shain Studio"
+    },
+    "labels": {
+      "headerTitle": "Gaming",
+      "headerDescription": "Walkthrough guides, gaming moments, and gameplay playthroughs",
+      "errorText": "Failed to load videos — showing demo content.",
+      "retry": "Retry"
+    },
+    "breadcrumbs": {
+      "home": "Home",
+      "beyondWork": "Beyond Work",
+      "gaming": "Gaming"
+    },
+    "mockChannel": {
+      "title": "Shain Plays Games",
+      "description": "Piano cover background music + gaming contents. Guides, walkthroughs, and gameplay.",
+      "subscriberCount": "891",
+      "videoCount": "20"
+    },
+    "mockVideos": [
+      {
+        "title": "Rathgricy Fallen Feather,A dream that has becoming a memory #12.12.2022",
+        "description": "Ragnarok Mobile Eternal Love gaming showcase and memorable playthrough."
+      },
+      {
+        "title": "Latest giftcodes for coz2 that you could possibly found",
+        "description": "Clash of Zombies 2 usable gift codes guide with proof."
+      },
+      {
+        "title": "Thanatos Ragnarok Mobile f2p friendly low deposit built guide",
+        "description": "Thanatos Ragnarok Mobile f2p friendly low deposit build walkthrough."
       }
     ]
   },

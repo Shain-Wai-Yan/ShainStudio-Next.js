@@ -70,8 +70,8 @@ src/app/
 ├── robot.ts                   # Robots.txt configuration
 │
 ├── api/
-│   ├── amv-editing/
-│   │   └── route.ts           # GET /api/amv-editing — YouTube channel & videos
+│   ├── youtube/
+│   │   └── route.ts           # GET /api/youtube — Unified YouTube channel & videos proxy (AMV, Gaming)
 │   ├── blogs/
 │   │   ├── route.ts           # GET /api/blogs — Blog list from Strapi
 │   │   └── [slug]/
@@ -220,14 +220,14 @@ src/app/
 |------|-------------|
 | `PortfolioClient.tsx` | Portfolio hub client — GSAP horizontal scroll gallery + project cards |
 
-### AMV Editing Components (`components/amv-editing/`)
+### Video Channel Components (`components/video-channel/`)
 | File | Description |
 |------|-------------|
-| `AMVHeader.tsx` | Page hero & intro |
-| `ChannelInfo.tsx` | YouTube channel information |
-| `FeaturedVideo.tsx` | Featured/highlighted video player |
-| `VideoGrid.tsx` | Video thumbnail grid |
-| `VideoModal.tsx` | Video lightbox modal |
+| `ChannelHeader.tsx` | Page hero & channel title / video count badge |
+| `ChannelInfo.tsx` | YouTube channel information, panoramic banner & stats |
+| `FeaturedVideo.tsx` | Featured/highlighted video spotlight player |
+| `VideoGrid.tsx` | Responsive video thumbnail grid with search |
+| `VideoModal.tsx` | Accessible video lightbox modal player |
 
 ### Blog Components (`components/blog/`)
 | File | Description |
@@ -503,9 +503,9 @@ src/locales/
 ## Data Flow
 
 ```
-AMV Editing:
-  YouTube API → /api/amv-editing → amv-editing/* components → User
-  (Fallback: mock data from en.json / zh.json)
+YouTube Video Channels (AMV Editing & Gaming):
+  YouTube API → Cloudflare Worker → /api/youtube → video-channel/* components → User
+  (Fallback: channel mock data from en.json / zh.json)
 
 Blog:
   Strapi → /api/blogs → blog/* components → User

@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { DEFAULT_LOCALE, isSupportedLocale } from '@/lib/locales';
 import { DEFAULT_OG_IMAGE, SITE_URL } from '@/lib/seo';
 import { getPhotography, repository } from '@/lib/server/photography-data';
+import { YOUTUBE_CHANNELS } from '@/lib/youtube-channels';
+import { getYouTubeWorkerHeaders, getYouTubeWorkerUrl } from '@/lib/server/youtube-worker';
 import HobbiesPursuitList, { type PursuitItem } from '@/components/hobbies/HobbiesPursuitList';
 
 interface Props {
@@ -19,7 +21,7 @@ const copy = {
     statsLabels: {
       photos: 'Archived Photos',
       views: 'YouTube Views',
-      videos: 'AMV Edits',
+      videos: 'YouTube Videos',
       collections: 'Photo Collections',
     },
     sectionLabel: 'Current Pursuits',
@@ -38,6 +40,13 @@ const copy = {
       description:
         'Rhythm, emotion, and stories reshaped through music and video cuts. A personal creative outlet exploring pacing and kinetic timing.',
     },
+    gaming: {
+      number: '03',
+      title: 'Gaming',
+      category: 'Playthroughs & Guides',
+      description:
+        'Gameplay walkthroughs, game guides, and memorable playthroughs paired with custom background music.',
+    },
     backHome: 'Back to home',
     footerStudio: 'Shain Studio',
     footerYear: 'Est. 2024',
@@ -51,7 +60,7 @@ const copy = {
     statsLabels: {
       photos: '已归档照片',
       views: 'YouTube 播放量',
-      videos: 'AMV 剪辑作品',
+      videos: 'YouTube 视频',
       collections: '摄影主题分类',
     },
     sectionLabel: '近期兴趣',
@@ -70,6 +79,13 @@ const copy = {
       description:
         '用音乐与动态影像重新编排节律与情绪，出于个人对音乐卡点与画面节奏的热爱与探索。',
     },
+    gaming: {
+      number: '03',
+      title: '游戏',
+      category: '实况与攻略',
+      description:
+        '游戏通关实况、攻略解析与精彩瞬间。记录游戏世界中的策略探索与趣味体验。',
+    },
     backHome: '返回主页',
     footerStudio: '明元易工作室',
     footerYear: '创立于 2024',
@@ -83,7 +99,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const title = locale === 'zh' ? '工作之外 | 明元易' : 'Beyond Work | Shain Wai Yan';
   const description =
     locale === 'zh'
-      ? '明元易在工作之外的个人兴趣空间：摄影与 AMV 视频剪辑。'
+      ? '明元易在工作之外的个人兴趣空间：摄影、AMV 视频剪辑与游戏。'
       : 'Explore the interests, personal projects, and creative hobbies that Shain Wai Yan pursues beyond work.';
 
   return {
@@ -118,7 +134,7 @@ export function generateStaticParams() {
 }
 
 /**
- * Fetch dynamic data for hobbies: exact photo count, target photo (xu3bmcyepjhtd4mcpb8y6vf4), and live YouTube stats
+ * Fetch dynamic data for hobbies: exact photo count, target photo (xu3bmcyepjhtd4mcpb8y6vf4), and live YouTube stats (AMV + Gaming combined)
  */
 async function getDynamicHobbyData(locale: string) {
   let photoTotal = 209;
@@ -127,8 +143,10 @@ async function getDynamicHobbyData(locale: string) {
   let featuredPhotoImage =
     'https://res.cloudinary.com/dl00p17ca/image/upload/v1774771797/Mayoralty_frame_357db71323.jpg';
   let featuredPhotoTitle = 'Mayoralty at Yangon';
-  let ytViews: number | null = null;
-  let ytVideos: number | null = null;
+  let ytViews = 134426 + 119637;
+  let ytVideos = 25 + 20;
+  let amvVideos = 25;
+  let gamingVideos = 20;
 
   // 1. Fetch exact photo count and the requested target photo from Strapi
   try {
@@ -152,21 +170,56 @@ async function getDynamicHobbyData(locale: string) {
     console.warn('[HobbiesPage] Photo data fetch fallback:', error);
   }
 
-  // 2. Fetch dynamically updated YouTube channel views and videos
+  // 2. Fetch dynamically updated YouTube channel views and videos for BOTH channels
   try {
-    const res = await fetch(
-      'https://youtube-api-fetcher.shainwaiyan2002.workers.dev/api/youtube/channel?channelId=UCV4ZLWfXF15d4tyzdJTkzpw',
-      {
-        next: { revalidate: 300 },
-        signal: AbortSignal.timeout(5000),
+    const workerBase = getYouTubeWorkerUrl();
+    const workerHeaders = getYouTubeWorkerHeaders();
+    const [amvRes, gamingRes] = await Promise.allSettled([
+      fetch(
+        `${workerBase}/api/youtube/channel?channelId=${YOUTUBE_CHANNELS.amv.channelId}`,
+        {
+          next: { revalidate: 300 },
+          signal: AbortSignal.timeout(5000),
+          headers: workerHeaders,
+        }
+      ),
+      fetch(
+        `${workerBase}/api/youtube/channel?channelId=${YOUTUBE_CHANNELS.gaming.channelId}`,
+        {
+          next: { revalidate: 300 },
+          signal: AbortSignal.timeout(5000),
+          headers: workerHeaders,
+        }
+      ),
+    ]);
+
+    let amvViews = 134426;
+    let gamingViews = 119637;
+
+    if (amvRes.status === 'fulfilled' && amvRes.value.ok) {
+      const amvData = await amvRes.value.json();
+      const stats = amvData?.items?.[0]?.statistics;
+      if (stats?.viewCount) {
+        amvViews = Number(stats.viewCount);
       }
-    );
-    if (res.ok) {
-      const data = await res.json();
-      const stats = data?.items?.[0]?.statistics;
-      if (stats?.viewCount) ytViews = Number(stats.viewCount);
-      if (stats?.videoCount) ytVideos = Number(stats.videoCount);
+      if (stats?.videoCount) {
+        amvVideos = Number(stats.videoCount);
+      }
     }
+
+    if (gamingRes.status === 'fulfilled' && gamingRes.value.ok) {
+      const gamingData = await gamingRes.value.json();
+      const stats = gamingData?.items?.[0]?.statistics;
+      if (stats?.viewCount) {
+        gamingViews = Number(stats.viewCount);
+      }
+      if (stats?.videoCount) {
+        gamingVideos = Number(stats.videoCount);
+      }
+    }
+
+    ytViews = amvViews + gamingViews;
+    ytVideos = amvVideos + gamingVideos;
   } catch (error) {
     console.warn('[HobbiesPage] YouTube stats fetch fallback:', error);
   }
@@ -176,8 +229,10 @@ async function getDynamicHobbyData(locale: string) {
     collectionCount,
     featuredPhotoImage,
     featuredPhotoTitle,
-    ytViews: ytViews ?? 134426,
-    ytVideos: ytVideos ?? 25,
+    ytViews,
+    ytVideos,
+    amvVideos,
+    gamingVideos,
   };
 }
 
@@ -225,9 +280,17 @@ export default async function HobbiesPage({ params }: Props) {
       ...t.amv,
       href: `${basePath}/hobbies/amv-editing`,
       accent: 'from-indigo-500 to-purple-400',
-      badge: `${data.ytVideos} ${locale === 'zh' ? '个视频 · YouTube' : 'videos · YouTube'}`,
+      badge: `${data.amvVideos} ${locale === 'zh' ? '个视频 · YouTube' : 'videos · YouTube'}`,
       previewImage: 'https://i.ytimg.com/vi/Q1fT0PJOZsI/hqdefault.jpg',
       previewLabel: locale === 'zh' ? '进击的巨人 · 24帧卡点' : 'Attack on Titan · 24fps',
+    },
+    {
+      ...t.gaming,
+      href: `${basePath}/hobbies/gaming`,
+      accent: 'from-emerald-500 to-teal-400',
+      badge: `${data.gamingVideos} ${locale === 'zh' ? '个视频 · YouTube' : 'videos · YouTube'}`,
+      previewImage: 'https://i.ytimg.com/vi/Iv4PM0YN5V8/hqdefault.jpg',
+      previewLabel: 'Rathgricy Fallen Feather · RO',
     },
   ];
 

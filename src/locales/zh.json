@@ -10,6 +10,7 @@
     "codingProjects": "编程项目",
     "photography": "摄影",
     "amvEditing": "AMV编辑",
+    "gaming": "游戏",
     "certificate": "证书",
     "blog": "博客",
     "contact": "联系我"
@@ -315,6 +316,50 @@
       {
         "title": "利威尔·阿克曼（偷走了风头的配角）AMV/剪辑",
         "description": "对《进击的巨人》中利威尔·阿克曼的史诗致敬。"
+      }
+    ]
+  },
+  "gaming": {
+    "title": "游戏",
+    "subtitle": "通关实况、游戏攻略与配乐",
+    "description": "游戏通关实况、攻略解析与精彩瞬间，结合钢琴背景配乐与深度游戏心得。",
+    "seo": {
+      "title": "游戏频道 | Shain Studio",
+      "description": "探索明元易（Shain Plays Games）的游戏通关实况、兑换码指南与精彩游戏集锦。",
+      "keywords": "明元易, Shain Wai Yan, Shain Plays Games, 游戏, 通关, 攻略, 仙境传说RO, 游戏实况, 作品集",
+      "openGraphTitle": "游戏频道 | Shain Studio",
+      "openGraphDesc": "游戏通关实况、攻略解析与精彩瞬间",
+      "siteName": "Shain Studio"
+    },
+    "labels": {
+      "headerTitle": "游戏",
+      "headerDescription": "通关实况、游戏攻略与精彩瞬间",
+      "errorText": "未能加载视频 — 正在显示示例内容。",
+      "retry": "重试"
+    },
+    "breadcrumbs": {
+      "home": "首页",
+      "beyondWork": "工作之外",
+      "gaming": "游戏"
+    },
+    "mockChannel": {
+      "title": "Shain Plays Games",
+      "description": "钢琴配乐背景音乐 + 游戏实况内容。通关攻略与精彩集锦。",
+      "subscriberCount": "891",
+      "videoCount": "20"
+    },
+    "mockVideos": [
+      {
+        "title": "Rathgricy Fallen Feather,A dream that has becoming a memory #12.12.2022",
+        "description": "仙境传说RO 守护永恒的爱 精彩实况回顾与记录。"
+      },
+      {
+        "title": "Latest giftcodes for coz2 that you could possibly found",
+        "description": "僵尸冲突2（Clash of Zombies 2）有效礼包兑换码分享。"
+      },
+      {
+        "title": "Thanatos Ragnarok Mobile f2p friendly low deposit built guide",
+        "description": "仙境传说RO 达纳托斯塔零氪友好低存入搭配攻略。"
       }
     ]
   },

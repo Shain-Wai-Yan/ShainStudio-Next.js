@@ -290,3 +290,24 @@ test('SEO helpers prevent duplicated brands and reject foreign CMS canonicals', 
   assert.deepEqual(website.creator, { '@id': 'https://www.shainwaiyan.com/#person' });
   assert.deepEqual(website.publisher, { '@id': 'https://www.shainwaiyan.com/#person' });
 });
+
+test('YouTube channels are allowlisted and malformed dates stay readable', () => {
+  const { getYouTubeChannelConfig } = load('src/lib/youtube-channels.ts');
+  const { formatPublishedDate } = load('src/lib/youtube-utils.ts');
+  assert.equal(getYouTubeChannelConfig('gaming').channelId, 'UCxkWgKCJFMtjjq8vK9xTd6g');
+  assert.equal(getYouTubeChannelConfig('unknown-channel'), null);
+  assert.equal(formatPublishedDate(''), 'Unknown date');
+});
+
+test('YouTube proxy and Worker fail closed without public mutation endpoints', () => {
+  const amvRoutePath = path.join(__dirname, '..', 'src/app/api/amv-editing/route.ts');
+  assert.equal(fs.existsSync(amvRoutePath), false, 'Deprecated /api/amv-editing route should be removed');
+  const youtubeRoute = fs.readFileSync(path.join(__dirname, '..', 'src/app/api/youtube/route.ts'), 'utf8');
+  const worker = fs.readFileSync(path.join(__dirname, '..', 'youtube-apis-fetcher.js'), 'utf8');
+  assert.match(youtubeRoute, /status: 502/);
+  assert.doesNotMatch(youtubeRoute, /export async function POST/);
+  assert.match(worker, /PORTFOLIO_API_SECRET/);
+  assert.match(worker, /ALLOWED_CHANNEL_IDS/);
+  assert.doesNotMatch(worker, /api\/analytics\/track|api\/cache\/clear|api\/youtube\/video-details/);
+  assert.doesNotMatch(worker, /Access-Control-Allow-Origin['"]:\s*['"]\*['"]/);
+});

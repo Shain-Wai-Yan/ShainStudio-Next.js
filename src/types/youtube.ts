@@ -26,6 +26,7 @@ export interface YouTubeSnippet {
   channelId: string;
   title: string;
   description: string;
+  customUrl?: string;
   thumbnails: YouTubeThumbnails;
   channelTitle: string;
   playlistId?: string;
