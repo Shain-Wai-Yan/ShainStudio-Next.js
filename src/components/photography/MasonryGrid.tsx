@@ -46,6 +46,20 @@ export function MasonryGrid({ photos, onPhotoClick }: MasonryGridProps) {
     getItemKey: (index) => photos[index]?.documentId ?? photos[index]?.id ?? index,
   });
 
+  if (width === 0) {
+    return (
+      <div ref={containerRef} className="w-full">
+        <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-3">
+          {photos.map((photo, index) => (
+            <div key={photo.documentId ?? photo.id ?? index} className="mb-3 break-inside-avoid">
+              <PhotoCard photo={photo} onClick={() => onPhotoClick(photo)} priority={index === 0} />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div ref={containerRef} className="relative w-full" style={{ height: virtualizer.getTotalSize() }}>
       {width > 0 && virtualizer.getVirtualItems().map((item) => {

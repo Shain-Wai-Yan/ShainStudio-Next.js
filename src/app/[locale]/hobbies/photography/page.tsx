@@ -4,6 +4,8 @@ import { PhotographyGallery } from '@/components/photography/PhotographyGallery'
 import { getDictionary } from '@/lib/getDictionary'; // ✅ Use async
 import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
 import { DEFAULT_OG_IMAGE, SITE_URL, brandedTitle } from '@/lib/seo';
+import { repository } from '@/lib/server/photography-data';
+import type { PhotoCollection, PhotoFeedPage, PhotographyLocale } from '@/lib/strapi/photography';
 
 interface PhotographyPageProps {
   params: Promise<{ locale: string }>;
@@ -60,6 +62,20 @@ export default async function PhotographyPage(props: PhotographyPageProps) {
     { label: t.photography.breadcrumbs.photography, href: `${basePath}/hobbies/photography` },
   ];
 
+  let initialFeed: PhotoFeedPage = { photos: [], page: 1, pageCount: 0, total: 0, hasMore: false };
+  let initialCollections: PhotoCollection[] = [];
+
+  try {
+    const [feedData, collectionsData] = await Promise.all([
+      repository.getFeed({ page: 1, pageSize: 24, seed: 0, language: locale as PhotographyLocale }),
+      repository.getCollections(locale as PhotographyLocale),
+    ]);
+    initialFeed = feedData;
+    initialCollections = collectionsData;
+  } catch (error) {
+    console.error('[Photography SSR] Failed to pre-fetch initial data:', error);
+  }
+
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-8 md:py-12">
@@ -75,7 +91,11 @@ export default async function PhotographyPage(props: PhotographyPageProps) {
           </p>
         </div>
 
-        <PhotographyGallery language={locale as 'en' | 'zh'} />
+        <PhotographyGallery
+          language={locale as 'en' | 'zh'}
+          initialFeed={initialFeed}
+          initialCollections={initialCollections}
+        />
       </div>
     </main>
   );

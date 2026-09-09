@@ -37,17 +37,24 @@ function GallerySkeleton() {
   );
 }
 
-export function PhotographyGallery({ language }: { language: 'en' | 'zh' }) {
-  const [seed, setSeed] = useState<number | null>(null);
-  const [photos, setPhotos] = useState<Photo[]>([]);
-  const [collections, setCollections] = useState<PhotoCollection[]>([]);
+export interface PhotographyGalleryProps {
+  language: 'en' | 'zh';
+  initialFeed?: PhotoFeedPage;
+  initialCollections?: PhotoCollection[];
+}
+
+export function PhotographyGallery({ language, initialFeed, initialCollections }: PhotographyGalleryProps) {
+  const hasInitialFeed = Boolean(initialFeed && initialFeed.photos && initialFeed.photos.length > 0);
+  const [seed, setSeed] = useState<number | null>(0);
+  const [photos, setPhotos] = useState<Photo[]>(() => initialFeed?.photos ?? []);
+  const [collections, setCollections] = useState<PhotoCollection[]>(() => initialCollections ?? []);
   const [selectedCollection, setSelectedCollection] = useState('');
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
-  const [page, setPage] = useState(0);
-  const [pageCount, setPageCount] = useState(0);
-  const [total, setTotal] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(() => initialFeed?.page ?? (hasInitialFeed ? 1 : 0));
+  const [pageCount, setPageCount] = useState(() => initialFeed?.pageCount ?? 0);
+  const [total, setTotal] = useState(() => initialFeed?.total ?? (initialFeed?.photos?.length ?? 0));
+  const [loading, setLoading] = useState(() => !hasInitialFeed);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState('');
   const [buffered, setBuffered] = useState<PhotoFeedPage | null>(null);
@@ -59,29 +66,47 @@ export function PhotographyGallery({ language }: { language: 'en' | 'zh' }) {
   const nextInFlightRef = useRef(false);
   const requestKeyRef = useRef('');
   const activeTriggerRef = useRef<HTMLButtonElement | null>(null);
+  const isFirstMountRef = useRef(true);
+  const isInitialUrlSyncRef = useRef(true);
 
   const labels = language === 'zh'
     ? { search: '搜索标题、地点、分类或标签…', all: '探索全部', loading: '正在加载照片…', more: '加载更多', retry: '重试', empty: '没有找到照片。', results: '张照片', collections: '作品集', hide: '收起筛选', show: '筛选' }
     : { search: 'Search titles, places, collections, or tags…', all: 'Explore all', loading: 'Loading photography…', more: 'Load more', retry: 'Try again', empty: 'No photos found.', results: 'photos', collections: 'Collections', hide: 'Hide toolbar', show: 'Filters' };
 
   useEffect(() => {
-    const stored = sessionStorage.getItem(SEED_KEY);
-    const nextSeed = stored == null ? crypto.getRandomValues(new Uint32Array(1))[0] % 64 : Number(stored) % 64;
-    sessionStorage.setItem(SEED_KEY, String(nextSeed));
     const query = new URLSearchParams(window.location.search);
-    setSelectedCollection(query.get('collection') ?? '');
-    setSearch((query.get('q') ?? '').slice(0, 80));
-    setSeed(nextSeed);
-  }, []);
+    const initialCollection = query.get('collection') ?? '';
+    const initialSearch = (query.get('q') ?? '').slice(0, 80);
+    
+    setSelectedCollection(initialCollection);
+    setSearch(initialSearch);
+
+    // If we have an SSR feed and no active filters, we MUST keep the seed as 0
+    // to prevent Effect from detecting a seed change and wiping the SSR photos.
+    if (hasInitialFeed && !initialCollection && !initialSearch) {
+      setSeed(0);
+    } else {
+      let nextSeed = 0;
+      try {
+        const stored = sessionStorage.getItem(SEED_KEY);
+        nextSeed = stored == null ? crypto.getRandomValues(new Uint32Array(1))[0] % 64 : Number(stored) % 64;
+        sessionStorage.setItem(SEED_KEY, String(nextSeed));
+      } catch {
+        nextSeed = 0;
+      }
+      setSeed(nextSeed);
+    }
+  }, [hasInitialFeed]);
 
   useEffect(() => {
+    if (collections.length > 0) return;
     const controller = new AbortController();
     fetch(`/api/photography/collections?language=${language}`, { signal: controller.signal })
       .then((response) => response.ok ? response.json() : Promise.reject(new Error('Collections unavailable')))
       .then((data) => setCollections(Array.isArray(data.collections) ? data.collections : []))
       .catch((reason) => { if (reason instanceof Error && reason.name !== 'AbortError') console.warn(reason.message); });
     return () => controller.abort();
-  }, [language]);
+  }, [collections.length, language]);
 
   useEffect(() => {
     const timeout = window.setTimeout(() => setDebouncedSearch(search.trim().length >= 2 ? search.trim() : ''), 300);
@@ -99,6 +124,16 @@ export function PhotographyGallery({ language }: { language: 'en' | 'zh' }) {
 
   useEffect(() => {
     if (seed == null) return;
+    if (isFirstMountRef.current) {
+      isFirstMountRef.current = false;
+      const query = new URLSearchParams(window.location.search);
+      const urlCollection = query.get('collection') ?? '';
+      const urlSearch = (query.get('q') ?? '').slice(0, 80);
+      if (hasInitialFeed && !urlCollection && !urlSearch) {
+        requestKeyRef.current = `${seed}:${language}:${selectedCollection}:${debouncedSearch}`;
+        return;
+      }
+    }
     const controller = new AbortController();
     nextAbortRef.current?.abort();
     setBuffered(null);
@@ -117,10 +152,14 @@ export function PhotographyGallery({ language }: { language: 'en' | 'zh' }) {
       .catch((reason) => { if (reason instanceof Error && reason.name !== 'AbortError') setError(reason.message); })
       .finally(() => { if (!controller.signal.aborted) setLoading(false); });
     return () => controller.abort();
-  }, [debouncedSearch, language, requestPage, seed, selectedCollection]);
+  }, [debouncedSearch, hasInitialFeed, language, requestPage, seed, selectedCollection]);
 
   useEffect(() => {
     if (seed == null) return;
+    if (isInitialUrlSyncRef.current) {
+      isInitialUrlSyncRef.current = false;
+      return;
+    }
     const params = new URLSearchParams();
     if (selectedCollection) params.set('collection', selectedCollection);
     if (search.trim()) params.set('q', search.trim().slice(0, 80));
@@ -223,7 +262,7 @@ export function PhotographyGallery({ language }: { language: 'en' | 'zh' }) {
       >
         <span>{labels.all}</span>
         {!selectedCollection && total > 0 && (
-          <span className="rounded-full bg-white/20 px-1.5 py-0.2 text-[10px] sm:text-[11px] font-semibold dark:bg-black/15">
+          <span className="rounded-full bg-white/20 px-1.5 py-0.5 text-[10px] sm:text-[11px] font-semibold dark:bg-black/15">
             {total}
           </span>
         )}
@@ -244,7 +283,7 @@ export function PhotographyGallery({ language }: { language: 'en' | 'zh' }) {
           >
             <span>{collection.name}</span>
             <span
-              className={`rounded-full px-1.5 py-0.2 text-[10px] sm:text-[11px] font-medium ${
+              className={`rounded-full px-1.5 py-0.5 text-[10px] sm:text-[11px] font-medium ${
                 isActive
                   ? 'bg-white/20 dark:bg-black/15'
                   : 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400'
