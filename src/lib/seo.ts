@@ -161,9 +161,9 @@ export function websiteJsonLd(locale: Locale) {
     '@id': WEBSITE_ID,
     url: SITE_URL,
     name: SITE_NAME,
-    alternateName: isZh ? [SITE_ALTERNATE_NAME, 'Shain Wai Yan 个人作品集'] : SITE_ALTERNATE_NAME,
+    alternateName: isZh ? [SITE_ALTERNATE_NAME, '明元易个人作品集'] : SITE_ALTERNATE_NAME,
     description: isZh
-      ? 'Shain Wai Yan（Xolbine、明元易）的个人作品集，以 Shain Studio 呈现技术营销、MarTech 与创意科技作品。'
+      ? '明元易（Shain Wai Yan，又名 Xolbine）的个人作品集，以 Shain Studio 呈现技术营销、MarTech 与创意科技作品。'
       : 'Shain Studio is the personal portfolio of Shain Wai Yan (Xolbine, 明元易), presenting work in technical marketing, MarTech, and creative technology.',
     inLanguage: isZh ? 'zh-CN' : 'en-US',
     publisher: { '@id': PERSON_ID },

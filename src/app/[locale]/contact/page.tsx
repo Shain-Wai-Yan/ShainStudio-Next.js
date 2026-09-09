@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: ContactPageProps): Promise<Me
   const urlPath = isZh ? '/zh/contact' : '/contact';
 
   const title = isZh
-    ? `${t.contactPage.heroTitle} ${t.contactPage.heroTitleHighlight} | 明元易 (Shain Wai Yan)`
+    ? `${t.contactPage.heroTitle} ${t.contactPage.heroTitleHighlight} | 明元易`
     : 'Contact Shain Wai Yan | Technical Marketer';
 
   return {

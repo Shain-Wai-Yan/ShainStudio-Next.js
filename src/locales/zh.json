@@ -3,6 +3,7 @@
     "home": "首页",
     "about": "关于我",
     "portfolio": "作品集",
+    "beyondWork": "工作之外",
     "businessPlans": "商业计划",
     "marketingPlans": "营销计划",
     "marketingInMotion": "营销实战",
@@ -257,7 +258,7 @@
     "description": "精选的摄影作品集，探索构图、光线和情感。每一张照片都捕捉了一个决定性时刻与有意的叙事。",
     "seo": {
       "title": "摄影作品集 | Shain Studio",
-      "description": "探索 Shain Wai Yan 的摄影作品集，包含风景、建筑等精彩影像。",
+      "description": "探索明元易（Shain Wai Yan）的摄影作品，包含风景、建筑等精彩影像。",
       "openGraphTitle": "摄影作品集 | Shain Studio",
       "openGraphDesc": "探索我的摄影作品集，包含风景、人像、建筑等多种风格的摄影作品。"
     },
@@ -372,10 +373,10 @@
     "subtitle": "专业认证",
     "description": "我的专业证书、资质和成就的集合。",
     "seo": {
-      "title": "认证资质：谷歌 · Meta · HubSpot | 明元易 Shain Wai Yan",
+      "title": "认证资质：谷歌 · Meta · HubSpot | 明元易",
       "description": "浏览明元易（Shain Wai Yan）来自谷歌、Meta、HubSpot Academy等权威机构的专业认证——涵盖数字营销、SEO、电商运营、社交媒体策略与商业发展。",
       "keywords": "明元易证书, 谷歌数字营销认证, Meta社媒营销证书, HubSpot Academy, 专业资质, 数字营销认证, Shain Wai Yan, Coursera证书, SEO认证, 营销专业人士",
-      "ogTitle": "专业认证资质库 | 明元易 Shain Wai Yan",
+      "ogTitle": "专业认证资质库 | 明元易",
       "ogDescription": "精心整理的权威认证展示库，涵盖谷歌、Meta、HubSpot及全球领先平台——涉及SEO、数字营销、电商与策略领域。"
     },
     "labels": {
@@ -422,9 +423,9 @@
     "heroTitle": "关于",
     "heroTitleHighlight": "我",
     "heroSubtitle": "技术营销从业者 | MarTech 爱好者 | 创意科技实践者",
-    "profileAltText": "Shain Wai Yan - 技术营销从业者",
-    "myName": "Shain Wai Yan",
-    "alsoKnownAs": "又名 Xolbine | 明元易",
+    "profileAltText": "明元易 - 技术营销从业者",
+    "myName": "明元易",
+    "alsoKnownAs": "又名 Xolbine | Shain Wai Yan",
     "motto": "有志者事竟成",
     "mottoTranslation": "\"有志者事竟成\"",
     "myStoryHeading": "我的故事",
@@ -714,18 +715,18 @@
   },
   "portfolioPage": {
     "hero": {
-      "eyebrow": "韦燕 · 作品集",
+      "eyebrow": "明元易 · 作品集",
       "headline": [
         "作品",
         "自有",
         "其声"
       ],
-      "subtitlePrefix": "六个领域。一种执着：打造 ",
+      "subtitlePrefix": "四个领域。一种执着：打造 ",
       "subtitleHighlight": "美观高效",
       "subtitleSuffix": " 的作品，留下深刻印象。",
       "stats": [
         {
-          "number": "6+",
+          "number": "4",
           "label": "专业领域"
         },
         {
@@ -750,10 +751,6 @@
       "✦",
       "全栈代码",
       "✦",
-      "摄影作品",
-      "✦",
-      "视频编辑",
-      "✦",
       "品牌标识",
       "✦",
       "数据驱动",
@@ -777,8 +774,8 @@
       "btnAbout": "关于我"
     },
     "footer": {
-      "signature": "韦燕工作室",
-      "copyright": "© {year} 韦燕"
+      "signature": "Shain Studio",
+      "copyright": "© {year} 明元易"
     },
     "items": {
       "business-plans": {

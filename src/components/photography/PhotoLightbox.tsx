@@ -188,7 +188,7 @@ export function PhotoLightbox({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleKeyDown]);
 
-  const detailUrl = `${window.location.origin}${language === 'en' ? '' : `/${language}`}/portfolio/photography/photo/${photo.documentId ?? photo.id}`;
+  const detailUrl = `${window.location.origin}${language === 'en' ? '' : `/${language}`}/hobbies/photography/photo/${photo.documentId ?? photo.id}`;
   const sharePhoto = useCallback(async () => {
     try {
       if (navigator.share) await navigator.share({ title: photo.title, url: detailUrl });

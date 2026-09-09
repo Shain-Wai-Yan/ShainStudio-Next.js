@@ -17,8 +17,8 @@ const localizedStaticPaths = staticPaths.flatMap(pathname => {
   const english = pathname.replace(/^\/zh(?=\/|$)/, '') || '/';
   return [english, english === '/' ? '/zh' : `/zh${english}`];
 });
-const photoDetailPaths = sitemapPaths.filter(pathname => pathname.startsWith('/portfolio/photography/photo/'));
-const nonPhotoSitemapPaths = sitemapPaths.filter(pathname => !pathname.startsWith('/portfolio/photography/photo/'));
+const photoDetailPaths = sitemapPaths.filter(pathname => pathname.startsWith('/hobbies/photography/photo/'));
+const nonPhotoSitemapPaths = sitemapPaths.filter(pathname => !pathname.startsWith('/hobbies/photography/photo/'));
 // A representative sample validates the dynamic photo route without turning a
 // smoke run into hundreds of origin reads as the gallery grows.
 const paths = [...new Set([...nonPhotoSitemapPaths, ...photoDetailPaths.slice(0, 5), ...localizedStaticPaths])];
@@ -85,7 +85,7 @@ for (const [pathname, canonical] of [
   ['/zh/certificate', '/certificate'],
   ['/zh/portfolio/coding-projects', '/portfolio/coding-projects'],
   ['/zh/portfolio/marketing-in-motion', '/portfolio/marketing-in-motion'],
-  ['/zh/portfolio/photography', '/portfolio/photography'],
+  ['/zh/hobbies/photography', '/hobbies/photography'],
 ]) {
   const html = await (await fetch(`${base}${pathname}`)).text();
   assert.match(metaContent(html, 'robots') ?? '', /noindex/, `${pathname}: untranslated page must be noindex`);

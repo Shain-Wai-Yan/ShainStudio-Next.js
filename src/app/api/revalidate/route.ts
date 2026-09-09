@@ -16,7 +16,7 @@ const CONTENT = {
     tag: 'coding-projects',
     paths: ['/portfolio/coding-projects', '/zh/portfolio/coding-projects'],
   },
-  photography: { tag: 'photography', paths: ['/portfolio/photography', '/zh/portfolio/photography'] },
+  photography: { tag: 'photography', paths: ['/hobbies', '/zh/hobbies', '/hobbies/photography', '/zh/hobbies/photography'] },
   'marketing-plans': { tag: 'marketing-plans', paths: ['/portfolio/marketing-plans', '/zh/portfolio/marketing-plans'] },
   'business-plans': { tag: 'business-plans', paths: ['/portfolio/business-plans', '/zh/portfolio/business-plans'] },
   certificates: { tag: 'certificates', paths: ['/certificate', '/zh/certificate'] },
@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
 
   const documentId = payload.entry?.documentId ?? payload.documentId;
   const photoPath = type === 'photography' && typeof documentId === 'string' && /^[a-z0-9]{8,40}$/i.test(documentId)
-    ? `/portfolio/photography/photo/${documentId}`
+    ? `/hobbies/photography/photo/${documentId}`
     : null;
   if (photoPath) {
     revalidatePath(photoPath);

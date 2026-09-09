@@ -3,6 +3,7 @@
     "home": "Home",
     "about": "About Me",
     "portfolio": "Portfolio",
+    "beyondWork": "Beyond Work",
     "businessPlans": "Business Plans",
     "marketingPlans": "Marketing Plans",
     "marketingInMotion": "Marketing in Motion",
@@ -720,12 +721,12 @@
         "SPEAKS FOR",
         "ITSELF"
       ],
-      "subtitlePrefix": "Six disciplines. One obsession: making things that ",
+      "subtitlePrefix": "Four disciplines. One obsession: making things that ",
       "subtitleHighlight": "work beautifully",
       "subtitleSuffix": " and leave an impression.",
       "stats": [
         {
-          "number": "6+",
+          "number": "4",
           "label": "Disciplines"
         },
         {
@@ -749,10 +750,6 @@
       "Case Studies",
       "✦",
       "Full-Stack Code",
-      "✦",
-      "Photography",
-      "✦",
-      "Motion Editing",
       "✦",
       "Brand Identity",
       "✦",

@@ -44,16 +44,11 @@ async function fetchGithubRepoCount(): Promise<number> {
   return user.public_repos ?? 0;
 }
 
-const YOUTUBE_WORKER_URL = 'https://youtube-api-fetcher.shainwaiyan2002.workers.dev';
-const YOUTUBE_CHANNEL_ID = 'UCV4ZLWfXF15d4tyzdJTkzpw';
-
 export interface PortfolioCounts {
   businessPlans: number;
   marketingPlans: number;
   marketingInMotion: number;
   codingProjects: number;
-  photography: number;
-  amvEditing: number;
 }
 
 function fetchCount(endpoint: string) {
@@ -65,48 +60,15 @@ export async function getPortfolioCounts(): Promise<PortfolioCounts> {
     fetchCount('business-plans'),
     fetchCount('marketing-plans'),
     fetchCount('marketing-projects'),
-    // Ping Strapi directly for photography count (Safer than local API route)
-    fetchCount('photographies'),
     fetchGithubRepoCount(),
-    fetchYouTubeCount(),
   ]);
 
   return {
     businessPlans: getStrapiTotal(results[0]),
     marketingPlans: getStrapiTotal(results[1]),
     marketingInMotion: getStrapiTotal(results[2]),
-    // Photography is now a direct Strapi response (has .meta.pagination.total)
-    photography: getStrapiTotal(results[3]),
-    // GitHub: direct count (plain number)
-    codingProjects: getSimpleValue(results[4] as PromiseSettledResult<number>),
-    amvEditing: getSimpleValue(results[5] as PromiseSettledResult<number>),
+    codingProjects: getSimpleValue(results[3] as PromiseSettledResult<number>),
   };
-}
-
-async function fetchYouTubeCount(): Promise<number> {
-  try {
-    const url = `${YOUTUBE_WORKER_URL}/api/youtube/channel?channelId=${YOUTUBE_CHANNEL_ID}`;
-    const response = await fetch(url, { next: { revalidate: 3600 }, signal: AbortSignal.timeout(5000) });
-    if (!response.ok) return 0;
-    
-    interface YouTubeResponse {
-      items?: Array<{
-        statistics?: {
-          videoCount?: string;
-        };
-      }>;
-      statistics?: {
-        videoCount?: string;
-      };
-    }
-    
-    const data = await response.json() as YouTubeResponse;
-    // YouTube API returns an array of items
-    const stats = data.items?.[0]?.statistics || data.statistics;
-    return parseInt(stats?.videoCount || '0', 10);
-  } catch {
-    return 0;
-  }
 }
 
 /**

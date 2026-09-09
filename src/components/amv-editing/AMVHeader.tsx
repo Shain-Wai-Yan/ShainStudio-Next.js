@@ -4,9 +4,10 @@ interface AMVHeaderProps {
   title: string;
   description: string;
   totalVideos?: number;
+  eyebrow?: string;
 }
 
-export default function AMVHeader({ title, description, totalVideos }: AMVHeaderProps) {
+export default function AMVHeader({ title, description, totalVideos, eyebrow = 'Beyond Work' }: AMVHeaderProps) {
   return (
     <section className="relative text-center py-16 md:py-24 px-4 overflow-hidden">
       {/* Decorative accents */}
@@ -21,7 +22,7 @@ export default function AMVHeader({ title, description, totalVideos }: AMVHeader
       <div className="inline-flex items-center gap-2 mb-6">
         <span className="block w-8 h-px bg-gold dark:bg-[#d4af37]" />
         <span className="text-xs uppercase tracking-[0.25em] text-gold dark:text-[#d4af37] font-semibold">
-          Portfolio
+          {eyebrow}
         </span>
         <span className="block w-8 h-px bg-gold dark:bg-[#d4af37]" />
       </div>

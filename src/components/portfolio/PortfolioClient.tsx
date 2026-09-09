@@ -273,7 +273,7 @@ export default function PortfolioClient({ locale, t, dynamicCounts }: Props) {
   const displayFont = "var(--font-serif)";
   const basePath = locale === 'en' ? '' : `/${locale}`;
 
-  // Helper to replace number in string like "6+ Projects" with actual count
+  // Helper to replace a number in copy such as "3+ Plans" with the live count.
   const formatStat = (original: string, count: number | undefined | null) => {
     if (count === undefined || count === null) return original;
     // Replace the first number found in the string (even if it's 0)
@@ -341,41 +341,6 @@ export default function PortfolioClient({ locale, t, dynamicCounts }: Props) {
       icon: (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
           <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
-        </svg>
-      ),
-    },
-    {
-      id: 'photography',
-      href: `${basePath}/portfolio/photography`,
-      number: '05',
-      title: t.items['photography'].title,
-      subtitle: t.items['photography'].subtitle,
-      description: t.items['photography'].description,
-      tags: t.items['photography'].tags,
-      stat: formatStat(t.items['photography'].stat, dynamicCounts.photography),
-      icon: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-          <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
-          <circle cx="12" cy="13" r="4"/>
-        </svg>
-      ),
-    },
-    {
-      id: 'amv-editing',
-      href: `${basePath}/portfolio/amv-editing`,
-      number: '06',
-      title: t.items['amv-editing'].title,
-      subtitle: t.items['amv-editing'].subtitle,
-      description: t.items['amv-editing'].description,
-      tags: t.items['amv-editing'].tags,
-      stat: formatStat(t.items['amv-editing'].stat, dynamicCounts.amvEditing),
-      icon: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-          <rect x="2" y="2" width="20" height="20" rx="2.18"/>
-          <line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/>
-          <line x1="2" y1="12" x2="22" y2="12"/>
-          <line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/>
-          <line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/>
         </svg>
       ),
     },
@@ -651,7 +616,7 @@ export default function PortfolioClient({ locale, t, dynamicCounts }: Props) {
             </div>
 
             {/* Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {ITEMS.map((item, i) => (
                 <TiltCard key={item.id} item={item} index={i} exploreText={t.cards.explore} isZh={isZh} />
               ))}
@@ -736,6 +701,12 @@ export default function PortfolioClient({ locale, t, dynamicCounts }: Props) {
                   {item.title}
                 </Link>
               ))}
+              <Link
+                href={`${basePath}/hobbies`}
+                className={`text-[10px] font-semibold ${isZh ? '' : 'uppercase'} tracking-wider text-[#555555] dark:text-white/25 hover:text-[#191970] dark:hover:text-[#d4af37] transition-colors duration-200`}
+              >
+                {isZh ? '工作之外' : 'Beyond Work'}
+              </Link>
             </nav>
             <span className="text-[10px] text-[#666666]/45 dark:text-white/15" style={{ fontFamily: isZh ? 'ZCOOL QingKe HuangYou, sans-serif' : 'inherit' }}>
                {t.footer.copyright.replace('{year}', new Date().getFullYear().toString())}

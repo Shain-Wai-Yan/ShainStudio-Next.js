@@ -12,6 +12,7 @@ import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
 const Header = ({ translations }: { translations: Pick<Dictionary, 'nav'> }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isPortfolioOpen, setIsPortfolioOpen] = useState(false);
+  const [isHobbiesOpen, setIsHobbiesOpen] = useState(false);
   const pathname = usePathname();
   
   // Extract locale from pathname /[locale]/... or fallback to legacy /zh pattern
@@ -50,14 +51,18 @@ const Header = ({ translations }: { translations: Pick<Dictionary, 'nav'> }) => 
     { href: `${basePath}/portfolio/marketing-plans`, label: translations.nav.marketingPlans },
     { href: `${basePath}/portfolio/marketing-in-motion`, label: translations.nav.marketingInMotion },
     { href: `${basePath}/portfolio/coding-projects`, label: translations.nav.codingProjects },
-    { href: `${basePath}/portfolio/photography`, label: translations.nav.photography },
-    { href: `${basePath}/portfolio/amv-editing`, label: translations.nav.amvEditing },
+  ];
+
+  const hobbyItems = [
+    { href: `${basePath}/hobbies/photography`, label: translations.nav.photography },
+    { href: `${basePath}/hobbies/amv-editing`, label: translations.nav.amvEditing },
   ];
 
   const navLinks = [
     { href: locale === 'en' ? '/' : `${basePath}`, label: translations.nav.home },
     { href: `${basePath}/about`, label: translations.nav.about },
-    { href: `${basePath}/portfolio`, label: translations.nav.portfolio, hasDropdown: true },
+    { href: `${basePath}/portfolio`, label: translations.nav.portfolio, dropdown: 'portfolio' as const },
+    { href: `${basePath}/hobbies`, label: translations.nav.beyondWork, dropdown: 'hobbies' as const },
     { href: `${basePath}/certificate`, label: translations.nav.certificate },
     { href: `${basePath}/blog`, label: translations.nav.blog },
     { href: `${basePath}/contact`, label: translations.nav.contact },
@@ -71,6 +76,7 @@ const Header = ({ translations }: { translations: Pick<Dictionary, 'nav'> }) => 
   };
 
   const isPortfolioActive = pathname.includes('/portfolio');
+  const isHobbiesActive = pathname.includes('/hobbies');
 
   return (
     <header data-nosnippet className="fixed top-0 left-0 right-0 z-[1000] transition-all duration-300 shadow-lg bg-[#191970] dark:bg-[#0f0f1e]">
@@ -101,10 +107,11 @@ const Header = ({ translations }: { translations: Pick<Dictionary, 'nav'> }) => 
         <nav className="hidden lg:flex items-center gap-0" role="navigation" aria-label="Main navigation">
           <ul className="flex gap-0 items-center">
             {navLinks.map((link) => {
-              const active = link.hasDropdown ? isPortfolioActive : isActiveRoute(link.href);
+              const active = link.dropdown === 'portfolio' ? isPortfolioActive : link.dropdown === 'hobbies' ? isHobbiesActive : isActiveRoute(link.href);
+              const dropdownItems = link.dropdown === 'portfolio' ? portfolioItems : hobbyItems;
               return (
                 <li key={link.href} className="group relative">
-                  {link.hasDropdown ? (
+                  {link.dropdown ? (
                     <>
                       <Link
                         href={link.href}
@@ -117,10 +124,10 @@ const Header = ({ translations }: { translations: Pick<Dictionary, 'nav'> }) => 
                         {link.label}
                       </Link>
                       <ul 
-                        className="absolute hidden group-hover:block bg-white dark:bg-[#1e1e2e] text-[#191970] dark:text-white shadow-xl rounded-lg mt-0 py-2 w-64 z-20 border-t-4 border-[#ffd700]"
+                        className="absolute hidden group-hover:block group-focus-within:block bg-white dark:bg-[#1e1e2e] text-[#191970] dark:text-white shadow-xl rounded-lg mt-0 py-2 w-64 z-20 border-t-4 border-[#ffd700]"
                         role="menu"
                       >
-                        {portfolioItems.map((item) => (
+                        {dropdownItems.map((item) => (
                           <li key={item.href} role="none">
                             <Link
                               href={item.href}
@@ -182,10 +189,12 @@ const Header = ({ translations }: { translations: Pick<Dictionary, 'nav'> }) => 
           <nav className="w-full">
             <ul className="flex flex-col" role="menu">
               {navLinks.map((link) => {
-                const active = link.hasDropdown ? isPortfolioActive : isActiveRoute(link.href);
+                const active = link.dropdown === 'portfolio' ? isPortfolioActive : link.dropdown === 'hobbies' ? isHobbiesActive : isActiveRoute(link.href);
+                const dropdownItems = link.dropdown === 'portfolio' ? portfolioItems : hobbyItems;
+                const submenuOpen = link.dropdown === 'portfolio' ? isPortfolioOpen : isHobbiesOpen;
                 return (
                   <li key={link.href} role="none" className="border-b border-gray-100 dark:border-[#333333]">
-                    {link.hasDropdown ? (
+                    {link.dropdown ? (
                       <>
                         {/* Portfolio main link + expand button container */}
                         <div className="flex items-stretch">
@@ -207,32 +216,33 @@ const Header = ({ translations }: { translations: Pick<Dictionary, 'nav'> }) => 
                           <button
                             onClick={(e) => {
                               e.preventDefault();
-                              togglePortfolio();
+                              if (link.dropdown === 'portfolio') togglePortfolio();
+                              else setIsHobbiesOpen((open) => !open);
                             }}
                             className={`px-4 py-4 flex items-center justify-center border-l border-gray-100 dark:border-[#333333] transition-colors duration-300 ${
                               active
                                 ? 'text-[#ffd700] bg-[#f8f9fa] dark:bg-[#2a2a3a]'
                                 : 'text-[#191970] dark:text-white hover:text-[#ffd700] dark:hover:text-[#d4af37] hover:bg-[#f8f9fa] dark:hover:bg-[#2a2a3a]'
                             }`}
-                            aria-expanded={isPortfolioOpen}
-                            aria-controls="portfolio-menu"
-                            aria-label="Toggle portfolio submenu"
+                            aria-expanded={submenuOpen}
+                            aria-controls={`${link.dropdown}-menu`}
+                            aria-label={`Toggle ${link.label} submenu`}
                           >
                             <FaChevronDown 
                               size={16} 
-                              className={`text-[#ffd700] transition-transform duration-300 ${isPortfolioOpen ? 'rotate-180' : ''}`}
+                              className={`text-[#ffd700] transition-transform duration-300 ${submenuOpen ? 'rotate-180' : ''}`}
                             />
                           </button>
                         </div>
 
                         {/* Portfolio Submenu */}
-                        {isPortfolioOpen && (
+                        {submenuOpen && (
                           <ul 
-                            id="portfolio-menu"
+                            id={`${link.dropdown}-menu`}
                             className="bg-[#f8f9fa] dark:bg-[#2a2a3a] flex flex-col"
                             role="menu"
                           >
-                            {portfolioItems.map((item) => (
+                            {dropdownItems.map((item) => (
                               <li key={item.href} role="none" className="border-t border-gray-100 dark:border-[#333333]">
                                 <Link
                                   href={item.href}
@@ -244,6 +254,7 @@ const Header = ({ translations }: { translations: Pick<Dictionary, 'nav'> }) => 
                                   onClick={() => {
                                     setIsMenuOpen(false);
                                     setIsPortfolioOpen(false);
+                                    setIsHobbiesOpen(false);
                                   }}
                                   role="menuitem"
                                 >

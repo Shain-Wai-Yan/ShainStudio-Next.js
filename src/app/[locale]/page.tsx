@@ -86,7 +86,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const hp = t.homePage as unknown as HomePage;
 
   const title = locale === 'zh'
-    ? '技术营销作品集 | Shain Wai Yan'
+    ? '技术营销作品集 | 明元易'
     : 'Technical Marketing Portfolio | Shain Wai Yan';
   const description = hp.metaDescription || hp.description || 'The Shain Studio portfolio of Shain Wai Yan.';
   const url = absoluteUrl(locale);

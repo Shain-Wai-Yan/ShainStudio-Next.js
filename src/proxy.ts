@@ -39,6 +39,24 @@ export function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // Permanent hobby migration. This precedes locale cleanup so legacy /en
+  // URLs reach their canonical destination in a single redirect.
+  const hobbyMigration = pathname.match(/^\/(en\/|zh\/)?portfolio\/(photography|amv-editing)(\/.*)?$/);
+  if (hobbyMigration) {
+    const localePrefix = hobbyMigration[1] === 'zh/' ? '/zh' : '';
+    const url = request.nextUrl.clone();
+    url.pathname = `${localePrefix}/hobbies/${hobbyMigration[2]}${hobbyMigration[3] ?? ''}`;
+    return NextResponse.redirect(url, { status: 301 });
+  }
+
+  const shortHobbyRoute = pathname.match(/^\/(en\/|zh\/)?(photography|amv-editing)(\/.*)?$/);
+  if (shortHobbyRoute) {
+    const localePrefix = shortHobbyRoute[1] === 'zh/' ? '/zh' : '';
+    const url = request.nextUrl.clone();
+    url.pathname = `${localePrefix}/hobbies/${shortHobbyRoute[2]}${shortHobbyRoute[3] ?? ''}`;
+    return NextResponse.redirect(url, { status: 301 });
+  }
+
   // ============================================
   // CLEAN ENGLISH LOCALE REDIRECTS
   // ============================================
@@ -129,17 +147,6 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(url, { status: 301 });
   }
 
-  if (pathname === '/photography') {
-    const url = request.nextUrl.clone();
-    url.pathname = '/portfolio/photography';
-    return NextResponse.redirect(url, { status: 301 });
-  }
-
-  if (pathname === '/amv-editing') {
-    const url = request.nextUrl.clone();
-    url.pathname = '/portfolio/amv-editing';
-    return NextResponse.redirect(url, { status: 301 });
-  }
 
   if (pathname === '/marketing-in-motion') {
     const url = request.nextUrl.clone();
@@ -183,17 +190,6 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(url, { status: 301 });
   }
 
-  if (pathname === '/zh/photography') {
-    const url = request.nextUrl.clone();
-    url.pathname = '/zh/portfolio/photography';
-    return NextResponse.redirect(url, { status: 301 });
-  }
-
-  if (pathname === '/zh/amv-editing') {
-    const url = request.nextUrl.clone();
-    url.pathname = '/zh/portfolio/amv-editing';
-    return NextResponse.redirect(url, { status: 301 });
-  }
 
   if (pathname === '/zh/marketing-in-motion') {
     const url = request.nextUrl.clone();

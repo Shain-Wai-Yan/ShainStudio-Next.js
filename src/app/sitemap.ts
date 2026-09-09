@@ -50,18 +50,19 @@ const staticRoutes = {
     { path: '/blog',        priority: 0.9, changeFrequency: 'daily'   as const },
     { path: '/certificate', priority: 0.7, changeFrequency: 'monthly' as const },
     { path: '/contact',     priority: 0.8, changeFrequency: 'yearly'  as const },
+    { path: '/hobbies',     priority: 0.7, changeFrequency: 'monthly' as const },
+    { path: '/hobbies/amv-editing', priority: 0.6, changeFrequency: 'monthly' as const },
+    { path: '/hobbies/photography', priority: 0.7, changeFrequency: 'monthly' as const },
     // /privacy and /terms are intentionally noindex — keep them out of the sitemap
   ],
   // English portfolio pages
   portfolio: [
     { path: '/portfolio',                             priority: 0.9, changeFrequency: 'weekly'  as const },
-    { path: '/portfolio/amv-editing',                 priority: 0.7, changeFrequency: 'monthly' as const },
     { path: '/portfolio/business-plans',              priority: 0.7, changeFrequency: 'monthly' as const },
     { path: '/portfolio/coding-projects',             priority: 0.8, changeFrequency: 'weekly'  as const },
     { path: '/portfolio/coding-projects/archive',     priority: 0.5, changeFrequency: 'monthly' as const },
     { path: '/portfolio/marketing-in-motion',         priority: 0.8, changeFrequency: 'weekly'  as const },
     { path: '/portfolio/marketing-plans',             priority: 0.7, changeFrequency: 'monthly' as const },
-    { path: '/portfolio/photography',                 priority: 0.7, changeFrequency: 'monthly' as const },
   ],
   // Chinese STATIC pages only — pages with genuine translations
   // Excluded: /zh/blog, /zh/blog/[slug], /zh/portfolio/*, /zh/certificate
@@ -71,6 +72,7 @@ const staticRoutes = {
     { path: '/zh/about',     priority: 0.8, changeFrequency: 'monthly' as const },
     { path: '/zh/portfolio', priority: 0.8, changeFrequency: 'weekly'  as const },
     { path: '/zh/contact',   priority: 0.7, changeFrequency: 'yearly'  as const },
+    { path: '/zh/hobbies',   priority: 0.6, changeFrequency: 'monthly' as const },
   ],
 };
 
@@ -162,7 +164,7 @@ async function fetchAllCodingProjectSlugs(): Promise<CodingProjectSlug[]> {
 // ─── Sitemap Generator ────────────────────────────────────────────────────────
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const translatedPaths = new Set(['/', '/about', '/portfolio', '/contact']);
+  const translatedPaths = new Set(['/', '/about', '/portfolio', '/hobbies', '/contact']);
 
   // ── Static pages ──────────────────────────────────────────────────────────
   const staticPages: MetadataRoute.Sitemap = [
@@ -230,7 +232,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     const photos = await photographyRepository.getSitemapPhotos();
     photoPages = photos.flatMap((photo) => photo.documentId ? [{
-      url: `${SITE_URL}/portfolio/photography/photo/${photo.documentId}`,
+      url: `${SITE_URL}/hobbies/photography/photo/${photo.documentId}`,
       lastModified: photo.updatedAt || undefined,
       changeFrequency: 'monthly' as const,
       priority: 0.6,

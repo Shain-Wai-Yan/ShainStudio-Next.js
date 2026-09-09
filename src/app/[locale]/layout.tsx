@@ -37,14 +37,14 @@ export async function generateMetadata({ params }: Omit<LocaleLayoutProps, 'chil
   return {
     title: {
       default: isZh
-        ? "技术营销作品集 | Shain Wai Yan"
+        ? "技术营销作品集 | 明元易"
         : "Technical Marketing Portfolio | Shain Wai Yan",
       template: `%s | ${SITE_NAME}`,
     },
     description: isZh
-      ? "Shain Wai Yan（Xolbine、明元易）的个人作品集，以 Shain Studio 呈现技术营销、MarTech 与创意科技作品。"
+      ? "明元易（Shain Wai Yan，又名 Xolbine）的个人作品集，以 Shain Studio 呈现技术营销、MarTech 与创意科技作品。"
       : "Shain Studio is the personal portfolio of Shain Wai Yan (Xolbine, 明元易), presenting technical marketing, MarTech, and creative technology work.",
-    authors: [{ name: "Shain Wai Yan" }],
+    authors: [{ name: isZh ? "明元易" : "Shain Wai Yan" }],
     robots: "index, follow, max-image-preview:large",
     metadataBase: new URL(SITE_URL),
     alternates: {
@@ -62,10 +62,10 @@ export async function generateMetadata({ params }: Omit<LocaleLayoutProps, 'chil
       type: 'website',
       url: baseUrl,
       title: isZh
-        ? '技术营销从业者 | Shain Wai Yan'
+        ? '技术营销从业者 | 明元易'
         : 'Technical Marketer | Shain Wai Yan',
       description: isZh
-        ? '在 Shain Wai Yan（Xolbine、明元易）的作品集中探索AI驱动的营销活动、内容策略和市场分析。'
+        ? '在明元易（Shain Wai Yan，又名 Xolbine）的作品集中探索AI驱动的营销活动、内容策略和市场分析。'
         : 'Explore AI-powered campaigns, content strategy, and market analysis in the portfolio of Shain Wai Yan (Xolbine).',
       images: DEFAULT_OG_IMAGE,
       siteName: SITE_NAME,
@@ -75,10 +75,10 @@ export async function generateMetadata({ params }: Omit<LocaleLayoutProps, 'chil
     twitter: {
       card: 'summary_large_image',
       title: isZh
-        ? '技术营销从业者 | Shain Wai Yan'
+        ? '技术营销从业者 | 明元易'
         : 'Technical Marketer | Shain Wai Yan',
       description: isZh
-        ? '在 Shain Wai Yan（Xolbine、明元易）的作品集中探索AI驱动的营销活动、内容策略和市场分析。'
+        ? '在明元易（Shain Wai Yan，又名 Xolbine）的作品集中探索AI驱动的营销活动、内容策略和市场分析。'
         : 'Explore AI-powered campaigns, content strategy, and market analysis in the portfolio of Shain Wai Yan (Xolbine).',
       images: [DEFAULT_OG_IMAGE],
     },
