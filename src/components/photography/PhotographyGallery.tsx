@@ -448,7 +448,7 @@ export function PhotographyGallery({ language, initialFeed, initialCollections }
         <div className="rounded-2xl border border-red-200 bg-red-50 p-8 text-center dark:border-red-900/50 dark:bg-red-950/20"><p className="mb-4 text-sm text-red-600 dark:text-red-400">{error}</p><button type="button" onClick={() => window.location.reload()} className="rounded-full bg-[#191970] px-5 py-2 text-sm font-semibold text-white">{labels.retry}</button></div>
       ) : photos.length === 0 ? <p className="py-24 text-center text-gray-500">{labels.empty}</p> : (
         <>
-          <MasonryGrid photos={photos} onPhotoClick={openPhoto} />
+          <MasonryGrid photos={photos} onPhotoClick={openPhoto} language={language} />
           <div ref={prefetchRef} className="h-px" aria-hidden="true" />
           <div ref={appendRef} className="h-px" aria-hidden="true" />
           <div className="flex min-h-24 items-center justify-center py-6">

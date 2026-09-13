@@ -299,15 +299,63 @@ test('YouTube channels are allowlisted and malformed dates stay readable', () =>
   assert.equal(formatPublishedDate(''), 'Unknown date');
 });
 
-test('YouTube proxy and Worker fail closed without public mutation endpoints', () => {
+test('YouTube proxy fails closed and the retired standalone Worker stays absent', () => {
   const amvRoutePath = path.join(__dirname, '..', 'src/app/api/amv-editing/route.ts');
   assert.equal(fs.existsSync(amvRoutePath), false, 'Deprecated /api/amv-editing route should be removed');
   const youtubeRoute = fs.readFileSync(path.join(__dirname, '..', 'src/app/api/youtube/route.ts'), 'utf8');
-  const worker = fs.readFileSync(path.join(__dirname, '..', 'youtube-apis-fetcher.js'), 'utf8');
   assert.match(youtubeRoute, /status: 502/);
   assert.doesNotMatch(youtubeRoute, /export async function POST/);
-  assert.match(worker, /PORTFOLIO_API_SECRET/);
-  assert.match(worker, /ALLOWED_CHANNEL_IDS/);
-  assert.doesNotMatch(worker, /api\/analytics\/track|api\/cache\/clear|api\/youtube\/video-details/);
-  assert.doesNotMatch(worker, /Access-Control-Allow-Origin['"]:\s*['"]\*['"]/);
+  const workerPath = path.join(__dirname, '..', 'youtube-apis-fetcher.js');
+  assert.equal(fs.existsSync(workerPath), false, 'Retired standalone Worker must not silently return');
+});
+
+test('art records normalize Strapi v4/v5 media and never invent CMS content', async () => {
+  const fields = {
+    title: 'Study', slug: 'study', alt_text: '', date_created: '2026-01-02',
+    description: '<p>Safe</p><script>bad()</script>', is_featured: true,
+    createdAt: '2026-01-02T00:00:00.000Z', updatedAt: '2026-01-03T00:00:00.000Z',
+  };
+  const media = { url: '/uploads/study.jpg', width: 900, height: 1200, alternativeText: 'CMS alt' };
+  for (const record of [
+    { id: 7, documentId: 'doc-7', ...fields, image: media },
+    { id: 7, documentId: 'doc-7', attributes: { ...fields, image: { data: { attributes: media } } } },
+  ]) {
+    const art = load('src/lib/server/art-data.ts', {
+      '@/lib/strapi/client': { fetchFromStrapi: async () => ({ data: { data: [record], meta: { pagination: { total: 1, pageCount: 1 } } }, error: null }) },
+    });
+    const result = await art.getArtPieces({ pageSize: 1 });
+    assert.equal(result.arts[0].width, 900);
+    assert.equal(result.arts[0].height, 1200);
+    assert.equal(result.arts[0].altText, 'CMS alt');
+    assert.equal(result.arts[0].description.includes('<script>'), false);
+  }
+
+  const empty = load('src/lib/server/art-data.ts', {
+    '@/lib/strapi/client': { fetchFromStrapi: async () => ({ data: { data: [], meta: { pagination: { total: 0, pageCount: 0 } } }, error: null }) },
+  });
+  assert.deepEqual((await empty.getArtPieces()).arts, []);
+  assert.equal(await empty.getArtPieceBySlug('silent-reverie-in-graphite'), null);
+
+  const offline = load('src/lib/server/art-data.ts', {
+    '@/lib/strapi/client': { fetchFromStrapi: async () => ({ data: null, error: 'offline' }) },
+  });
+  await assert.rejects(offline.getArtPieces(), /offline/);
+});
+
+test('art API rejects malformed and excessive pagination before reaching the CMS', async () => {
+  let calls = 0;
+  const { GET } = load('src/app/api/art/route.ts', {
+    'next/server': {
+      NextResponse: { json: (data, options = {}) => ({ data, status: options.status ?? 200, headers: options.headers }) },
+    },
+    '@/lib/server/art-data': {
+      getArtPieces: async () => { calls += 1; return { arts: [], total: 0, pageCount: 0, page: 1 }; },
+      getArtPieceBySlug: async () => null,
+    },
+  });
+  for (const query of ['page=Infinity', 'page=-1', 'page=10001', 'pageSize=101', 'pageSize=2.5']) {
+    const response = await GET({ nextUrl: new URL(`https://example.test/api/art?${query}`) });
+    assert.equal(response.status, 400);
+  }
+  assert.equal(calls, 0);
 });

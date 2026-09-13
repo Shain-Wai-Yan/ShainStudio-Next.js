@@ -9,6 +9,7 @@
     "marketingInMotion": "Marketing in Motion",
     "codingProjects": "Coding Projects",
     "photography": "Photography",
+    "pencilArt": "Pencil Art",
     "amvEditing": "AMV Editing",
     "gaming": "Gaming",
     "certificate": "Certificate",
@@ -273,6 +274,40 @@
       "home": "Home",
       "portfolio": "Portfolio",
       "photography": "Photography"
+    }
+  },
+  "pencilArt": {
+    "title": "Pencil Art",
+    "subtitle": "Original Artwork & Sketchbook Showcase",
+    "description": "Original artwork, graphite drawings, and sketchbook studies crafted with fine attention to texture, depth, and shadow.",
+    "seo": {
+      "title": "Pencil Art Gallery | Shain Studio",
+      "description": "Explore Shain Wai Yan's pencil art gallery featuring original sketchbook drawings, graphite studies, and classical artwork.",
+      "openGraphTitle": "Pencil Art Gallery | Shain Studio",
+      "openGraphDesc": "Minimalist art gallery showcasing original pencil sketches and drawings by Shain Wai Yan."
+    },
+    "labels": {
+      "eyebrow": "ORIGINAL ARTWORK",
+      "pressToView": "Press to view details",
+      "aboutPiece": "ABOUT THE PIECE",
+      "dateCreated": "Created",
+      "medium": "Medium",
+      "defaultMedium": "Graphite on archival paper",
+      "viewOriginal": "Inspect Fullscreen",
+      "copyLink": "Share Artwork",
+      "copied": "Link Copied!",
+      "close": "Close",
+      "empty": "No artwork found in this collection.",
+      "backToGallery": "Back to Gallery",
+      "viewStandalone": "Open standalone page",
+      "artworkCount": "Works",
+      "dimensions": "Dimensions",
+      "featuredBadge": "Featured Piece"
+    },
+    "breadcrumbs": {
+      "home": "Home",
+      "beyondWork": "Beyond Work",
+      "pencilArt": "Pencil Art"
     }
   },
   "amvEditing": {

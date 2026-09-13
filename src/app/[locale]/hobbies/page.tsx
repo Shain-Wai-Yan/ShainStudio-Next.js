@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { DEFAULT_LOCALE, isSupportedLocale } from '@/lib/locales';
 import { DEFAULT_OG_IMAGE, SITE_URL } from '@/lib/seo';
 import { getPhotography, repository } from '@/lib/server/photography-data';
+import { getArtPieces } from '@/lib/server/art-data';
 import { YOUTUBE_CHANNELS } from '@/lib/youtube-channels';
 import { getYouTubeWorkerHeaders, getYouTubeWorkerUrl } from '@/lib/server/youtube-worker';
 import HobbiesPursuitList, { type PursuitItem } from '@/components/hobbies/HobbiesPursuitList';
@@ -33,15 +34,22 @@ const copy = {
       description:
         'Capturing moments, places, natural light, and the quiet details I wanted to remember across Taunggyi, Inle Lake, Yangon, and travels.',
     },
-    amv: {
+    pencilArt: {
       number: '02',
+      title: 'Pencil Art',
+      category: 'Original Sketchbook & Drawings',
+      description:
+        'Original graphite artwork, classical studies, and sketchbook drawings exploring volumetric shadow and delicate contouring.',
+    },
+    amv: {
+      number: '03',
       title: 'AMV Editing',
       category: 'Motion & Music Cuts',
       description:
         'Rhythm, emotion, and stories reshaped through music and video cuts. A personal creative outlet exploring pacing and kinetic timing.',
     },
     gaming: {
-      number: '03',
+      number: '04',
       title: 'Gaming',
       category: 'Playthroughs & Guides',
       description:
@@ -72,15 +80,22 @@ const copy = {
       description:
         '记录东枝、茵莱湖、仰光及旅途中的自然风光、城市建筑与宁静光影，留存那些值得记住的细节。',
     },
-    amv: {
+    pencilArt: {
       number: '02',
+      title: '铅笔画',
+      category: '手绘素描与速写画册',
+      description:
+        '纯手工石墨铅笔画、古典习作与速写画册作品，探索明暗光影深度与细腻线条肌理。',
+    },
+    amv: {
+      number: '03',
       title: 'AMV 编辑',
       category: '动漫视频与节拍剪辑',
       description:
         '用音乐与动态影像重新编排节律与情绪，出于个人对音乐卡点与画面节奏的热爱与探索。',
     },
     gaming: {
-      number: '03',
+      number: '04',
       title: '游戏',
       category: '实况与攻略',
       description:
@@ -224,6 +239,24 @@ async function getDynamicHobbyData(locale: string) {
     console.warn('[HobbiesPage] YouTube stats fetch fallback:', error);
   }
 
+  // 3. Fetch art piece count and featured art preview
+  let artTotal = 0;
+  let featuredArtImage = '/images/hero-statue-clean.webp';
+  let featuredArtTitle = locale === 'zh' ? '铅笔画' : 'Pencil Art';
+
+  try {
+    const artFeed = await getArtPieces({ pageSize: 1 });
+    if (artFeed.total > 0) {
+      artTotal = artFeed.total;
+    }
+    if (artFeed.arts[0]) {
+      featuredArtImage = artFeed.arts[0].image;
+      featuredArtTitle = artFeed.arts[0].title;
+    }
+  } catch (error) {
+    console.warn('[HobbiesPage] Art data fetch fallback:', error);
+  }
+
   return {
     photoTotal,
     collectionCount,
@@ -233,6 +266,9 @@ async function getDynamicHobbyData(locale: string) {
     ytVideos,
     amvVideos,
     gamingVideos,
+    artTotal,
+    featuredArtImage,
+    featuredArtTitle,
   };
 }
 
@@ -275,6 +311,14 @@ export default async function HobbiesPage({ params }: Props) {
         locale === 'zh'
           ? `${data.featuredPhotoTitle} · 仰光`
           : `${data.featuredPhotoTitle} · Yangon`,
+    },
+    {
+      ...t.pencilArt,
+      href: `${basePath}/hobbies/pencil-art`,
+      accent: 'from-stone-600 to-zinc-400',
+      badge: `${data.artTotal} ${locale === 'zh' ? '件作品' : 'artworks'}`,
+      previewImage: data.featuredArtImage,
+      previewLabel: data.featuredArtTitle,
     },
     {
       ...t.amv,

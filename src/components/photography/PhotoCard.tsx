@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import CImage from '@/components/ui/CImage';
 import { Photo } from '@/lib/strapi/photography';
 
@@ -8,9 +9,10 @@ interface PhotoCardProps {
   photo: Photo;
   onClick: () => void;
   priority?: boolean;
+  language: 'en' | 'zh';
 }
 
-export function PhotoCard({ photo, onClick, priority = false }: PhotoCardProps) {
+export function PhotoCard({ photo, onClick, priority = false, language }: PhotoCardProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
 
@@ -20,18 +22,29 @@ export function PhotoCard({ photo, onClick, priority = false }: PhotoCardProps) 
   // image appears at its own size with no layout shift. Fallback keeps old 3:2.
   const imgWidth  = photo.width  ?? 600;
   const imgHeight = photo.height ?? 400;
+  const documentId = photo.documentId;
+  const detailHref = documentId
+    ? `${language === 'en' ? '' : `/${language}`}/hobbies/photography/photo/${documentId}`
+    : undefined;
+
+  const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    // Preserve native browser behavior for new-tab/window gestures. A regular
+    // click keeps the fast lightbox experience while the real href remains
+    // crawlable and available to users who want the dedicated photo page.
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    onClick();
+  };
 
   // ── Error / no image ────────────────────────────────────────────────────────
   if (!photo.image || hasError) {
     return (
-      <div
+      <Link
+        href={detailHref ?? '#'}
         // break-inside-avoid: critical for CSS columns — prevents this card
         // from being split across two columns
         className="break-inside-avoid mb-3 rounded-xl overflow-hidden cursor-pointer bg-gray-100 dark:bg-gray-800 border border-dashed border-gray-200 dark:border-gray-700 h-44 flex items-center justify-center group hover:border-[#191970]/30 dark:hover:border-[#ffd700]/30 transition-all duration-300"
-        onClick={onClick}
-        role="button"
-        tabIndex={0}
-        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onClick(); }}
+        onClick={detailHref ? handleClick : (event) => { event.preventDefault(); onClick(); }}
         aria-label={`View photo: ${photo.title}`}
       >
         <div className="text-center px-4">
@@ -42,13 +55,14 @@ export function PhotoCard({ photo, onClick, priority = false }: PhotoCardProps) 
           </svg>
           <p className="text-xs text-gray-400 dark:text-gray-500 line-clamp-2">{photo.title}</p>
         </div>
-      </div>
+      </Link>
     );
   }
 
   // ── Normal card ─────────────────────────────────────────────────────────────
   return (
-    <div
+    <Link
+      href={detailHref ?? '#'}
       className={[
         // break-inside-avoid is THE key CSS columns property.
         // Without it the browser can slice a card in half across columns.
@@ -60,10 +74,7 @@ export function PhotoCard({ photo, onClick, priority = false }: PhotoCardProps) 
       style={{
         boxShadow: '0 1px 8px rgba(25,25,112,0.07)',
       }}
-      onClick={onClick}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onClick(); }}
+      onClick={detailHref ? handleClick : (event) => { event.preventDefault(); onClick(); }}
       aria-label={`View photo: ${photo.title}`}
     >
       <CImage
@@ -121,6 +132,6 @@ export function PhotoCard({ photo, onClick, priority = false }: PhotoCardProps) 
           </span>
         </div>
       )}
-    </div>
+    </Link>
   );
 }

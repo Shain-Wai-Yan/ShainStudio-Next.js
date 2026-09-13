@@ -55,6 +55,7 @@ const Header = ({ translations }: { translations: Pick<Dictionary, 'nav'> }) => 
 
   const hobbyItems = [
     { href: `${basePath}/hobbies/photography`, label: translations.nav.photography },
+    { href: `${basePath}/hobbies/pencil-art`, label: translations.nav.pencilArt },
     { href: `${basePath}/hobbies/amv-editing`, label: translations.nav.amvEditing },
     { href: `${basePath}/hobbies/gaming`, label: translations.nav.gaming },
   ];

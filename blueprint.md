@@ -230,3 +230,115 @@ Following the component generalization under `video-channel/`, the API route nam
 3. **Removal of Deprecated Route:**
    - Deleted `src/app/api/amv-editing/route.ts` and its enclosing directory since all callers have transitioned to `/api/youtube`.
    - Updated `scripts/audit-regressions.cjs` Test 25 to assert that the deprecated route has been deleted and that `/api/youtube` handles fail-closed proxying with zero mutation endpoints.
+
+---
+
+## 11. Current Task: Minimalist Pencil Art Gallery Showcase (`/hobbies/pencil-art`)
+
+### Context & Goals
+1. **Strapi Integration:**
+   - Integrate collection type `arts` (`title`, `slug`, `image`, `alt_text`, `date_created`, `description` from `plugin::portfolio-editor.html`, `is_featured`).
+   - Explicit empty-state and CMS-error handling without publishing placeholder artwork as real content.
+2. **Minimalist Gallery Presentation (rogerhaus.com inspiration):**
+   - Single piece focus: centered artwork on clean museum wall canvas.
+   - No title on the gallery screen to keep the art pristine and uncluttered.
+   - Custom `< | | | 5 | | | | >` interactive pagination bar at the bottom with keyboard arrow navigation and mobile touch gestures.
+   - Luxurious pop-up exhibition dossier on click: micro typography subtitles, Playfair Display title, metadata pills, sanitized rich HTML description, high-res inspect zoom, and shareable link.
+   - Dedicated standalone detail page at `/[locale]/hobbies/pencil-art/[slug]` for deep-linking and SEO.
+3. **Navigation & Hub Integration:**
+   - Positioned directly under Photography in `Header.tsx` dropdown: Photography, Pencil Art, AMV Editing, Gaming.
+   - Added to `/hobbies` hub page as Pursuit `02 Pencil Art`.
+   - Localized in English and Chinese (`en.json`, `zh.json`).
+   - Added to `sitemap.ts`.
+
+---
+
+## 12. Current Task: Refined Minimalist Editorial Artwork View (`PencilArtDetailView.tsx`)
+
+### Context & Goals
+Based on user feedback, refined the artwork presentation:
+1. **Layout Alignment:**
+   - Art portrait showcase positioned on the **Left** in a clean, frame-like small white box (`p-3 sm:p-5 md:p-6 bg-white dark:bg-[#12131c] rounded-sm shadow-[0_20px_50px_-15px_rgba(0,0,0,0.14)]`) without oversized or nested box containers.
+   - Text details positioned on the **Right** (`lg:col-span-5`).
+2. **Typographic Cleansing & Mini-Text Editorial Elegance:**
+   - **Removed unnecessary texts:** Deleted subtitle ("Shain Wai Yan · Graphite on Archival Paper · Sketchbook Study"), deleted `EDITION / Original Study 1/1`, deleted `/ CATALOGUE DOSSIER`, deleted `CURATORIAL STATEMENT & ESSAY`, and deleted `AUTHENTICATED STUDIO ARCHIVE / SHAIN STUDIO · MMXVI`.
+   - **Streamlined Metadata:** Retained only `Created` and `Medium` with refined, smaller typography (`text-[9px] uppercase tracking-widest` label, `text-[11px]` value).
+   - **Preserved & Elevated Big Capital Drop Cap:** Kept the prominent serif drop cap letter on the first paragraph (`float-left text-4xl font-serif leading-none mr-2.5 text-[#191970] dark:text-amber-300 font-semibold`).
+   - **Editorial Mini-Text:** Styled the description as clean, luxurious mini-text (`text-xs sm:text-[13px] leading-[1.85] tracking-[0.01em] text-neutral-600 dark:text-neutral-300`).
+   - **Eliminated Ugly Clutter Lines:** Removed all vertical left accent lines and dashed border lines, keeping only the clean, subtle top/bottom borders on metadata and before next/prev piece navigation.
+3. **Modal Parity (`PencilArtGallery.tsx`):**
+   - Applied matching clean mini-text, smaller metadata, and drop cap styling in the quick-view gallery modal.
+
+### Verification
+- Run `npm run lint` and `npm test` to ensure zero regressions.
+- Capture browser preview with `browser_subagent` to visually confirm clean, luxurious aesthetic.
+
+---
+
+## 13. Current Task: Direct Individual Artwork Navigation & Gallery Simplification (`PencilArtGallery.tsx`)
+
+### Context & Goals
+The user requested removing the preview card popup modal and the "Press to view details" notification pill from the main gallery carousel (`/hobbies/pencil-art`):
+1. **Remove "Press to view details" Notification:** Eliminate the hover/press pill overlay on the carousel image for a clean, museum-grade aesthetic.
+2. **Remove Modal Preview Card:** Remove the intermediate modal popup (`isModalOpen`) entirely.
+3. **Direct Navigation:** Clicking any artwork in the gallery carousel navigates directly to its dedicated individual artwork page (`/[locale]/hobbies/pencil-art/[slug]`).
+4. **Preserve Gallery Controls:** Keep smooth `< | | | 5 | | | | >` interactive pagination bar, keyboard arrow navigation, and mobile swipe gestures.
+
+### Action Steps
+1. **Update `PencilArtGallery.tsx`:**
+   - Wrap artwork display inside Next.js `<Link href="...">` to the individual artwork page.
+   - Delete the `pressToView` prompt pill.
+   - Delete the modal dialog (`isModalOpen`) and unused modal state/handlers.
+2. **Verify:**
+   - Run `npm run lint` and `npm test`.
+   - Test navigation via browser subagent to verify clicking artwork leads directly to the individual page.
+
+---
+
+## 14. Current Task: Desktop Gallery Left Bar with Artist Signature & Dynamic Drawing List (`PencilArtGallery.tsx`)
+
+### Context & Goals
+The main pencil art gallery (`/hobbies/pencil-art`) had an empty left side on desktop, leaving the framed artwork centered in large whitespace. Inspired by high-end contemporary artist portfolio websites (such as Roger Haus at `rogerhaus.com`), the user requested:
+1. **Desktop Left Bar / Rail:** Add a dedicated left bar on desktop (`lg:`) to balance the gallery composition.
+2. **Authentic Curvy Artist Signature Typography:** Render the artist's name ("Shain Wai Yan") in a cursive signature typography, paired with a handcrafted calligraphic ink brush signature emblem.
+3. **Dynamically Rendered Drawing List:** A curated exhibition list on the left side populated directly from `arts` data with index numbers (`01`, `02`...) and drawing titles.
+4. **Interactive Two-Way Synchronization:** Clicking any drawing in the list immediately loads it into the main frame, and changes made via the `< 1 | 2 | 3 >` pagination bar or keyboard arrows update the active item in the left rail in real time.
+5. **Editorial Links & Actions:** Direct action link to view the piece's individual detail page (`VIEW DETAILS ↗`) and return to the creative studio (`← BEYOND WORK`).
+
+### Action Plan
+1. **Google Font & Tailwind Tokens:**
+   - Import `Alex_Brush` from `next/font/google` in `src/app/[locale]/layout.tsx` as `--font-signature`.
+   - Extend `tailwind.config.ts` and `src/app/globals.css` with the `font-signature` family token.
+2. **Update `PencilArtGallery.tsx`:**
+   - Restructure desktop layout with a dedicated left rail (`hidden lg:flex flex-col justify-between w-64 xl:w-72`).
+   - Implement the artist signature header with ink-stroke SVG mark and curvy typography.
+   - Render the dynamic drawing checklist with interactive active and hover states.
+   - Synchronize with the center artwork frame and bottom pagination bar.
+3. **Verification:**
+   - Run `npm run lint`, `npx tsc --noEmit`, and `npm test`.
+   - Use browser subagent to verify visual aesthetics, signature font rendering, and list click interactions on desktop.
+
+---
+
+## 15. Current Task: Code-Generated Organic Contour Background Pattern (`ArtGalleryBackground.tsx`)
+
+### Context & Goals
+The user requested a theme-aware decorative background pattern behind the artworks on the Art Gallery page (`/hobbies/pencil-art`), based on ideas explored in discussion (organic flowing lines, abstract pencil strokes, topographic contours).
+Specific constraints:
+1. **Strict Scoping to Gallery Only:** The pattern must appear ONLY in the gallery exhibition section behind the artwork and controls, and NOT behind the left sketchbook sidebar (`<aside>`).
+2. **Pure Code Generation:** No external image files (PNG, JPG, SVG asset files). Generated entirely with React SVG JSX, CSS gradients, and vector paths.
+3. **Theme Awareness:**
+   - Light Mode: Subtle graphite/charcoal contour curves (`stroke-neutral-900/[0.06]`) on warm gallery background.
+   - Dark Mode: Luminous silver-graphite and warm champagne/amber contour curves (`dark:stroke-white/[0.08]` and `dark:stroke-amber-400/[0.06]`) on deep midnight background.
+4. **Subtle & Atmospheric:** 3%–8% opacity with soft radial vignette edge falloff so it never distracts from the framed drawings.
+5. **Responsive & Dynamic:** Expands gracefully when the sidebar collapses/unhides, and centers behind the artwork on mobile.
+
+### Action Plan
+1. **Create `src/components/art/ArtGalleryBackground.tsx`:**
+   - Multi-layer procedural SVG with undulating bezier contour curves, delicate dashed accent paths, and ambient radial glow.
+   - Radial vignette mask (`mask-image: radial-gradient(...)`) ensuring smooth edge falloff.
+2. **Integrate into `PencilArtGallery.tsx`:**
+   - Embed `<ArtGalleryBackground />` as an `absolute inset-0 pointer-events-none -z-0 overflow-hidden` backdrop strictly inside the Center Artwork Column.
+   - Ensure the left `<aside>` sidebar is unmarred by any background patterns.
+3. **Verification:**
+   - Run `npx tsc --noEmit`, `npm run lint`, and `npm test`.

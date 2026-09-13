@@ -9,6 +9,7 @@
     "marketingInMotion": "营销实战",
     "codingProjects": "编程项目",
     "photography": "摄影",
+    "pencilArt": "铅笔画",
     "amvEditing": "AMV编辑",
     "gaming": "游戏",
     "certificate": "证书",
@@ -273,6 +274,40 @@
       "home": "首页",
       "portfolio": "作品集",
       "photography": "摄影"
+    }
+  },
+  "pencilArt": {
+    "title": "铅笔画",
+    "subtitle": "手绘素描与速写画册展",
+    "description": "纯手工纸本素描、石墨手绘与速写画册作品，探索明暗光影、质感肌理与古典雕塑美学。",
+    "seo": {
+      "title": "铅笔画展厅 | 明元易工作室",
+      "description": "探索明元易（Shain Wai Yan）的原创铅笔画与素描手绘作品集，包含古典素描、光影习作与画册速写。",
+      "openGraphTitle": "铅笔画展厅 | 明元易工作室",
+      "openGraphDesc": "极简在线画廊，收录明元易原创铅笔手绘与纸本素描作品。"
+    },
+    "labels": {
+      "eyebrow": "原创手绘作品",
+      "pressToView": "点击查看作品详情",
+      "aboutPiece": "作品详情",
+      "dateCreated": "创作时间",
+      "medium": "媒介质地",
+      "defaultMedium": "档案级棉浆纸 / 石墨铅笔",
+      "viewOriginal": "查看高精原图",
+      "copyLink": "分享作品",
+      "copied": "链接已复制！",
+      "close": "关闭",
+      "empty": "当前暂无作品展示。",
+      "backToGallery": "返回画廊",
+      "viewStandalone": "打开独立页面",
+      "artworkCount": "件作品",
+      "dimensions": "画幅尺寸",
+      "featuredBadge": "精选佳作"
+    },
+    "breadcrumbs": {
+      "home": "首页",
+      "beyondWork": "工作之外",
+      "pencilArt": "铅笔画"
     }
   },
   "amvEditing": {

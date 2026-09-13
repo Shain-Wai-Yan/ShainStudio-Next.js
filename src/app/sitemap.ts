@@ -1,6 +1,7 @@
 import { MetadataRoute } from 'next';
 import { fetchFromStrapi } from '@/lib/strapi/client';
 import { repository as photographyRepository } from '@/lib/server/photography-data';
+import { getArtPieces } from '@/lib/server/art-data';
 
 const SITE_URL = 'https://www.shainwaiyan.com';
 
@@ -54,6 +55,7 @@ const staticRoutes = {
     { path: '/hobbies/amv-editing', priority: 0.6, changeFrequency: 'monthly' as const },
     { path: '/hobbies/gaming', priority: 0.6, changeFrequency: 'monthly' as const },
     { path: '/hobbies/photography', priority: 0.7, changeFrequency: 'monthly' as const },
+    { path: '/hobbies/pencil-art', priority: 0.7, changeFrequency: 'monthly' as const },
     // /privacy and /terms are intentionally noindex — keep them out of the sitemap
   ],
   // English portfolio pages
@@ -242,6 +244,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error('[Sitemap] Failed to fetch photography records:', error);
   }
 
+  let artPages: MetadataRoute.Sitemap = [];
+  try {
+    const artFeed = await getArtPieces({ pageSize: 100 });
+    artPages = artFeed.arts.map((piece) => ({
+      url: `${SITE_URL}/hobbies/pencil-art/${piece.slug}`,
+      lastModified: piece.updatedAt || piece.createdAt || piece.dateCreated,
+      changeFrequency: 'monthly' as const,
+      priority: 0.6,
+      images: [piece.image],
+    }));
+  } catch (error) {
+    console.error('[Sitemap] Failed to fetch artwork records:', error);
+  }
+
   // ── Combine all pages ─────────────────────────────────────────────────────
   const allPages = [
     ...staticPages,
@@ -249,6 +265,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...marketingPages,
     ...codingPages,
     ...photoPages,
+    ...artPages,
   ];
 
   console.log(`[Sitemap] Generated sitemap with ${allPages.length} URLs:`);
@@ -257,6 +274,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   console.log(`  - Marketing projects (EN only): ${marketingPages.length}`);
   console.log(`  - Coding projects (EN only): ${codingPages.length}`);
   console.log(`  - Photography details (EN only): ${photoPages.length}`);
+  console.log(`  - Pencil art details (EN only): ${artPages.length}`);
 
   return allPages;
 }

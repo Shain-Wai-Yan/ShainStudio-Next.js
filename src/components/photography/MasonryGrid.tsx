@@ -5,11 +5,11 @@ import { useWindowVirtualizer } from '@tanstack/react-virtual';
 import type { Photo } from '@/lib/strapi/photography';
 import { PhotoCard } from './PhotoCard';
 
-interface MasonryGridProps { photos: Photo[]; onPhotoClick: (photo: Photo) => void }
+interface MasonryGridProps { photos: Photo[]; onPhotoClick: (photo: Photo) => void; language: 'en' | 'zh' }
 const GAP = 12;
 const columnsForWidth = (width: number) => width < 640 ? 1 : width < 1024 ? 2 : width < 1280 ? 3 : 4;
 
-export function MasonryGrid({ photos, onPhotoClick }: MasonryGridProps) {
+export function MasonryGrid({ photos, onPhotoClick, language }: MasonryGridProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(0);
   const [scrollMargin, setScrollMargin] = useState(0);
@@ -52,7 +52,7 @@ export function MasonryGrid({ photos, onPhotoClick }: MasonryGridProps) {
         <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-3">
           {photos.map((photo, index) => (
             <div key={photo.documentId ?? photo.id ?? index} className="mb-3 break-inside-avoid">
-              <PhotoCard photo={photo} onClick={() => onPhotoClick(photo)} priority={index === 0} />
+              <PhotoCard photo={photo} onClick={() => onPhotoClick(photo)} priority={index === 0} language={language} />
             </div>
           ))}
         </div>
@@ -73,7 +73,7 @@ export function MasonryGrid({ photos, onPhotoClick }: MasonryGridProps) {
             className="absolute left-0 top-0"
             style={{ width: columnWidth, transform: `translate3d(${item.lane * (columnWidth + GAP)}px, ${item.start - scrollMargin}px, 0)` }}
           >
-            <PhotoCard photo={photo} onClick={() => onPhotoClick(photo)} priority={item.index === 0} />
+            <PhotoCard photo={photo} onClick={() => onPhotoClick(photo)} priority={item.index === 0} language={language} />
           </div>
         );
       })}
