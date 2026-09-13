@@ -119,11 +119,11 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
         <link rel="dns-prefetch" href="https://res.cloudinary.com" />
       </head>
       <body className="font-sans">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
+        />
         <ThemeProvider attribute="class" disableTransitionOnChange>
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
-          />
           <Header translations={{ nav: t.nav }} />
           <main className="min-h-screen">
             {children}
