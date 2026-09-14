@@ -359,3 +359,160 @@ test('art API rejects malformed and excessive pagination before reaching the CMS
   }
   assert.equal(calls, 0);
 });
+
+test('CMS detail routes use on-demand ISR without fetching content during builds', () => {
+  for (const [file, seconds] of [
+    ['src/app/[locale]/blog/[slug]/page.tsx', 300],
+    ['src/app/[locale]/hobbies/pencil-art/[slug]/page.tsx', 3600],
+    ['src/app/[locale]/portfolio/coding-projects/[slug]/page.tsx', 300],
+    ['src/app/[locale]/portfolio/marketing-in-motion/[slug]/page.tsx', 300],
+  ]) {
+    const source = fs.readFileSync(path.join(__dirname, '..', file), 'utf8');
+    assert.doesNotMatch(source, /force-dynamic/);
+    assert.match(source, /export function generateStaticParams\(\)\s*\{\s*return \[\];\s*\}/);
+    assert.match(source, new RegExp(`export const revalidate = ${seconds}`));
+  }
+});
+
+test('repository markdown is sanitized before either HTML rendering path', () => {
+  const source = fs.readFileSync(
+    path.join(__dirname, '..', 'src/components/coding-project/RepoViewer.tsx'),
+    'utf8',
+  );
+  assert.match(source, /sanitizeHtml\(html,/);
+  assert.match(source, /setRenderedHTML\(sanitizeMarkdownHtml\(html\)\)/);
+  assert.match(source, /setRenderedHTML\(sanitizeMarkdownHtml\(basicMarkdown\(text, isDark\)\)\)/);
+  assert.match(source, /allowedSchemesByTag:\s*\{\s*img:\s*\[['"]http['"], ['"]https['"]\]/);
+});
+
+test('CSP is enforced and production scripts cannot use eval', () => {
+  const source = fs.readFileSync(path.join(__dirname, '..', 'next.config.ts'), 'utf8');
+  assert.match(source, /key: ["']Content-Security-Policy["']/);
+  assert.doesNotMatch(source, /Content-Security-Policy-Report-Only/);
+  assert.match(source, /isDevelopment \? ["'] 'unsafe-eval'["'] : ['"]/);
+  for (const directive of ['object-src \'none\'', 'base-uri \'self\'', 'frame-ancestors \'self\'']) {
+    assert.equal(source.includes(directive), true);
+  }
+  assert.doesNotMatch(source, /["']upgrade-insecure-requests["']/);
+  assert.match(source, /isDevelopment \? ['"] ws: wss:/);
+});
+
+test('analytics vendors mount only after explicit or regional permission', () => {
+  const manager = fs.readFileSync(path.join(__dirname, '..', 'src/components/analytics/AnalyticsConsent.tsx'), 'utf8');
+  const layout = fs.readFileSync(path.join(__dirname, '..', 'src/app/[locale]/layout.tsx'), 'utf8');
+  assert.match(manager, /consent === ['"]granted['"]/);
+  assert.match(manager, /readAnalyticsConsent\(\)/);
+  assert.match(manager, /writeAnalyticsConsent\(nextConsent\)/);
+  assert.match(manager, /Clarity\.consent\(false\)/);
+  assert.match(manager, /removeAnalyticsCookies\(\)/);
+  assert.match(manager, /fetch\(['"]\/api\/analytics-region['"]/);
+  assert.match(manager, /sessionStorage/);
+  assert.doesNotMatch(layout, /<GoogleAnalytics|<ClarityAnalytics/);
+});
+
+test('analytics region detection requires consent in Europe and for unknown locations', () => {
+  const { GET } = load('src/app/api/analytics-region/route.ts', {
+    'next/server': {
+      NextResponse: { json: (data, options = {}) => ({ data, headers: options.headers }) },
+    },
+  });
+  const request = (country, continent) => ({ headers: new Headers({
+    ...(country ? { 'x-vercel-ip-country': country } : {}),
+    ...(continent ? { 'x-vercel-ip-continent': continent } : {}),
+  }) });
+  const previousNodeEnv = process.env.NODE_ENV;
+  process.env.NODE_ENV = 'production';
+  try {
+    assert.equal(GET(request('DE', 'EU')).data.consentRequired, true);
+    assert.equal(GET(request('GB', 'EU')).data.consentRequired, true);
+    assert.equal(GET(request('CH', 'EU')).data.consentRequired, true);
+    assert.equal(GET(request('US', 'NA')).data.consentRequired, false);
+    assert.equal(GET(request()).data.consentRequired, true);
+  } finally {
+    process.env.NODE_ENV = previousNodeEnv;
+  }
+});
+
+test('PDF viewer uses a same-origin worker and CSP permits Cloudinary document fetches', () => {
+  const viewer = fs.readFileSync(path.join(__dirname, '..', 'src/components/DocumentViewer.tsx'), 'utf8');
+  const config = fs.readFileSync(path.join(__dirname, '..', 'next.config.ts'), 'utf8');
+  assert.match(viewer, /new URL\(\s*['"]pdfjs-dist\/build\/pdf\.worker\.min\.mjs['"]/);
+  assert.doesNotMatch(viewer, /unpkg\.com/);
+  assert.match(config, /connect-src[^\n]+https:\/\/res\.cloudinary\.com/);
+  assert.match(config, /worker-src 'self' blob:/);
+});
+
+test('decorative textures do not depend on CSP-blocked Unsplash images', () => {
+  for (const file of [
+    'src/app/[locale]/contact/contact-form.tsx',
+    'src/components/certificates/VaultHero.tsx',
+  ]) {
+    const source = fs.readFileSync(path.join(__dirname, '..', file), 'utf8');
+    assert.doesNotMatch(source, /images\.unsplash\.com/);
+    assert.match(source, /radial-gradient/);
+  }
+});
+
+test('automatic regional analytics enables custom events without persisting travel-sensitive consent', () => {
+  const previousWindow = global.window;
+  const storage = (values = {}) => ({
+    getItem: key => Object.hasOwn(values, key) ? values[key] : null,
+    setItem: (key, value) => { values[key] = value; },
+  });
+  try {
+    global.window = {
+      localStorage: storage(),
+      sessionStorage: storage({ 'shain-studio:analytics-region:v1': 'automatic' }),
+    };
+    let consent = load('src/lib/analytics-consent.ts');
+    assert.equal(consent.readAnalyticsConsent(), null);
+    assert.equal(consent.readEffectiveAnalyticsConsent(), 'granted');
+
+    consent.updateGoogleAnalyticsConsent('denied');
+    consent.updateGoogleAnalyticsConsent('granted');
+    assert.deepEqual(global.window.dataLayer, [
+      ['consent', 'update', { analytics_storage: 'denied' }],
+      ['consent', 'update', { analytics_storage: 'granted' }],
+    ]);
+
+    global.window.localStorage.setItem(consent.ANALYTICS_CONSENT_KEY, 'denied');
+    consent = load('src/lib/analytics-consent.ts');
+    assert.equal(consent.readEffectiveAnalyticsConsent(), 'denied');
+
+    const trackedLink = fs.readFileSync(path.join(__dirname, '..', 'src/components/analytics/TrackedLink.tsx'), 'utf8');
+    assert.match(trackedLink, /readEffectiveAnalyticsConsent\(\) === ['"]granted['"]/);
+  } finally {
+    global.window = previousWindow;
+  }
+});
+
+test('contact and newsletter share one configurable production Worker URL', () => {
+  const contact = fs.readFileSync(path.join(__dirname, '..', 'src/app/[locale]/contact/contact-form.tsx'), 'utf8');
+  const newsletter = fs.readFileSync(path.join(__dirname, '..', 'src/components/blog/BlogHero.tsx'), 'utf8');
+  const workerUrl = fs.readFileSync(path.join(__dirname, '..', 'src/lib/form-worker.ts'), 'utf8');
+  const config = fs.readFileSync(path.join(__dirname, '..', 'next.config.ts'), 'utf8');
+  for (const source of [contact, newsletter]) {
+    assert.match(source, /FORM_WORKER_URL/);
+    assert.doesNotMatch(source, /form-collector\.shainwaiyan\.com/);
+    assert.doesNotMatch(source, /NEXT_PUBLIC_HUBSPOT_(PORTAL|FORM)_ID/);
+  }
+  assert.match(contact, /formType: ['"]contact['"]/);
+  assert.match(newsletter, /formType: ['"]newsletter['"]/);
+  assert.doesNotMatch(newsletter, /HUBSPOT_(PORTAL|FORM)_ID/);
+  assert.match(workerUrl, /NEXT_PUBLIC_CLOUDFLARE_WORKER_URL/);
+  assert.match(workerUrl, /https:\/\/form\.shainwaiyan\.com/);
+  assert.match(config, /formWorkerOrigin/);
+});
+
+test('contact message input enforces its documented 500-character limit', () => {
+  const contact = fs.readFileSync(path.join(__dirname, '..', 'src/app/[locale]/contact/contact-form.tsx'), 'utf8');
+  assert.match(contact, /<textarea[\s\S]*?name=['"]message['"][\s\S]*?maxLength=\{500\}/);
+});
+
+test('mobile footer keeps copyright and policy links on single compact lines', () => {
+  const footer = fs.readFileSync(path.join(__dirname, '..', 'src/components/Footer.tsx'), 'utf8');
+  assert.match(footer, /whitespace-nowrap text-\[clamp\(0\.5rem,2\.25vw,0\.7rem\)\]/);
+  assert.match(footer, /flex w-full md:w-auto items-center justify-center flex-nowrap/);
+  assert.match(footer, /text-\[clamp\(0\.48rem,2\.2vw,0\.7rem\)\] md:text-\[0\.7rem\]/);
+  assert.match(footer, /flex flex-col md:flex-row/);
+});

@@ -68,7 +68,7 @@ export function PhotoCard({ photo, onClick, priority = false, language }: PhotoC
         // Without it the browser can slice a card in half across columns.
         'break-inside-avoid',
         // Visual
-        'relative rounded-xl overflow-hidden cursor-pointer group',
+        'relative block rounded-xl overflow-hidden cursor-pointer group',
         'bg-gray-100 dark:bg-gray-800',
       ].join(' ')}
       style={{

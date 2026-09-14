@@ -452,7 +452,7 @@ export function PhotographyGallery({ language, initialFeed, initialCollections }
           <div ref={prefetchRef} className="h-px" aria-hidden="true" />
           <div ref={appendRef} className="h-px" aria-hidden="true" />
           <div className="flex min-h-24 items-center justify-center py-6">
-            {hasMore ? <button type="button" disabled={loadingMore} onClick={() => void appendNext(true)} className="rounded-full border border-[#191970]/30 bg-white px-6 py-2.5 text-sm font-semibold text-[#191970] transition hover:bg-[#191970] hover:text-white disabled:opacity-50 dark:border-[#ffd700]/40 dark:bg-gray-900 dark:text-[#ffd700] dark:hover:bg-[#ffd700] dark:hover:text-[#191970]">{loadingMore ? labels.loading : labels.more}</button> : <p className="text-xs text-gray-400">{total} {labels.results}</p>}
+            {hasMore ? <a href={`?page=${page + 1}`} aria-disabled={loadingMore} onClick={(event) => { event.preventDefault(); if (!loadingMore) void appendNext(true); }} className={`rounded-full border border-[#191970]/30 bg-white px-6 py-2.5 text-sm font-semibold text-[#191970] transition hover:bg-[#191970] hover:text-white dark:border-[#ffd700]/40 dark:bg-gray-900 dark:text-[#ffd700] dark:hover:bg-[#ffd700] dark:hover:text-[#191970] ${loadingMore ? 'pointer-events-none opacity-50' : ''}`}>{loadingMore ? labels.loading : labels.more}</a> : <p className="text-xs text-gray-400">{total} {labels.results}</p>}
           </div>
         </>
       )}

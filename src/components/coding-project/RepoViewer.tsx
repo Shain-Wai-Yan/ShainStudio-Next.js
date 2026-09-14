@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 
 import { RepoFile } from '@/lib/github-api';
 import { useTheme } from 'next-themes';
+import sanitizeHtml from 'sanitize-html';
 
 interface RepoViewerProps {
   repoName: string;
@@ -40,6 +41,34 @@ function getLang(name: string) {
 
 function escapeHtml(s: string) {
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function sanitizeMarkdownHtml(html: string): string {
+  return sanitizeHtml(html, {
+    allowedTags: [
+      'a', 'blockquote', 'br', 'code', 'del', 'em', 'h1', 'h2', 'h3', 'h4',
+      'h5', 'h6', 'hr', 'img', 'li', 'ol', 'p', 'pre', 'strong', 'table',
+      'tbody', 'td', 'th', 'thead', 'tr', 'ul',
+    ],
+    allowedAttributes: {
+      a: ['href', 'title', 'target', 'rel', 'style'],
+      code: ['class', 'style'],
+      h1: ['style'], h2: ['style'], h3: ['style'], h4: ['style'], h5: ['style'], h6: ['style'],
+      img: ['src', 'alt', 'title', 'width', 'height', 'style'],
+      blockquote: ['style'], br: ['style'], hr: ['style'], li: ['style'],
+      ol: ['style'], p: ['style'], pre: ['style'], table: ['style'],
+      tbody: ['style'], td: ['style'], th: ['style'], thead: ['style'], tr: ['style'], ul: ['style'],
+    },
+    allowedSchemes: ['http', 'https', 'mailto'],
+    allowedSchemesByTag: { img: ['http', 'https'] },
+    allowProtocolRelative: false,
+    transformTags: {
+      a: (_tagName, attribs) => ({
+        tagName: 'a',
+        attribs: { ...attribs, target: '_blank', rel: 'noopener noreferrer' },
+      }),
+    },
+  });
 }
 
 /** Properly decode GitHub's base64 — preserves UTF-8 emojis & CJK */
@@ -193,7 +222,7 @@ export function RepoViewer({ repoName, defaultBranch = 'main', onClose }: RepoVi
     if (win.marked) {
       win.marked.use({ gfm: true, breaks: true });
       const html: string = await win.marked.parse(text);
-      setRenderedHTML(html);
+      setRenderedHTML(sanitizeMarkdownHtml(html));
       setTimeout(() => {
         if (win.hljs && contentRef.current) {
           contentRef.current.querySelectorAll('pre code').forEach((block) => {
@@ -203,7 +232,7 @@ export function RepoViewer({ repoName, defaultBranch = 'main', onClose }: RepoVi
         }
       }, 80);
     } else {
-      setRenderedHTML(basicMarkdown(text, isDark));
+      setRenderedHTML(sanitizeMarkdownHtml(basicMarkdown(text, isDark)));
     }
   };
 

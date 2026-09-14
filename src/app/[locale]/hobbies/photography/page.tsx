@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { Breadcrumb } from '@/components/Breadcrumb';
 import { PhotographyGallery } from '@/components/photography/PhotographyGallery';
 import { getDictionary } from '@/lib/getDictionary'; // ✅ Use async
@@ -10,6 +9,7 @@ import type { PhotoCollection, PhotoFeedPage, PhotographyLocale } from '@/lib/st
 
 interface PhotographyPageProps {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ page?: string }>;
 }
 
 export const revalidate = 3600;
@@ -63,22 +63,20 @@ export default async function PhotographyPage(props: PhotographyPageProps) {
     { label: t.photography.breadcrumbs.photography, href: `${basePath}/hobbies/photography` },
   ];
 
+  const { page: rawPage } = await props.searchParams;
+  const parsedPage = Number.parseInt(rawPage ?? '1', 10);
+  const initialPage = Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1;
+
   let initialFeed: PhotoFeedPage = { photos: [], page: 1, pageCount: 0, total: 0, hasMore: false };
   let initialCollections: PhotoCollection[] = [];
-  let archivePhotos: Awaited<ReturnType<typeof repository.getSitemapPhotos>> = [];
 
   try {
-    const [feedData, collectionsData, archiveData] = await Promise.all([
-      repository.getFeed({ page: 1, pageSize: 24, seed: 0, language: locale as PhotographyLocale }),
+    const [feedData, collectionsData] = await Promise.all([
+      repository.getFeed({ page: initialPage, pageSize: 24, seed: 0, language: locale as PhotographyLocale }),
       repository.getCollections(locale as PhotographyLocale),
-      repository.getSitemapPhotos().catch((error) => {
-        console.error('[Photography SSR] Failed to build photo archive:', error);
-        return [];
-      }),
     ]);
     initialFeed = feedData;
     initialCollections = collectionsData;
-    archivePhotos = archiveData;
   } catch (error) {
     console.error('[Photography SSR] Failed to pre-fetch initial data:', error);
   }
@@ -103,28 +101,6 @@ export default async function PhotographyPage(props: PhotographyPageProps) {
           initialFeed={initialFeed}
           initialCollections={initialCollections}
         />
-
-        {archivePhotos.length > 0 && (
-          <nav className="mt-12 border-t border-gray-200 pt-8 dark:border-gray-800" aria-label={locale === 'zh' ? '摄影作品索引' : 'Photography archive'}>
-            <details className="group rounded-2xl border border-gray-200 bg-white px-5 py-4 dark:border-gray-800 dark:bg-gray-900">
-              <summary className="cursor-pointer text-sm font-semibold text-[#191970] marker:text-gray-400 dark:text-[#ffd700]">
-                {locale === 'zh' ? `浏览全部 ${archivePhotos.length} 幅摄影作品` : `Browse all ${archivePhotos.length} photographs`}
-              </summary>
-              <ul className="mt-5 grid gap-x-6 gap-y-2 sm:grid-cols-2 lg:grid-cols-3">
-                {archivePhotos.map((photo) => photo.documentId && (
-                  <li key={photo.documentId}>
-                    <Link
-                      href={`${basePath}/hobbies/photography/photo/${photo.documentId}`}
-                      className="text-sm text-gray-600 underline-offset-4 hover:text-[#191970] hover:underline dark:text-gray-300 dark:hover:text-[#ffd700]"
-                    >
-                      {photo.title}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </details>
-          </nav>
-        )}
       </div>
     </main>
   );

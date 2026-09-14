@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { FaLinkedin, FaGithub, FaYoutube, FaEnvelope } from 'react-icons/fa';
 import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
 import type { Dictionary } from '@/lib/getDictionary';
+import { OPEN_ANALYTICS_SETTINGS_EVENT } from '@/lib/analytics-consent';
 
 /* ─── animated verbs ──────────────────────────────────────────────────── */
 const VERB_INTERVAL = 2200; // ms between swaps
@@ -212,18 +213,26 @@ const Footer = ({ t }: { t: Pick<Dictionary, 'footer'> }) => {
       </button>
 
       {/* ── BOTTOM BAR ────────────────────────────────────────────── */}
-      <div className="px-6 md:px-[5vw]">
-        <div className="flex items-center justify-between py-[1.2rem] px-[2rem] flex-wrap gap-3 bg-white rounded-t-[16px] transition-colors duration-300">
-          <p className="text-[0.7rem] text-[#333333] m-0 tracking-[0.05em] uppercase font-medium transition-colors duration-300">
+      <div className="px-2 sm:px-6 md:px-[5vw]">
+        <div className="flex flex-col md:flex-row items-center md:justify-between py-[1.2rem] px-2 sm:px-4 md:px-[2rem] flex-nowrap gap-2 md:gap-3 bg-white rounded-t-[16px] transition-colors duration-300">
+          <p className="whitespace-nowrap text-[clamp(0.5rem,2.25vw,0.7rem)] md:text-[0.7rem] text-[#333333] m-0 tracking-[0.025em] md:tracking-[0.05em] uppercase font-medium transition-colors duration-300">
             &copy; {currentYear} Shain Studio.&nbsp;{t.footer.allRightsReserved}
           </p>
 
-          <div className="flex items-center gap-2.5">
-            <Link href={`${basePath}/privacy`} className="text-[0.7rem] text-[#333333] no-underline uppercase tracking-[0.06em] font-medium transition-colors duration-300 hover:text-[#191970]">
+          <div className="flex w-full md:w-auto items-center justify-center flex-nowrap gap-1 sm:gap-2 md:gap-2.5 whitespace-nowrap">
+            <Link href={`${basePath}/privacy`} className="text-[clamp(0.48rem,2.2vw,0.7rem)] md:text-[0.7rem] text-[#333333] no-underline uppercase tracking-[0.02em] md:tracking-[0.06em] font-medium transition-colors duration-300 hover:text-[#191970]">
               {t.footer.privacyPolicy}
             </Link>
-            <span className="text-[#aaaaaa] text-[0.75rem] transition-colors duration-300">\</span>
-            <Link href={`${basePath}/terms`} className="text-[0.7rem] text-[#333333] no-underline uppercase tracking-[0.06em] font-medium transition-colors duration-300 hover:text-[#191970]">
+            <span className="text-[#aaaaaa] text-[clamp(0.5rem,2.2vw,0.75rem)] md:text-[0.75rem] transition-colors duration-300">\</span>
+            <button
+              type="button"
+              onClick={() => window.dispatchEvent(new Event(OPEN_ANALYTICS_SETTINGS_EVENT))}
+              className="text-[clamp(0.48rem,2.2vw,0.7rem)] md:text-[0.7rem] text-[#333333] uppercase tracking-[0.02em] md:tracking-[0.06em] font-medium transition-colors duration-300 hover:text-[#191970]"
+            >
+              {locale === 'zh' ? '隐私设置' : 'Privacy settings'}
+            </button>
+            <span className="text-[#aaaaaa] text-[clamp(0.5rem,2.2vw,0.75rem)] md:text-[0.75rem] transition-colors duration-300">\</span>
+            <Link href={`${basePath}/terms`} className="text-[clamp(0.48rem,2.2vw,0.7rem)] md:text-[0.7rem] text-[#333333] no-underline uppercase tracking-[0.02em] md:tracking-[0.06em] font-medium transition-colors duration-300 hover:text-[#191970]">
               {t.footer.termsOfService}
             </Link>
           </div>

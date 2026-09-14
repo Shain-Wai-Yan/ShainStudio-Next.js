@@ -5,7 +5,6 @@ import { notFound } from 'next/navigation';
 import type { MarketingProject } from '@/lib/strapi/marketing-in-motion';
 import {
   getMarketingProject,
-  getMarketingProjects,
   getRelatedMarketingProjects,
 } from '@/lib/server/project-data';
 import ProjectHeader from '@/components/marketing-in-motion/ProjectHeader';
@@ -17,19 +16,11 @@ import { getDictionary } from '@/lib/getDictionary';
 import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
 import { DEFAULT_OG_IMAGE, PERSON_ID, SITE_URL, brandedTitle, personRef, safeCanonicalUrl } from '@/lib/seo';
 
-export const revalidate = 3600; // Revalidate every hour
-export const dynamicParams = true; // Allow new projects to be fetched at runtime
-
-export async function generateStaticParams() {
-  const { projects } = await getMarketingProjects(1, 100);
-  const locales = ['en', 'zh'];
-
-  return locales.flatMap((locale) =>
-    projects.map((project) => ({
-      locale,
-      slug: project.slug,
-    }))
-  );
+// Build no CMS detail pages up front. Each slug is generated on first request,
+// cached, and refreshed with ISR without making deployments depend on Strapi.
+export const revalidate = 300;
+export function generateStaticParams() {
+  return [];
 }
 
 interface MarketingProjectPageProps {
@@ -86,8 +77,6 @@ export async function generateMetadata(
     },
   };
 }
-
-// ✅ KEEP DYNAMIC (no force-static)
 
 export default async function MarketingProjectPage(
   props: MarketingProjectPageProps

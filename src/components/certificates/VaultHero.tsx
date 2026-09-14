@@ -107,7 +107,7 @@ export function VaultHero({ certificates, dictionary, onCardClick }: VaultHeroPr
     >
       {/* Background Plaster Noise Texture Overlay */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0)_0%,rgba(0,0,0,0.03)_100%)] pointer-events-none" />
-      <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.015] bg-repeat pointer-events-none bg-[url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=400&q=20')]" />
+      <div className="absolute inset-0 opacity-[0.08] dark:opacity-[0.04] bg-[radial-gradient(circle,rgba(25,25,112,0.22)_0.5px,transparent_0.7px)] bg-[length:4px_4px] pointer-events-none" />
 
       {/* Modern Technical Blueprint Grid Lines */}
       <div className="absolute inset-x-0 top-12 h-[1px] bg-stone-900/10 dark:bg-stone-100/5 editorial-grid-line pointer-events-none" />

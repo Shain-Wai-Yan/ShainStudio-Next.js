@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { FORM_WORKER_URL } from '@/lib/form-worker';
 
 interface BlogHeroProps {
   title: string;
@@ -9,11 +10,6 @@ interface BlogHeroProps {
 }
 
 type FormStep = 'email' | 'name' | 'loading' | 'success' | 'error';
-
-// ── Exact values from your subscription-form.js ────────────────────────────
-const HUBSPOT_PORTAL_ID = '49395743';
-const HUBSPOT_FORM_ID   = '148e9cca-9066-40dc-8f56-2e4dbc0120d2';
-const WORKER_URL        = 'https://form.shainwaiyan.com';
 
 // ── Read hubspotutk cookie (matches vanilla getCookie helper) ──────────────
 function getHubspotCookie(): string | null {
@@ -30,12 +26,11 @@ async function submitViaWorker(
   firstName: string,
   lastName: string
 ): Promise<{ ok: boolean; message?: string }> {
-  const res = await fetch(WORKER_URL, {
+  const res = await fetch(FORM_WORKER_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
     body: JSON.stringify({
-      portalId: HUBSPOT_PORTAL_ID,
-      formId:   HUBSPOT_FORM_ID,
+      formType: 'newsletter',
       fields: [
         { name: 'email',     value: email },
         { name: 'firstname', value: firstName },

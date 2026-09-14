@@ -7,9 +7,8 @@ import { getHtmlLang, isSupportedLocale, DEFAULT_LOCALE } from "@/lib/locales";
 import { SITE_URL, SITE_NAME, DEFAULT_OG_IMAGE, LOGO_IMAGE, personJsonLd, websiteJsonLd } from "@/lib/seo";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { GoogleAnalytics } from '@next/third-parties/google';
 import SyntaxWidget from "@/components/syntax ai/SyntaxWidget";
-import ClarityAnalytics from "@/components/analytics/ClarityAnalytics";
+import AnalyticsConsentManager from '@/components/analytics/AnalyticsConsent';
 import { ThemeProvider } from "@/components/ThemeProvider";
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans', display: 'swap' });
@@ -130,10 +129,11 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
           </main>
           <Footer t={{ footer: t.footer }} />
           <SyntaxWidget />
-          {process.env.NODE_ENV === 'production' && <ClarityAnalytics />}
-          {process.env.NODE_ENV === 'production' && process.env.NEXT_PUBLIC_GA_ID && (
-            <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
-          )}
+          <AnalyticsConsentManager
+            locale={locale}
+            gaId={process.env.NEXT_PUBLIC_GA_ID}
+            clarityId={process.env.NEXT_PUBLIC_CLARITY_ID}
+          />
         </ThemeProvider>
       </body>
     </html>

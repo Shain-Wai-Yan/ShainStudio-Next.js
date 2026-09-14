@@ -11,20 +11,11 @@ interface ArtSlugPageProps {
   params: Promise<{ locale: string; slug: string }>;
 }
 
+// Build no CMS detail pages up front. Each slug is generated on first request,
+// cached, and refreshed with ISR without making deployments depend on Strapi.
 export const revalidate = 3600;
-export const dynamic = 'force-static';
-export const dynamicParams = true;
-
-export async function generateStaticParams() {
-  try {
-    const feed = await getArtPieces({ pageSize: 100 });
-    // Artwork content exists only in English in the CMS. Chinese detail URLs
-    // remain available with translated UI, but are generated on demand and noindexed.
-    return feed.arts.map((piece) => ({ locale: 'en', slug: piece.slug }));
-  } catch (error) {
-    console.error('[ArtPieceSlugPage] Unable to pre-render artwork slugs:', error);
-    return [];
-  }
+export function generateStaticParams() {
+  return [];
 }
 
 export async function generateMetadata({

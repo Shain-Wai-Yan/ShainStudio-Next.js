@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Clarity from '@microsoft/clarity';
 import { ReactNode, MouseEvent } from 'react';
+import { readEffectiveAnalyticsConsent } from '@/lib/analytics-consent';
 
 interface TrackedLinkProps {
   href: string;
@@ -26,10 +27,12 @@ export default function TrackedLink({
 }: TrackedLinkProps) {
   
   const handleClick = (e: MouseEvent<HTMLAnchorElement>) => {
-    try {
-      Clarity.event(eventName);
-    } catch (error) {
-      console.error('Failed to track Clarity event:', error);
+    if (readEffectiveAnalyticsConsent() === 'granted') {
+      try {
+        Clarity.event(eventName);
+      } catch (error) {
+        console.error('Failed to track Clarity event:', error);
+      }
     }
     
     // CRITICAL: Fire the original onClick if it was passed in

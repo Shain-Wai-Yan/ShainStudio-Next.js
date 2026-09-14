@@ -52,6 +52,7 @@ STRAPI_API_URL=https://your-strapi-url
 STRAPI_API_TOKEN=your-strapi-token
 STRAPI_REVALIDATION_SECRET=generate-a-long-random-secret
 GITHUB_TOKEN=your-github-token
+NEXT_PUBLIC_CLOUDFLARE_WORKER_URL=https://form.shainwaiyan.com
 ```
 
 ### Development

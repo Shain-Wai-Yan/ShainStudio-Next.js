@@ -7,6 +7,7 @@ import { getDictionarySync } from '@/lib/getDictionary';
 import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
 import Image from 'next/image';
 import { gsap } from 'gsap';
+import { FORM_WORKER_URL } from '@/lib/form-worker';
 
 export function ContactForm() {
   const pathname = usePathname();
@@ -137,8 +138,7 @@ export function ContactForm() {
       ];
 
       const payload = {
-        portalId: process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID,
-        formId: process.env.NEXT_PUBLIC_HUBSPOT_FORM_ID,
+        formType: 'contact',
         fields: fields,
         context: {
           hutk: hutk,
@@ -148,7 +148,7 @@ export function ContactForm() {
       };
 
       const response = await fetch(
-        process.env.NEXT_PUBLIC_CLOUDFLARE_WORKER_URL || 'https://form-collector.shainwaiyan.com',
+        FORM_WORKER_URL,
         {
           method: 'POST',
           headers: {
@@ -182,7 +182,7 @@ export function ContactForm() {
       
       {/* ── Background Plaster Noise Texture Overlay (Replicating Certificate Hero Background) ── */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0)_0%,rgba(0,0,0,0.025)_100%)] pointer-events-none" />
-      <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.015] bg-repeat pointer-events-none bg-[url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=400&q=20')]" />
+      <div className="absolute inset-0 opacity-[0.08] dark:opacity-[0.04] bg-[radial-gradient(circle,rgba(25,25,112,0.22)_0.5px,transparent_0.7px)] bg-[length:4px_4px] pointer-events-none" />
 
       {/* ── Modern Technical Blueprint Grid Lines ── */}
       <div className="absolute inset-x-0 top-16 h-[1px] bg-stone-900/10 dark:bg-stone-100/5 pointer-events-none" />
@@ -353,6 +353,7 @@ export function ContactForm() {
                     onChange={handleInputChange}
                     required
                     aria-required="true"
+                    maxLength={500}
                     rows={4}
                     placeholder={t.messagePlaceholder}
                     className="w-full bg-transparent border-none outline-none p-0 text-base font-bold text-stone-950 dark:text-white placeholder:text-stone-300 dark:placeholder:text-stone-700 placeholder:font-serif placeholder:italic placeholder:font-normal resize-none"

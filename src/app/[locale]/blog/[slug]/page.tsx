@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Script from 'next/script';
 import { notFound } from 'next/navigation';
-import { fetchAllBlogs, fetchBlogBySlug, fetchRelatedBlogs } from '@/lib/server/blogs';
+import { fetchBlogBySlug, fetchRelatedBlogs } from '@/lib/server/blogs';
 import BlogPostHeader from '@/components/blog/BlogPostHeader';
 import BlogPostContent from '@/components/blog/BlogPostContent';
 import RelatedPosts from '@/components/blog/RelatedPosts';
@@ -15,18 +15,11 @@ interface BlogPostPageProps {
   params: Promise<{ slug: string; locale?: string }>;
 }
 
+// Build no CMS detail pages up front. Each slug is generated on first request,
+// cached, and refreshed with ISR without making deployments depend on Strapi.
 export const revalidate = 300;
-export const dynamicParams = true;
-
-export async function generateStaticParams() {
-  const [english, chinese] = await Promise.all([
-    fetchAllBlogs('en', { pageSize: 100 }),
-    fetchAllBlogs('zh', { pageSize: 100 }),
-  ]);
-  return [
-    ...english.blogs.map(blog => ({ locale: 'en', slug: blog.Slug })),
-    ...chinese.blogs.map(blog => ({ locale: 'zh', slug: blog.Slug })),
-  ];
+export function generateStaticParams() {
+  return [];
 }
 
 export async function generateMetadata(props: BlogPostPageProps): Promise<Metadata> {

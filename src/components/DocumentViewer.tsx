@@ -48,7 +48,10 @@ export function DocumentViewer({
   // Load react-pdf
   useEffect(() => {
     import('react-pdf').then((mod) => {
-      mod.pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${mod.pdfjs.version}/build/pdf.worker.min.mjs`;
+      mod.pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+        'pdfjs-dist/build/pdf.worker.min.mjs',
+        import.meta.url,
+      ).toString();
       setPdfComponents({ Document: mod.Document, Page: mod.Page });
     });
   }, []);

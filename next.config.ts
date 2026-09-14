@@ -1,5 +1,26 @@
 import type { NextConfig } from "next";
 
+const DEFAULT_FORM_WORKER_ORIGIN = 'https://form.shainwaiyan.com';
+const isDevelopment = process.env.NODE_ENV === 'development';
+
+function getFormWorkerOrigin() {
+  const configuredUrl = process.env.NEXT_PUBLIC_CLOUDFLARE_WORKER_URL;
+  if (!configuredUrl) return DEFAULT_FORM_WORKER_ORIGIN;
+
+  try {
+    const url = new URL(configuredUrl);
+    const isLocalDevelopment = isDevelopment
+      && (url.hostname === 'localhost' || url.hostname === '127.0.0.1');
+    return url.protocol === 'https:' || isLocalDevelopment
+      ? url.origin
+      : DEFAULT_FORM_WORKER_ORIGIN;
+  } catch {
+    return DEFAULT_FORM_WORKER_ORIGIN;
+  }
+}
+
+const formWorkerOrigin = getFormWorkerOrigin();
+
 const securityHeaders = [
   // Prevent clickjacking (Lighthouse: "Mitigate clickjacking with XFO or CSP")
   { key: "X-Frame-Options", value: "SAMEORIGIN" },
@@ -14,18 +35,24 @@ const securityHeaders = [
   // COOP — allow-popups keeps Google OAuth / Analytics working
   // (Lighthouse: "Ensure proper origin isolation with COOP")
   { key: "Cross-Origin-Opener-Policy", value: "same-origin-allow-popups" },
-  // Basic CSP in report-only mode so 3rd-party scripts (GA, Clarity) are not broken
-  // Switch to enforcing once you have verified no violations in DevTools
+  // Enforced CSP. Inline script/style support remains necessary for the current
+  // Next.js static output and component-level styles; eval is development-only.
   {
-    key: "Content-Security-Policy-Report-Only",
+    key: "Content-Security-Policy",
     value: [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.clarity.ms https://cdn.clarity.ms",
-      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+      `script-src 'self' 'unsafe-inline'${isDevelopment ? " 'unsafe-eval'" : ''} https://www.googletagmanager.com https://www.clarity.ms https://cdn.clarity.ms https://cdn.jsdelivr.net https://cdnjs.cloudflare.com`,
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com",
       "font-src 'self' https://fonts.gstatic.com",
       "img-src 'self' data: blob: https://res.cloudinary.com https://www.shainwaiyan.com https://api.shainwaiyan.com https://backend-cms-89la.onrender.com https://personal-cms-backup.onrender.com https://i.ytimg.com https://yt3.googleusercontent.com https://yt3.ggpht.com https://via.placeholder.com",
-      "connect-src 'self' https://api.shainwaiyan.com https://backend-cms-89la.onrender.com https://personal-cms-backup.onrender.com https://www.google-analytics.com https://www.clarity.ms",
+      `connect-src 'self'${isDevelopment ? ' ws: wss:' : ''} https://api.shainwaiyan.com https://backend-cms-89la.onrender.com https://personal-cms-backup.onrender.com https://res.cloudinary.com ${formWorkerOrigin} https://*.google-analytics.com https://*.analytics.google.com https://*.clarity.ms`,
       "frame-src 'self' https://www.youtube.com",
+      "media-src 'self' blob:",
+      "worker-src 'self' blob:",
+      "object-src 'none'",
+      "base-uri 'self'",
+      "form-action 'self'",
+      "frame-ancestors 'self'",
     ].join("; "),
   },
 ];
