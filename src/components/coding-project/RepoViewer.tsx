@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 
 import { RepoFile } from '@/lib/github-api';
 import { useTheme } from 'next-themes';
+import { useHydrated } from '@/lib/use-hydrated';
 import sanitizeHtml from 'sanitize-html';
 
 interface RepoViewerProps {
@@ -84,26 +85,74 @@ function decodeBase64UTF8(b64: string): string {
   }
 }
 
-function loadScript(src: string): Promise<void> {
-  return new Promise((resolve, reject) => {
-    if (document.querySelector(`script[src="${src}"]`)) {
-      const check = () => { if ((window as unknown as { marked?: unknown }).marked) resolve(); else setTimeout(check, 50); };
-      check(); return;
+const scriptLoads = new Map<string, Promise<void>>();
+
+export function loadScript(src: string): Promise<void> {
+  const integrity = CDN_INTEGRITY[src];
+  if (!integrity) return Promise.reject(new Error('Unapproved script URL'));
+  const ready = () => src.includes('/marked@')
+    ? Boolean((window as unknown as { marked?: unknown }).marked)
+    : Boolean((window as unknown as { hljs?: unknown }).hljs);
+  if (ready()) return Promise.resolve();
+  const pending = scriptLoads.get(src);
+  if (pending) return pending;
+
+  const promise = new Promise<void>((resolve, reject) => {
+    const existing = document.querySelector<HTMLScriptElement>(`script[src="${src}"]`);
+    const script = existing ?? document.createElement('script');
+    if (existing && existing.integrity !== integrity) {
+      reject(new Error('Existing script has an unapproved integrity digest'));
+      return;
     }
-    const s = document.createElement('script');
-    s.src = src; s.async = true;
-    s.onload = () => resolve(); s.onerror = () => reject(new Error(`Failed to load ${src}`));
-    document.head.appendChild(s);
+    const cleanup = () => {
+      clearTimeout(timeout);
+      script.removeEventListener('load', loaded);
+      script.removeEventListener('error', failed);
+    };
+    const failed = () => {
+      cleanup();
+      script.remove();
+      reject(new Error(`Failed to load ${src}`));
+    };
+    const loaded = () => {
+      if (!ready()) { failed(); return; }
+      cleanup();
+      resolve();
+    };
+    const timeout = setTimeout(failed, 15000);
+    script.addEventListener('load', loaded);
+    script.addEventListener('error', failed);
+    if (!existing) {
+      script.integrity = integrity;
+      script.crossOrigin = 'anonymous';
+      script.src = src;
+      script.async = true;
+      document.head.appendChild(script);
+    }
   });
+  scriptLoads.set(src, promise);
+  void promise.catch(() => { if (scriptLoads.get(src) === promise) scriptLoads.delete(src); });
+  return promise;
 }
 
 function loadLink(href: string) {
+  const integrity = CDN_INTEGRITY[href];
+  if (!integrity) throw new Error('Unapproved stylesheet URL');
   if (!document.querySelector(`link[href="${href}"]`)) {
     const l = document.createElement('link');
+    l.integrity = integrity;
+    l.crossOrigin = 'anonymous';
     l.rel = 'stylesheet'; l.href = href;
     document.head.appendChild(l);
   }
 }
+
+// Bind versioned CDN assets to reviewed bytes. Browsers reject modified assets.
+const CDN_INTEGRITY: Record<string, string> = {
+  'https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js': 'sha384-odPBjvtXVM/5hOYIr3A1dB+flh0c3wAT3bSesIOqEGmyUA4JoKf/YTWy0XKOYAY7',
+  'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js': 'sha384-F/bZzf7p3Joyp5psL90p/p89AZJsndkSoGwRpXcZhleCWhd8SnRuoYo4d0yirjJp',
+  'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css': 'sha384-eFTL69TLRZTkNfYZOLM+G04821K1qZao/4QLJbet1pP4tcF+fdXq/9CdqAbWRl/L',
+};
 
 function FolderIcon() {
   return (
@@ -131,14 +180,13 @@ export function RepoViewer({ repoName, defaultBranch = 'main', onClose }: RepoVi
   const [loadingContent, setLoadingContent] = useState(false);
   const [fileError, setFileError]       = useState<string | null>(null);
   const [dirError, setDirError]         = useState<string | null>(null);
-  const [isDark, setIsDark]             = useState(false);
   const contentRef                      = useRef<HTMLDivElement>(null);
 
-  // Detect dark mode reactively via next-themes
+  const fileRequest = useRef<AbortController | null>(null);
+  const directoryRequest = useRef<AbortController | null>(null);
   const { resolvedTheme } = useTheme();
-  useEffect(() => {
-    setIsDark(resolvedTheme === 'dark');
-  }, [resolvedTheme]);
+  const hydrated = useHydrated();
+  const isDark = hydrated && resolvedTheme === 'dark';
 
   // Load CDN libs once
   useEffect(() => {
@@ -151,34 +199,34 @@ export function RepoViewer({ repoName, defaultBranch = 'main', onClose }: RepoVi
 
   // ── Open a file ───────────────────────────────────────────────────────────
   const openFile = useCallback(async (file: RepoFile) => {
+    fileRequest.current?.abort();
+    const controller = new AbortController();
+    fileRequest.current = controller;
     setSelectedFile(file); setRenderedHTML(''); setFileError(null);
-    if (isBinary(file.name)) return;
+    if (isBinary(file.name)) { setLoadingContent(false); return; }
     setLoadingContent(true);
     try {
       const p = new URLSearchParams({ username: 'Shain-Wai-Yan', type: 'file', repo: repoName, path: file.path, branch });
-      const res = await fetch(`/api/github?${p}`);
+      const res = await fetch(`/api/github?${p}`, { signal: controller.signal });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       const text = data.content ? decodeBase64UTF8(data.content) : '';
-      if (isMD(file.name)) {
-        await renderMarkdown(text);
-      } else {
-        renderCode(text, file.name);
-      }
+      const html = isMD(file.name) ? await renderMarkdown(text) : renderCode(text, file.name);
+      if (!controller.signal.aborted) setRenderedHTML(html);
     } catch (e) {
-      setFileError(`Could not load: ${e instanceof Error ? e.message : 'Unknown error'}`);
+      if (!controller.signal.aborted) setFileError(`Could not load: ${e instanceof Error ? e.message : 'Unknown error'}`);
     } finally {
-      setLoadingContent(false);
+      if (!controller.signal.aborted) setLoadingContent(false);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [repoName, branch]);
 
   // ── Load directory ────────────────────────────────────────────────────────
-  const fetchDir = useCallback(async (path: string) => {
-    setLoadingFiles(true); setDirError(null);
-    try {
-      const p = new URLSearchParams({ username: 'Shain-Wai-Yan', type: 'contents', repo: repoName, path, branch });
-      const res = await fetch(`/api/github?${p}`);
+  const fetchDir = useCallback((path: string) => {
+    directoryRequest.current?.abort();
+    const controller = new AbortController();
+    directoryRequest.current = controller;
+    const p = new URLSearchParams({ username: 'Shain-Wai-Yan', type: 'contents', repo: repoName, path, branch });
+    return fetch(`/api/github?${p}`, { signal: controller.signal }).then(async res => {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const raw   = await res.json();
       const items: RepoFile[] = Array.isArray(raw) ? raw : [raw];
@@ -187,19 +235,38 @@ export function RepoViewer({ repoName, defaultBranch = 'main', onClose }: RepoVi
         if (a.type !== 'dir' && b.type === 'dir') return 1;
         return a.name.localeCompare(b.name);
       });
+      if (controller.signal.aborted) return;
       setFiles(sorted);
+      setDirError(null);
       if (path === '') {
         const readme = sorted.find(f => f.type === 'file' && f.name.toLowerCase() === 'readme.md');
         if (readme) openFile(readme);
       }
-    } catch (e) {
-      setDirError(`Could not load files: ${e instanceof Error ? e.message : 'Unknown error'}`);
-    } finally {
-      setLoadingFiles(false);
-    }
+    }).catch((e: unknown) => {
+      if (!controller.signal.aborted) setDirError(`Could not load files: ${e instanceof Error ? e.message : 'Unknown error'}`);
+    }).finally(() => {
+      if (!controller.signal.aborted) setLoadingFiles(false);
+    });
   }, [repoName, branch, openFile]);
 
-  useEffect(() => { fetchDir(''); }, [fetchDir]);
+  useEffect(() => {
+    void fetchDir('');
+    return () => { directoryRequest.current?.abort(); fileRequest.current?.abort(); };
+  }, [fetchDir]);
+
+  useEffect(() => {
+    const win = window as unknown as { hljs?: { highlightElement: (el: HTMLElement) => void } };
+    if (!renderedHTML || !selectedFile || !isMD(selectedFile.name)) return;
+    let active = true;
+    void loadScript('https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js')
+      .then(() => {
+        if (!active) return;
+        contentRef.current?.querySelectorAll<HTMLElement>('pre code').forEach(block => {
+          if (!block.dataset.highlighted) win.hljs?.highlightElement(block);
+        });
+      }).catch(() => {});
+    return () => { active = false; };
+  }, [renderedHTML, selectedFile]);
 
   // Close on Escape
   useEffect(() => {
@@ -208,50 +275,12 @@ export function RepoViewer({ repoName, defaultBranch = 'main', onClose }: RepoVi
     return () => window.removeEventListener('keydown', h);
   }, [onClose]);
 
-  const renderMarkdown = async (text: string) => {
-    const win = window as unknown as {
-      marked?: {
-        use: (o: { gfm?: boolean; breaks?: boolean }) => void;
-        parse: (s: string) => Promise<string>;
-      };
-      hljs?: { highlightElement: (el: HTMLElement) => void };
-    };
-    if (!win.marked) {
-      try { await loadScript('https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js'); } catch {}
-    }
-    if (win.marked) {
-      win.marked.use({ gfm: true, breaks: true });
-      const html: string = await win.marked.parse(text);
-      setRenderedHTML(sanitizeMarkdownHtml(html));
-      setTimeout(() => {
-        if (win.hljs && contentRef.current) {
-          contentRef.current.querySelectorAll('pre code').forEach((block) => {
-            const el = block as HTMLElement;
-            if (!el.dataset.highlighted) win.hljs!.highlightElement(el);
-          });
-        }
-      }, 80);
-    } else {
-      setRenderedHTML(sanitizeMarkdownHtml(basicMarkdown(text, isDark)));
-    }
-  };
-
-  const renderCode = (text: string, filename: string) => {
-    const win = window as unknown as {
-      hljs?: { highlight: (s: string, o: { language: string; ignoreIllegals?: boolean }) => { value: string } };
-    };
-    if (win.hljs) {
-      try {
-        const result = win.hljs.highlight(text, { language: getLang(filename), ignoreIllegals: true });
-        setRenderedHTML(result.value); return;
-      } catch {}
-    }
-    setRenderedHTML(escapeHtml(text));
-  };
-
   // ── Navigate directory ────────────────────────────────────────────────────
   const navigateTo = (path: string) => {
-    setCurrentPath(path); setSelectedFile(null); setRenderedHTML(''); fetchDir(path);
+    fileRequest.current?.abort();
+    setLoadingContent(false);
+    setLoadingFiles(true); setDirError(null);
+    setCurrentPath(path); setSelectedFile(null); setRenderedHTML(''); void fetchDir(path);
   };
 
   const breadcrumbs = currentPath ? currentPath.split('/') : [];
@@ -546,80 +575,84 @@ export function RepoViewer({ repoName, defaultBranch = 'main', onClose }: RepoVi
 }
 
 // ── Fallback markdown renderer (no deps) ─────────────────────────────────────
-function basicMarkdown(md: string, dark: boolean): string {
+function basicMarkdown(md: string): string {
   if (!md) return '';
-
-  const bodyColor    = dark ? '#e0e0e0'  : '#24292e';
-  const headingColor = dark ? '#d4af37'  : '#191970';
-  const mutedColor   = dark ? '#9ca3af'  : '#6a737d';
-  const linkColor    = dark ? '#d4af37'  : '#0366d6';
-  const codeBg       = dark ? 'rgba(255,255,255,.1)' : 'rgba(27,31,35,.07)';
-  const preBg        = dark ? '#1e1e1e'  : '#f6f8fa';
-  const hrColor      = dark ? '#444'     : '#e1e4e8';
-  const borderColor  = dark ? '#444'     : '#dfe2e5';
-
-  const inline = (s: string) =>
-    s.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, `<img src="$2" alt="$1" style="max-width:100%;border-radius:4px"/>`)
-     .replace(/\[([^\]]+)\]\(([^)]+)\)/g, `<a href="$2" target="_blank" rel="noopener noreferrer" style="color:${linkColor}">$1</a>`)
-     .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
-     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-     .replace(/\*(.+?)\*/g, '<em>$1</em>')
-     .replace(/`([^`]+)`/g, `<code style="background:${codeBg};padding:.2em .45em;border-radius:3px;font-size:.85em;font-family:monospace">$1</code>`);
-
-  const escHtml = (s: string) => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-
-  const lines = md.split('\n');
+  // The same rv-markdown CSS themes both the CDN renderer and this fallback.
+  const inline = (text: string) => text
+    .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1"/>')
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
+    .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>');
   const out: string[] = [];
-  let inCode = false; let codeLang = ''; let codeLines: string[] = [];
-  let listLines: string[] = [];
-
+  let inCode = false, codeLang = '';
+  let codeLines: string[] = [], listLines: string[] = [];
   const flushList = () => {
-    if (listLines.length) {
-      out.push(`<ul style="padding-left:1.8em;margin:0 0 1em;color:${bodyColor}">${
-        listLines.map(l => `<li style="margin:.25em 0;line-height:1.6">${l}</li>`).join('')
-      }</ul>`);
-      listLines = [];
-    }
+    if (listLines.length) out.push(`<ul>${listLines.map(line => `<li>${line}</li>`).join('')}</ul>`);
+    listLines = [];
   };
-
-  for (const line of lines) {
+  for (const line of md.split('\n')) {
     if (line.startsWith('```')) {
+      flushList();
       if (!inCode) { inCode = true; codeLang = line.slice(3).trim() || 'text'; codeLines = []; }
       else {
         inCode = false;
-        out.push(`<pre style="background:${preBg};border-radius:6px;padding:1em;overflow-x:auto;margin:0 0 1em;font-size:.8em;line-height:1.5"><code class="language-${codeLang}">${escHtml(codeLines.join('\n'))}</code></pre>`);
+        out.push(`<pre><code class="language-${escapeHtml(codeLang)}">${escapeHtml(codeLines.join('\n'))}</code></pre>`);
         codeLines = [];
       }
       continue;
     }
     if (inCode) { codeLines.push(line); continue; }
     if (!line.trim()) { flushList(); out.push('<br/>'); continue; }
-
-    const hm = line.match(/^(#{1,6})\s+(.+)$/);
-    if (hm) {
+    const heading = line.match(/^(#{1,6})\s+(.+)$/);
+    if (heading) {
       flushList();
-      const level = hm[1].length;
-      const sizes = ['1.75em','1.35em','1.1em','.95em','.9em','.85em'];
-      const border = level <= 2 ? `border-bottom:1px solid ${hrColor};padding-bottom:.25em;` : '';
-      out.push(`<h${level} style="font-size:${sizes[level-1]};font-weight:700;margin:1.2em 0 .5em;color:${headingColor};${border}">${inline(hm[2])}</h${level}>`);
-      continue;
+      out.push(`<h${heading[1].length}>${inline(heading[2])}</h${heading[1].length}>`);
+    } else if (/^---+$/.test(line.trim())) {
+      flushList(); out.push('<hr/>');
+    } else if (line.startsWith('> ')) {
+      flushList(); out.push(`<blockquote>${inline(line.slice(2))}</blockquote>`);
+    } else if (/^\s*(?:[-*+]|\d+\.) /.test(line)) {
+      listLines.push(inline(line.replace(/^\s*(?:[-*+]|\d+\.) /, '')));
+    } else {
+      flushList(); out.push(`<p>${inline(line)}</p>`);
     }
-    if (/^---+$/.test(line.trim())) {
-      flushList();
-      out.push(`<hr style="border:none;border-top:1px solid ${hrColor};margin:1.5em 0"/>`);
-      continue;
-    }
-    if (line.startsWith('> ')) {
-      flushList();
-      out.push(`<blockquote style="margin:0 0 1em;padding:.5em 1em;color:${mutedColor};border-left:4px solid ${borderColor}">${inline(line.slice(2))}</blockquote>`);
-      continue;
-    }
-    if (/^\s*[-*+] /.test(line)) { listLines.push(inline(line.replace(/^\s*[-*+] /,''))); continue; }
-    if (/^\s*\d+\. /.test(line)) { listLines.push(inline(line.replace(/^\s*\d+\. /,''))); continue; }
-
-    flushList();
-    out.push(`<p style="margin:0 0 .75em;line-height:1.7;color:${bodyColor}">${inline(line)}</p>`);
   }
+  if (inCode) out.push(`<pre><code>${escapeHtml(codeLines.join('\n'))}</code></pre>`);
   flushList();
   return out.join('\n');
+}
+
+async function renderMarkdown(text: string) {
+  const win = window as unknown as {
+    marked?: {
+      use: (o: { gfm?: boolean; breaks?: boolean }) => void;
+      parse: (s: string) => Promise<string>;
+    };
+    hljs?: { highlightElement: (el: HTMLElement) => void };
+  };
+  if (!win.marked) {
+    try { await loadScript('https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js'); } catch {}
+  }
+  if (win.marked) {
+    win.marked.use({ gfm: true, breaks: true });
+    const html: string = await win.marked.parse(text);
+    return sanitizeMarkdownHtml(html);
+  } else {
+    return sanitizeMarkdownHtml(basicMarkdown(text));
+  }
+}
+
+function renderCode(text: string, filename: string) {
+  const win = window as unknown as {
+    hljs?: { highlight: (s: string, o: { language: string; ignoreIllegals?: boolean }) => { value: string } };
+  };
+  if (win.hljs) {
+    try {
+      const result = win.hljs.highlight(text, { language: getLang(filename), ignoreIllegals: true });
+      return result.value;
+    } catch {}
+  }
+  return escapeHtml(text);
 }

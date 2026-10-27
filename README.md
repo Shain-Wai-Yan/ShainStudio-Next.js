@@ -6,11 +6,11 @@ A bilingual (English & Chinese) personal portfolio website built with **Next.js 
 
 | | |
 |-|-|
-| Framework | Next.js 16.1.6 (App Router) |
+| Framework | Next.js 16.4.3 (App Router) |
 | React | React 19 |
 | Styling | Tailwind CSS 4 |
 | Language | TypeScript 5 |
-| CMS | Strapi (headless, hosted on Render) |
+| CMS | Strapi 5.59 (headless, Northflank primary / Render standby) |
 | Animation | GSAP 3 + @gsap/react |
 | Theme | next-themes (dark / light mode) |
 | Image CDN | Cloudinary |
@@ -32,14 +32,22 @@ A bilingual (English & Chinese) personal portfolio website built with **Next.js 
 ## Getting Started
 
 ### Prerequisites
-- Node.js 20+
-- npm
+- Node.js 24.22.1 or a newer patched 24.x release (use `.nvmrc`)
+- npm 11.x
 
 ### Installation
 
 ```bash
-npm install
+nvm install
+nvm use
+npm ci
 ```
+
+Run `nvm use` in each new shell. CI reads `.nvmrc`; Vercel selects Node 24 from `package.json` engines. Confirm the build log uses at least 24.22.1. The CMS Dockerfile pins the same patch.
+
+Firebase Studio uses the checksum-pinned Node 24.22.1 binary in `.idx/dev.nix`; rebuild the workspace after pulling this change. Its Linux/Nix runtime must be verified in Firebase Studio. Keep that pin and its checksum aligned with `.nvmrc` when upgrading.
+
+[Vercel Node version selection](https://vercel.com/docs/functions/runtimes/node-js/node-js-versions).
 
 ### Environment Variables
 

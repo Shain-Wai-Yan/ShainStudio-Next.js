@@ -9,7 +9,7 @@ const ts = require('typescript');
 function load(file, mocks = {}) {
   const source = fs.readFileSync(path.join(__dirname, '..', file), 'utf8');
   const { outputText } = ts.transpileModule(source, { compilerOptions: {
-    module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, esModuleInterop: true,
+    module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, esModuleInterop: true, jsx: ts.JsxEmit.ReactJSX,
   } });
   const loaded = { exports: {} };
   new Function('require', 'module', 'exports', outputText)(name => {
@@ -380,8 +380,8 @@ test('repository markdown is sanitized before either HTML rendering path', () =>
     'utf8',
   );
   assert.match(source, /sanitizeHtml\(html,/);
-  assert.match(source, /setRenderedHTML\(sanitizeMarkdownHtml\(html\)\)/);
-  assert.match(source, /setRenderedHTML\(sanitizeMarkdownHtml\(basicMarkdown\(text, isDark\)\)\)/);
+  assert.match(source, /return sanitizeMarkdownHtml\(html\)/);
+  assert.match(source, /return sanitizeMarkdownHtml\(basicMarkdown\(text\)\)/);
   assert.match(source, /allowedSchemesByTag:\s*\{\s*img:\s*\[['"]http['"], ['"]https['"]\]/);
 });
 
@@ -515,4 +515,178 @@ test('mobile footer keeps copyright and policy links on single compact lines', (
   assert.match(footer, /flex w-full md:w-auto items-center justify-center flex-nowrap/);
   assert.match(footer, /text-\[clamp\(0\.48rem,2\.2vw,0\.7rem\)\] md:text-\[0\.7rem\]/);
   assert.match(footer, /flex flex-col md:flex-row/);
+});
+
+test('revalidation authenticates and rejects invalid or oversized JSON without invalidation', async () => {
+  const previousSecret = process.env.STRAPI_REVALIDATION_SECRET;
+  process.env.STRAPI_REVALIDATION_SECRET = 'isolated-test-secret';
+  const invalidations = [];
+  try {
+    const { POST } = load('src/app/api/revalidate/route.ts', {
+      'next/server': { NextResponse: { json: (data, options) => ({ data, status: options?.status ?? 200 }) } },
+      'next/cache': {
+        revalidateTag: (...args) => invalidations.push(args),
+        revalidatePath: (...args) => invalidations.push(args),
+      },
+    });
+    const request = (body, authorized = true) => new Request('https://example.test/api/revalidate', {
+      method: 'POST', body,
+      headers: authorized ? { authorization: 'Bearer isolated-test-secret' } : {},
+    });
+    assert.equal((await POST(request('{"model":"blogs"}', false))).status, 401);
+    for (const body of ['null', '[]', '"blogs"', '{']) {
+      assert.equal((await POST(request(body))).status, 400);
+    }
+    assert.equal((await POST(request(JSON.stringify({ model: 'blogs', extra: 'x'.repeat(17000) })))).status, 413);
+    assert.equal(invalidations.length, 0);
+    assert.equal((await POST(request('{"model":"blogs","entry":{"slug":"hello"}}'))).status, 200);
+    assert.ok(invalidations.some(args => args[0] === '/blog/hello'));
+    for (const model of ['art', 'arts', 'api::art.art', 'pencil-art']) {
+      invalidations.length = 0;
+      const result = await POST(request(JSON.stringify({ model, entry: { slug: 'graphite-study' } })));
+      assert.equal(result.status, 200);
+      assert.ok(invalidations.some(args => args[0] === 'arts' && args[1].expire === 0));
+      for (const path of ['/hobbies', '/zh/hobbies', '/hobbies/pencil-art', '/zh/hobbies/pencil-art', '/hobbies/pencil-art/graphite-study', '/zh/hobbies/pencil-art/graphite-study']) {
+        assert.ok(invalidations.some(args => args[0] === path), path);
+      }
+    }
+    invalidations.length = 0;
+    assert.equal((await POST(request('{"model":"cart"}'))).status, 400);
+    assert.equal(invalidations.length, 0);
+  } finally {
+    if (previousSecret === undefined) delete process.env.STRAPI_REVALIDATION_SECRET;
+    else process.env.STRAPI_REVALIDATION_SECRET = previousSecret;
+  }
+});
+
+
+function viewerHarness() {
+  const states = [], callbacks = [], effects = [];
+  const react = {
+    useState(initial) {
+      const index = states.length;
+      states.push(typeof initial === 'function' ? initial() : initial);
+      return [states[index], value => { states[index] = typeof value === 'function' ? value(states[index]) : value; }];
+    },
+    useRef: value => ({ current: value }),
+    useCallback: callback => { callbacks.push(callback); return callback; },
+    useEffect: effect => { effects.push(effect); },
+  };
+  const viewer = load('src/components/coding-project/RepoViewer.tsx', {
+    react, 'next-themes': { useTheme: () => ({ resolvedTheme: 'light' }) },
+    '@/lib/use-hydrated': { useHydrated: () => true },
+  });
+  viewer.RepoViewer({ repoName: 'test-repo', onClose() {} });
+  return { ...viewer, states, openFile: callbacks[0], fetchDir: callbacks[1], effects };
+}
+
+test('repository viewer discards stale fetches, Markdown parsing, errors and loading completion', async () => {
+  const previousFetch = global.fetch, previousWindow = global.window;
+  const requests = [];
+  let finishParsing;
+  const parsingStarted = Promise.withResolvers();
+  global.window = { marked: { use() {}, parse() {
+    parsingStarted.resolve();
+    return new Promise(resolve => { finishParsing = resolve; });
+  } } };
+  global.fetch = (url, options) => {
+    const deferred = Promise.withResolvers();
+    requests.push({ ...deferred, options, url });
+    return deferred.promise;
+  };
+  try {
+    const viewer = viewerHarness();
+    const file = name => ({ name, path: name, type: 'file' });
+    const old = viewer.openFile(file('old.md'));
+    requests[0].resolve(Response.json({ content: Buffer.from('old markdown').toString('base64') }));
+    await parsingStarted.promise;
+    const latest = viewer.openFile(file('new.ts'));
+    assert.equal(requests[0].options.signal.aborted, true);
+    requests[1].resolve(Response.json({ content: Buffer.from('const latest = true;').toString('base64') }));
+    await latest;
+    finishParsing('<h1>Stale markdown</h1>');
+    await old;
+    assert.equal(viewer.states[3].name, 'new.ts');
+    assert.equal(viewer.states[4], 'const latest = true;');
+    assert.equal(viewer.states[6], false);
+    const failed = viewer.openFile(file('failed.ts'));
+    const pending = viewer.openFile(file('pending.ts'));
+    requests[2].reject(new Error('Stale failure'));
+    await failed;
+    assert.equal(viewer.states[7], null);
+    assert.equal(viewer.states[6], true, 'Old finally must not hide the current spinner');
+    await viewer.openFile(file('image.png'));
+    assert.equal(requests[3].options.signal.aborted, true);
+    requests[3].resolve(Response.json({ content: 'c3RhbGU=' }));
+    await pending;
+    assert.equal(viewer.states[4], '');
+    assert.equal(viewer.states[6], false);
+  } finally { global.fetch = previousFetch; global.window = previousWindow; }
+});
+
+test('CDN loads share pending work, verify the correct library, reject failure and allow retry', async () => {
+  const previousWindow = global.window, previousDocument = global.document;
+  const scripts = [];
+  global.window = {};
+  global.document = {
+    querySelector: selector => scripts.find(script => selector === `script[src="${script.src}"]`) ?? null,
+    createElement: () => Object.assign(new EventTarget(), { remove() { scripts.splice(scripts.indexOf(this), 1); } }),
+    head: { appendChild: script => scripts.push(script) },
+  };
+  try {
+    const { loadScript } = viewerHarness();
+    const highlight = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js';
+    const marked = 'https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js';
+    const first = loadScript(highlight);
+    assert.equal(loadScript(highlight), first);
+    assert.equal(scripts.length, 1);
+    assert.match(scripts[0].integrity, /^sha384-/);
+    assert.equal(scripts[0].crossOrigin, 'anonymous');
+    global.window.hljs = {};
+    scripts[0].dispatchEvent(new Event('load'));
+    await first; // Marked is absent; highlight readiness must still resolve.
+    const failure = loadScript(marked);
+    scripts[1].dispatchEvent(new Event('error'));
+    await assert.rejects(failure, /Failed to load/);
+    const retry = loadScript(marked);
+    assert.equal(scripts.length, 2);
+    global.window.marked = {};
+    scripts[1].dispatchEvent(new Event('load'));
+    await retry;
+    await assert.rejects(loadScript('https://evil.example/payload.js'), /Unapproved/);
+  } finally { global.window = previousWindow; global.document = previousDocument; }
+});
+
+
+test('persisted analytics denial takes precedence over a completed automatic-region lookup', () => {
+  const previousWindow = global.window, previousEnvironment = process.env.NODE_ENV;
+  let explicitConsent = 'denied';
+  global.window = {
+    localStorage: { getItem: () => explicitConsent },
+    sessionStorage: { getItem: () => 'automatic' },
+  };
+  process.env.NODE_ENV = 'production';
+  try {
+    let stateIndex = 0;
+    const Analytics = () => null;
+    const { default: Manager } = load('src/components/analytics/AnalyticsConsent.tsx', {
+      react: {
+        useEffect() {},
+        useSyncExternalStore: (_subscribe, snapshot) => snapshot(),
+        useState: initial => [[null, 'automatic', false][stateIndex++] ?? initial, () => {}],
+      },
+      'next/link': () => null,
+      '@next/third-parties/google': { GoogleAnalytics: Analytics },
+      '@/components/analytics/ClarityAnalytics': () => null,
+    });
+    const containsAnalytics = node => Boolean(node && (node.type === Analytics ||
+      (Array.isArray(node) ? node.some(containsAnalytics) : containsAnalytics(node.props?.children))));
+    assert.equal(containsAnalytics(Manager({locale:'en',gaId:'test-only'})), false);
+    explicitConsent = 'granted'; stateIndex = 0;
+    assert.equal(containsAnalytics(Manager({locale:'en',gaId:'test-only'})), true);
+  } finally {
+    global.window = previousWindow;
+    if (previousEnvironment === undefined) delete process.env.NODE_ENV;
+    else process.env.NODE_ENV = previousEnvironment;
+  }
 });

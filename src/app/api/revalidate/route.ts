@@ -1,10 +1,34 @@
 import { revalidatePath, revalidateTag } from 'next/cache';
 import { NextRequest, NextResponse } from 'next/server';
+import { createHash, timingSafeEqual } from 'node:crypto';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const SECRET = process.env.STRAPI_REVALIDATION_SECRET;
+const MAX_BODY_BYTES = 16 * 1024;
+
+async function readPayload(request: NextRequest): Promise<unknown> {
+  const reader = request.body?.getReader();
+  if (!reader) throw new Error('Invalid JSON payload');
+  const chunks: Uint8Array[] = [];
+  let size = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      size += value.byteLength;
+      if (size > MAX_BODY_BYTES) {
+        await reader.cancel();
+        throw new RangeError('Payload too large');
+      }
+      chunks.push(value);
+    }
+    return JSON.parse(Buffer.concat(chunks).toString('utf8'));
+  } finally {
+    reader.releaseLock();
+  }
+}
 
 const CONTENT = {
   blogs: { tag: 'blogs', paths: ['/blog', '/zh/blog'] },
@@ -19,6 +43,7 @@ const CONTENT = {
   photography: { tag: 'photography', paths: ['/hobbies', '/zh/hobbies', '/hobbies/photography', '/zh/hobbies/photography'] },
   'marketing-plans': { tag: 'marketing-plans', paths: ['/portfolio/marketing-plans', '/zh/portfolio/marketing-plans'] },
   'business-plans': { tag: 'business-plans', paths: ['/portfolio/business-plans', '/zh/portfolio/business-plans'] },
+  arts: { tag: 'arts', paths: ['/hobbies', '/zh/hobbies', '/hobbies/pencil-art', '/zh/hobbies/pencil-art'] },
   certificates: { tag: 'certificates', paths: ['/certificate', '/zh/certificate'] },
 } as const;
 
@@ -32,6 +57,7 @@ function contentType(model: unknown): ContentType | null {
   if (value.includes('photograph')) return 'photography';
   if (value.includes('marketing-plan')) return 'marketing-plans';
   if (value.includes('business-plan')) return 'business-plans';
+  if (['art', 'arts', 'api::art.art', 'pencil-art'].includes(value)) return 'arts';
   if (value.includes('certificate')) return 'certificates';
   return null;
 }
@@ -41,6 +67,7 @@ function slugFor(type: ContentType, value: unknown): string | null {
   if (type === 'blogs') return value.startsWith('zh-') ? `/zh/blog/${value}` : `/blog/${value}`;
   if (type === 'marketing-projects') return `/portfolio/marketing-in-motion/${value}`;
   if (type === 'coding-projects') return `/portfolio/coding-projects/${value}`;
+  if (type === 'arts') return `/hobbies/pencil-art/${value}`;
   return null;
 }
 
@@ -50,14 +77,20 @@ export async function POST(request: NextRequest) {
   }
 
   const authorization = request.headers.get('authorization');
-  if (authorization !== `Bearer ${SECRET}`) {
+  const digest = (value: string) => createHash('sha256').update(value).digest();
+  if (!authorization || !timingSafeEqual(digest(authorization), digest(`Bearer ${SECRET}`))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   let payload: { model?: unknown; entry?: { slug?: unknown; documentId?: unknown }; slug?: unknown; documentId?: unknown };
   try {
-    payload = await request.json();
-  } catch {
+    const value = await readPayload(request);
+    if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('Invalid JSON payload');
+    payload = value;
+  } catch (error) {
+    if (error instanceof RangeError) {
+      return NextResponse.json({ error: 'Payload too large' }, { status: 413 });
+    }
     return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 });
   }
 
@@ -71,7 +104,8 @@ export async function POST(request: NextRequest) {
   for (const path of content.paths) revalidatePath(path);
 
   const detailPath = slugFor(type, payload.entry?.slug ?? payload.slug);
-  if (detailPath) revalidatePath(detailPath);
+  const detailPaths = detailPath ? (type === 'arts' ? [detailPath, `/zh${detailPath}`] : [detailPath]) : [];
+  for (const path of detailPaths) revalidatePath(path);
 
   const documentId = payload.entry?.documentId ?? payload.documentId;
   const photoPath = type === 'photography' && typeof documentId === 'string' && /^[a-z0-9]{8,40}$/i.test(documentId)
@@ -82,5 +116,5 @@ export async function POST(request: NextRequest) {
     revalidatePath(`/zh${photoPath}`);
   }
 
-  return NextResponse.json({ revalidated: true, type, paths: [...content.paths, ...(detailPath ? [detailPath] : []), ...(photoPath ? [photoPath, `/zh${photoPath}`] : [])] });
+  return NextResponse.json({ revalidated: true, type, paths: [...content.paths, ...detailPaths, ...(photoPath ? [photoPath, `/zh${photoPath}`] : [])] });
 }

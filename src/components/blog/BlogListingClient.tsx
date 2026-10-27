@@ -51,13 +51,13 @@ export default function BlogListingClient({ allBlogs, categories, tags, language
   const currentPage = Number(searchParams.get('page')) || 1;
 
   // Local state only for input typing to prevent lag, and mobile filter toggle
-  const [searchInput, setSearchInput] = useState(urlSearch);
+  const [searchDraft, setSearchDraft] = useState({ url: urlSearch, value: urlSearch });
+  // Adjust this component before rendering children when navigation changes the URL.
+  if (searchDraft.url !== urlSearch) {
+    setSearchDraft({ url: urlSearch, value: urlSearch });
+  }
+  const searchInput = searchDraft.url === urlSearch ? searchDraft.value : urlSearch;
   const [showFilters, setShowFilters] = useState(false);
-
-  // Sync back local search input if URL changes externally (e.g. Back button)
-  useEffect(() => {
-    setSearchInput(urlSearch);
-  }, [urlSearch]);
 
   const postsPerPage = 12;
 
@@ -77,16 +77,16 @@ export default function BlogListingClient({ allBlogs, categories, tags, language
   }, [pathname, router]);
 
   // Debounce before updating URL
-  const debouncedSearch = useDebounce(searchInput, 280);
+  const debouncedSearch = useDebounce(searchDraft, 280);
 
   useEffect(() => {
-    if (debouncedSearch !== urlSearch) {
-      updateUrl(debouncedSearch, selectedCategory, selectedTag, 1);
+    if (debouncedSearch === searchDraft && debouncedSearch.url === urlSearch && debouncedSearch.value !== urlSearch) {
+      updateUrl(debouncedSearch.value, selectedCategory, selectedTag, 1);
     }
-  }, [debouncedSearch, urlSearch, selectedCategory, selectedTag, updateUrl]);
+  }, [debouncedSearch, searchDraft, urlSearch, selectedCategory, selectedTag, updateUrl]);
 
   const handleSearchChange = (value: string) => {
-    setSearchInput(value); // Only updates local state. useEffect debounces it to the URL.
+    setSearchDraft({ url: urlSearch, value }); // Only updates local state. useEffect debounces it to the URL.
   };
 
   const handleCategoryChange = (value: string) => {
@@ -109,7 +109,7 @@ export default function BlogListingClient({ allBlogs, categories, tags, language
   };
 
   const clearAll = () => { 
-    setSearchInput(''); // Clear local
+    setSearchDraft({ url: urlSearch, value: '' }); // Clear local
     updateUrl('', '', '', 1); // Clear URL
   };
 

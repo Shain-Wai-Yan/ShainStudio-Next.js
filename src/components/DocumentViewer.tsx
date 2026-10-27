@@ -17,13 +17,18 @@ interface DocumentViewerProps {
   onClose: () => void;
 }
 
-export function DocumentViewer({
+export function DocumentViewer(props: DocumentViewerProps) {
+  if (!props.isOpen) return null;
+  return <OpenDocumentViewer key={props.documentUrl} {...props} />;
+}
+
+function OpenDocumentViewer({
   isOpen,
   documentUrl,
   title,
   onClose,
 }: DocumentViewerProps) {
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, updateCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -123,23 +128,10 @@ export function DocumentViewer({
     return () => window.removeEventListener('resize', check);
   }, [isOpen, isPortrait]);
 
-  // Reset on new document
-  useEffect(() => {
-    if (isOpen) {
-      setCurrentPage(1);
-      setTotalPages(0);
-      setIsLoading(true);
-      setError(null);
-      setZoom(1);
-      setRotation(0);
-      setShowThumbnails(false);
-    }
-  }, [isOpen, documentUrl]);
-
-  // Reset rotation on page change
-  useEffect(() => {
+  const setCurrentPage = useCallback((page: React.SetStateAction<number>) => {
+    updateCurrentPage(page);
     setRotation(0);
-  }, [currentPage]);
+  }, []);
 
   // Keyboard navigation
   useEffect(() => {
@@ -199,14 +191,14 @@ export function DocumentViewer({
     };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, [isOpen, totalPages, dualPage, onClose, showPageInput]);
+  }, [isOpen, totalPages, dualPage, onClose, showPageInput, setCurrentPage]);
 
   const onDocumentLoadSuccess = useCallback(({ numPages }: { numPages: number }) => {
     setTotalPages(numPages);
     setCurrentPage(1);
     setIsLoading(false);
     setError(null);
-  }, []);
+  }, [setCurrentPage]);
 
   const onDocumentLoadError = useCallback((err: Error) => {
     console.error('[DocumentViewer] PDF load error:', err);

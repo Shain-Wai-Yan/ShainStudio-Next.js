@@ -116,16 +116,13 @@ export default function GamingPage() {
     return allItems;
   }, []);
 
-  const loadData = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const [channelRes, allVideoItems] = await Promise.all([
+  const loadData = useCallback(() => {
+    return Promise.all([
         fetch('/api/youtube?channel=gaming&endpoint=channel'),
         fetchAllVideos(),
-      ]);
+      ]).then(async ([channelRes, allVideoItems]) => {
 
+      setError(null);
       if (!channelRes.ok) throw new Error('Channel API request failed');
 
       const channelRawData: YouTubeApiResponse = await channelRes.json();
@@ -162,14 +159,14 @@ export default function GamingPage() {
       } else {
         setVideos(mockVideos.map((v) => transformVideoData(v, GAMING_CONFIG.tags)));
       }
-    } catch (err) {
+    }).catch((err: unknown) => {
       console.error('Failed to load gaming data:', err);
       setError(t.gaming.labels.errorText);
       setChannelData(mockChannelData);
       setVideos(mockVideos.map((v) => transformVideoData(v, GAMING_CONFIG.tags)));
-    } finally {
+    }).finally(() => {
       setIsLoading(false);
-    }
+    });
   }, [fetchAllVideos, mockChannelData, mockVideos, t.gaming.labels.errorText]);
 
   useEffect(() => {
@@ -223,7 +220,7 @@ export default function GamingPage() {
           <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 rounded-xl p-4 mb-8 text-center">
             <p className="text-amber-800 dark:text-amber-400 text-sm">{error}</p>
             <button
-              onClick={loadData}
+              onClick={() => { setIsLoading(true); setError(null); void loadData(); }}
               className="mt-2 px-5 py-2 bg-[#191970] dark:bg-[#a67c00] text-white dark:text-[#0f0f45] text-sm rounded-full hover:bg-[#0f0f4d] dark:hover:bg-[#c9a236] transition-colors"
             >
               {t.gaming.labels.retry}

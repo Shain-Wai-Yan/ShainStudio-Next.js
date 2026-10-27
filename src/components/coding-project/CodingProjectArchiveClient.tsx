@@ -96,22 +96,21 @@ export function CodingProjectArchiveClient({
   const hasMore = displayCount < filteredProjects.length;
 
   // ─── Load data ────────────────────────────────────────────────────────────
-  const loadProjects = useCallback(async (isInitial = false) => {
-    if (isInitial) setIsLoading(true);
-    setError(null);
-    try {
-      const res = await fetch('/api/coding-projects?pageSize=100');
-      const json = await res.json();
+  const loadProjects = useCallback((isInitial = false) => {
+    return fetch('/api/coding-projects?pageSize=100')
+      .then(res => res.json())
+      .then(json => {
+      setError(null);
       if (json.error) {
         setError(json.error);
       } else {
         setAllProjects(json.data ?? []);
       }
-    } catch (e) {
+    }).catch((e: unknown) => {
       setError(e instanceof Error ? e.message : 'Unknown error');
-    } finally {
+    }).finally(() => {
       if (isInitial) setIsLoading(false);
-    }
+    });
   }, []);
 
   useEffect(() => {
@@ -242,7 +241,7 @@ export function CodingProjectArchiveClient({
           isLoading={isLoading}
           error={error}
           locale={locale}
-          onRetry={loadProjects}
+          onRetry={() => { setIsLoading(true); setError(null); void loadProjects(true); }}
           viewDetailsLabel={labels.viewDetails}
           labels={{
             loading: labels.loadingText,

@@ -2,7 +2,7 @@
 
 import { GoogleAnalytics } from '@next/third-parties/google';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useSyncExternalStore } from 'react';
 import type { Locale } from '@/lib/locales';
 import ClarityAnalytics from '@/components/analytics/ClarityAnalytics';
 import {
@@ -44,31 +44,32 @@ interface AnalyticsConsentProps {
   clarityId?: string;
 }
 
+// Read persisted browser preferences through an external-store snapshot so SSR
+// stays consent-free and hydration does not need a synchronous effect reset.
+function storedPreference() {
+  try {
+    return readAnalyticsConsent() ?? window.sessionStorage.getItem(ANALYTICS_REGION_SESSION_KEY) ?? 'unknown';
+  } catch { return 'unknown'; }
+}
+function subscribePreferences(changed: () => void) {
+  window.addEventListener('storage', changed);
+  return () => window.removeEventListener('storage', changed);
+}
+const serverPreference = () => null;
+
 export default function AnalyticsConsentManager({ locale, gaId, clarityId }: AnalyticsConsentProps) {
-  const [consent, setConsent] = useState<AnalyticsConsent | null>(null);
-  const [ready, setReady] = useState(false);
+  const persisted = useSyncExternalStore(subscribePreferences, storedPreference, serverPreference);
+  const [choice, setConsent] = useState<AnalyticsConsent | null>(null);
+  const [region, setRegion] = useState<'automatic' | 'consent-required' | null>(null);
+  const persistedConsent = persisted === 'granted' || persisted === 'denied' ? persisted : null;
+  const consent = choice ?? persistedConsent ?? (persisted === 'automatic' || region === 'automatic' ? 'granted' : null);
+  const ready = consent !== null || persisted === 'consent-required' || region !== null;
   const [preferencesOpen, setPreferencesOpen] = useState(false);
   const copy = COPY[locale];
   const privacyHref = locale === 'zh' ? '/zh/privacy' : '/privacy';
 
   useEffect(() => {
-    const savedConsent = readAnalyticsConsent();
-    if (savedConsent) {
-      setConsent(savedConsent);
-      setReady(true);
-      return;
-    }
-
-    const sessionRegion = window.sessionStorage.getItem(ANALYTICS_REGION_SESSION_KEY);
-    if (sessionRegion === 'consent-required') {
-      setReady(true);
-      return;
-    }
-    if (sessionRegion === 'automatic') {
-      setConsent('granted');
-      setReady(true);
-      return;
-    }
+    if (persisted !== 'unknown') return;
 
     const controller = new AbortController();
     void fetch('/api/analytics-region', { cache: 'no-store', signal: controller.signal })
@@ -77,21 +78,17 @@ export default function AnalyticsConsentManager({ locale, gaId, clarityId }: Ana
         return response.json() as Promise<{ consentRequired?: boolean }>;
       })
       .then(({ consentRequired }) => {
-        if (consentRequired === false) {
-          window.sessionStorage.setItem(ANALYTICS_REGION_SESSION_KEY, 'automatic');
-          setConsent('granted');
-        } else {
-          window.sessionStorage.setItem(ANALYTICS_REGION_SESSION_KEY, 'consent-required');
-        }
+        if (controller.signal.aborted) return;
+        const nextRegion = consentRequired === false ? 'automatic' : 'consent-required';
+        try { window.sessionStorage.setItem(ANALYTICS_REGION_SESSION_KEY, nextRegion); } catch { /* The region decision can remain in memory. */ }
+        setRegion(nextRegion);
       })
-      .catch((error: unknown) => {
-        if (error instanceof Error && error.name === 'AbortError') return;
-        // Unknown geography fails closed and displays the consent choice.
-      })
-      .finally(() => setReady(true));
+      .catch(() => {
+        if (!controller.signal.aborted) setRegion('consent-required');
+      });
 
     return () => controller.abort();
-  }, []);
+  }, [persisted]);
 
   useEffect(() => {
     const openPreferences = () => setPreferencesOpen(true);

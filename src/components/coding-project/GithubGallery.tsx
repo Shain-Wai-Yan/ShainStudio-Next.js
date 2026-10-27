@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   fetchRepositories,
   fetchPinnedRepos,
@@ -47,32 +47,29 @@ export function GithubGallery({ initialStrapiProjects = [], labels }: GithubGall
   const [error, setError]             = useState<string | null>(null);
   const [viewerRepo, setViewerRepo]   = useState<string | null>(null);
 
-  useEffect(() => { loadGithubData(); }, []);
-
-  const loadGithubData = async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const [reposData, pinnedData, contribData, languagesData, activityData] =
-        await Promise.all([
+  const loadGithubData = useCallback(() => {
+    return Promise.all([
           fetchRepositories(),
           fetchPinnedRepos(),
           fetchContributions(),
           fetchTopLanguages(),
           fetchDetailedActivity(),
-        ]);
+        ]).then(([reposData, pinnedData, contribData, languagesData, activityData]) => {
+      setError(null);
       setRepositories(reposData);
       setPinnedRepos(pinnedData);
       setContributions(contribData);
       setLanguages(languagesData);
       setDetailedActivity(activityData);
-    } catch (err) {
+    }).catch((err: unknown) => {
       console.error('Error loading GitHub data:', err);
       setError('Failed to load GitHub data. Please try again later.');
-    } finally {
+    }).finally(() => {
       setIsLoading(false);
-    }
-  };
+    });
+  }, []);
+
+  useEffect(() => { void loadGithubData(); }, [loadGithubData]);
 
   return (
     <div className="w-full">
@@ -83,7 +80,7 @@ export function GithubGallery({ initialStrapiProjects = [], labels }: GithubGall
           text-red-700 dark:text-red-400">
           <span>{error}</span>
           <button
-            onClick={loadGithubData}
+            onClick={() => { setIsLoading(true); setError(null); void loadGithubData(); }}
             className="ml-4 underline hover:no-underline font-medium"
           >
             {t.retry}

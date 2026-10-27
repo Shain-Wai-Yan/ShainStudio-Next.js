@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { PortfolioCounts } from '@/lib/getPortfolioCounts';
 import { useTheme } from 'next-themes';
+import { useHydrated } from '@/lib/use-hydrated';
 
 // ─── Particle canvas — gold in both modes, denser on dark ─────────────────────
 
@@ -263,11 +264,8 @@ interface Props {
 export default function PortfolioClient({ locale, t, dynamicCounts }: Props) {
 
   const { resolvedTheme } = useTheme();
-  const [dark, setDark] = useState(false);
-  
-  useEffect(() => {
-    setDark(resolvedTheme === 'dark');
-  }, [resolvedTheme]);
+  const hydrated = useHydrated();
+  const dark = hydrated && resolvedTheme === 'dark';
 
   const isZh = locale === 'zh';
   const displayFont = "var(--font-serif)";

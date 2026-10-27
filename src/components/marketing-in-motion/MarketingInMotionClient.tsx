@@ -101,12 +101,12 @@ export function MarketingInMotionClient({
   const currentPage = Math.min(Math.max(1, currentPageRaw), totalPages);
 
   // Local state for search input (for fast typing before debounce)
-  const [searchInput, setSearchInput] = useState(urlSearch);
-
-  // Sync back local search input when URL changes (e.g. Back button)
-  useEffect(() => {
-    setSearchInput(urlSearch);
-  }, [urlSearch]);
+  const [searchDraft, setSearchDraft] = useState({ url: urlSearch, value: urlSearch });
+  // Adjust this component before rendering children when navigation changes the URL.
+  if (searchDraft.url !== urlSearch) {
+    setSearchDraft({ url: urlSearch, value: urlSearch });
+  }
+  const searchInput = searchDraft.url === urlSearch ? searchDraft.value : urlSearch;
 
   // ─── Scroll-to-top button ─────────────────────────────────────────────────
   useEffect(() => {
@@ -166,22 +166,21 @@ export function MarketingInMotionClient({
   const visibleProjects = filteredProjects.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
   // ─── Load data ────────────────────────────────────────────────────────────
-  const loadProjects = useCallback(async (isInitial = false) => {
-    if (isInitial) setIsLoading(true);
-    setError(null);
-    try {
-      const res = await fetch('/api/marketing-in-motion?pageSize=100');
-      const json = await res.json();
+  const loadProjects = useCallback((isInitial = false) => {
+    return fetch('/api/marketing-in-motion?pageSize=100')
+      .then(res => res.json())
+      .then(json => {
+      setError(null);
       if (json.error) {
         setError(json.error);
       } else {
         setAllProjects(json.data ?? []);
       }
-    } catch (e) {
+    }).catch((e: unknown) => {
       setError(e instanceof Error ? e.message : 'Unknown error');
-    } finally {
+    }).finally(() => {
       if (isInitial) setIsLoading(false);
-    }
+    });
   }, []);
 
   useEffect(() => {
@@ -195,11 +194,11 @@ export function MarketingInMotionClient({
   const handleRefresh = useCallback(async () => {
     setIsRefreshing(true);
     await loadProjects(false);
-    setSearchInput('');
+    setSearchDraft({ url: urlSearch, value: '' });
     setIsRefreshing(false);
     // Note: since this is a hard refresh, we can just replace the URL with the base pathname
     router.replace(pathname, { scroll: false });
-  }, [loadProjects, router, pathname]);
+  }, [loadProjects, router, pathname, urlSearch]);
 
   // ─── URL sync (debounced) ─────────────────────────────────────────────────
   const updateUrl = useCallback((newSearch: string, newFilters: typeof urlFilters, newSort: SortOption, newPage: number) => {
@@ -218,20 +217,20 @@ export function MarketingInMotionClient({
     }
   }, [pathname, router]);
 
-  const debouncedSearch = useDebounce(searchInput, 300);
+  const debouncedSearch = useDebounce(searchDraft, 300);
 
   // Push debounced search to URL
   useEffect(() => {
-    if (debouncedSearch !== urlSearch) {
-      updateUrl(debouncedSearch, urlFilters, urlSortBy, 1);
+    if (debouncedSearch === searchDraft && debouncedSearch.url === urlSearch && debouncedSearch.value !== urlSearch) {
+      updateUrl(debouncedSearch.value, urlFilters, urlSortBy, 1);
     }
-  }, [debouncedSearch, urlSearch, urlFilters, urlSortBy, updateUrl]);
+  }, [debouncedSearch, searchDraft, urlSearch, urlFilters, urlSortBy, updateUrl]);
 
   const handleSearchChange = useCallback(
     (value: string) => {
-      setSearchInput(value); // purely local updates
+      setSearchDraft({ url: urlSearch, value }); // purely local updates
     },
-    [],
+    [urlSearch],
   );
 
   const handleFilterChange = useCallback(
@@ -418,7 +417,7 @@ export function MarketingInMotionClient({
               isLoading={isLoading}
               error={error}
               locale={locale}
-              onRetry={loadProjects}
+              onRetry={() => { setIsLoading(true); setError(null); void loadProjects(true); }}
               viewDetailsLabel={labels.viewDetails}
               labels={{
                 loading: labels.loadingText,

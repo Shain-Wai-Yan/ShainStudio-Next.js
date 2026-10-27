@@ -1,6 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Photo, PhotoCollection, PhotoFeedPage } from '@/lib/strapi/photography';
 import { MasonryGrid } from './MasonryGrid';
@@ -45,12 +46,22 @@ export interface PhotographyGalleryProps {
 
 export function PhotographyGallery({ language, initialFeed, initialCollections }: PhotographyGalleryProps) {
   const hasInitialFeed = Boolean(initialFeed && initialFeed.photos && initialFeed.photos.length > 0);
-  const [seed, setSeed] = useState<number | null>(0);
+  const query = useSearchParams();
+  const initialCollection = query.get('collection') ?? '';
+  const initialSearch = (query.get('q') ?? '').slice(0, 80);
+  const [seed] = useState(() => {
+    if (typeof window === 'undefined' || (hasInitialFeed && !initialCollection && !initialSearch)) return 0;
+    try {
+      const stored = sessionStorage.getItem(SEED_KEY);
+      const value = stored === null ? crypto.getRandomValues(new Uint32Array(1))[0] : Number(stored);
+      return Number.isFinite(value) ? Math.abs(value) % 64 : 0;
+    } catch { return 0; }
+  });
   const [photos, setPhotos] = useState<Photo[]>(() => initialFeed?.photos ?? []);
   const [collections, setCollections] = useState<PhotoCollection[]>(() => initialCollections ?? []);
-  const [selectedCollection, setSelectedCollection] = useState('');
-  const [search, setSearch] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [selectedCollection, setSelectedCollection] = useState(initialCollection);
+  const [search, setSearch] = useState(initialSearch);
+  const [debouncedSearch, setDebouncedSearch] = useState(initialSearch.trim().length >= 2 ? initialSearch.trim() : '');
   const [page, setPage] = useState(() => initialFeed?.page ?? (hasInitialFeed ? 1 : 0));
   const [pageCount, setPageCount] = useState(() => initialFeed?.pageCount ?? 0);
   const [total, setTotal] = useState(() => initialFeed?.total ?? (initialFeed?.photos?.length ?? 0));
@@ -74,29 +85,8 @@ export function PhotographyGallery({ language, initialFeed, initialCollections }
     : { search: 'Search titles, places, collections, or tags…', all: 'Explore all', loading: 'Loading photography…', more: 'Load more', retry: 'Try again', empty: 'No photos found.', results: 'photos', collections: 'Collections', hide: 'Hide toolbar', show: 'Filters' };
 
   useEffect(() => {
-    const query = new URLSearchParams(window.location.search);
-    const initialCollection = query.get('collection') ?? '';
-    const initialSearch = (query.get('q') ?? '').slice(0, 80);
-    
-    setSelectedCollection(initialCollection);
-    setSearch(initialSearch);
-
-    // If we have an SSR feed and no active filters, we MUST keep the seed as 0
-    // to prevent Effect from detecting a seed change and wiping the SSR photos.
-    if (hasInitialFeed && !initialCollection && !initialSearch) {
-      setSeed(0);
-    } else {
-      let nextSeed = 0;
-      try {
-        const stored = sessionStorage.getItem(SEED_KEY);
-        nextSeed = stored == null ? crypto.getRandomValues(new Uint32Array(1))[0] % 64 : Number(stored) % 64;
-        sessionStorage.setItem(SEED_KEY, String(nextSeed));
-      } catch {
-        nextSeed = 0;
-      }
-      setSeed(nextSeed);
-    }
-  }, [hasInitialFeed]);
+    try { sessionStorage.setItem(SEED_KEY, String(seed)); } catch { /* Storage can be unavailable. */ }
+  }, [seed]);
 
   useEffect(() => {
     if (collections.length > 0) return;
