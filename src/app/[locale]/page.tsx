@@ -1,6 +1,5 @@
 import React from 'react';
-import fs from 'fs';
-import path from 'path';
+import { getClientLogos } from '@/lib/server/clients';
 import { Metadata } from 'next';
 import { getDictionary } from '@/lib/getDictionary';
 import type { Dictionary } from '@/lib/getDictionary';
@@ -24,32 +23,6 @@ import GsapCta from '@/components/landing/GsapCta';
 /* ─────────────────────────────────────────────────────────── */
 interface StatDef { value: number; suffix: string; label: string }
 interface ProjectDef { tag: string; award?: string; title: string; desc: string; href: string }
-interface ClientLogoDef { src: string; alt: string }
-
-/* ─────────────────────────────────────────────────────────── */
-/*  CLIENT LOGOS                                                */
-/* ─────────────────────────────────────────────────────────── */
-const CLIENT_IMAGE_RE = /\.(png|jpe?g|webp|avif|svg)$/i;
-
-// The hero's "clients" strip is sourced from the filesystem, so adding a
-// client is just dropping an image into public/images/Clients — the next
-// build picks it up with no code change.
-function getClientLogos(): ClientLogoDef[] {
-  try {
-    const dir = path.join(process.cwd(), 'public', 'images', 'Clients');
-    return fs
-      .readdirSync(dir)
-      .filter((file) => CLIENT_IMAGE_RE.test(file))
-      .sort((a, b) => a.localeCompare(b))
-      .map((file) => ({
-        src: `/images/Clients/${file}`,
-        alt: file.replace(CLIENT_IMAGE_RE, ''),
-      }));
-  } catch {
-    // Folder missing or unreadable — the hero simply renders without the strip
-    return [];
-  }
-}
 
 interface HomePage {
   badge: string;
@@ -127,7 +100,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 export default async function Page({ params }: { params: Promise<{ locale: string }> }) {
   const resolvedParams = await params;
   const locale = isSupportedLocale(resolvedParams.locale) ? resolvedParams.locale : DEFAULT_LOCALE;
-  const t: Dictionary = await getDictionary(locale);
+  const [t, clientLogos]: [Dictionary, Awaited<ReturnType<typeof getClientLogos>>] = await Promise.all([getDictionary(locale), getClientLogos()]);
   const hp = t.homePage as unknown as HomePage;
 
   const resolvedStats = hp.stats || [
@@ -149,7 +122,7 @@ export default async function Page({ params }: { params: Promise<{ locale: strin
   return (
     <>
       <div className="studio-home" data-locale={locale}>
-        <GsapHero hp={hp} locale={locale} clientLogos={getClientLogos()} />
+        <GsapHero hp={hp} locale={locale} clientLogos={clientLogos} />
         <StudioMarquee locale={locale} items={hp.marqueeItems} />
         <GsapStats stats={resolvedStats} locale={locale} />
         <GsapBento projects={resolvedProjects} locale={locale} />

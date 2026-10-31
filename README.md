@@ -121,3 +121,18 @@ webhook for create, update, publish, unpublish, and delete events.
 
 The endpoint accepts Strapi's standard webhook body and revalidates the affected
 blog, portfolio collection, photography page, plan list, or certificate page.
+
+The homepage client strip reads the Strapi `clients` collection server-side. Only
+published clients with a valid document ID, name, and image are displayed. The
+complete collection is cached for 300 seconds with the `clients` tag; client
+publication/unpublication and published deletion events use stale-while-revalidate
+invalidation, not a full deployment or hard path expiration. Both English and
+Chinese homepage output depend on that tag. Cached logos remain visible during
+temporary CMS failures; cold failures and successful empty collections hide only
+the strip. The original `public/images/Clients` assets remain solely for rollback.
+
+Run `npm run test:clients:cache` to build and exercise real production caching
+against a loopback mock CMS, including the five-minute timed-refresh failure case.
+It uses fake credentials, checks both locale outputs, and verifies the server token
+is absent from rendered HTML and browser JavaScript. This replaces `.next` output;
+run `npm run build` again afterwards for the normal CMS configuration.

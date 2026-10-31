@@ -9,6 +9,7 @@ import dynamic from "next/dynamic";
 import CImage from "@/components/ui/CImage";
 import ClientsStrip from "./ClientsStrip";
 import HeroTypewriter from "../HeroTypewriter";
+import type { ClientLogo } from '@/types/client';
 
 const StatueHoverReveal = dynamic(() => import("./StatueHoverReveal"), { ssr: false });
 
@@ -16,7 +17,7 @@ interface GsapHeroProps {
   hp: { badge?: string; title?: string; titleHighlight?: string; description?: string;
     viewPortfolio?: string; getInTouch?: string; clientsLabel?: string; };
   locale: string;
-  clientLogos?: { src: string; alt: string }[];
+  clientLogos?: ClientLogo[];
 }
 
 export default function GsapHero({ hp, locale, clientLogos = [] }: GsapHeroProps) {

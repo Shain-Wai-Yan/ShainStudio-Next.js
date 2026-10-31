@@ -16,6 +16,7 @@ interface FetchOptions {
   timeout?: number;
   revalidate?: number;
   tags?: string[];
+  cache?: 'no-store';
 }
 
 interface FetchResponse<T> {
@@ -33,7 +34,7 @@ export async function fetchFromStrapi<T>(
   try {
     const {
       method = 'GET', queryParams = {}, timeout = API_TIMEOUT,
-      revalidate = 300, tags = [],
+      revalidate = 300, tags = [], cache,
     } = options;
 
     // Build query string from params object
@@ -69,7 +70,7 @@ export async function fetchFromStrapi<T>(
         method,
         headers,
         signal: controller.signal,
-        ...(method === 'GET'
+        ...(method === 'GET' && cache !== 'no-store'
           ? { next: { revalidate, ...(tags.length > 0 ? { tags } : {}) } }
           : { cache: 'no-store' as const }),
       });

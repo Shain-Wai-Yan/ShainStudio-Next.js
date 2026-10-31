@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Pause, Play } from "lucide-react";
 import CImage from "@/components/ui/CImage";
 
-interface ClientLogo { src: string; alt: string; }
+import type { ClientLogo } from '@/types/client';
 
 export default function ClientsStrip({ label, logos, locale = "en", className = "" }: {
   label: string;
@@ -235,9 +235,8 @@ export default function ClientsStrip({ label, logos, locale = "en", className = 
         <div ref={trackRef} className="studio-partners-track">
           {[0, 1].map(copy => <ul key={copy} className="studio-partner-logos" role="list" aria-hidden={copy === 1}>
             {logos.map(logo => {
-              const name = logo.alt.replace(/\s+logo.*$/i, "");
-              return <li key={logo.src} className="studio-partner-logo">
-                <div><CImage src={logo.src} alt={copy === 0 ? name : ""} fill sizes="(max-width: 767px) 96px, 112px" loading="lazy" draggable={false} className="object-contain" /></div>
+              return <li key={logo.id} className="studio-partner-logo">
+                <div><CImage src={logo.src} alt={copy === 0 ? logo.alt : ""} fill sizes="(max-width: 767px) 96px, 112px" loading="lazy" draggable={false} className="object-contain" /></div>
               </li>;
             })}
           </ul>)}

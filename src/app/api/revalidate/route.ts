@@ -45,6 +45,7 @@ const CONTENT = {
   'business-plans': { tag: 'business-plans', paths: ['/portfolio/business-plans', '/zh/portfolio/business-plans'] },
   arts: { tag: 'arts', paths: ['/hobbies', '/zh/hobbies', '/hobbies/pencil-art', '/zh/hobbies/pencil-art'] },
   certificates: { tag: 'certificates', paths: ['/certificate', '/zh/certificate'] },
+  clients: { tag: 'clients', paths: ['/en', '/zh'] },
 } as const;
 
 type ContentType = keyof typeof CONTENT;
@@ -59,6 +60,7 @@ function contentType(model: unknown): ContentType | null {
   if (value.includes('business-plan')) return 'business-plans';
   if (['art', 'arts', 'api::art.art', 'pencil-art'].includes(value)) return 'arts';
   if (value.includes('certificate')) return 'certificates';
+  if (['client', 'clients', 'api::client.client'].includes(value)) return 'clients';
   return null;
 }
 
@@ -82,7 +84,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  let payload: { model?: unknown; entry?: { slug?: unknown; documentId?: unknown }; slug?: unknown; documentId?: unknown };
+  let payload: { model?: unknown; uid?: unknown; event?: unknown; entry?: { slug?: unknown; documentId?: unknown; publishedAt?: unknown }; slug?: unknown; documentId?: unknown };
   try {
     const value = await readPayload(request);
     if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('Invalid JSON payload');
@@ -94,12 +96,22 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 });
   }
 
-  const type = contentType(payload.model);
+  const type = contentType(payload.uid ?? payload.model);
   if (!type) {
     return NextResponse.json({ error: 'Unsupported Strapi content type' }, { status: 400 });
   }
 
   const content = CONTENT[type];
+  if (type === 'clients') {
+    const publishedDelete = payload.event === 'entry.delete' && typeof payload.entry?.publishedAt === 'string' && !!payload.entry.publishedAt;
+    if (!['entry.publish', 'entry.unpublish'].includes(String(payload.event)) && !publishedDelete) {
+      return NextResponse.json({ revalidated: false, skipped: true, type });
+    }
+    // Both prerendered homepages depend on this tag. Hard path invalidation
+    // would also expire their data and defeat stale-on-error availability.
+    revalidateTag('clients', 'max');
+    return NextResponse.json({ revalidated: true, type, paths: [...content.paths], mode: 'stale-while-revalidate' });
+  }
   revalidateTag(content.tag, { expire: 0 });
   for (const path of content.paths) revalidatePath(path);
 
