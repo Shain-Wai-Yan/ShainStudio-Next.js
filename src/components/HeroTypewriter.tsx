@@ -1,68 +1,78 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef } from "react";
 
-const ROLES = [
-  'Digital Marketer',
-  'Vibe Coder',
-  'Systems Architect',
-  'Creative Storyteller',
-  'SEO Engineer',
-];
-
-const TYPING_SPEED = 80;
-const DELETING_SPEED = 45;
-const PAUSE_AFTER_TYPE = 1800;
-const PAUSE_AFTER_DELETE = 400;
+const ROLES = ["SEO Engineer", "Vibe Coder", "Digital Marketer", "Systems Architect", "Creative Storyteller"];
 
 export default function HeroTypewriter() {
-  const [displayed, setDisplayed] = useState('');
-  const [roleIndex, setRoleIndex] = useState(0);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [isPaused, setIsPaused] = useState(false);
+  const rootRef = useRef<HTMLSpanElement>(null);
+  const textRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
-    if (isPaused) return;
-
-    const current = ROLES[roleIndex];
-
-    const timeout = setTimeout(() => {
-      if (!isDeleting) {
-        if (displayed.length < current.length) {
-          setDisplayed(current.slice(0, displayed.length + 1));
-        } else {
-          setIsPaused(true);
-          setTimeout(() => {
-            setIsDeleting(true);
-            setIsPaused(false);
-          }, PAUSE_AFTER_TYPE);
-        }
+    const root = rootRef.current;
+    const text = textRef.current;
+    if (!root || !text) return;
+    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let visible = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let index = 0;
+    let displayed = ROLES[0];
+    let deleting = true;
+    const stop = () => {
+      clearTimeout(timer);
+      timer = undefined;
+      root.dataset.playing = "false";
+    };
+    const schedule = (delay: number) => {
+      if (!visible || document.hidden || motion.matches) return;
+      root.dataset.playing = "true";
+      timer = setTimeout(step, delay);
+    };
+    const step = () => {
+      timer = undefined;
+      if (deleting) {
+        displayed = displayed.slice(0, -1);
+        text.textContent = displayed;
+        if (!displayed.length) {
+          deleting = false;
+          index = (index + 1) % ROLES.length;
+          schedule(300);
+        } else schedule(34);
       } else {
-        if (displayed.length > 0) {
-          setDisplayed(current.slice(0, displayed.length - 1));
-        } else {
-          setIsPaused(true);
-          setTimeout(() => {
-            setIsDeleting(false);
-            setRoleIndex((prev) => (prev + 1) % ROLES.length);
-            setIsPaused(false);
-          }, PAUSE_AFTER_DELETE);
-        }
+        displayed = ROLES[index].slice(0, displayed.length + 1);
+        text.textContent = displayed;
+        if (displayed === ROLES[index]) { deleting = true; schedule(1800); }
+        else schedule(65);
       }
-    }, isDeleting ? DELETING_SPEED : TYPING_SPEED);
-
-    return () => clearTimeout(timeout);
-  }, [displayed, isDeleting, isPaused, roleIndex]);
+    };
+    const update = () => {
+      stop();
+      if (motion.matches) {
+        index = 0;
+        displayed = ROLES[0];
+        deleting = true;
+        text.textContent = displayed;
+      } else schedule(1600);
+    };
+    const observer = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      update();
+    });
+    observer.observe(root);
+    document.addEventListener("visibilitychange", update);
+    motion.addEventListener("change", update);
+    return () => {
+      stop();
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", update);
+      motion.removeEventListener("change", update);
+    };
+  }, []);
 
   return (
-    <span
-      className="hero-typewriter"
-      aria-label={`Role: ${ROLES[roleIndex]}`}
-    >
-      <span className="hero-typewriter__text text-[#1e1e48] dark:!text-transparent dark:!bg-clip-text dark:!bg-gradient-to-r dark:!from-[#bf953f] dark:!via-[#fcf6ba] dark:!to-[#b38728]">
-        {displayed}
-      </span>
-      <span className="hero-typewriter__cursor" aria-hidden="true">|</span>
+    <span ref={rootRef} className="hero-typewriter" data-playing="false">
+      <span className="sr-only">{ROLES.join(". ")}.</span>
+      <span aria-hidden="true"><span ref={textRef} className="hero-typewriter__text">{ROLES[0]}</span><span className="hero-typewriter__cursor">|</span></span>
     </span>
   );
 }

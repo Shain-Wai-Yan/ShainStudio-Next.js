@@ -1,0 +1,60 @@
+/* The original midnight-and-gold invitation, refined as one composition. */
+.studio-collab {
+  --collab-gold: #d6bc79;
+  scroll-margin-top: 80px;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background: #1e1e48;
+  color: #f4efe3;
+  border-bottom: 1px solid #d6bc7926;
+}
+.dark .studio-collab { background: #07071a; }
+.studio-collab::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: radial-gradient(ellipse at 52% 40%,#d4af3710,transparent 65%);
+}
+.studio-collab-shell { width: min(100% - 9vw,1320px); margin-inline: auto; padding-block: clamp(70px,7vw,112px) 26px; }
+.studio-collab-top { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.studio-collab-eyebrow { display: inline-flex; align-items: center; gap: 16px; font-size: 10px; line-height: 1.5; letter-spacing: .22em; text-transform: uppercase; color: var(--collab-gold); }
+.studio-collab-eyebrow > span { height: 1px; width: 35px; background: var(--collab-gold); }
+.studio-collab-ornament { font: 400 29px/1 serif; color: var(--collab-gold); }
+.studio-collab-title { container-type: inline-size; margin: 0; padding-block: clamp(55px,6vw,90px) clamp(55px,6vw,90px); font-family: var(--font-serif),Georgia,serif; font-weight: 400; text-align: center; text-transform: uppercase; }
+.studio-collab-line { display: block; position: relative; width: fit-content; max-width: 100%; margin-inline: auto; padding-block: .035em .09em; }
+.studio-collab-intro { font-size: clamp(25px,4.7cqw,68px); line-height: 1.2; letter-spacing: -.025em; margin-bottom: 15px; }
+.studio-collab-main { font-size: clamp(34px,12.1cqw,170px); line-height: 1.02; letter-spacing: -.055em; }
+.studio-collab-outline { color: transparent; -webkit-text-stroke: 1px #d6bc7985; }
+.studio-collab-fill { position: absolute; inset: 0; padding: inherit; color: var(--collab-gold); background: linear-gradient(110deg,#b88c3a 0%,#f4e5b0 36%,#d6bc79 65%,#b88c3a 100%); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; pointer-events: none; user-select: none; }
+.studio-collab-bottom { display: flex; align-items: center; justify-content: space-between; gap: 70px; border-top: 1px solid #f4efe324; padding-block: 36px 56px; }
+.studio-collab-copy { margin: 0; max-width: 49ch; font-size: clamp(14px,1.15vw,17px); font-weight: 300; line-height: 1.85; color: #c4c1d1; }
+.studio-collab-button { position: relative; isolation: isolate; overflow: hidden; display: inline-flex; align-items: center; justify-content: space-between; gap: 38px; padding: 10px 11px 10px 29px; flex-shrink: 0; border: 1px solid #d6bc7980; border-radius: 60px; color: var(--collab-gold); transition: color .45s,border-color .45s,transform .5s cubic-bezier(.22,1,.36,1); text-decoration: none; }
+.studio-collab-button::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(110deg,#c4a358,#f4e5b0,#c9aa61); border-radius: inherit; transform: translateY(101%); transition: transform .55s cubic-bezier(.22,1,.36,1); }
+.studio-collab-button > span:first-child { font-size: 12px; letter-spacing: .055em; text-transform: uppercase; font-weight: 500; }
+.studio-collab-arrow { display: grid; place-items: center; width: 43px; height: 43px; border-radius: 50%; border: 1px solid #d6bc7940; background: #ffffff04; transition: transform .55s cubic-bezier(.22,1,.36,1),border-color .45s; }
+.studio-collab-button:is(:hover,:focus-visible) { color: #1e1e48; border-color: var(--collab-gold); transform: translateY(-3px); }
+.studio-collab-button:is(:hover,:focus-visible)::before { transform: translateY(0); }
+.studio-collab-button:is(:hover,:focus-visible) .studio-collab-arrow { transform: rotate(-45deg); border-color: #1e1e4830; }
+.studio-collab-button:focus-visible { outline: 2px solid #f4e5b0; outline-offset: 6px; }
+.studio-collab-signoff { border-top: 1px solid #f4efe312; padding-top: 24px; display: flex; align-items: center; justify-content: space-between; gap: 20px; color: #aaa6bc; font-size: 9px; line-height: 1.5; }
+.studio-collab-signoff > span:first-child { color: var(--collab-gold); font-family: var(--font-serif),serif; font-style: italic; font-size: 15px; }
+.studio-collab[data-locale="zh"] .studio-collab-intro { letter-spacing: .06em; }
+.studio-collab[data-locale="zh"] .studio-collab-main { letter-spacing: -.025em; }
+@media (max-width: 767px) {
+  .studio-collab-shell { width: calc(100% - 40px); padding-top: 54px; padding-bottom: 23px; }
+  .studio-collab-eyebrow { font-size: 8px; letter-spacing: .16em; gap: 12px; }
+  .studio-collab-eyebrow > span { width: 24px; }
+  .studio-collab-ornament { font-size: 23px; }
+  .studio-collab-title { padding-block: 48px 44px; }
+  .studio-collab-intro { font-size: clamp(19px,6.1cqw,42px); letter-spacing: -.02em; margin-bottom: 13px; }
+  .studio-collab-main { font-size: clamp(34px,14.3cqw,90px); letter-spacing: -.055em; }
+  .studio-collab-bottom { flex-direction: column; align-items: start; gap: 26px; padding-block: 27px 34px; }
+  .studio-collab-copy { font-size: 13px; line-height: 1.85; max-width: 40ch; }
+  .studio-collab-button { gap: 30px; padding-left: 25px; }
+  .studio-collab-button > span:first-child { font-size: 11px; }
+  .studio-collab-signoff { padding-top: 21px; align-items: baseline; gap: 15px; font-size: 8px; }
+  .studio-collab-signoff > span:last-child { text-align: right; max-width: 24ch; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .studio-collab-button,.studio-collab-button::before,.studio-collab-arrow { transition: none; }
+  .studio-collab-button:is(:hover,:focus-visible) { transform: none; }
+}

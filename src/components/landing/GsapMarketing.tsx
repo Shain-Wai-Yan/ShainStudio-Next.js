@@ -1,392 +1,150 @@
 "use client";
 
-import React, { useRef } from "react";
-import { useGSAP } from "@gsap/react";
-import { gsap, ScrollTrigger } from "@/lib/gsapSetup";
-import { Globe, Users, TrendingUp, Zap } from "lucide-react";
+import { useEffect, useRef, type RefObject } from "react";
+import { ArrowUpRight, Asterisk } from "lucide-react";
+import { useStudioReveal } from "./useStudioReveal";
 
-/* ─────────────────────────────────────────────── */
-/*  TYPES                                           */
-/* ─────────────────────────────────────────────── */
-
-interface MarketingPillarData {
-  index: string;
-  eyebrow: string;
-  title: string;
-  body: string;
-}
-
+interface MarketingPillarData { index: string; eyebrow: string; title: string; body: string; }
 export interface GsapMarketingProps {
   data: {
-    header: {
-      eyebrow: string;
-      line1: string;
-      line2: string;
-      line3: string;
-      description: string;
-    };
+    header: { eyebrow: string; line1: string; line2: string; line3: string; description: string; };
     pillars: MarketingPillarData[];
-    intersection: {
-      line1: string;
-      line2: string;
-      line3: string;
-    };
-    verdict: {
-      eyebrow: string;
-      text1: string;
-      highlight1: string;
-      highlight2: string;
-      text2: string;
-      items: string[];
-    };
+    intersection: { line1: string; line2: string; line3: string; };
+    verdict: { eyebrow: string; text1: string; highlight1: string; highlight2: string; text2: string; items: string[]; };
   };
 }
 
-const PILLAR_STYLES = [
-  {
-    icon: Users,
-    accent: "from-[#bf953f] via-[#fcf6ba] to-[#b38728]",
-    bg: "bg-[#fafafa] dark:bg-[#0a0a1a]",
-  },
-  {
-    icon: TrendingUp,
-    accent: "from-[#d4af37] via-[#f9f295] to-[#d4af37]",
-    bg: "bg-white dark:bg-[#0f0f2a]",
-  },
-  {
-    icon: Globe,
-    accent: "from-[#bf953f] via-[#fcf6ba] to-[#b38728]",
-    bg: "bg-[#fafafa] dark:bg-[#0a0a1a]",
-  },
-  {
-    icon: Zap,
-    accent: "from-[#d4af37] via-[#f9f295] to-[#d4af37]",
-    bg: "bg-white dark:bg-[#0f0f2a]",
-  },
-];
-
-/* ─────────────────────────────────────────────── */
-/*  SUB‑COMPONENTS                                 */
-/* ─────────────────────────────────────────────── */
-
-function PillarCard({
-  pillar,
-  style,
-  cardRef,
-}: {
-  pillar: MarketingPillarData;
-  style: typeof PILLAR_STYLES[number];
-  cardRef: (el: HTMLDivElement | null) => void;
-}) {
-  const Icon = style.icon;
-  return (
-    <div
-      ref={cardRef}
-      className={`mkt-card will-change-transform relative w-full flex flex-col rounded-3xl md:rounded-[2rem] border border-[#1e1e48]/10 dark:border-[#d4af37]/15 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.15)] dark:shadow-[0_30px_80px_-20px_rgba(0,0,0,0.6)] overflow-hidden min-h-[clamp(340px,55svh,520px)] md:min-h-0 md:h-[clamp(420px,65vh,680px)] ${style.bg}`}
-    >
-      {/* Radial-gradient glows instead of blur() filters — same look, far cheaper paint */}
-      <div
-        className="pointer-events-none absolute -top-48 -right-48 w-[36rem] h-[36rem] rounded-full"
-        style={{ background: "radial-gradient(circle, rgba(212, 175, 55, 0.05) 0%, rgba(212, 175, 55, 0) 60%)" }}
-      />
-      <div
-        className="pointer-events-none absolute -bottom-36 -left-36 w-[27rem] h-[27rem] rounded-full dark:hidden"
-        style={{ background: "radial-gradient(circle, rgba(30, 30, 72, 0.05) 0%, rgba(30, 30, 72, 0) 60%)" }}
-      />
-      <div
-        className="pointer-events-none absolute -bottom-36 -left-36 w-[27rem] h-[27rem] rounded-full hidden dark:block"
-        style={{ background: "radial-gradient(circle, rgba(212, 175, 55, 0.05) 0%, rgba(212, 175, 55, 0) 60%)" }}
-      />
-
-      <div className="relative z-10 flex-1 flex flex-col justify-between p-5 sm:p-8 md:p-14">
-        <div className="flex items-start justify-between">
-          <div className="flex items-center gap-3 md:gap-4 min-w-0">
-            <div className="w-9 h-9 md:w-12 md:h-12 shrink-0 rounded-full border border-[#1e1e48]/20 dark:border-[#d4af37]/30 flex items-center justify-center backdrop-blur-sm bg-white/50 dark:bg-black/40">
-              <Icon className="w-4 h-4 md:w-5 md:h-5 text-[#1e1e48] dark:text-[#d4af37]" />
-            </div>
-            <p className="text-[10px] md:text-xs font-mono tracking-[0.15em] md:tracking-[0.25em] uppercase text-[#d4af37]">
-              {pillar.eyebrow}
-            </p>
-          </div>
-          <span className="text-[2.75rem] sm:text-[5rem] md:text-[8rem] font-serif font-bold leading-none text-[#1e1e48]/5 dark:text-white/5 select-none shrink-0 pl-3 -mt-1 md:-mt-4">
-            {pillar.index}
-          </span>
-        </div>
-
-        <div className="mt-5 md:mt-0">
-          <h3 className="text-3xl sm:text-4xl md:text-6xl font-serif tracking-tighter text-[#1e1e48] dark:text-white mb-3 md:mb-8 leading-[1.1] md:leading-[1.05]">
-            {pillar.title}
-          </h3>
-          <div className="border-l-2 border-[#d4af37]/50 pl-3 sm:pl-4 md:pl-6">
-            <p className="text-[13px] sm:text-base md:text-lg text-[#1e1e48]/65 dark:text-gray-300 font-light leading-[1.65] md:leading-relaxed max-w-2xl">
-              {pillar.body}
-            </p>
-          </div>
-        </div>
-
-        <div className={`absolute bottom-0 left-0 w-full h-[3px] bg-gradient-to-r ${style.accent} opacity-60`} />
-      </div>
-    </div>
-  );
+/** Keep the original reversible, word-by-word Verdict entrance near its viewport. */
+function useVerdictMotion(scope: RefObject<HTMLDivElement | null>) {
+  useEffect(() => {
+    const root = scope.current;
+    if (!root) return;
+    let cancelled = false;
+    let revert: (() => void) | undefined;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return;
+      observer.disconnect();
+      void import("@/lib/gsapSetup").then(({ gsap }) => {
+        if (cancelled) return;
+        const media = gsap.matchMedia();
+        media.add("(prefers-reduced-motion: no-preference)", () => {
+          const timeline = gsap.timeline({ scrollTrigger: {
+            id: "studio-verdict", trigger: root, start: "top 75%",
+            toggleActions: "play none none reverse",
+          } });
+          timeline
+            .fromTo(".verdict-eyebrow", { opacity: 0, letterSpacing: "0.5em" },
+              { opacity: 1, letterSpacing: "0.25em", duration: 1, ease: "power3.out" })
+            .fromTo(".verdict-word", { opacity: 0, y: 30, rotateX: 45 },
+              { opacity: 1, y: 0, rotateX: 0, stagger: 0.05, duration: 0.8, ease: "back.out(1.5)" }, "-=0.6")
+            .fromTo(".verdict-item-line", { scaleX: 0, opacity: 0 },
+              { scaleX: 1, opacity: 1, stagger: 0.1, duration: 0.6, ease: "power3.out" }, "-=0.2")
+            .fromTo(".verdict-item-text", { opacity: 0, x: -20 },
+              { opacity: 1, x: 0, stagger: 0.1, duration: 0.8, ease: "power2.out" }, "<+0.2");
+        }, root);
+        revert = () => media.revert();
+      }).catch(() => { /* The server-rendered Verdict stays readable without motion. */ });
+    }, { rootMargin: "300px 0px" });
+    observer.observe(root);
+    return () => { cancelled = true; observer.disconnect(); revert?.(); };
+  }, [scope]);
 }
 
-/* ─────────────────────────────────────────────── */
-/*  MAIN SECTION                                   */
-/* ─────────────────────────────────────────────── */
+function VerdictWords({ text }: { text: string }) {
+  return text.split(/(\s+)/).map((part, index) => /\s/.test(part)
+    ? part : <span className="verdict-word" key={index}>{part}</span>);
+}
+
+function StatementWords({ text }: { text: string }) {
+  // Chinese has no spaces: short character groups keep the same reading rhythm.
+  const parts = /\s/.test(text) ? text.split(/(\s+)/) : Array.from(text);
+  return <><span className="sr-only">{text}</span><span aria-hidden="true">{parts.map((part, index) => /\s/.test(part)
+    ? part : <span className="studio-type-word" key={index}>{part}</span>)}</span></>;
+}
+
+function useApproachTypography(scope: RefObject<HTMLElement | null>) {
+  useEffect(() => {
+    const root = scope.current;
+    if (!root) return;
+    let cancelled = false;
+    let revert: (() => void) | undefined;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return;
+      observer.disconnect();
+      void import("@/lib/gsapSetup").then(({ gsap }) => {
+        if (cancelled) return;
+        const media = gsap.matchMedia();
+        media.add("(prefers-reduced-motion: no-preference)", () => {
+          gsap.fromTo(".studio-title-line > *", { yPercent: 110 }, {
+            yPercent: 0, duration: 1.1, stagger: .12, ease: "power3.out", clearProps: "transform",
+            scrollTrigger: { trigger: root.querySelector(".studio-approach-intro"), start: "top 82%", once: true },
+          });
+          const statement = root.querySelector(".studio-intersection");
+          const words = gsap.utils.toArray<HTMLElement>(".studio-intersection .studio-type-word");
+          gsap.fromTo(words, { opacity: .18, y: 12 }, {
+            opacity: 1, y: 0, stagger: .08, ease: "none",
+            scrollTrigger: { trigger: statement, start: "top 82%", end: "bottom 72%", scrub: .6 },
+          });
+          gsap.fromTo(".studio-intersection-mark", { rotate: -60, scale: .75 }, {
+            rotate: 0, scale: 1, ease: "none",
+            scrollTrigger: { trigger: statement, start: "top 82%", end: "center 65%", scrub: .8 },
+          });
+        }, root);
+        revert = () => media.revert();
+      }).catch(() => { /* Typography remains readable when motion cannot load. */ });
+    }, { rootMargin: "250px 0px" });
+    observer.observe(root);
+    return () => { cancelled = true; observer.disconnect(); revert?.(); };
+  }, [scope]);
+}
 
 export default function GsapMarketing({ data }: GsapMarketingProps) {
-  const containerRef = useRef<HTMLElement>(null);
-  const stackRef = useRef<HTMLDivElement>(null);
-  const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
-  const intersectionRef = useRef<HTMLDivElement>(null);
+  const container = useRef<HTMLElement>(null);
+  useStudioReveal(container);
+  useApproachTypography(container);
   const verdictRef = useRef<HTMLDivElement>(null);
-
+  useVerdictMotion(verdictRef);
   const { header, pillars, intersection, verdict } = data;
-
-  useGSAP(
-    () => {
-      const mm = gsap.matchMedia();
-
-      mm.add("(prefers-reduced-motion: no-preference)", () => {
-      /* ── 1. Section header reveal ── */
-      gsap.fromTo(
-        ".mkt-header-line",
-        { opacity: 0, y: 40 },
-        {
-          opacity: 1,
-          y: 0,
-          stagger: 0.12,
-          duration: 0.9,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: ".mkt-header",
-            start: "top 80%",
-            toggleActions: "play none none reverse",
-          },
-        }
-      );
-
-      /* ── 2. Stacking sticky cards ── */
-      cardsRef.current.forEach((card, i) => {
-        if (!card) return;
-
-        ScrollTrigger.create({
-          trigger: card,
-          // Below md the fixed header (80px) is proportionally taller than
-          // 10% of the viewport, so pin below it instead of under it.
-          start: () => (window.innerWidth < 768 ? "top 88px" : "top 10%"),
-          endTrigger: stackRef.current,
-          end: "bottom bottom",
-          pin: true,
-          pinSpacing: false,
-          anticipatePin: 1,
-          id: `mkt-pin-${i}`,
-        });
-
-        if (i < pillars.length - 1) {
-          gsap.to(card, {
-            scale: 1 - (pillars.length - 1 - i) * 0.025,
-            opacity: 0.55,
-            ease: "none",
-            scrollTrigger: {
-              trigger: card,
-              // Keep in sync with the pin start above.
-              start: () => (window.innerWidth < 768 ? "top 88px" : "top 10%"),
-              end: () => `+=${window.innerHeight * 0.85}`,
-              scrub: 1.2,
-            },
-          });
-        }
-      });
-
-      /* ── 3. The Intersection (Punchy Kinetics) ── */
-      const tlIntersection = gsap.timeline({
-        scrollTrigger: {
-          trigger: intersectionRef.current,
-          start: "top 75%",
-          end: "bottom 80%",
-          toggleActions: "play pause resume reverse",
-        },
-      });
-
-      tlIntersection
-        // Line 1 slides in from left
-        .fromTo(
-          ".intersect-line-1",
-          { opacity: 0, x: -100, filter: "blur(10px)" },
-          { opacity: 1, x: 0, filter: "blur(0px)", duration: 1, ease: "power4.out" }
-        )
-        // Line 2 slides in from right
-        .fromTo(
-          ".intersect-line-2",
-          { opacity: 0, x: 100, filter: "blur(10px)" },
-          { opacity: 1, x: 0, filter: "blur(0px)", duration: 1, ease: "power4.out" },
-          "-=0.7"
-        )
-        // Line 3 (Punchline) explodes from center with glow
-        .fromTo(
-          ".intersect-line-3",
-          { opacity: 0, scale: 0.5, y: 50, filter: "blur(20px)" },
-          { opacity: 1, scale: 1, y: 0, filter: "blur(0px)", duration: 1.2, ease: "elastic.out(1, 0.5)" },
-          "-=0.4"
-        );
-
-      /* ── 4. The Verdict (Enhanced Entrance) ── */
-      const tlVerdict = gsap.timeline({
-        scrollTrigger: {
-          trigger: verdictRef.current,
-          start: "top 75%",
-          toggleActions: "play none none reverse",
-        },
-      });
-
-      // Eyebrow
-      tlVerdict.fromTo(
-        ".verdict-eyebrow",
-        { opacity: 0, letterSpacing: "0.5em" },
-        { opacity: 1, letterSpacing: "0.25em", duration: 1, ease: "power3.out" }
-      );
-
-      // Main Text words
-      tlVerdict.fromTo(
-        ".verdict-word",
-        { opacity: 0, y: 30, rotateX: 45 },
-        { opacity: 1, y: 0, rotateX: 0, stagger: 0.05, duration: 0.8, ease: "back.out(1.5)" },
-        "-=0.6"
-      );
-
-      // Checkmark Items with elastic arrow slide
-      tlVerdict.fromTo(
-        ".verdict-item-line",
-        { width: 0, alpha: 0 },
-        { width: "2rem", alpha: 1, stagger: 0.1, duration: 0.6, ease: "power3.out" },
-        "-=0.2"
-      );
-      tlVerdict.fromTo(
-        ".verdict-item-text",
-        { opacity: 0, x: -20 },
-        { opacity: 1, x: 0, stagger: 0.1, duration: 0.8, ease: "power2.out" },
-        "<+0.2"
-      );
-      });
-      return () => mm.revert();
-    },
-    { scope: containerRef, dependencies: [pillars], revertOnUpdate: true }
-  );
-
   return (
-    <section ref={containerRef} className="relative z-10 bg-[#fafafa] dark:bg-black overflow-hidden">
-      
-      {/* ── HEADER ── */}
-      <div className="mkt-header pt-28 md:pt-40 pb-16 px-6 md:px-12 max-w-7xl mx-auto">
-        <div className="mkt-header-line flex items-center gap-4 mb-10">
-          <span className="w-12 h-[1px] bg-[#d4af37]" />
-          <span className="text-[#1e1e48]/60 dark:text-[#d4af37] text-xs md:text-sm font-bold tracking-[0.25em] uppercase font-mono">
-            {header.eyebrow}
-          </span>
-        </div>
-
-        {/* Headline space intentionally left blank — the heading stays in the
-            DOM but invisible (opacity-0), preserving the section's semantics
-            and the original spacing between the eyebrow and the copy. */}
-        <h2 className="text-5xl md:text-7xl lg:text-[5.5rem] font-serif tracking-tighter leading-[1.05] mb-6 opacity-0 select-none pointer-events-none">
-          <span className="block mb-1">{header.line1}</span>
-          <span className="block mb-1">{header.line2}</span>
-          <span className="block">{header.line3}</span>
-        </h2>
-
-        <p className="mkt-header-line text-base md:text-xl text-[#1e1e48]/55 dark:text-gray-400 max-w-2xl font-light leading-relaxed">
-          {header.description}
-        </p>
-      </div>
-
-      {/* ── STACKING CARDS ── */}
-      <div ref={stackRef} className="relative px-6 md:px-12 max-w-6xl mx-auto" style={{ paddingBottom: `${pillars.length * 14}vh` }}>
-        {pillars.map((pillar, i) => (
-          <div key={i} className="mb-12" style={{ marginTop: i === 0 ? 0 : "4vh" }}>
-            <PillarCard 
-              pillar={pillar} 
-              style={PILLAR_STYLES[i]}
-              cardRef={(el) => { cardsRef.current[i] = el; }} 
-            />
+    <section ref={container} className="studio-approach studio-section" aria-labelledby="studio-approach-title">
+      <div className="studio-shell">
+        <div className="studio-approach-grid">
+          <div className="studio-approach-intro">
+            <p className="studio-eyebrow"><span className="studio-section-index">02 /</span> {header.eyebrow}</p>
+            <h2 id="studio-approach-title" className="studio-section-title"><span className="studio-title-line"><span>{header.line1}</span></span><span className="studio-title-line"><em>{header.line2}</em></span><span className="studio-title-line"><span>{header.line3}</span></span></h2>
+            <p className="studio-approach-description">{header.description}</p>
+            <div className="studio-approach-mark" aria-hidden="true"><Asterisk size={48} strokeWidth={1} /><span>THOUGHTFULLY<br />CONNECTED.</span></div>
           </div>
-        ))}
-      </div>
-
-      {/* ── THE INTERSECTION (Punchy Kinetics) ── */}
-      <div ref={intersectionRef} className="px-6 md:px-12 max-w-6xl mx-auto pb-24 md:pb-48 mt-[-8vh]">
-        <div className="relative text-center flex flex-col items-center justify-center space-y-6 md:space-y-8">
-          
-          {/* Subtle background glow */}
-          <div
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[900px] h-[500px] rounded-full pointer-events-none"
-            style={{ background: "radial-gradient(ellipse, rgba(212, 175, 55, 0.05) 0%, rgba(212, 175, 55, 0) 60%)" }}
-          />
-
-          <p className="intersect-line-1 text-2xl md:text-5xl lg:text-6xl font-serif tracking-tight text-[#1e1e48]/40 dark:text-white/30 italic">
-            {intersection.line1}
-          </p>
-          <p className="intersect-line-2 text-2xl md:text-5xl lg:text-6xl font-serif tracking-tight text-[#1e1e48]/40 dark:text-white/30 italic">
-            {intersection.line2}
-          </p>
-          
-          <div className="pt-8 intersect-line-3 relative">
-            <h3 className="text-3xl sm:text-4xl md:text-7xl lg:text-[5.5rem] font-serif font-bold tracking-tighter leading-[1.1] md:leading-none text-transparent bg-clip-text bg-gradient-to-r from-[#bf953f] via-[#fcf6ba] to-[#b38728] drop-shadow-[0_0_30px_rgba(212,175,55,0.4)]">
-              {intersection.line3.split(" ").map((word, i, arr) => (
-                <React.Fragment key={i}>
-                  {word}{" "}
-                  {i === Math.floor(arr.length / 2) && <br className="hidden md:block" />}
-                </React.Fragment>
-              ))}
-            </h3>
-            {/* Sparkles / accents */}
-            <div className="absolute -top-4 -right-8 text-[#d4af37] opacity-60 animate-pulse">✦</div>
-            <div className="absolute -bottom-8 -left-4 text-[#d4af37] opacity-40 animate-pulse delay-150">✦</div>
-          </div>
-
-        </div>
-      </div>
-
-      {/* ── THE VERDICT (Enhanced Animation) ── */}
-      <div ref={verdictRef} className="px-6 md:px-12 max-w-6xl mx-auto pb-24 md:pb-40 border-t border-[#1e1e48]/8 dark:border-[#d4af37]/10 pt-14 md:pt-20">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-12 lg:gap-24 items-center">
-          
-          <div>
-            <p className="verdict-eyebrow text-xs font-mono tracking-[0.25em] uppercase text-[#d4af37] mb-5 md:mb-8 will-change-transform flex items-center gap-4">
-               <span className="w-8 h-[1px] bg-[#d4af37]"></span> {verdict.eyebrow}
-            </p>
-            <p className="text-2xl sm:text-3xl md:text-5xl font-serif text-[#1e1e48] dark:text-white tracking-tight leading-[1.15]" style={{ perspective: "1000px" }}>
-              {/* Word by word split for animation */}
-              {verdict.text1.split(" ").map((w,i)=>(
-                 <span key={i} className="verdict-word inline-block mr-[0.25em] will-change-transform">{w}</span>
-              ))}
-              <span className="verdict-word inline-block mr-[0.25em] text-transparent bg-clip-text bg-gradient-to-r from-[#bf953f] via-[#fcf6ba] to-[#b38728] will-change-transform">
-                {verdict.highlight1}
-              </span>
-              <span className="verdict-word inline-block mr-[0.25em] text-transparent bg-clip-text bg-gradient-to-r from-[#bf953f] via-[#fcf6ba] to-[#b38728] will-change-transform">
-                {verdict.highlight2}
-              </span>
-              <br className="hidden md:block"/>
-              {verdict.text2.split(" ").map((w,i)=>(
-                 <span key={`b-${i}`} className="verdict-word inline-block mr-[0.25em] will-change-transform">{w}</span>
-              ))}
-            </p>
-          </div>
-          
-          <div className="space-y-5 md:space-y-8 pl-0 md:pl-8 border-l border-transparent md:border-[#1e1e48]/5 dark:md:border-[#d4af37]/10">
-            {verdict.items.map((line, i) => (
-              <div key={i} className="flex items-center gap-4 md:gap-6 group cursor-default">
-                <span className="verdict-item-line h-[2px] shrink-0 bg-[#d4af37]/50 group-hover:w-16 group-hover:bg-[#d4af37] transition-all duration-500 ease-out-expo will-change-[width]" />
-                <span className="verdict-item-text text-base sm:text-lg md:text-2xl text-[#1e1e48]/70 dark:text-gray-300 font-light group-hover:text-[#1e1e48] dark:group-hover:text-white transition-colors duration-300 will-change-transform">
-                  {line}
-                </span>
-              </div>
+          <div className="studio-services">
+            {pillars.map((pillar) => (
+              <article key={pillar.index} className="studio-service" data-studio-reveal="">
+                <div className="studio-service-top"><span className="studio-eyebrow">/ {pillar.index}</span><ArrowUpRight size={21} aria-hidden="true" /></div>
+                <h3>{pillar.title}</h3>
+                <p className="studio-service-eyebrow">{pillar.eyebrow}</p>
+                <p className="studio-service-body">{pillar.body}</p>
+                <span className="studio-service-rule" aria-hidden="true" />
+              </article>
             ))}
           </div>
+        </div>
 
+        <div className="studio-intersection">
+          <p><StatementWords text={intersection.line1} /></p>
+          <p><StatementWords text={intersection.line2} /></p>
+          <h3><Asterisk className="studio-intersection-mark" aria-hidden="true" size={34} strokeWidth={1} /><StatementWords text={intersection.line3} /></h3>
+        </div>
+
+        <div ref={verdictRef} className="studio-verdict">
+          <div>
+            <p className="studio-eyebrow verdict-eyebrow">{verdict.eyebrow}</p>
+            <blockquote>
+              <span className="sr-only">{verdict.text1} {verdict.highlight1} {verdict.highlight2} {verdict.text2}</span>
+              <span aria-hidden="true"><VerdictWords text={verdict.text1} /> <em className="verdict-word">{verdict.highlight1}</em>{" "}<em className="verdict-word">{verdict.highlight2}</em>{" "}<VerdictWords text={verdict.text2} /></span>
+            </blockquote>
+          </div>
+          <ul>{verdict.items.map((item) => <li key={item}><span className="verdict-item-line" aria-hidden="true" /><span className="verdict-item-text">{item}</span></li>)}</ul>
         </div>
       </div>
-
     </section>
   );
 }

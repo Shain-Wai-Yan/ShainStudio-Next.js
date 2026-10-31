@@ -9,7 +9,8 @@
     "lint": "eslint",
     "test": "node --test scripts/*.cjs",
     "typecheck": "tsc --noEmit",
-    "smoke": "node scripts/smoke.mjs"
+    "smoke": "node scripts/smoke.mjs",
+    "audit": "node scripts/check-dependency-audit.js"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^7.2.0",
@@ -51,5 +52,8 @@
     "node": ">=24.22.1 <25",
     "npm": ">=11 <12"
   },
-  "packageManager": "npm@11.19.1"
+  "packageManager": "npm@11.19.1",
+  "overrides": {
+    "minimatch@>=9": "11.0.3"
+  }
 }

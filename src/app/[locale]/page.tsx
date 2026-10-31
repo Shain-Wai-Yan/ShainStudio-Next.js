@@ -6,18 +6,18 @@ import { getDictionary } from '@/lib/getDictionary';
 import type { Dictionary } from '@/lib/getDictionary';
 import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
 import { SITE_URL, SITE_NAME, DEFAULT_OG_IMAGE, absoluteUrl, languageAlternates } from '@/lib/seo';
-import dynamic from 'next/dynamic';
+import '@/components/landing/studio.css';
 
 // GsapHero is above-the-fold — direct import so it ships with the initial bundle
 import GsapHero from '@/components/landing/GsapHero';
 
-// Below-fold sections: next/dynamic splits their JS into separate chunks
-// (no ssr:false — HTML is still server-rendered so SEO/accessibility is preserved)
-const GsapMarquee  = dynamic(() => import('@/components/landing/GsapMarquee'));
-const GsapStats    = dynamic(() => import('@/components/landing/GsapStats'));
-const GsapBento    = dynamic(() => import('@/components/landing/GsapBento'));
-const GsapMarketing = dynamic(() => import('@/components/landing/GsapMarketing'));
-const GsapCta      = dynamic(() => import('@/components/landing/GsapCta'));
+// Render sections directly. Server-side next/dynamic does not defer their client
+// JavaScript; optional scroll effects are loaded by useStudioReveal instead.
+import StudioMarquee from '@/components/landing/GsapMarquee';
+import GsapStats from '@/components/landing/GsapStats';
+import GsapBento from '@/components/landing/GsapBento';
+import GsapMarketing from '@/components/landing/GsapMarketing';
+import GsapCta from '@/components/landing/GsapCta';
 
 /* ─────────────────────────────────────────────────────────── */
 /*  TYPES                                                       */
@@ -130,10 +130,6 @@ export default async function Page({ params }: { params: Promise<{ locale: strin
   const t: Dictionary = await getDictionary(locale);
   const hp = t.homePage as unknown as HomePage;
 
-  const resolvedMarqueeItems = hp.marqueeItems || [
-    "Digital Marketing", "Vibe Coding", "SEO Entity Management", "Next.js", "System Architecture", "AI Orchestration"
-  ];
-
   const resolvedStats = hp.stats || [
     { value: 99, suffix: "/100", label: "SEO Health" },
     { value: 100, suffix: "K+", label: "Views" },
@@ -152,14 +148,14 @@ export default async function Page({ params }: { params: Promise<{ locale: strin
 
   return (
     <>
-      <div className="font-sans antialiased text-slate-900 dark:text-slate-50 bg-white dark:bg-black selection:bg-amber-500/30">
+      <div className="studio-home" data-locale={locale}>
         <GsapHero hp={hp} locale={locale} clientLogos={getClientLogos()} />
-        <GsapMarquee items={resolvedMarqueeItems} />
-        <GsapStats stats={resolvedStats} />
+        <StudioMarquee locale={locale} items={hp.marqueeItems} />
+        <GsapStats stats={resolvedStats} locale={locale} />
         <GsapBento projects={resolvedProjects} locale={locale} />
         <GsapMarketing data={t.gsapMarketing} />
-        <GsapCta hp={hp} locale={locale} />
       </div>
+      <GsapCta hp={hp} locale={locale} />
     </>
   );
 }

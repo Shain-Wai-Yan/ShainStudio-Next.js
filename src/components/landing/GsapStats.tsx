@@ -1,104 +1,52 @@
 "use client";
 
-import React, { useRef } from "react";
-import { useGSAP } from "@gsap/react";
-import { gsap } from "@/lib/gsapSetup";
+import { useEffect, useRef } from "react";
+import { useStudioReveal } from "./useStudioReveal";
 
 interface StatDef { value: number; suffix: string; label: string; }
-interface GsapStatsProps {
-  stats: StatDef[];
-}
-
-export default function GsapStats({ stats }: GsapStatsProps) {
-  const containerRef = useRef<HTMLElement>(null);
-
-  useGSAP(
-    () => {
-      const mm = gsap.matchMedia();
-
-      // Under reduced motion no tweens are created — items render visible and
-      // the SSR'd final numbers stay as-is.
-      mm.add("(prefers-reduced-motion: no-preference)", () => {
-      // 1. Entrance animation for the items
-      gsap.fromTo(
-        ".stat-item",
-        { opacity: 0, y: 50, scale: 0.9 },
-        {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          stagger: 0.15,
-          duration: 0.8,
-          ease: "back.out(1.2)",
-          scrollTrigger: {
-            trigger: containerRef.current,
-            start: "top 80%",
-            toggleActions: "play none none reverse",
-          },
-        }
-      );
-
-      // 2. Animate the numbers counting up using scoped selector
-      gsap.utils.toArray<HTMLElement>(".stat-number").forEach((el) => {
-        
-        gsap.from(el, {
-          textContent: 0,
-          duration: 2,
-          ease: "power2.out",
-          snap: { textContent: 1 },
-          scrollTrigger: {
-            trigger: el,
-            start: "top 90%",
-          },
-          onUpdate: function () {
-            // Using a simple textContent update is cleaner than innerHTML for numbers
-            el.textContent = Math.ceil(
-              Number(this.targets()[0].textContent)
-            ).toString();
-          },
-        });
-      });
-      });
-      return () => mm.revert();
-    },
-    { scope: containerRef }
-  );
-
-  if (!stats || stats.length === 0) return null;
-
+export default function GsapStats({ stats, locale = "en" }: { stats: StatDef[]; locale?: string }) {
+  const container = useRef<HTMLElement>(null);
+  useStudioReveal(container);
+  useEffect(() => {
+    const root = container.current;
+    if (!root) return;
+    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const elements = Array.from(root.querySelectorAll<HTMLElement>("[data-studio-number]"));
+    let frame = 0;
+    const finish = () => { cancelAnimationFrame(frame); elements.forEach(element => { element.textContent = element.dataset.studioNumber || ""; }); };
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return;
+      observer.disconnect();
+      if (motion.matches) return;
+      const started = performance.now();
+      const count = (now: number) => {
+        const progress = Math.min(1, (now - started) / 1400);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        elements.forEach(element => { element.textContent = String(Math.round(Number(element.dataset.studioNumber) * eased)); });
+        if (progress < 1) frame = requestAnimationFrame(count);
+      };
+      frame = requestAnimationFrame(count);
+    });
+    observer.observe(root);
+    const reduce = () => { if (motion.matches) finish(); };
+    motion.addEventListener("change", reduce);
+    return () => { finish(); observer.disconnect(); motion.removeEventListener("change", reduce); };
+  }, []);
+  if (!stats?.length) return null;
   return (
-    <section
-      ref={containerRef}
-      className="py-16 md:py-24 border-y border-[#1e1e48]/10 dark:border-[#d4af37]/20 bg-[#fafafa] dark:bg-black relative z-20"
-    >
-      <div className="container mx-auto px-6 md:px-12">
-        <div className="mb-12 md:mb-16 flex items-center gap-4">
-          <span className="w-8 h-[1px] bg-[#d4af37]"></span>
-          <h2 className="text-[#1e1e48]/80 dark:text-[#d4af37] text-sm md:text-base font-bold tracking-widest uppercase">Numbers that speak</h2>
+    <section ref={container} className="studio-stats" aria-label={locale === "zh" ? "实践成果" : "A little perspective"}>
+      <div className="studio-shell studio-proof-layout">
+        <div className="studio-proof-intro" data-studio-reveal="">
+          <span className="studio-eyebrow">{locale === "zh" ? "想法之外" : "Beyond the idea"}</span>
+          <h2>{locale === "zh" ? "创意有形。" : "Creative thinking."}<br /><em>{locale === "zh" ? "影响可见。" : "Tangible impact."}</em></h2>
+          <p>{locale === "zh" ? "策略、构建与探索，让想法真正落地。" : "A practice shaped by strategy, building, and the curiosity to keep going further."}</p>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
-          {stats.map((s: StatDef, i: number) => (
-            <div key={i} className="stat-item flex flex-col relative group">
-              {/* Subtle hover effect */}
-              <div className="absolute inset-0 bg-[#1e1e48]/5 dark:bg-[#d4af37]/5 -m-4 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10"></div>
-              
-              <div className="flex items-baseline mb-2">
-                <span
-                  className="stat-number text-5xl md:text-6xl font-serif font-bold text-[#1e1e48] dark:!text-white tracking-tighter"
-                  data-value={s.value}
-                >
-                  {s.value}
-                </span>
-                <span className="text-2xl md:text-3xl text-[#d4af37] dark:!text-[#d4af37] font-serif ml-1 drop-shadow-sm">
-                  {s.suffix}
-                </span>
-              </div>
-              <p className="text-sm md:text-base text-[#1e1e48]/70 dark:!text-[#d4af37] font-bold tracking-widest uppercase">
-                {s.label}
-              </p>
-            </div>
-          ))}
-        </div>
+        <dl className="studio-stats-grid">
+          {stats.map((stat, index) => <div key={stat.label} className="studio-stat" data-studio-reveal={String(index * 0.05)}>
+            <dt className="studio-stat-label"><span aria-hidden="true">0{index + 1}</span>{stat.label}</dt>
+            <dd aria-label={stat.value + stat.suffix} className="studio-stat-value"><span aria-hidden="true" data-studio-number={stat.value}>{stat.value}</span><span aria-hidden="true" className="studio-stat-suffix">{stat.suffix}</span></dd>
+          </div>)}
+        </dl>
       </div>
     </section>
   );
