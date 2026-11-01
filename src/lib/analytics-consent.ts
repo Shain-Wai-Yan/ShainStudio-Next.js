@@ -1,13 +1,14 @@
 export const ANALYTICS_CONSENT_KEY = 'shain-studio:analytics-consent:v1';
-export const ANALYTICS_REGION_SESSION_KEY = 'shain-studio:analytics-region:v1';
 export const OPEN_ANALYTICS_SETTINGS_EVENT = 'shain-studio:open-analytics-settings';
 
 export type AnalyticsConsent = 'granted' | 'denied';
 
 export function readAnalyticsConsent(): AnalyticsConsent | null {
   if (typeof window === 'undefined') return null;
-  const value = window.localStorage.getItem(ANALYTICS_CONSENT_KEY);
-  return value === 'granted' || value === 'denied' ? value : null;
+  try {
+    const value = window.localStorage.getItem(ANALYTICS_CONSENT_KEY);
+    return value === 'granted' || value === 'denied' ? value : null;
+  } catch { return null; }
 }
 
 export function writeAnalyticsConsent(value: AnalyticsConsent) {
@@ -35,9 +36,7 @@ export function readEffectiveAnalyticsConsent(): AnalyticsConsent | null {
   if (explicitConsent) return explicitConsent;
   if (typeof window === 'undefined') return null;
 
-  return window.sessionStorage.getItem(ANALYTICS_REGION_SESSION_KEY) === 'automatic'
-    ? 'granted'
-    : null;
+  return 'granted';
 }
 
 export function removeAnalyticsCookies() {

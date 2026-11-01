@@ -397,7 +397,7 @@ test('CSP is enforced and production scripts cannot use eval', () => {
   assert.match(source, /isDevelopment \? ['"] ws: wss:/);
 });
 
-test('analytics vendors mount only after explicit or regional permission', () => {
+test('analytics defaults on with a persisted footer opt-out', () => {
   const manager = fs.readFileSync(path.join(__dirname, '..', 'src/components/analytics/AnalyticsConsent.tsx'), 'utf8');
   const layout = fs.readFileSync(path.join(__dirname, '..', 'src/app/[locale]/layout.tsx'), 'utf8');
   assert.match(manager, /consent === ['"]granted['"]/);
@@ -405,8 +405,8 @@ test('analytics vendors mount only after explicit or regional permission', () =>
   assert.match(manager, /writeAnalyticsConsent\(nextConsent\)/);
   assert.match(manager, /Clarity\.consent\(false\)/);
   assert.match(manager, /removeAnalyticsCookies\(\)/);
-  assert.match(manager, /fetch\(['"]\/api\/analytics-region['"]/);
-  assert.match(manager, /sessionStorage/);
+  assert.doesNotMatch(manager, /fetch\(['"]\/api\/analytics-region['"]/);
+  assert.match(manager, /const showPanel = preferencesOpen/);
   assert.doesNotMatch(layout, /<GoogleAnalytics|<ClarityAnalytics/);
 });
 
@@ -453,7 +453,7 @@ test('decorative textures do not depend on CSP-blocked Unsplash images', () => {
   }
 });
 
-test('automatic regional analytics enables custom events without persisting travel-sensitive consent', () => {
+test('default analytics enables custom events and honors explicit opt-out', () => {
   const previousWindow = global.window;
   const storage = (values = {}) => ({
     getItem: key => Object.hasOwn(values, key) ? values[key] : null,
@@ -658,7 +658,7 @@ test('CDN loads share pending work, verify the correct library, reject failure a
 });
 
 
-test('persisted analytics denial takes precedence over a completed automatic-region lookup', () => {
+test('persisted analytics denial takes precedence over the enabled default', () => {
   const previousWindow = global.window, previousEnvironment = process.env.NODE_ENV;
   let explicitConsent = 'denied';
   global.window = {
@@ -673,7 +673,7 @@ test('persisted analytics denial takes precedence over a completed automatic-reg
       react: {
         useEffect() {},
         useSyncExternalStore: (_subscribe, snapshot) => snapshot(),
-        useState: initial => [[null, 'automatic', false][stateIndex++] ?? initial, () => {}],
+        useState: initial => [[null, false][stateIndex++] ?? initial, () => {}],
       },
       'next/link': () => null,
       '@next/third-parties/google': { GoogleAnalytics: Analytics },
@@ -682,7 +682,7 @@ test('persisted analytics denial takes precedence over a completed automatic-reg
     const containsAnalytics = node => Boolean(node && (node.type === Analytics ||
       (Array.isArray(node) ? node.some(containsAnalytics) : containsAnalytics(node.props?.children))));
     assert.equal(containsAnalytics(Manager({locale:'en',gaId:'test-only'})), false);
-    explicitConsent = 'granted'; stateIndex = 0;
+    explicitConsent = null; stateIndex = 0;
     assert.equal(containsAnalytics(Manager({locale:'en',gaId:'test-only'})), true);
   } finally {
     global.window = previousWindow;

@@ -7,7 +7,6 @@ import type { Locale } from '@/lib/locales';
 import ClarityAnalytics from '@/components/analytics/ClarityAnalytics';
 import {
   type AnalyticsConsent,
-  ANALYTICS_REGION_SESSION_KEY,
   readAnalyticsConsent,
   removeAnalyticsCookies,
   OPEN_ANALYTICS_SETTINGS_EVENT,
@@ -19,7 +18,7 @@ const COPY = {
   en: {
     eyebrow: 'Your privacy',
     title: 'Choose how we use analytics',
-    description: 'We use Google Analytics and Microsoft Clarity to understand site performance and improve the experience. Where consent is required, they stay off unless you allow them. Elsewhere, you can turn them off here at any time. Necessary features always work.',
+    description: 'We use Google Analytics and Microsoft Clarity to understand site performance and improve the experience. Analytics are enabled by default. You can turn them off here at any time through Privacy settings in the footer. Necessary features always work.',
     accept: 'Allow analytics',
     reject: 'Necessary only',
     settings: 'Privacy settings',
@@ -29,7 +28,7 @@ const COPY = {
   zh: {
     eyebrow: '您的隐私',
     title: '选择分析数据的使用方式',
-    description: '我们使用 Google Analytics 和 Microsoft Clarity 来了解网站性能并改善体验。在法律要求同意的地区，只有您允许后才会启用；在其他地区，您可以随时在此关闭。必要功能始终正常运行。',
+    description: '我们使用 Google Analytics 和 Microsoft Clarity 来了解网站性能并改善体验。分析功能默认启用。您可以随时通过页脚的隐私设置将其关闭。必要功能始终正常运行。',
     accept: '允许分析',
     reject: '仅必要功能',
     settings: '隐私设置',
@@ -48,8 +47,8 @@ interface AnalyticsConsentProps {
 // stays consent-free and hydration does not need a synchronous effect reset.
 function storedPreference() {
   try {
-    return readAnalyticsConsent() ?? window.sessionStorage.getItem(ANALYTICS_REGION_SESSION_KEY) ?? 'unknown';
-  } catch { return 'unknown'; }
+    return readAnalyticsConsent() ?? 'granted';
+  } catch { return 'granted'; }
 }
 function subscribePreferences(changed: () => void) {
   window.addEventListener('storage', changed);
@@ -60,35 +59,10 @@ const serverPreference = () => null;
 export default function AnalyticsConsentManager({ locale, gaId, clarityId }: AnalyticsConsentProps) {
   const persisted = useSyncExternalStore(subscribePreferences, storedPreference, serverPreference);
   const [choice, setConsent] = useState<AnalyticsConsent | null>(null);
-  const [region, setRegion] = useState<'automatic' | 'consent-required' | null>(null);
-  const persistedConsent = persisted === 'granted' || persisted === 'denied' ? persisted : null;
-  const consent = choice ?? persistedConsent ?? (persisted === 'automatic' || region === 'automatic' ? 'granted' : null);
-  const ready = consent !== null || persisted === 'consent-required' || region !== null;
+  const consent = choice ?? persisted;
   const [preferencesOpen, setPreferencesOpen] = useState(false);
   const copy = COPY[locale];
   const privacyHref = locale === 'zh' ? '/zh/privacy' : '/privacy';
-
-  useEffect(() => {
-    if (persisted !== 'unknown') return;
-
-    const controller = new AbortController();
-    void fetch('/api/analytics-region', { cache: 'no-store', signal: controller.signal })
-      .then((response) => {
-        if (!response.ok) throw new Error('Unable to determine analytics region');
-        return response.json() as Promise<{ consentRequired?: boolean }>;
-      })
-      .then(({ consentRequired }) => {
-        if (controller.signal.aborted) return;
-        const nextRegion = consentRequired === false ? 'automatic' : 'consent-required';
-        try { window.sessionStorage.setItem(ANALYTICS_REGION_SESSION_KEY, nextRegion); } catch { /* The region decision can remain in memory. */ }
-        setRegion(nextRegion);
-      })
-      .catch(() => {
-        if (!controller.signal.aborted) setRegion('consent-required');
-      });
-
-    return () => controller.abort();
-  }, [persisted]);
 
   useEffect(() => {
     const openPreferences = () => setPreferencesOpen(true);
@@ -98,6 +72,7 @@ export default function AnalyticsConsentManager({ locale, gaId, clarityId }: Ana
 
   const choose = async (nextConsent: AnalyticsConsent) => {
     writeAnalyticsConsent(nextConsent);
+    if (gaId) (window as unknown as Record<string, unknown>)[`ga-disable-${gaId}`] = nextConsent === 'denied';
     updateGoogleAnalyticsConsent(nextConsent);
     setConsent(nextConsent);
     setPreferencesOpen(false);
@@ -111,10 +86,13 @@ export default function AnalyticsConsentManager({ locale, gaId, clarityId }: Ana
         // The tracker may never have loaded, which is the expected first-visit state.
       }
       removeAnalyticsCookies();
+      // Unmounting cannot unload a vendor script already running in this tab.
+      // Reload with the saved denial so neither tracker initializes again.
+      window.location.reload();
     }
   };
 
-  const showPanel = ready && (consent === null || preferencesOpen);
+  const showPanel = preferencesOpen;
 
   return (
     <>
