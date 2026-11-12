@@ -1,3 +1,4 @@
+import { localizedCollectionSeo, localizedSource } from '@/lib/server/localized-content';
 import { fetchBusinessPlans, transformBusinessPlan } from '@/lib/strapi/business-plans';
 import { Metadata } from 'next';
 import { getDictionary } from '@/lib/getDictionary';
@@ -21,10 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: { absolute: brandedTitle(title, 'Shain Studio') },
     description,
-    robots: locale === 'zh' ? { index: false, follow: true } : { index: true, follow: true },
-    alternates: {
-      canonical: absoluteUrl('en', '/portfolio/business-plans'),
-    },
+    ...await localizedCollectionSeo('business-plans', '/portfolio/business-plans', locale === 'zh' ? 'zh' : 'en'),
     openGraph: {
       title,
       description,
@@ -55,7 +53,7 @@ export async function generateStaticParams() {
 export default async function BusinessPlansPage({ params }: Props) {
   const { locale: rawLocale } = await params;
   const locale = isSupportedLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
-  const [t, result] = await Promise.all([getDictionary(locale), fetchBusinessPlans(1, 100)]);
+  const [t, result] = await Promise.all([getDictionary(locale), fetchBusinessPlans(1, 100, localizedSource(locale))]);
 
   return <BusinessPlanClient initialPlans={result.plans.map(transformBusinessPlan)} initialError={result.error} locale={locale as 'en' | 'zh'} t={{ nav: t.nav, businessPlans: t.businessPlans }} />;
 }

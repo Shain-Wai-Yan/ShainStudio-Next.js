@@ -1,4 +1,4 @@
-import sanitizeHtml from 'sanitize-html';
+import {sanitizeRichText} from '@/lib/utils/sanitize-rich-text';
 import parse, { Element } from 'html-react-parser';
 import React from 'react';
 import { 
@@ -20,18 +20,7 @@ const activePlugins = [
 
 export default function RichTextRenderer({ content, className = '' }: RichTextRendererProps) {
   
-  const cleanContent = sanitizeHtml(content || '', {
-    allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img', 'oembed', 'figure']),
-    allowedAttributes: {
-      ...sanitizeHtml.defaults.allowedAttributes,
-      img: ['src', 'alt', 'loading', 'decoding', 'style', 'class'],
-      figure: ['class'],
-      oembed: ['url', 'src']
-    },
-    allowedSchemesByTag: {
-      img: ['http', 'https', 'data']
-    }
-  });
+  const cleanContent=sanitizeRichText(content);
 
   const parsedContent = parse(cleanContent, {
     replace: (domNode) => {

@@ -9,6 +9,8 @@ import { StrapiFile } from '@/types/strapi';
 
 export interface Certificate {
   id: number;
+  documentId?: string;
+  localization?: import('@/types/localization').ContentLocalization;
   Title: string;
   Description: string;
   Image: StrapiFile | StrapiFile[] | string; // Fixed: was CertificateImage
@@ -33,12 +35,12 @@ export interface CertificatesResponse {
 /**
  * Fetches certificates from Strapi
  */
-export async function fetchCertificates(): Promise<{
+export async function fetchCertificates(source: typeof fetchFromStrapi = fetchFromStrapi): Promise<{
   certificates: Certificate[];
   error: string | null;
 }> {
   try {
-    const response = await fetchFromStrapi<CertificatesResponse>('certificates', {
+    const response = await source<CertificatesResponse>('certificates', {
       revalidate: 3600,
       tags: ['strapi', 'certificates'],
       queryParams: {

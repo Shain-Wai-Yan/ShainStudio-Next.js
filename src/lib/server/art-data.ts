@@ -1,5 +1,6 @@
 import 'server-only';
-import { fetchFromStrapi } from '@/lib/strapi/client';
+import { localizedSource } from '@/lib/server/localized-content';
+import type { ContentLocale } from '@/types/localization';
 import { STRAPI_ORIGIN_URL } from '@/lib/strapi/config';
 import { sanitizeDescription } from '@/lib/utils/sanitize-description';
 import type { ArtPiece, ArtFeedPage, ArtQueryOptions } from '@/lib/strapi/art';
@@ -54,7 +55,7 @@ function normalizeMedia(media: unknown): NormalizedMedia | null {
 /**
  * Transforms a raw Strapi art document into a type-safe ArtPiece.
  */
-function transformArtPiece(raw: Record<string, unknown>): ArtPiece | null {
+export function transformArtPiece(raw: Record<string, unknown>): ArtPiece | null {
   if (!raw) return null;
   try {
     const data = (raw.attributes as Record<string, unknown>) || raw;
@@ -75,6 +76,7 @@ function transformArtPiece(raw: Record<string, unknown>): ArtPiece | null {
     const description = rawDesc ? sanitizeDescription(rawDesc) : '';
 
     return {
+      localization: data.localization as import('@/types/localization').ContentLocalization | undefined,
       id: Number(raw.id),
       documentId: typeof raw.documentId === 'string' ? raw.documentId : undefined,
       title,
@@ -121,7 +123,7 @@ export async function getArtPieces(options: ArtQueryOptions = {}): Promise<ArtFe
       queryParams['filters[is_featured][$eq]'] = true;
     }
 
-    const response = await fetchFromStrapi<{
+    const response = await localizedSource(options.locale ?? 'en')<{
       data: Record<string, unknown>[];
       meta?: { pagination?: { total?: number; pageCount?: number } };
     }>('arts', {
@@ -154,11 +156,11 @@ export async function getArtPieces(options: ArtQueryOptions = {}): Promise<ArtFe
 /**
  * Fetches an individual art piece by slug. A healthy CMS miss returns null.
  */
-export async function getArtPieceBySlug(slug: string): Promise<ArtPiece | null> {
+export async function getArtPieceBySlug(slug: string, locale: ContentLocale = 'en'): Promise<ArtPiece | null> {
   if (!slug || slug.length > 200) return null;
 
   try {
-    const response = await fetchFromStrapi<{ data: Record<string, unknown>[] }>('arts', {
+    const response = await localizedSource(locale)<{ data: Record<string, unknown>[] }>('arts', {
       queryParams: {
         'filters[slug][$eq]': slug,
         populate: '*',

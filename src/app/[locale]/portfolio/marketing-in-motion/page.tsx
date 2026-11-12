@@ -1,3 +1,4 @@
+import { localizedCollectionSeo } from '@/lib/server/localized-content';
 import { serializeJsonLd } from '@/lib/utils/json-ld';
 import { Suspense } from 'react';
 import { Metadata } from 'next';
@@ -6,7 +7,7 @@ import { MarketingInMotionClient } from '@/components/marketing-in-motion/Market
 import { getDictionary } from '@/lib/getDictionary';
 import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
 import { getMarketingProjects } from '@/lib/server/project-data';
-import { DEFAULT_OG_IMAGE, SITE_NAME, SITE_URL, brandedTitle, personRef } from '@/lib/seo';
+import { DEFAULT_OG_IMAGE, SITE_NAME, brandedTitle, personRef } from '@/lib/seo';
 
 interface MarketingInMotionPageProps {
   params: Promise<{ locale: string }>;
@@ -31,10 +32,7 @@ export async function generateMetadata(
     title: { absolute: brandedTitle(t.marketingInMotion.seo.title, 'Shain Studio') },
     description: t.marketingInMotion.seo.description,
     keywords: t.marketingInMotion.seo.keywords,
-    robots: locale === 'zh' ? { index: false, follow: true } : { index: true, follow: true },
-    alternates: {
-      canonical: `${SITE_URL}/portfolio/marketing-in-motion`,
-    },
+    ...await localizedCollectionSeo('marketing-projects', '/portfolio/marketing-in-motion', locale === 'zh' ? 'zh' : 'en'),
     openGraph: {
       type: 'website',
       url: `https://www.shainwaiyan.com${basePath}/portfolio/marketing-in-motion`,
@@ -60,7 +58,7 @@ export default async function MarketingInMotionPage(props: MarketingInMotionPage
   const t = await getDictionary(locale);
 
   // Pre-fetch data dynamically server-side for maximum SEO availability
-  const { projects } = await getMarketingProjects(1, 100);
+  const { projects } = await getMarketingProjects(1, 100, locale);
 
   const basePath = locale === 'en' ? '' : `/${locale}`;
 

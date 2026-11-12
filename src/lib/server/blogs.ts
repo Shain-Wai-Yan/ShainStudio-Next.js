@@ -4,11 +4,13 @@ import type { BlogPost } from '@/lib/strapi/blogs';
 import { getBlogPost, getBlogPosts } from './blog-data';
 
 // Maps camelCase API response → PascalCase BlogPost that components expect
-function mapPost(p: Record<string, unknown>): BlogPost {
+export function mapPost(p: Record<string, unknown>): BlogPost {
   // ── Resolve SEO fields ────────────────────────────────────────────────────
   const rawSeo = p.seo as Record<string, unknown> | undefined;
   const seo: BlogPost['Seo'] = rawSeo
     ? {
+        canonicalUrl: rawSeo.canonicalUrl as string | undefined,
+        noIndex: Boolean(rawSeo.noIndex),
         metaTitle:       rawSeo.metaTitle       as string | undefined,
         metaDescription: rawSeo.metaDescription as string | undefined,
         ogImageUrl:      rawSeo.ogImageUrl       as string | null | undefined,
@@ -16,6 +18,8 @@ function mapPost(p: Record<string, unknown>): BlogPost {
     : undefined;
 
   return {
+    documentId: p.documentId as string,
+    localization: p.localization as import('@/types/localization').ContentLocalization | undefined,
     id:            p.id            as number,
     Title:         String(p.title   ?? 'Untitled'),
     Slug:          String(p.slug    ?? ''),
@@ -48,9 +52,9 @@ const listBlogs = cache(async (language: 'en' | 'zh', page: number, pageSize: nu
 export async function fetchAllBlogs(language: 'en' | 'zh' = 'en', options: { page?: number; pageSize?: number } = {}) {
   return listBlogs(language, options.page ?? 1, options.pageSize ?? 12);
 }
-export const fetchBlogBySlug = cache(async (slug: string) => {
+export const fetchBlogBySlug = cache(async (slug: string, language: 'en' | 'zh' = 'en') => {
   try {
-    const post = await getBlogPost(slug);
+    const post = await getBlogPost(slug, language);
     return { blog: post ? mapPost(post) : null, error: null };
   } catch (error) {
     return { blog: null, error: error instanceof Error ? error.message : 'CMS unavailable' };

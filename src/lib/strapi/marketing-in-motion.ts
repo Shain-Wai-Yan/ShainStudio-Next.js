@@ -23,10 +23,12 @@ export interface StrapiSeoBlock {
   metaTitle?: string;
   metaDescription?: string;
   canonicalUrl?: string;
+  noIndex?: boolean;
   structuredData?: unknown;
 }
 
 export interface StrapiMarketingProject {
+  localization?: import('@/types/localization').ContentLocalization;
   id: number;
   // Strapi v5 flat structure
   Title?: string;
@@ -65,6 +67,7 @@ export interface StrapiMarketingProjectsResponse {
 // ─── Transformed Shape ────────────────────────────────────────────────────────
 
 export interface MarketingProject {
+  localization?: import('@/types/localization').ContentLocalization;
   id: number;
   title: string;
   slug: string;
@@ -85,6 +88,7 @@ export interface MarketingProject {
     metaDescription: string;
     ogImage: string;
     canonicalUrl: string;
+    noIndex?: boolean;
   };
 }
 
@@ -291,9 +295,11 @@ export function transformMarketingProject(raw: StrapiMarketingProject): Marketin
       metaDescription: seoRaw?.metaDescription || summary,
       ogImage: coverImage,
       canonicalUrl: seoRaw?.canonicalUrl || '',
+      noIndex: Boolean(seoRaw?.noIndex),
     };
 
     return {
+      localization: raw.localization,
       id: raw.id,
       title,
       slug,
@@ -322,9 +328,10 @@ export function transformMarketingProject(raw: StrapiMarketingProject): Marketin
 export async function fetchMarketingProjects(
   page = 1,
   pageSize = 36,
+  source: typeof fetchFromStrapi = fetchFromStrapi,
 ): Promise<{ projects: MarketingProject[]; total: number; error: string | null }> {
   try {
-    const response = await fetchFromStrapi<StrapiMarketingProjectsResponse>(
+    const response = await source<StrapiMarketingProjectsResponse>(
       'marketing-projects',
       {
         tags: ['strapi', 'marketing-projects'],
@@ -354,9 +361,10 @@ export async function fetchMarketingProjects(
 
 export async function fetchMarketingProjectBySlug(
   slug: string,
+  source: typeof fetchFromStrapi = fetchFromStrapi,
 ): Promise<{ project: MarketingProject | null; error: string | null }> {
   try {
-    const response = await fetchFromStrapi<StrapiMarketingProjectsResponse>(
+    const response = await source<StrapiMarketingProjectsResponse>(
       'marketing-projects',
       {
         tags: ['strapi', 'marketing-projects'],
@@ -386,14 +394,15 @@ export async function fetchRelatedMarketingProjects(
   category: string,
   currentSlug: string,
   limit = 3,
-  timeout?: number
+  timeout?: number,
+  source: typeof fetchFromStrapi = fetchFromStrapi,
 ): Promise<{ projects: MarketingProject[]; error: string | null }> {
   if (!category || category === 'Uncategorized') {
     return { projects: [], error: null };
   }
 
   try {
-    const response = await fetchFromStrapi<StrapiMarketingProjectsResponse>(
+    const response = await source<StrapiMarketingProjectsResponse>(
       'marketing-projects',
       {
         tags: ['strapi', 'marketing-projects'],

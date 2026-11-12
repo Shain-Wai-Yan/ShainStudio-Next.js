@@ -113,7 +113,7 @@ export function MarketingInMotionClient({
     const onScroll = () => setShowScrollTop(window.scrollY > 600);
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+  }, [locale]);
 
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -167,7 +167,7 @@ export function MarketingInMotionClient({
 
   // ─── Load data ────────────────────────────────────────────────────────────
   const loadProjects = useCallback((isInitial = false) => {
-    return fetch('/api/marketing-in-motion?pageSize=100')
+    return fetch(`/api/marketing-in-motion?pageSize=100&language=${locale}`)
       .then(res => res.json())
       .then(json => {
       setError(null);
@@ -181,7 +181,7 @@ export function MarketingInMotionClient({
     }).finally(() => {
       if (isInitial) setIsLoading(false);
     });
-  }, []);
+  }, [locale]);
 
   useEffect(() => {
     // Only fetch client-side on initial load if SSR didn't pass anything

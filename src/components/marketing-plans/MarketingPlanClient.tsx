@@ -40,7 +40,7 @@ export function MarketingPlanClient({ locale, dict, initialPlans, initialError }
     setError(null);
 
     try {
-      const res = await fetch('/api/marketing-plans');
+      const res = await fetch(`/api/marketing-plans?language=${locale}`);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
       setPlans((json?.data || []) as TransformedPlan[]);

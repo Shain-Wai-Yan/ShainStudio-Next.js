@@ -245,7 +245,7 @@ async function getDynamicHobbyData(locale: string) {
   let featuredArtTitle = locale === 'zh' ? '铅笔画' : 'Pencil Art';
 
   try {
-    const artFeed = await getArtPieces({ pageSize: 1 });
+    const artFeed = await getArtPieces({ pageSize: 1, locale: locale === 'zh' ? 'zh' : 'en' });
     if (artFeed.total > 0) {
       artTotal = artFeed.total;
     }

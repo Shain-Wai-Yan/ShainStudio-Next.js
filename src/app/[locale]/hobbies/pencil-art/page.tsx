@@ -30,7 +30,7 @@ export default async function PencilArtPage({ params }: PencilArtPageProps) {
 
   let arts: ArtGalleryPiece[] = [];
   try {
-    const feed = await getArtPieces({ pageSize: 50 });
+    const feed = await getArtPieces({ pageSize: 50, locale });
     arts = feed.arts.map(({ id, title, slug, image, width, height, altText }) => ({
       id,
       title,
@@ -46,6 +46,7 @@ export default async function PencilArtPage({ params }: PencilArtPageProps) {
 
   return (
     <section className="min-h-screen bg-white dark:bg-[#0a0b10] text-neutral-900 dark:text-neutral-100 transition-colors duration-300" aria-labelledby="pencil-art-title">
+      {locale === 'zh' && <p lang="zh-CN" className="mx-auto max-w-7xl px-4 py-2 text-sm text-stone-500">尚未发布中文版本的内容将显示英文原文。</p>}
       <h1 id="pencil-art-title" className="sr-only">{t.pencilArt.title}</h1>
       <div className="w-full max-w-[1680px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-14 pt-20 sm:pt-24 pb-4">
         {/* Minimal Breadcrumbs */}

@@ -1,4 +1,5 @@
 export interface Photo {
+  localization?: import('@/types/localization').ContentLocalization;
   id: number;
   documentId?: string;
   title: string;

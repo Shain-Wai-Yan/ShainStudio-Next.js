@@ -15,6 +15,13 @@ function load(file, mocks = {}) {
   new Function('require', 'module', 'exports', outputText)(name => {
     if (Object.hasOwn(mocks, name)) return mocks[name];
     if (name === 'server-only') return {};
+    // Adapter tests isolate normalization from the independently tested locale cache.
+    if (name === '@/lib/server/localized-content') return {
+      localizedSource: () => mocks['@/lib/strapi/client']?.fetchFromStrapi ?? (async (endpoint, options) => {
+        const response = await fetch(`https://cms.example.test/api/${endpoint}?${new URLSearchParams(options.queryParams)}`);
+        return {data:await response.json(),error:null};
+      }),
+    };
     if (name.startsWith('@/')) return load(`src/${name.slice(2)}.ts`, mocks);
     return require(name);
   }, loaded, loaded.exports);
@@ -81,7 +88,7 @@ test('Chinese redirect retains attribution parameters', () => {
   assert.equal(response.url.pathname, '/zh');
   assert.equal(response.url.search, '?utm_source=test');
 });
-test('blog language filters run before pagination and failures are not empty success', async () => {
+test('blog delegates native language resolution before pagination and propagates failures', async () => {
   const calls = [];
   const { getBlogPosts } = load('src/lib/server/blog-data.ts', {
     '@/lib/strapi/client': { fetchFromStrapi: async (endpoint, options) => {
@@ -90,7 +97,7 @@ test('blog language filters run before pagination and failures are not empty suc
     } },
   });
   await getBlogPosts(new URLSearchParams('language=zh&page=2&pageSize=999'));
-  assert.equal(calls[0]['filters[slug][$startsWith]'], 'zh-');
+  assert.equal(calls[0]['filters[slug][$startsWith]'], undefined);
   assert.equal(calls[0]['pagination[page]'], 2);
   assert.equal(calls[0]['pagination[pageSize]'], 100);
   const failed = load('src/lib/server/blog-data.ts', { '@/lib/strapi/client': { fetchFromStrapi: async () => ({ data: null, error: 'offline' }) } });
@@ -539,16 +546,14 @@ test('revalidation authenticates and rejects invalid or oversized JSON without i
     }
     assert.equal((await POST(request(JSON.stringify({ model: 'blogs', extra: 'x'.repeat(17000) })))).status, 413);
     assert.equal(invalidations.length, 0);
-    assert.equal((await POST(request('{"model":"blogs","entry":{"slug":"hello"}}'))).status, 200);
-    assert.ok(invalidations.some(args => args[0] === '/blog/hello'));
-    for (const model of ['art', 'arts', 'api::art.art', 'pencil-art']) {
+    assert.equal((await POST(request('{"model":"blogs","event":"entry.publish","entry":{"slug":"hello"}}'))).status, 200);
+    assert.ok(invalidations.some(args => args[0] === 'blogs:en'));
+    assert.equal(invalidations.some(args => String(args[0]).startsWith('/')), false);
+    for (const model of ['art', 'arts', 'api::art.art']) {
       invalidations.length = 0;
-      const result = await POST(request(JSON.stringify({ model, entry: { slug: 'graphite-study' } })));
+      const result = await POST(request(JSON.stringify({ model, event:'entry.publish', entry: { slug: 'graphite-study' } })));
       assert.equal(result.status, 200);
-      assert.ok(invalidations.some(args => args[0] === 'arts' && args[1].expire === 0));
-      for (const path of ['/hobbies', '/zh/hobbies', '/hobbies/pencil-art', '/zh/hobbies/pencil-art', '/hobbies/pencil-art/graphite-study', '/zh/hobbies/pencil-art/graphite-study']) {
-        assert.ok(invalidations.some(args => args[0] === path), path);
-      }
+      assert.deepEqual(invalidations, [['arts:en',{expire:0}],['arts:zh-CN',{expire:0}]]);
     }
     invalidations.length = 0;
     assert.equal((await POST(request('{"model":"cart"}'))).status, 400);

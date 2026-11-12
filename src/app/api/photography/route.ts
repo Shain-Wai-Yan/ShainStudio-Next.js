@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
     if (duration > 1000) console.warn(`[Photography API] Slow ${isSearch ? 'search' : 'feed'} request: ${duration}ms`);
     return NextResponse.json(data, {
       headers: {
-        'Cache-Control': isSearch ? 'private, no-store' : 'public, s-maxage=300, stale-while-revalidate=600',
+        'Cache-Control': 'private, no-store',
         'Server-Timing': `photography;dur=${duration}`,
       },
     });

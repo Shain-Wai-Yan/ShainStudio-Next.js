@@ -1,4 +1,5 @@
-import { fetchFromStrapi } from './strapi/client';
+import { localizedSource } from '@/lib/server/localized-content';
+import type { ContentLocale } from '@/types/localization';
 
 const GITHUB_USERNAME = 'Shain-Wai-Yan';
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN || '';
@@ -51,15 +52,15 @@ export interface PortfolioCounts {
   codingProjects: number;
 }
 
-function fetchCount(endpoint: string) {
-  return fetchFromStrapi<Record<string, unknown>>(endpoint, { queryParams: { 'pagination[pageSize]': 1, 'fields[0]': 'createdAt' } });
+function fetchCount(endpoint: string, locale: ContentLocale) {
+  return localizedSource(locale)<Record<string, unknown>>(endpoint, { queryParams: { 'pagination[pageSize]': 1, 'fields[0]': 'createdAt' } });
 }
 
-export async function getPortfolioCounts(): Promise<PortfolioCounts> {
+export async function getPortfolioCounts(locale: ContentLocale = 'en'): Promise<PortfolioCounts> {
   const results = await Promise.allSettled([
-    fetchCount('business-plans'),
-    fetchCount('marketing-plans'),
-    fetchCount('marketing-projects'),
+    fetchCount('business-plans', locale),
+    fetchCount('marketing-plans', locale),
+    fetchCount('marketing-projects', locale),
     fetchGithubRepoCount(),
   ]);
 

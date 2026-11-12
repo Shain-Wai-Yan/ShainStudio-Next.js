@@ -1,5 +1,6 @@
 'use client';
 
+import ContentLanguageNotice from '@/components/shared/ContentLanguageNotice';
 import Link from 'next/link';
 import CImage from '@/components/ui/CImage';
 import { BlogPost, transformBlog } from '@/lib/strapi/blogs';
@@ -47,7 +48,7 @@ export default function BlogCard({ blog, language, variant = 'grid', priority = 
             </div>
             <h2 className="text-base font-semibold text-[#111] dark:text-white mb-1.5 group-hover:text-[#191970] dark:group-hover:text-[#ffd700] transition-colors line-clamp-2">
               {blog.Title}
-            </h2>
+            </h2><ContentLanguageNotice localization={blog.localization} compact />
             <p className="text-[#666] dark:text-[#b0b0b0] text-sm line-clamp-2">{transformed.excerpt}</p>
             {blog.Tags && blog.Tags.length > 0 && (
               <div className="flex gap-1.5 mt-2 flex-wrap">
@@ -111,7 +112,7 @@ export default function BlogCard({ blog, language, variant = 'grid', priority = 
           {/* Title */}
           <h2 className="text-sm font-semibold text-[#111] dark:text-white mb-2 group-hover:text-[#191970] dark:group-hover:text-[#ffd700] transition-colors line-clamp-2 leading-snug flex-1">
             {blog.Title}
-          </h2>
+          </h2><ContentLanguageNotice localization={blog.localization} compact />
 
           {/* Excerpt */}
           <p className="text-[#666] dark:text-[#b0b0b0] text-xs line-clamp-3 mb-3 leading-relaxed">

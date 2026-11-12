@@ -48,7 +48,7 @@ export default function BusinessPlanClient({ locale, t, initialPlans, initialErr
     setError(null);
 
     try {
-      const res = await fetch('/api/business-plans');
+      const res = await fetch(`/api/business-plans?language=${locale}`);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
       setPlans((json?.data || []) as TransformedPlan[]);

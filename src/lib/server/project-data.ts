@@ -1,5 +1,6 @@
 import 'server-only';
-import { unstable_cache } from 'next/cache';
+import { localizedSource } from '@/lib/server/localized-content';
+import type { ContentLocale } from '@/types/localization';
 import {
   fetchMarketingProjectBySlug,
   fetchMarketingProjects,
@@ -9,113 +10,100 @@ import {
   fetchCodingProjects,
 } from '@/lib/strapi/coding-projects';
 
-const CACHE_SECONDS = 300;
 
-const loadMarketingProjects = unstable_cache(
-  async (page: number, pageSize: number) => {
-    const result = await fetchMarketingProjects(page, pageSize);
+const loadMarketingProjects = (
+  async (page: number, pageSize: number, locale: ContentLocale) => {
+    const result = await fetchMarketingProjects(page, pageSize, localizedSource(locale));
     if (result.error) throw new Error(result.error);
     return result;
-  },
-  ['strapi-marketing-projects'],
-  { revalidate: CACHE_SECONDS, tags: ['strapi', 'marketing-projects'] },
+  }
 );
 
-const loadMarketingProject = unstable_cache(
-  async (slug: string) => {
-    const result = await fetchMarketingProjectBySlug(slug);
+const loadMarketingProject = (
+  async (slug: string, locale: ContentLocale) => {
+    const result = await fetchMarketingProjectBySlug(slug, localizedSource(locale));
     if (result.error) throw new Error(result.error);
     return result.project;
-  },
-  ['strapi-marketing-project'],
-  { revalidate: CACHE_SECONDS, tags: ['strapi', 'marketing-projects'] },
+  }
 );
 
-const loadRelatedMarketingProjects = unstable_cache(
-  async (category: string, currentSlug: string, limit: number) => {
-    const result = await loadMarketingProjects(1, 100);
+const loadRelatedMarketingProjects = (
+  async (category: string, currentSlug: string, limit: number, locale: ContentLocale) => {
+    const result = await loadMarketingProjects(1, 100, locale);
     return result.projects
       .filter(project => project.slug !== currentSlug && project.category === category)
       .slice(0, limit);
-  },
-  ['strapi-related-marketing-projects'],
-  { revalidate: CACHE_SECONDS, tags: ['strapi', 'marketing-projects'] },
+  }
 );
 
-const loadCodingProjects = unstable_cache(
-  async (page: number, pageSize: number) => {
-    const result = await fetchCodingProjects(page, pageSize);
+const loadCodingProjects = (
+  async (page: number, pageSize: number, locale: ContentLocale) => {
+    const result = await fetchCodingProjects(page, pageSize, localizedSource(locale));
     if (result.error) throw new Error(result.error);
     return result;
-  },
-  ['strapi-coding-projects'],
-  { revalidate: CACHE_SECONDS, tags: ['strapi', 'coding-projects'] },
+  }
 );
 
-const loadCodingProject = unstable_cache(
-  async (slug: string) => {
-    const result = await fetchCodingProjectBySlug(slug);
+const loadCodingProject = (
+  async (slug: string, locale: ContentLocale) => {
+    const result = await fetchCodingProjectBySlug(slug, localizedSource(locale));
     if (result.error) throw new Error(result.error);
     return result.project;
-  },
-  ['strapi-coding-project'],
-  { revalidate: CACHE_SECONDS, tags: ['strapi', 'coding-projects'] },
+  }
 );
 
-const loadRelatedCodingProjects = unstable_cache(
-  async (category: string, currentSlug: string, limit: number) => {
-    const result = await loadCodingProjects(1, 100);
+const loadRelatedCodingProjects = (
+  async (category: string, currentSlug: string, limit: number, locale: ContentLocale) => {
+    const result = await loadCodingProjects(1, 100, locale);
     return result.projects
       .filter(project => project.slug !== currentSlug && project.category === category)
       .slice(0, limit);
-  },
-  ['strapi-related-coding-projects'],
-  { revalidate: CACHE_SECONDS, tags: ['strapi', 'coding-projects'] },
+  }
 );
 
-export async function getMarketingProjects(page = 1, pageSize = 36) {
+export async function getMarketingProjects(page = 1, pageSize = 36, locale: ContentLocale = 'en') {
   try {
-    return await loadMarketingProjects(page, pageSize);
+    return await loadMarketingProjects(page, pageSize, locale);
   } catch (error) {
     return { projects: [], total: 0, error: error instanceof Error ? error.message : 'CMS unavailable' };
   }
 }
 
-export async function getMarketingProject(slug: string) {
+export async function getMarketingProject(slug: string, locale: ContentLocale = 'en') {
   try {
-    return { project: await loadMarketingProject(slug), error: null };
+    return { project: await loadMarketingProject(slug, locale), error: null };
   } catch (error) {
     return { project: null, error: error instanceof Error ? error.message : 'CMS unavailable' };
   }
 }
 
-export async function getRelatedMarketingProjects(category: string, currentSlug: string, limit = 3) {
+export async function getRelatedMarketingProjects(category: string, currentSlug: string, limit = 3, locale: ContentLocale = 'en') {
   try {
-    return { projects: await loadRelatedMarketingProjects(category, currentSlug, limit), error: null };
+    return { projects: await loadRelatedMarketingProjects(category, currentSlug, limit, locale), error: null };
   } catch (error) {
     return { projects: [], error: error instanceof Error ? error.message : 'CMS unavailable' };
   }
 }
 
-export async function getCodingProjects(page = 1, pageSize = 100) {
+export async function getCodingProjects(page = 1, pageSize = 100, locale: ContentLocale = 'en') {
   try {
-    return await loadCodingProjects(page, pageSize);
+    return await loadCodingProjects(page, pageSize, locale);
   } catch (error) {
     return { projects: [], total: 0, error: error instanceof Error ? error.message : 'CMS unavailable' };
   }
 }
 
-export async function getCodingProject(slug: string) {
+export async function getCodingProject(slug: string, locale: ContentLocale = 'en') {
   try {
-    return { project: await loadCodingProject(slug), error: null };
+    return { project: await loadCodingProject(slug, locale), error: null };
   } catch (error) {
     return { project: null, error: error instanceof Error ? error.message : 'CMS unavailable' };
   }
 }
 
-export async function getRelatedCodingProjects(category: string, currentSlug: string, limit = 3) {
+export async function getRelatedCodingProjects(category: string, currentSlug: string, limit = 3, locale: ContentLocale = 'en') {
   try {
-    return { projects: await loadRelatedCodingProjects(category, currentSlug, limit), error: null };
+    return { projects: await loadRelatedCodingProjects(category, currentSlug, limit, locale), error: null };
   } catch (error) {
     return { projects: [], error: error instanceof Error ? error.message : 'CMS unavailable' };
   }

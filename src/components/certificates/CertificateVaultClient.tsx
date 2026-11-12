@@ -264,6 +264,7 @@ function CertificateVaultInner({
                 <li key={cert.id}>
                   <CertificateTimelineRow
                     certificate={{
+                      localization: cert.localization,
                       id: cert.id,
                       title: cert.Title,
                       description: cert.Description,

@@ -1,8 +1,11 @@
 'use client';
 
+import ContentLanguageNotice from '@/components/shared/ContentLanguageNotice';
+import type { ContentLocalization } from '@/types/localization';
 import { Calendar, ChevronRight, CheckCircle } from 'lucide-react';
 
 interface TimelineCertificate {
+  localization?: ContentLocalization;
   id: number;
   title: string;
   description: string;
@@ -87,7 +90,7 @@ export function CertificateTimelineRow({
             <div className="space-y-1 min-w-0">
               <h3 className="font-bold text-gray-900 dark:text-white text-base md:text-lg group-hover:text-[#191970] dark:group-hover:text-[#ffd700] transition-colors leading-tight">
                 {certificate.title}
-              </h3>
+              </h3><ContentLanguageNotice localization={certificate.localization} compact />
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-3.5 h-3.5 flex-shrink-0 text-[#ffd700] dark:text-[#a67c00]" />
                 <span className="text-xs font-bold text-gray-500 dark:text-gray-400 tracking-wide uppercase truncate">

@@ -1,5 +1,6 @@
 import 'server-only';
-import { fetchFromStrapi } from '@/lib/strapi/client';
+import { localizedSource } from '@/lib/server/localized-content';
+import type { ContentLocale } from '@/types/localization';
 import { STRAPI_ORIGIN_URL } from '@/lib/strapi/config';
 import { boundedInteger } from '@/lib/utils/pagination';
 
@@ -33,7 +34,7 @@ function resolveMediaUrl(media: Record<string, unknown> | null | undefined): str
  * Direct port of vanilla JS transformPostData.
  * No abstractions — handles the image exactly as the working vanilla JS does.
  */
-function transformPost(strapiPost: Record<string, unknown>) {
+export function transformPost(strapiPost: Record<string, unknown>) {
   if (!strapiPost) return null;
   try {
     const data = (strapiPost.attributes as Record<string, unknown>) || strapiPost;
@@ -63,6 +64,8 @@ function transformPost(strapiPost: Record<string, unknown>) {
 
     const seo = rawSeo
       ? {
+          canonicalUrl: rawSeo.canonicalUrl as string | undefined,
+          noIndex: Boolean(rawSeo.noIndex),
           metaTitle:       (rawSeo.metaTitle       as string | undefined) ?? undefined,
           metaDescription: (rawSeo.metaDescription as string | undefined) ?? undefined,
           ogImageUrl:      seoOgImageUrl,
@@ -112,13 +115,15 @@ function transformPost(strapiPost: Record<string, unknown>) {
 
     return {
       id: strapiPost.id as number,
+      documentId: data.documentId as string,
+      localization: data.localization as import('@/types/localization').ContentLocalization | undefined,
       title, slug, excerpt, content,
       featuredImage,
       publishDate, updatedAt, author,
       categories: postCategories.filter(Boolean),
       tags: postTags.filter(Boolean),
       readingTime: calculateReadingTime(content), // always calculated server-side from full content
-      language: (slug.startsWith('zh-') ? 'zh' : 'en') as 'en' | 'zh',
+      language: ((data.localization as import('@/types/localization').ContentLocalization | undefined)?.resolvedLocale ?? (data.locale === 'zh-CN' ? 'zh' : 'en')) as ContentLocale,
       seo,
     };
   } catch (err) {
@@ -131,16 +136,12 @@ function transformPost(strapiPost: Record<string, unknown>) {
 export async function getBlogPosts(sp: URLSearchParams) {
   const page = boundedInteger(sp.get('page'), 1, 10000);
   const pageSize = boundedInteger(sp.get('pageSize'), 100, 100);
-  const language = sp.get('language');
+  const language: ContentLocale = sp.get('language') === 'zh' ? 'zh' : 'en';
   const queryParams: Record<string, string | number | boolean> = {
     'pagination[page]': page, 'pagination[pageSize]': pageSize,
     populate: '*', sort: 'publishDate:desc',
   };
-  // This collection encodes Chinese posts with the zh- slug prefix.
-  // Filter before pagination so counts and pages describe the selected language.
-  if (language === 'zh') queryParams['filters[slug][$startsWith]'] = 'zh-';
-  if (language === 'en') queryParams['filters[$not][slug][$startsWith]'] = 'zh-';
-  const { data, error } = await fetchFromStrapi<{
+  const { data, error } = await localizedSource(language)<{
     data: Record<string, unknown>[];
     meta?: { pagination?: { total?: number; pageCount?: number } };
   }>('blogs', { tags: ['strapi', 'blogs'], queryParams });
@@ -152,9 +153,9 @@ export async function getBlogPosts(sp: URLSearchParams) {
     pageCount: data.meta?.pagination?.pageCount ?? 1 };
 }
 
-export async function getBlogPost(slug: string) {
+export async function getBlogPost(slug: string, language: ContentLocale = 'en') {
   if (!/^[a-z0-9-]+$/i.test(slug) || slug.length > 200) return null;
-  const { data, error } = await fetchFromStrapi<{ data: Record<string, unknown>[] }>('blogs', {
+  const { data, error } = await localizedSource(language)<{ data: Record<string, unknown>[] }>('blogs', {
     tags: ['strapi', 'blogs'],
     queryParams: { 'filters[slug][$eq]': slug, populate: '*', 'pagination[pageSize]': 1 },
   });

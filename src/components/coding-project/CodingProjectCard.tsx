@@ -1,5 +1,6 @@
 'use client';
 
+import ContentLanguageNotice from '@/components/shared/ContentLanguageNotice';
 import Link from 'next/link';
 import CImage from '@/components/ui/CImage';
 import type { CodingProject } from '@/lib/strapi/coding-projects';
@@ -75,7 +76,7 @@ export function CodingProjectCard({
           <Link href={href} className="focus:outline-none before:absolute before:inset-0 before:z-10">
             {project.title}
           </Link>
-        </h3>
+        </h3><ContentLanguageNotice localization={project.localization} compact />
 
         <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2 mb-4 leading-relaxed flex-1">
           {project.summary}

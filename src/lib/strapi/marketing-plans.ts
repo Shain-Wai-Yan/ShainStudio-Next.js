@@ -10,6 +10,8 @@ import { sanitizeDescription } from '@/lib/utils/sanitize-description';
 
 export interface MarketingPlan {
   id: number;
+  documentId?: string;
+  localization?: import('@/types/localization').ContentLocalization;
   Title: string;
   Description: string;
   Slug: string;
@@ -36,14 +38,15 @@ export interface MarketingPlansResponse {
  */
 export async function fetchMarketingPlans(
   page = 1,
-  pageSize = 36
+  pageSize = 36,
+  source: typeof fetchFromStrapi = fetchFromStrapi
 ): Promise<{
   plans: MarketingPlan[];
   total: number;
   error: string | null;
 }> {
   try {
-    const response = await fetchFromStrapi<MarketingPlansResponse>('marketing-plans', {
+    const response = await source<MarketingPlansResponse>('marketing-plans', {
       revalidate: 3600,
       tags: ['strapi', 'marketing-plans'],
       queryParams: {

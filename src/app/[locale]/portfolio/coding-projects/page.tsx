@@ -1,3 +1,4 @@
+import { localizedCollectionSeo } from '@/lib/server/localized-content';
 import { serializeJsonLd } from '@/lib/utils/json-ld';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
@@ -32,10 +33,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: { absolute: brandedTitle(seo.title, 'Shain Studio') },
     description: seo.description,
-    robots: locale === 'zh' ? { index: false, follow: true } : { index: true, follow: true },
-    alternates: {
-      canonical: `${SITE_URL}/portfolio/coding-projects`,
-    },
+    ...await localizedCollectionSeo('coding-projects', '/portfolio/coding-projects', locale === 'zh' ? 'zh' : 'en'),
     openGraph: {
       title: seo.title,
       description: seo.description,
@@ -66,7 +64,7 @@ export default async function CodingProjectsPage({ params }: Props) {
   const dict = await getDictionary(locale);
   
   // Fetch coding projects from Strapi
-  const { projects: strapiProjects } = await getCodingProjects();
+  const { projects: strapiProjects } = await getCodingProjects(1, 100, locale);
 
   // Prepare structured data
   const topProjectsForSeo = strapiProjects.slice(0, 10);

@@ -13,10 +13,22 @@ fs.mkdirSync(output, { recursive: true });
 const secret = 'clients-cache-acceptance-secret';
 const apiToken = 'clients-cache-content-token-not-for-browser';
 const rows = name => [{ documentId: 'cacheclienta', name, image: { url: 'https://res.cloudinary.com/demo/image/upload/sample.jpg', mime: 'image/jpeg' } }];
+let chinesePublished = false;
+const projectReads = {en:0,'zh-CN':0};
+const project = {id:1,documentId:'bilingualfixture',slug:'bilingual-fixture',title:'BILINGUAL_ENGLISH',summary:'English summary',content:'<p>English body</p>',publishedAt:'2026-11-01T00:00:00Z',updatedAt:'2026-11-01T00:00:00Z',projectDate:'2026-11-01',category:null,tags:[],tools_useds:[],seo:null};
 let state = { fail: true, failPage: 0, data: rows('CACHE_ALPHA'), pageSize: 1, reads: 0 };
 const cms = http.createServer((req, res) => {
   const url = new URL(req.url, 'http://localhost');
   res.setHeader('content-type', 'application/json');
+  if (url.pathname === '/api/coding-projects') {
+    const locale = url.searchParams.get('locale');
+    assert.ok(['en','zh-CN'].includes(locale));
+    assert.equal(url.searchParams.get('status'),'published');
+    assert.equal(req.headers.authorization,`Bearer ${apiToken}`);
+    projectReads[locale]++;
+    const data = locale === 'en' ? [{...project,locale}] : chinesePublished ? [{...project,id:2,locale,title:'双语中文项目',content:'<p>已经发布的中文内容</p>'}] : [];
+    res.end(JSON.stringify({data,meta:{pagination:{page:1,pageSize:100,pageCount:data.length?1:0,total:data.length}}}));return;
+  }
   if (url.pathname === '/api/clients') {
     state.reads++;
     assert.equal(req.headers.authorization, `Bearer ${apiToken}`);
@@ -132,6 +144,51 @@ try {
   await event();
   await waitFor(body => body.includes('alt="CACHE_BETA"') && body.includes('alt="CACHE_GAMMA"') && !body.includes('alt="CACHE_ALPHA"'), 'Recovery must replace the whole collection in both locales.');
   console.log('PASS: all pages replace the aggregate after recovery.');
+
+  // Exercise actual ISR/detail/list/sitemap dependencies and locale isolation.
+  const detail = '/portfolio/coding-projects/bilingual-fixture';
+  for (const path of [detail,`/zh${detail}`,'/portfolio/coding-projects','/zh/portfolio/coding-projects','/sitemap.xml']) await html(path);
+  let fallback = await html(`/zh${detail}`);
+  assert.ok(fallback.includes('English version — Chinese translation pending'));
+  assert.match(fallback,/<meta name="robots" content="noindex, follow"/);
+  assert.ok(fallback.includes(`rel="canonical" href="https://www.shainwaiyan.com${detail}"`));
+  assert.ok(!(await html('/sitemap.xml')).includes(`/zh${detail}`));
+  // Wait until the warm English page is a settled ISR HIT before counting reads.
+  await delay(1000);
+  const api = await fetch(`${origin}/api/coding-projects?language=zh&pageSize=100`);
+  assert.equal(api.headers.get('cache-control'),'private, no-store');
+  await api.arrayBuffer();
+  const englishReads = projectReads.en;
+  const publishChinese = async eventName => {
+    const response = await fetch(`${origin}/api/revalidate`,{method:'POST',headers:{authorization:`Bearer ${secret}`,'content-type':'application/json'},
+      body:JSON.stringify({uid:'api::coding-project.coding-project',event:eventName,entry:{documentId:project.documentId,locale:'zh-CN'}})});
+    assert.equal(response.status,200);
+  };
+  chinesePublished = true;
+  await publishChinese('entry.publish');
+  for (let attempt=0;attempt<100;attempt++) {
+    const body=await html(`/zh${detail}`);
+    const sitemap=await html('/sitemap.xml');
+    const english=await html(detail);
+    const listing=await html('/zh/portfolio/coding-projects');
+    if(body.includes('<h1') && body.includes('双语中文项目') && !body.includes('English version — Chinese translation pending')
+      && body.includes(`rel="canonical" href="https://www.shainwaiyan.com/zh${detail}"`)
+      && sitemap.includes(`/zh${detail}`) && listing.includes('双语中文项目')
+      && english.includes('hrefLang="zh-CN"') && english.includes('BILINGUAL_ENGLISH')) break;
+    if(attempt===99) throw new Error('Chinese publication failed to refresh detail, list, sitemap or reciprocal English hreflang.');
+    await delay(300);
+  }
+  assert.equal(projectReads.en,englishReads,'Chinese publication must retain cached English body snapshots');
+  console.log('PASS: Chinese publication refreshes detail/list/sitemap and reciprocal hreflang without refetching English body snapshots.');
+  await delay(1000);
+  chinesePublished=false;await publishChinese('entry.unpublish');
+  for(let attempt=0;attempt<100;attempt++) {
+    const body=await html(`/zh${detail}`);const sitemap=await html('/sitemap.xml');
+    if(body.includes('English version — Chinese translation pending')&&!sitemap.includes(`/zh${detail}`))break;
+    if(attempt===99)throw new Error('Chinese unpublication failed to restore fallback and remove sitemap entry.');
+    await delay(300);
+  }
+  console.log('PASS: Chinese unpublication restores labelled/noindex English fallback and removes Chinese sitemap URLs.');
 
   if (!process.argv.includes('--skip-timed')) {
     state.fail = true;

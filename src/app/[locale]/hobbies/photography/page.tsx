@@ -1,9 +1,10 @@
+import { localizedCollectionSeo } from '@/lib/server/localized-content';
 import type { Metadata } from 'next';
 import { Breadcrumb } from '@/components/Breadcrumb';
 import { PhotographyGallery } from '@/components/photography/PhotographyGallery';
 import { getDictionary } from '@/lib/getDictionary'; // ✅ Use async
 import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
-import { DEFAULT_OG_IMAGE, SITE_URL, brandedTitle } from '@/lib/seo';
+import { DEFAULT_OG_IMAGE, brandedTitle } from '@/lib/seo';
 import { repository } from '@/lib/server/photography-data';
 import type { PhotoCollection, PhotoFeedPage, PhotographyLocale } from '@/lib/strapi/photography';
 
@@ -29,10 +30,7 @@ export async function generateMetadata(
   return {
     title: { absolute: brandedTitle(t.photography.seo.title, 'Shain Studio') },
     description: t.photography.seo.description,
-    robots: locale === 'zh' ? { index: false, follow: true } : { index: true, follow: true },
-    alternates: {
-      canonical: `${SITE_URL}/hobbies/photography`,
-    },
+    ...await localizedCollectionSeo('photographies', '/hobbies/photography', locale === 'zh' ? 'zh' : 'en'),
     openGraph: {
       title: t.photography.seo.openGraphTitle,
       description: t.photography.seo.openGraphDesc,
@@ -96,7 +94,8 @@ export default async function PhotographyPage(props: PhotographyPageProps) {
           </p>
         </div>
 
-        <PhotographyGallery
+        {locale === 'zh' && <p lang="zh-CN" className="mx-auto max-w-7xl px-4 py-2 text-sm text-stone-500">尚未发布中文版本的内容将显示英文原文。</p>}
+      <PhotographyGallery
           language={locale as 'en' | 'zh'}
           initialFeed={initialFeed}
           initialCollections={initialCollections}

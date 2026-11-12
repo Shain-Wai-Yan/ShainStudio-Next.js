@@ -4,6 +4,7 @@
  */
 
 export interface ArtPiece {
+  localization?: import('@/types/localization').ContentLocalization;
   id: number;
   documentId?: string;
   title: string;
@@ -30,6 +31,7 @@ export type ArtNavigationPiece = Pick<ArtPiece, 'title' | 'slug'>;
 export type ArtLocale = 'en' | 'zh';
 
 export interface ArtQueryOptions {
+  locale?: 'en' | 'zh';
   page?: number;
   pageSize?: number;
   featured?: boolean;

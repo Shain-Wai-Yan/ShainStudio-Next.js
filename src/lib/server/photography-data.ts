@@ -1,10 +1,10 @@
 import 'server-only';
+import { localizedSource, getLocalizedRows } from '@/lib/server/localized-content';
 import { boundedInteger } from '@/lib/utils/pagination';
 import { STRAPI_ORIGIN_URL } from '@/lib/strapi/config';
 import type { PhotographyRepository } from './photography-repository';
 import type { Photo, PhotoCollection, PhotoFeedPage, PhotoFeedQuery, PhotoSearchQuery, PhotographyLocale } from '@/lib/strapi/photography';
 
-const FETCH_TIMEOUT_MS = 10_000;
 const MAX_PAGE_SIZE = 24;
 const MAX_SEARCH_LENGTH = 80;
 type CacheMode = { revalidate: number } | { noStore: true };
@@ -49,24 +49,14 @@ function seededShuffle<T>(items: T[], seed: number): T[] {
   return result;
 }
 
-async function fetchStrapi(path: string, mode: CacheMode): Promise<Record<string, unknown>> {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
-  const headers: Record<string, string> = { Accept: 'application/json' };
-  if (process.env.VIP_SECRET_KEY) headers['x-shain-secret'] = process.env.VIP_SECRET_KEY;
-  try {
-    const response = await fetch(`${STRAPI_ORIGIN_URL}/api/${path}`, {
-      headers,
-      signal: controller.signal,
-      ...('noStore' in mode
-        ? { cache: 'no-store' as const }
-        : { next: { revalidate: mode.revalidate, tags: ['strapi', 'photography'] } }),
-    });
-    if (!response.ok) throw new Error(`Photography source returned HTTP ${response.status}`);
-    return await response.json() as Record<string, unknown>;
-  } finally {
-    clearTimeout(timeout);
-  }
+async function fetchStrapi(path: string, mode: CacheMode, language: PhotographyLocale = 'en'): Promise<Record<string, unknown>> {
+  const [endpoint, search = ''] = path.split('?');
+  const response = await localizedSource(language)<Record<string, unknown>>(endpoint, {
+    queryParams: Object.fromEntries(new URLSearchParams(search)),
+    revalidate: 'revalidate' in mode ? mode.revalidate : 300,
+  });
+  if (response.error || !response.data) throw new Error(response.error || 'Photography unavailable');
+  return response.data;
 }
 
 function makeAbsolute(url: string): string {
@@ -117,13 +107,14 @@ export function transformPhoto(record: Record<string, unknown>): Photo {
     description: typeof raw.description === 'string' ? raw.description : undefined,
     location: typeof raw.location === 'string' ? raw.location : '',
     category,
-    categorySlug: category ? slugifyCollection(category) : undefined,
+    categorySlug: relationValue(raw.category, 'slug') ?? (category ? slugifyCollection(category) : undefined),
     image: image.url,
     width: image.width,
     height: image.height,
     altText: typeof raw.alt_text === 'string' && raw.alt_text.trim() ? raw.alt_text : undefined,
     tags: tagsFrom(raw.tags),
-    language: raw.language === 'zh' ? 'zh' : 'en',
+    language: (raw.localization as import('@/types/localization').ContentLocalization | undefined)?.requestedLocale ?? 'en',
+    localization: raw.localization as import('@/types/localization').ContentLocalization | undefined,
     createdAt: typeof raw.createdAt === 'string' ? raw.createdAt : '',
     updatedAt: typeof raw.updatedAt === 'string' ? raw.updatedAt : '',
   };
@@ -141,6 +132,7 @@ function records(data: Record<string, unknown>): Photo[] {
 function addPopulate(params: URLSearchParams) {
   ['url', 'width', 'height'].forEach((field, index) => params.set(`populate[image][fields][${index}]`, field));
   params.set('populate[category][fields][0]', 'name');
+  params.set('populate[category][fields][1]', 'slug');
   params.set('populate[tags][fields][0]', 'name');
 }
 
@@ -159,18 +151,18 @@ class StrapiPhotographyRepository implements PhotographyRepository {
     const pageSize = Math.min(MAX_PAGE_SIZE, Math.max(1, Math.trunc(input.pageSize || MAX_PAGE_SIZE)));
     const page = Math.max(1, Math.trunc(input.page || 1));
     const seed = normalizeSeed(input.seed);
-    const collectionName = await this.collectionName(input.collection);
+    const collectionName = await this.collectionName(input.collection, input.language);
     if (input.collection && !collectionName) return { photos: [], page, pageCount: 0, total: 0, hasMore: false };
     const countParams = new URLSearchParams({ 'pagination[page]': '1', 'pagination[pageSize]': '1' });
     addFilters(countParams, collectionName);
-    const total = pagination(await fetchStrapi(`photographies?${countParams}`, { revalidate: 300 })).total;
+    const total = pagination(await fetchStrapi(`photographies?${countParams}`, { revalidate: 300 }, input.language)).total;
     const pageCount = Math.ceil(total / pageSize);
     if (pageCount === 0 || page > pageCount) return { photos: [], page, pageCount, total, hasMore: false };
     const sourcePage = seededPageOrder(pageCount, seed)[page - 1];
     const params = new URLSearchParams({ 'pagination[page]': String(sourcePage), 'pagination[pageSize]': String(pageSize), 'sort[0]': 'updatedAt:desc', 'sort[1]': 'id:desc' });
     addPopulate(params);
     addFilters(params, collectionName);
-    const photos = seededShuffle(records(await fetchStrapi(`photographies?${params}`, { revalidate: 300 })), seed * 10_007 + sourcePage);
+    const photos = seededShuffle(records(await fetchStrapi(`photographies?${params}`, { revalidate: 300 }, input.language)), seed * 10_007 + sourcePage);
     return { photos, page, pageCount, total, hasMore: page < pageCount };
   }
 
@@ -178,36 +170,37 @@ class StrapiPhotographyRepository implements PhotographyRepository {
     const search = input.search.trim().slice(0, MAX_SEARCH_LENGTH);
     const pageSize = Math.min(MAX_PAGE_SIZE, Math.max(1, Math.trunc(input.pageSize || MAX_PAGE_SIZE)));
     const page = Math.max(1, Math.trunc(input.page || 1));
-    const collectionName = await this.collectionName(input.collection);
+    const collectionName = await this.collectionName(input.collection, input.language);
     if (input.collection && !collectionName) return { photos: [], page, pageCount: 0, total: 0, hasMore: false };
     if (search.length < 2) return { photos: [], page, pageCount: 0, total: 0, hasMore: false };
     const params = new URLSearchParams({ 'pagination[page]': String(page), 'pagination[pageSize]': String(pageSize), 'sort[0]': 'updatedAt:desc', 'sort[1]': 'id:desc' });
     addPopulate(params);
     addFilters(params, collectionName, search);
-    const data = await fetchStrapi(`photographies?${params}`, { noStore: true });
+    const data = await fetchStrapi(`photographies?${params}`, { noStore: true }, input.language);
     const meta = pagination(data);
     return { photos: records(data), page, pageCount: meta.pageCount, total: meta.total, hasMore: page < meta.pageCount };
   }
 
   async getCollections(language: PhotographyLocale): Promise<PhotoCollection[]> {
-    void language;
-    const params = new URLSearchParams({ 'pagination[pageSize]': '100', 'fields[0]': 'name', 'fields[1]': 'slug', 'populate[photographies][count]': 'true', sort: 'name:asc' });
-    const data = await fetchStrapi(`categories?${params}`, { revalidate: 3600 });
-    if (!Array.isArray(data.data)) return [];
-    return (data.data as Record<string, unknown>[]).flatMap((entry) => {
-      const raw = entry.attributes && typeof entry.attributes === 'object' ? entry.attributes as Record<string, unknown> : entry;
-      const name = typeof raw.name === 'string' ? raw.name.trim() : '';
-      const count = (raw.photographies as { count?: number } | undefined)?.count ?? 0;
-      return name && count > 0 ? [{ name, slug: slugifyCollection(name), count, thumbnail: null }] : [];
-    });
+    const rows = await getLocalizedRows('photographies',language,{ queryParams: {
+      'fields[0]':'title','populate[category][fields][0]':'name','populate[category][fields][1]':'slug',
+    },revalidate:300 });
+    const collections = new Map<string,PhotoCollection>();
+    for (const row of rows) {
+      const name = relationValue(row.category,'name');
+      const slug = relationValue(row.category,'slug') ?? (name ? slugifyCollection(name) : '');
+      if (!name || !slug) continue;
+      const previous = collections.get(slug);
+      collections.set(slug,{name,slug,count:(previous?.count ?? 0)+1,thumbnail:null});
+    }
+    return [...collections.values()].sort((a,b) => a.name.localeCompare(b.name));
   }
 
   async getPhoto(documentId: string, language: PhotographyLocale): Promise<Photo | null> {
-    void language;
     if (!/^[a-z0-9]{8,40}$/i.test(documentId)) return null;
     const params = new URLSearchParams({ 'filters[documentId][$eq]': documentId, 'pagination[pageSize]': '1' });
     addPopulate(params);
-    return records(await fetchStrapi(`photographies?${params}`, { revalidate: 300 }))[0] ?? null;
+    return records(await fetchStrapi(`photographies?${params}`, { revalidate: 300 }, language))[0] ?? null;
   }
 
   async getRelated(photo: Photo, limit: number): Promise<Photo[]> {
@@ -215,23 +208,23 @@ class StrapiPhotographyRepository implements PhotographyRepository {
     const params = new URLSearchParams({ 'pagination[pageSize]': String(Math.min(12, Math.max(1, limit))), 'filters[category][name][$eq]': photo.category, 'sort[0]': 'updatedAt:desc' });
     if (photo.documentId) params.set('filters[documentId][$ne]', photo.documentId);
     addPopulate(params);
-    return records(await fetchStrapi(`photographies?${params}`, { revalidate: 300 }));
+    return records(await fetchStrapi(`photographies?${params}`, { revalidate: 300 }, photo.language));
   }
 
-  async getSitemapPhotos(): Promise<Photo[]> {
+  async getSitemapPhotos(language: PhotographyLocale = 'en'): Promise<Photo[]> {
     const output: Photo[] = [];
     for (let page = 1; page <= 100; page += 1) {
       const params = new URLSearchParams({ 'pagination[page]': String(page), 'pagination[pageSize]': '100', 'fields[0]': 'title', 'fields[1]': 'updatedAt', sort: 'updatedAt:desc' });
-      const data = await fetchStrapi(`photographies?${params}`, { revalidate: 300 });
+      const data = await fetchStrapi(`photographies?${params}`, { revalidate: 300 }, language);
       output.push(...records(data));
       if (page >= pagination(data).pageCount) break;
     }
     return output.filter((photo) => Boolean(photo.documentId));
   }
 
-  private async collectionName(slug?: string): Promise<string | undefined> {
+  private async collectionName(slug: string | undefined, language: PhotographyLocale = 'en'): Promise<string | undefined> {
     if (!slug) return undefined;
-    return (await this.getCollections('en')).find((collection) => collection.slug === slug)?.name;
+    return (await this.getCollections(language)).find((collection) => collection.slug === slug)?.name;
   }
 }
 

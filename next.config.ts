@@ -20,6 +20,17 @@ function getFormWorkerOrigin() {
 }
 
 const formWorkerOrigin = getFormWorkerOrigin();
+function previewAdminOrigin() {
+  const configured=process.env.EDITORIAL_ADMIN_ORIGIN;
+  if (!configured && process.env.EDITORIAL_PREVIEW_ENABLED==='true' && !isDevelopment) throw new Error('EDITORIAL_PREVIEW_ENABLED requires EDITORIAL_ADMIN_ORIGIN for the Strapi iframe.');
+  if (!configured && !isDevelopment) return "'self'";
+  try {
+    const url=new URL(configured || 'http://127.0.0.1:1338');
+    if(url.username || url.password || url.pathname!=='/' || url.search || url.hash
+      || !(url.protocol==='https:' || (url.protocol==='http:' && ['localhost','127.0.0.1'].includes(url.hostname)))) throw new Error();
+    return url.origin;
+  } catch { throw new Error('EDITORIAL_ADMIN_ORIGIN must be an exact HTTPS origin or a loopback HTTP origin for a local preview rehearsal.'); }
+}
 
 const securityHeaders = [
   // Prevent clickjacking (Lighthouse: "Mitigate clickjacking with XFO or CSP")
@@ -66,9 +77,12 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        source: "/(.*)",
+        source: "/((?!editor-preview(?:/|$)).*)",
         headers: securityHeaders,
       },
+      {source:'/editor-preview/:path*',headers:[...securityHeaders.filter(header=>!['X-Frame-Options','Content-Security-Policy','Referrer-Policy'].includes(header.key)),
+        {key:'Content-Security-Policy',value:securityHeaders.find(header=>header.key==='Content-Security-Policy')!.value.replace("frame-ancestors 'self'",`frame-ancestors 'self' ${previewAdminOrigin()}`)},
+        {key:'Cache-Control',value:'private, no-store, max-age=0'},{key:'X-Robots-Tag',value:'noindex, nofollow, noarchive'},{key:'Referrer-Policy',value:'no-referrer'}]},
     ];
   },
 

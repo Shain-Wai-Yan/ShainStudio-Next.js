@@ -1,3 +1,4 @@
+import { localizedCollectionSeo } from '@/lib/server/localized-content';
 import { serializeJsonLd } from '@/lib/utils/json-ld';
 import { Suspense } from 'react';
 import { Metadata } from 'next';
@@ -34,10 +35,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: { absolute: brandedTitle(archiveTitle, 'Shain Studio') },
     description: archiveDescription,
-    robots: locale === 'zh' ? { index: false, follow: true } : { index: true, follow: true },
-    alternates: {
-      canonical: `${SITE_URL}/portfolio/coding-projects/archive`,
-    },
+    ...await localizedCollectionSeo('coding-projects', '/portfolio/coding-projects/archive', locale === 'zh' ? 'zh' : 'en'),
     openGraph: {
       title: archiveTitle,
       description: archiveDescription,
@@ -70,7 +68,7 @@ export default async function CodingProjectsArchivePage({ params }: Props) {
   const archiveDescription = dict.codingProjects.archive?.description || 'Browse the complete database of my software engineering projects.';
 
   // Fetch coding projects from Strapi
-  const { projects: strapiProjects } = await getCodingProjects();
+  const { projects: strapiProjects } = await getCodingProjects(1, 100, locale);
 
   const jsonLd = {
     '@context': 'https://schema.org',

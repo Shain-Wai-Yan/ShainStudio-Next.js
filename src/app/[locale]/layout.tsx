@@ -1,5 +1,5 @@
 import { serializeJsonLd } from '@/lib/utils/json-ld';
-import { Inter, Playfair_Display } from "next/font/google";
+import {inter,playfair} from '@/lib/site-fonts';
 import type { Metadata } from "next";
 import { getDictionary } from '@/lib/getDictionary';
 import "@/app/globals.css";
@@ -10,9 +10,6 @@ import Footer from "@/components/Footer";
 import SyntaxWidget from "@/components/syntax ai/SyntaxWidget";
 import AnalyticsConsentManager from '@/components/analytics/AnalyticsConsent';
 import { ThemeProvider } from "@/components/ThemeProvider";
-
-const inter = Inter({ subsets: ['latin'], variable: '--font-sans', display: 'swap' });
-const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-serif', display: 'swap' });
 
 interface LocaleLayoutProps {
   children: React.ReactNode;

@@ -5,17 +5,18 @@ import { boundedInteger } from '@/lib/utils/pagination';
 export async function GET(request: NextRequest) {
   const started = performance.now();
   const searchParams = request.nextUrl.searchParams;
+  const locale = searchParams.get('language') === 'zh' ? 'zh' : 'en';
   const slug = searchParams.get('slug');
 
   try {
     if (slug) {
-      const piece = await getArtPieceBySlug(slug);
+      const piece = await getArtPieceBySlug(slug, locale);
       if (!piece) {
         return NextResponse.json({ error: 'Art piece not found' }, { status: 404 });
       }
       return NextResponse.json(piece, {
         headers: {
-          'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+          'Cache-Control': 'private, no-store',
           'Server-Timing': `art;dur=${Math.round(performance.now() - started)}`,
         },
       });
@@ -33,10 +34,10 @@ export async function GET(request: NextRequest) {
     }
     const featured = searchParams.get('featured') === 'true';
 
-    const data = await getArtPieces({ page, pageSize, featured });
+    const data = await getArtPieces({ page, pageSize, featured, locale });
     return NextResponse.json(data, {
       headers: {
-        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+        'Cache-Control': 'private, no-store',
         'Server-Timing': `art;dur=${Math.round(performance.now() - started)}`,
       },
     });

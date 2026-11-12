@@ -10,7 +10,7 @@ permissions:
   contents: read
 jobs:
   audit:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v5
@@ -26,7 +26,7 @@ jobs:
   clients-cache:
     if: github.event_name != 'schedule'
     needs: audit
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v5
@@ -37,3 +37,5 @@ jobs:
       - run: npm ci --ignore-scripts
       - name: Production homepage cache and failure recovery
         run: npm run test:clients:cache
+      - name: Production bilingual editorial preview and cache isolation
+        run: node scripts/editorial-preview.mjs

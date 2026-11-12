@@ -12,6 +12,7 @@ function load(file, mocks) {
   new Function('require', 'module', 'exports', compiled)(name => {
     if (name === 'server-only') return {};
     if (Object.hasOwn(mocks, name)) return mocks[name];
+    if (name.startsWith('@/')) return load('src/'+name.slice(2)+'.ts',mocks);
     return require(name);
   }, loaded, loaded.exports);
   return loaded.exports;

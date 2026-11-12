@@ -1,5 +1,6 @@
 'use client';
 
+import ContentLanguageNotice from '@/components/shared/ContentLanguageNotice';
 import Link from 'next/link';
 import CImage from '@/components/ui/CImage';
 import type { MarketingProject } from '@/lib/strapi/marketing-in-motion';
@@ -126,7 +127,7 @@ export function MarketingProjectCard({
             "
           >
             {project.title}
-          </h2>
+          </h2><ContentLanguageNotice localization={project.localization} compact />
 
           {/* Summary */}
           {summary && (

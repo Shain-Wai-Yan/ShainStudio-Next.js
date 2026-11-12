@@ -9,11 +9,12 @@ import ThemeToggle from './ThemeToggle';
 import type { Dictionary } from '@/lib/getDictionary';
 import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
 
-const Header = ({ translations }: { translations: Pick<Dictionary, 'nav'> }) => {
+const Header = ({ translations, previewLocale, previewPath }: { translations: Pick<Dictionary, 'nav'>; previewLocale?: 'en' | 'zh'; previewPath?: string }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isPortfolioOpen, setIsPortfolioOpen] = useState(false);
   const [isHobbiesOpen, setIsHobbiesOpen] = useState(false);
-  const pathname = usePathname();
+  const currentPathname = usePathname();
+  const pathname = previewPath ?? currentPathname;
   
   // Extract locale from pathname /[locale]/... or fallback to legacy /zh pattern
   const pathSegments = pathname.split('/').filter(Boolean);
@@ -28,6 +29,8 @@ const Header = ({ translations }: { translations: Pick<Dictionary, 'nav'> }) => 
     }
   }
   
+
+  if (previewLocale) locale=previewLocale;
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const togglePortfolio = () => setIsPortfolioOpen(!isPortfolioOpen);
@@ -166,7 +169,7 @@ const Header = ({ translations }: { translations: Pick<Dictionary, 'nav'> }) => 
 
         {/* Language Switcher + Theme Toggle + Mobile Button */}
         <div className="flex items-center gap-1 sm:gap-2">
-          <LanguageSwitcher />
+          <LanguageSwitcher previewPath={previewPath} />
           <ThemeToggle />
           <button
             className="lg:hidden hover:text-[#ffd700] transition-colors duration-300 flex items-center justify-center p-2 w-12 h-12 text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ffd700]"

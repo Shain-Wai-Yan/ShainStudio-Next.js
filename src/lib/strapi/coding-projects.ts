@@ -37,10 +37,12 @@ export interface StrapiSeoBlock {
   metaTitle?: string;
   metaDescription?: string;
   canonicalUrl?: string;
+  noIndex?: boolean;
   structuredData?: unknown;
 }
 
 export interface StrapiCodingProject {
+  localization?: import('@/types/localization').ContentLocalization;
   id: number;
   Title?: string;
   title?: string;
@@ -79,6 +81,7 @@ export interface StrapiCodingProjectsResponse {
 // ─── Transformed Shape ────────────────────────────────────────────────────────
 
 export interface CodingProject {
+  localization?: import('@/types/localization').ContentLocalization;
   id: number;
   title: string;
   slug: string;
@@ -101,6 +104,7 @@ export interface CodingProject {
     metaDescription: string;
     ogImage: string;
     canonicalUrl: string;
+    noIndex?: boolean;
   };
 }
 
@@ -233,9 +237,11 @@ export function transformCodingProject(raw: StrapiCodingProject): CodingProject 
       metaDescription: seoRaw?.metaDescription || summary,
       ogImage: coverImage,
       canonicalUrl: seoRaw?.canonicalUrl || '',
+      noIndex: Boolean(seoRaw?.noIndex),
     };
 
     return {
+      localization: raw.localization,
       id: raw.id,
       title,
       slug,
@@ -266,9 +272,10 @@ export function transformCodingProject(raw: StrapiCodingProject): CodingProject 
 export async function fetchCodingProjects(
   page = 1,
   pageSize = 100,
+  source: typeof fetchFromStrapi = fetchFromStrapi,
 ): Promise<{ projects: CodingProject[]; total: number; error: string | null }> {
   try {
-    const response = await fetchFromStrapi<StrapiResponse<StrapiCodingProject[]>>(
+    const response = await source<StrapiResponse<StrapiCodingProject[]>>(
       CODING_PROJECTS_ENDPOINT,
       {
         tags: ['strapi', 'coding-projects'],
@@ -308,9 +315,10 @@ export async function fetchCodingProjects(
 
 export async function fetchCodingProjectBySlug(
   slug: string,
+  source: typeof fetchFromStrapi = fetchFromStrapi,
 ): Promise<{ project: CodingProject | null; error: string | null }> {
   try {
-    const response = await fetchFromStrapi<StrapiCodingProjectsResponse>(
+    const response = await source<StrapiCodingProjectsResponse>(
       'coding-projects',
       {
         tags: ['strapi', 'coding-projects'],
@@ -348,14 +356,15 @@ export async function fetchRelatedCodingProjects(
   category: string,
   currentSlug: string,
   limit = 3,
-  timeout?: number
+  timeout?: number,
+  source: typeof fetchFromStrapi = fetchFromStrapi,
 ): Promise<{ projects: CodingProject[]; error: string | null }> {
   if (!category || category === 'Uncategorized') {
     return { projects: [], error: null };
   }
 
   try {
-    const response = await fetchFromStrapi<StrapiCodingProjectsResponse>(
+    const response = await source<StrapiCodingProjectsResponse>(
       'coding-projects',
       {
         tags: ['strapi', 'coding-projects'],

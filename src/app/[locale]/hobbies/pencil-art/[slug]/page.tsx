@@ -1,10 +1,9 @@
+import { localizedSeo } from '@/lib/content-localization';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { Breadcrumb } from '@/components/Breadcrumb';
-import { PencilArtDetailView } from '@/components/art/PencilArtDetailView';
 import { getDictionary } from '@/lib/getDictionary';
 import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
-import { brandedTitle, SITE_URL, DEFAULT_OG_IMAGE } from '@/lib/seo';
+import { brandedTitle, DEFAULT_OG_IMAGE } from '@/lib/seo';
 import { getArtPieceBySlug, getArtPieces } from '@/lib/server/art-data';
 
 interface ArtSlugPageProps {
@@ -26,7 +25,7 @@ export async function generateMetadata({
   const t = await getDictionary(locale);
   const basePath = locale === 'en' ? '' : `/${locale}`;
 
-  const piece = await getArtPieceBySlug(slug);
+  const piece = await getArtPieceBySlug(slug, locale);
   if (!piece) {
     return {
       title: brandedTitle('Artwork Not Found', 'Shain Studio'),
@@ -42,15 +41,7 @@ export async function generateMetadata({
   return {
     title: { absolute: brandedTitle(pieceTitle, 'Shain Studio') },
     description,
-    robots: locale === 'zh' ? { index: false, follow: true } : { index: true, follow: true },
-    alternates: {
-      canonical: `${SITE_URL}/hobbies/pencil-art/${slug}`,
-      languages: {
-        en: `${SITE_URL}/hobbies/pencil-art/${slug}`,
-        zh: `${SITE_URL}/zh/hobbies/pencil-art/${slug}`,
-        'x-default': `${SITE_URL}/hobbies/pencil-art/${slug}`,
-      },
-    },
+    ...localizedSeo(`/hobbies/pencil-art/${slug}`, locale, piece.localization),
     openGraph: {
       title: brandedTitle(pieceTitle, 'Shain Studio'),
       description,
@@ -69,55 +60,20 @@ export async function generateMetadata({
   };
 }
 
+import ArtView from '@/components/content-views/ArtView';
+
 export default async function ArtPieceSlugPage({ params }: ArtSlugPageProps) {
   const { locale: rawLocale, slug } = await params;
   const locale = isSupportedLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
-  const t = await getDictionary(locale);
-  const basePath = locale === 'en' ? '' : `/${locale}`;
 
   const [piece, feed] = await Promise.all([
-    getArtPieceBySlug(slug),
-    getArtPieces({ pageSize: 50 }),
+    getArtPieceBySlug(slug, locale),
+    getArtPieces({ pageSize: 50, locale }),
   ]);
 
   if (!piece) {
     notFound();
   }
 
-  // Find prev/next items (circular wrapping so arrow navigation is seamless from any artwork)
-  const currentIndex = feed.arts.findIndex((a) => a.slug === piece.slug);
-  const total = feed.arts.length;
-  const previous =
-    total > 1 && currentIndex >= 0
-      ? feed.arts[(currentIndex - 1 + total) % total]
-      : null;
-  const next =
-    total > 1 && currentIndex >= 0
-      ? feed.arts[(currentIndex + 1) % total]
-      : null;
-
-  const breadcrumbItems = [
-    { label: t.pencilArt.breadcrumbs.home, href: basePath || '/' },
-    { label: locale === 'zh' ? '工作之外' : 'Beyond Work', href: `${basePath}/hobbies` },
-    { label: t.pencilArt.breadcrumbs.pencilArt, href: `${basePath}/hobbies/pencil-art` },
-    { label: piece.title, href: `${basePath}/hobbies/pencil-art/${piece.slug}` },
-  ];
-
-  return (
-    <section className="min-h-screen bg-white dark:bg-[#0a0b10] text-neutral-900 dark:text-neutral-100 transition-colors duration-300">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-24 pb-12">
-        <div className="opacity-75 hover:opacity-100 transition-opacity">
-          <Breadcrumb items={breadcrumbItems} />
-        </div>
-
-        <PencilArtDetailView
-          piece={piece}
-          prevPiece={previous ? { title: previous.title, slug: previous.slug } : null}
-          nextPiece={next ? { title: next.title, slug: next.slug } : null}
-          locale={locale}
-          translations={t.pencilArt.labels}
-        />
-      </div>
-    </section>
-  );
+  return <ArtView piece={piece} feed={feed} locale={locale} />;
 }

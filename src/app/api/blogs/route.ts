@@ -4,7 +4,7 @@ import { getBlogPosts } from '@/lib/server/blog-data';
 export async function GET(request: NextRequest) {
   try {
     return NextResponse.json(await getBlogPosts(request.nextUrl.searchParams), {
-      headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600' },
+      headers: { 'Cache-Control': 'private, no-store' },
     });
   } catch (error) {
     console.error('[blogs]', error);

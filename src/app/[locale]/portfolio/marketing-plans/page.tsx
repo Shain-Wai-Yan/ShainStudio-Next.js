@@ -1,8 +1,9 @@
+import { localizedCollectionSeo, localizedSource } from '@/lib/server/localized-content';
 import { fetchMarketingPlans, transformMarketingPlan } from '@/lib/strapi/marketing-plans';
 import { Metadata } from 'next';
 import { getDictionary } from '@/lib/getDictionary';
 import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
-import { DEFAULT_OG_IMAGE, SITE_URL, brandedTitle } from '@/lib/seo';
+import { DEFAULT_OG_IMAGE, brandedTitle } from '@/lib/seo';
 import { MarketingPlanClient } from '@/components/marketing-plans/MarketingPlanClient';
 
 interface MarketingPlanPageProps {
@@ -19,10 +20,7 @@ export async function generateMetadata(props: MarketingPlanPageProps): Promise<M
   return {
     title: { absolute: brandedTitle(dict.marketingPlans.seo.title, 'Shain Studio') },
     description: dict.marketingPlans.seo.description,
-    robots: locale === 'zh' ? { index: false, follow: true } : { index: true, follow: true },
-    alternates: {
-      canonical: `${SITE_URL}/portfolio/marketing-plans`,
-    },
+    ...await localizedCollectionSeo('marketing-plans', '/portfolio/marketing-plans', locale === 'zh' ? 'zh' : 'en'),
     openGraph: {
       title: dict.marketingPlans.seo.title,
       description: dict.marketingPlans.seo.description,
@@ -52,7 +50,7 @@ export async function generateStaticParams() {
 export default async function MarketingPlanPage(props: MarketingPlanPageProps) {
   const params = await props.params;
   const locale = isSupportedLocale(params?.locale) ? params.locale : DEFAULT_LOCALE;
-  const [dict, result] = await Promise.all([getDictionary(locale), fetchMarketingPlans(1, 100)]);
+  const [dict, result] = await Promise.all([getDictionary(locale), fetchMarketingPlans(1, 100, localizedSource(locale))]);
 
   return <MarketingPlanClient initialPlans={result.plans.map(transformMarketingPlan)} initialError={result.error} locale={locale as 'en' | 'zh'} dict={{ nav: dict.nav, marketingPlans: dict.marketingPlans }} />;
 }

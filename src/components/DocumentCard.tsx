@@ -1,11 +1,14 @@
 'use client';
 
+import type { ContentLocalization } from '@/types/localization';
+import ContentLanguageNotice from '@/components/shared/ContentLanguageNotice';
 import { useState } from 'react';
 import CImage from '@/components/ui/CImage';
 
 const PLACEHOLDER_IMAGE = '/images/Shain Studio.webp';
 
 interface DocumentCardProps {
+  localization?: ContentLocalization;
   title: string;
   description: string;
   coverImage: string;
@@ -18,6 +21,7 @@ interface DocumentCardProps {
 
 export function DocumentCard({
   title,
+  localization,
   description,
   coverImage,
   fileType,
@@ -91,7 +95,7 @@ export function DocumentCard({
           <div>
             <h3 className="text-base sm:text-lg md:text-xl font-bold text-[#191970] dark:text-[#d4af37] mb-1.5 leading-snug">
               {title}
-            </h3>
+            </h3><ContentLanguageNotice localization={localization} compact />
 
             {/* Meta row */}
             <div className="flex items-center flex-wrap gap-1.5 text-xs sm:text-sm text-gray-500 dark:text-[#999999] mb-3">

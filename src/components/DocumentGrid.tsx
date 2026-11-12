@@ -1,8 +1,10 @@
 'use client';
 
+import type { ContentLocalization } from '@/types/localization';
 import { DocumentCard } from './DocumentCard';
 
 interface Document {
+  localization?: ContentLocalization;
   id: number;
   Title: string;
   Description: string;
@@ -78,6 +80,7 @@ export function DocumentGrid({
         <DocumentCard
           key={document.id}
           title={document.Title}
+          localization={document.localization}
           description={document.Description}
           coverImage={document.coverImageUrl}
           fileType={document.fileType}

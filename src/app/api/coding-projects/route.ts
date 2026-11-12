@@ -8,18 +8,19 @@ import { boundedInteger } from '@/lib/utils/pagination';
 import { NextRequest, NextResponse } from 'next/server';
 import { getCodingProject, getCodingProjects } from '@/lib/server/project-data';
 
-const CACHE_HEADERS = { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600' };
+const CACHE_HEADERS = { 'Cache-Control': 'private, no-store' };
 
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
 
+  const language = searchParams.get('language') === 'zh' ? 'zh' : 'en';
   const slug = searchParams.get('slug');
   const page = boundedInteger(searchParams.get('page'), 1, 10000);
   const pageSize = boundedInteger(searchParams.get('pageSize'), 100, 100);
 
   // ─── Single project by slug ───────────────────────────────────────────────
   if (slug) {
-    const { project, error } = await getCodingProject(slug);
+    const { project, error } = await getCodingProject(slug, language);
     if (error) {
       return NextResponse.json({ error }, { status: 500 });
     }
@@ -30,7 +31,7 @@ export async function GET(request: NextRequest) {
   }
 
   // ─── List with pagination ─────────────────────────────────────────────────
-  const { projects, total, error } = await getCodingProjects(page, pageSize);
+  const { projects, total, error } = await getCodingProjects(page, pageSize, language);
   if (error) {
     return NextResponse.json({ error }, { status: 500 });
   }

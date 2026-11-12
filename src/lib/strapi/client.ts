@@ -5,13 +5,15 @@
  */
 
 import { STRAPI_API_URL, STRAPI_ORIGIN_URL } from '@/lib/strapi/config';
+import {assertReadEndpoint,LOCALIZED_ENDPOINTS} from '@/lib/strapi/content-contract';
+import {readBoundedCmsJson} from '@/lib/strapi/bounded-json';
 
 const STRAPI_API_TOKEN = process.env.STRAPI_API_TOKEN;
 
 const API_TIMEOUT = 10000; // Allow CMS cold starts while bounding stalled requests.
 
-interface FetchOptions {
-  method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
+export interface FetchOptions {
+  method?: 'GET';
   queryParams?: Record<string, string | number | boolean>;
   timeout?: number;
   revalidate?: number;
@@ -32,14 +34,20 @@ export async function fetchFromStrapi<T>(
   options: FetchOptions = {}
 ): Promise<FetchResponse<T>> {
   try {
+    if(typeof window!=='undefined')throw new Error('CMS reads must use the website API routes in the browser.');
+    const collection=assertReadEndpoint(endpoint);
     const {
       method = 'GET', queryParams = {}, timeout = API_TIMEOUT,
       revalidate = 300, tags = [], cache,
     } = options;
+    if(method!=='GET')throw new Error('The public CMS client only supports GET.');
+    if(queryParams.status && queryParams.status!=='published')throw new Error('Draft reads require the dedicated signed preview channel.');
+    const publishedQuery:Record<string,string|number|boolean>={...queryParams,status:'published',...(LOCALIZED_ENDPOINTS.has(collection)?{locale:queryParams.locale||'en'}:{})};
+    if(LOCALIZED_ENDPOINTS.has(collection)&&!['en','zh-CN'].includes(String(publishedQuery.locale)))throw new Error('Unsupported CMS content locale.');
 
     // Build query string from params object
-    const queryString = Object.keys(queryParams)
-      .map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(String(queryParams[key]))}`)
+    const queryString = Object.keys(publishedQuery)
+      .map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(String(publishedQuery[key]))}`)
       .join('&');
 
     const url = `${STRAPI_API_URL}/${endpoint}${queryString ? `?${queryString}` : ''}`;
@@ -68,6 +76,7 @@ export async function fetchFromStrapi<T>(
     try {
       const response = await fetch(url, {
         method,
+        redirect:'error',
         headers,
         signal: controller.signal,
         ...(method === 'GET' && cache !== 'no-store'
@@ -97,7 +106,7 @@ export async function fetchFromStrapi<T>(
         throw new Error(`API error: ${response.status}`);
       }
 
-      const data = await response.json();
+      const data = await readBoundedCmsJson(response);
       // console.log('[Strapi Client] API Response:', data);
       return { data: data as T, error: null };
     } catch (fetchError) {

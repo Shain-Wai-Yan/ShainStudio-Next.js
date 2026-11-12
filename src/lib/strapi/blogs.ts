@@ -1,4 +1,5 @@
 export interface BlogPost {
+  localization?: import('@/types/localization').ContentLocalization;
   id: number;
   documentId?: string;
   Title: string;
@@ -18,6 +19,8 @@ export interface BlogPost {
   updatedAt: string;
   // ── SEO fields from Strapi Seo component ─────────────────────────────────
   Seo?: {
+    canonicalUrl?: string;
+    noIndex?: boolean;
     metaTitle?: string;
     metaDescription?: string;
     ogImageUrl?: string | null;  // already resolved to absolute URL by API route

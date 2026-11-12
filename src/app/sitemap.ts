@@ -1,48 +1,8 @@
-import { MetadataRoute } from 'next';
-import { fetchFromStrapi } from '@/lib/strapi/client';
-import { repository as photographyRepository } from '@/lib/server/photography-data';
-import { getArtPieces } from '@/lib/server/art-data';
-
+import type { MetadataRoute } from 'next';
+import { getLocalizedRows } from '@/lib/server/localized-content';
+import type { ContentLocalization } from '@/types/localization';
 const SITE_URL = 'https://www.shainwaiyan.com';
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-interface BlogPost {
-  slug: string;
-  updatedAt?: string;
-  publishDate?: string;
-}
-
-interface MarketingProject {
-  slug: string;
-  updatedAt?: string;
-  projectDate?: string;
-}
-
-interface CodingProjectSlug {
-  slug: string;
-  updatedAt?: string;
-  projectDate?: string;
-}
-
-interface StrapiSitemapResponse<T> {
-  data: T[];
-  meta: {
-    pagination: {
-      total: number;
-    };
-  };
-}
-
-function normalizeEntry<T extends { slug: string }>(entry: T & { attributes?: Partial<T> }): T {
-  return { ...entry, ...(entry.attributes ?? {}) } as T;
-}
-
-// ─── Static Routes Configuration ──────────────────────────────────────────────
-// IMPORTANT: Only include pages that are genuinely translated/unique.
-// Pages that just serve the same Strapi content with no translation
-// are excluded to avoid duplicate content penalties.
-
+export const revalidate = 300;
 const staticRoutes = {
   // English main pages
   main: [
@@ -79,202 +39,52 @@ const staticRoutes = {
   ],
 };
 
-// ─── Dynamic Content Fetchers ─────────────────────────────────────────────────
-// Using direct Strapi API calls instead of fetchFromStrapi wrapper
-// to ensure reliability in sitemap generation context
 
-async function fetchAllBlogSlugs(): Promise<BlogPost[]> {
-  try {
-    const res = await fetchFromStrapi<StrapiSitemapResponse<BlogPost>>('blogs', {
-      queryParams: {
-        'pagination[pageSize]': 100,
-        'fields[0]': 'slug',
-        'fields[1]': 'updatedAt',
-        'fields[2]': 'publishDate',
-        'sort': 'publishDate:desc',
-      },
-      timeout: 10000, // Strapi cold starts exceed the 3s default
-    });
-
-    if (res.error) {
-      console.error('[Sitemap] Strapi blogs error:', res.error);
-      return [];
-    }
-
-    const posts = (res.data?.data ?? []).map(normalizeEntry).filter((post) => Boolean(post.slug));
-    console.log(`[Sitemap] Fetched ${posts.length} blog posts from Strapi`);
-    return posts;
-  } catch (error) {
-    console.error('[Sitemap] Failed to fetch blog slugs:', error);
-    return [];
-  }
-}
-
-async function fetchAllMarketingProjectSlugs(): Promise<MarketingProject[]> {
-  try {
-    const res = await fetchFromStrapi<StrapiSitemapResponse<MarketingProject>>('marketing-projects', {
-      queryParams: {
-        'pagination[pageSize]': 100,
-        'fields[0]': 'slug',
-        'fields[1]': 'updatedAt',
-        'fields[2]': 'projectDate',
-        'sort': 'projectDate:desc',
-      },
-      timeout: 10000, // Strapi cold starts exceed the 3s default
-    });
-
-    if (res.error) {
-      console.error('[Sitemap] Strapi marketing-projects error:', res.error);
-      return [];
-    }
-
-    const projects = (res.data?.data ?? []).map(normalizeEntry).filter((project) => Boolean(project.slug));
-    console.log(`[Sitemap] Fetched ${projects.length} marketing projects from Strapi`);
-    return projects;
-  } catch (error) {
-    console.error('[Sitemap] Failed to fetch marketing project slugs:', error);
-    return [];
-  }
-}
-
-async function fetchAllCodingProjectSlugs(): Promise<CodingProjectSlug[]> {
-  try {
-    const res = await fetchFromStrapi<StrapiSitemapResponse<CodingProjectSlug>>('coding-projects', {
-      queryParams: {
-        'pagination[pageSize]': 100,
-        'fields[0]': 'slug',
-        'fields[1]': 'updatedAt',
-        'fields[2]': 'projectDate',
-        'sort': 'projectDate:desc',
-      },
-      timeout: 10000, // Strapi cold starts exceed the 3s default
-    });
-
-    if (res.error) {
-      console.error('[Sitemap] Strapi coding-projects error:', res.error);
-      return [];
-    }
-
-    const projects = (res.data?.data ?? []).map(normalizeEntry).filter((project) => Boolean(project.slug));
-    console.log(`[Sitemap] Fetched ${projects.length} coding projects from Strapi`);
-    return projects;
-  } catch (error) {
-    console.error('[Sitemap] Failed to fetch coding project slugs:', error);
-    return [];
-  }
-}
-
-// ─── Sitemap Generator ────────────────────────────────────────────────────────
-
+const collections = [
+  ['blogs','/blog', '/blog/'],
+  ['coding-projects','/portfolio/coding-projects','/portfolio/coding-projects/'],
+  ['marketing-projects','/portfolio/marketing-in-motion','/portfolio/marketing-in-motion/'],
+  ['photographies','/hobbies/photography','/hobbies/photography/photo/'],
+  ['arts','/hobbies/pencil-art','/hobbies/pencil-art/'],
+  ['certificates','/certificate',null],
+  ['business-plans','/portfolio/business-plans',null],
+  ['marketing-plans','/portfolio/marketing-plans',null],
+] as const;
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const translatedPaths = new Set(['/', '/about', '/portfolio', '/hobbies', '/contact']);
-
-  // ── Static pages ──────────────────────────────────────────────────────────
-  const staticPages: MetadataRoute.Sitemap = [
-    ...staticRoutes.main,
-    ...staticRoutes.portfolio,
-    ...staticRoutes.zhMain,
-  ].map((route) => {
-    const englishPath = route.path.startsWith('/zh')
-      ? route.path.replace('/zh', '') || '/'
-      : route.path;
-    const translated = translatedPaths.has(englishPath);
-
-    return {
-      url: `${SITE_URL}${route.path}`,
-      changeFrequency: route.changeFrequency,
-      priority: route.priority,
-      ...(translated && {
-        alternates: {
-          languages: {
-            en: `${SITE_URL}${englishPath}`,
-            zh: `${SITE_URL}/zh${englishPath === '/' ? '' : englishPath}`,
-            'x-default': `${SITE_URL}${englishPath}`,
-          },
-        },
-      }),
-    };
-  });
-
-  // ── English blog posts ONLY ───────────────────────────────────────────────
-  // zh/blog/[slug] pages are NOT included — same Strapi content, not translated
-  // No language filter — all posts in Strapi are English by default
-  const blogPosts = await fetchAllBlogSlugs();
-
-  const blogPages: MetadataRoute.Sitemap = blogPosts.map((post) => ({
-    url: `${SITE_URL}/blog/${post.slug}`,
-    lastModified: post.updatedAt || post.publishDate,
-    changeFrequency: 'weekly' as const,
-    priority: 0.8,
+  const pages: MetadataRoute.Sitemap = [...staticRoutes.main,...staticRoutes.portfolio,...staticRoutes.zhMain].map(route => ({
+    url: `${SITE_URL}${route.path}`,changeFrequency:route.changeFrequency,priority:route.priority,
   }));
-
-  // ── English marketing projects ONLY ──────────────────────────────────────
-  // zh/portfolio/marketing-in-motion/[slug] pages are NOT included
-  // Same content as English, fetched from same Strapi source
-  const marketingProjects = await fetchAllMarketingProjectSlugs();
-
-  const marketingPages: MetadataRoute.Sitemap = marketingProjects.map((project) => ({
-    url: `${SITE_URL}/portfolio/marketing-in-motion/${project.slug}`,
-    lastModified: project.updatedAt || project.projectDate,
-    changeFrequency: 'monthly' as const,
-    priority: 0.7,
-  }));
-
-  // ── English coding projects ONLY ─────────────────────────────────────────
-  // Same logic as above: EN URL with ZH alternate
-  const codingProjects = await fetchAllCodingProjectSlugs();
-
-  const codingPages: MetadataRoute.Sitemap = codingProjects.map((project) => ({
-    url: `${SITE_URL}/portfolio/coding-projects/${project.slug}`,
-    lastModified: project.updatedAt || project.projectDate,
-    changeFrequency: 'monthly' as const,
-    priority: 0.7,
-  }));
-
-  let photoPages: MetadataRoute.Sitemap = [];
-  try {
-    const photos = await photographyRepository.getSitemapPhotos();
-    photoPages = photos.flatMap((photo) => photo.documentId ? [{
-      url: `${SITE_URL}/hobbies/photography/photo/${photo.documentId}`,
-      lastModified: photo.updatedAt || undefined,
-      changeFrequency: 'monthly' as const,
-      priority: 0.6,
-    }] : []);
-  } catch (error) {
-    console.error('[Sitemap] Failed to fetch photography records:', error);
+  const translatedStatic = new Set(['/','/about','/portfolio','/hobbies','/contact']);
+  for (const page of pages) {
+    const path = new URL(page.url).pathname.replace(/^\/zh(?=\/|$)/,'') || '/';
+    if (translatedStatic.has(path)) page.alternates={languages:{en:`${SITE_URL}${path}`,'zh-CN':`${SITE_URL}/zh${path === '/' ? '' : path}`,'x-default':`${SITE_URL}${path}`}};
   }
-
-  let artPages: MetadataRoute.Sitemap = [];
-  try {
-    const artFeed = await getArtPieces({ pageSize: 100 });
-    artPages = artFeed.arts.map((piece) => ({
-      url: `${SITE_URL}/hobbies/pencil-art/${piece.slug}`,
-      lastModified: piece.updatedAt || piece.createdAt || piece.dateCreated,
-      changeFrequency: 'monthly' as const,
-      priority: 0.6,
-      images: [piece.image],
-    }));
-  } catch (error) {
-    console.error('[Sitemap] Failed to fetch artwork records:', error);
+  // Fetch complete locale snapshots; failed refreshes throw and retain prior ISR output.
+  for (const [endpoint,listPath,prefix] of collections) {
+    const options = ['blogs','coding-projects','marketing-projects'].includes(endpoint) ? {queryParams:{'populate[seo]':true}} : {};
+    const [english,rows] = await Promise.all([getLocalizedRows(endpoint,'en',options),getLocalizedRows(endpoint,'zh',options)]);
+    const englishById = new Map(english.map(row => [row.documentId,row]));
+    if (rows.some(row => (row.localization as ContentLocalization).chinesePublished)) {
+      pages.push({url:`${SITE_URL}/zh${listPath}`,changeFrequency:'weekly',priority:0.7});
+      if (endpoint === 'coding-projects') pages.push({url:`${SITE_URL}/zh${listPath}/archive`,changeFrequency:'weekly',priority:0.5});
+    }
+    if (!prefix) continue;
+    for (const row of rows) {
+      const identity = endpoint === 'photographies' ? row.documentId : row.slug;
+      if (typeof identity !== 'string' || !/^[a-z0-9_-]+$/i.test(identity)) continue;
+      const state = row.localization as ContentLocalization;
+      const path = `${prefix}${identity}`;
+      const languages: Record<string,string> = {};
+      const enNoIndex = (englishById.get(row.documentId)?.seo as {noIndex?:boolean} | undefined)?.noIndex;
+      const zhNoIndex = (row.seo as {noIndex?:boolean} | undefined)?.noIndex;
+      if (state.englishPublished && !enNoIndex) languages.en = `${SITE_URL}${path}`;
+      if (state.chinesePublished && !zhNoIndex) languages['zh-CN'] = `${SITE_URL}/zh${path}`;
+      languages['x-default'] = languages.en ?? languages['zh-CN'];
+      for (const language of ['en','zh-CN']) if (languages[language]) pages.push({
+        url:languages[language],lastModified:typeof row.updatedAt === 'string' ? row.updatedAt : undefined,
+        changeFrequency:'monthly',priority:0.6,alternates:{languages},
+      });
+    }
   }
-
-  // ── Combine all pages ─────────────────────────────────────────────────────
-  const allPages = [
-    ...staticPages,
-    ...blogPages,
-    ...marketingPages,
-    ...codingPages,
-    ...photoPages,
-    ...artPages,
-  ];
-
-  console.log(`[Sitemap] Generated sitemap with ${allPages.length} URLs:`);
-  console.log(`  - Static pages: ${staticPages.length}`);
-  console.log(`  - Blog posts (EN only): ${blogPages.length}`);
-  console.log(`  - Marketing projects (EN only): ${marketingPages.length}`);
-  console.log(`  - Coding projects (EN only): ${codingPages.length}`);
-  console.log(`  - Photography details (EN only): ${photoPages.length}`);
-  console.log(`  - Pencil art details (EN only): ${artPages.length}`);
-
-  return allPages;
+  return pages;
 }

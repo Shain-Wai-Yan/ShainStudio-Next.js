@@ -11,7 +11,7 @@ import { OPEN_ANALYTICS_SETTINGS_EVENT } from '@/lib/analytics-consent';
 /* ─── animated verbs ──────────────────────────────────────────────────── */
 const VERB_INTERVAL = 2200; // ms between swaps
 
-const Footer = ({ t }: { t: Pick<Dictionary, 'footer'> }) => {
+const Footer = ({ t, previewLocale }: { t: Pick<Dictionary, 'footer'>; previewLocale?: 'en' | 'zh' }) => {
   const pathname = usePathname();
 
   /* locale resolution */
@@ -24,6 +24,8 @@ const Footer = ({ t }: { t: Pick<Dictionary, 'footer'> }) => {
       locale = 'zh';
     }
   }
+
+  if (previewLocale) locale=previewLocale;
 
   /* ── localization ── */
   const basePath = locale === 'en' ? '' : `/${locale}`;

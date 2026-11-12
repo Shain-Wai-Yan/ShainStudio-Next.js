@@ -74,7 +74,7 @@ export function CodingProjectArchiveClient({
     const onScroll = () => setShowScrollTop(window.scrollY > 600);
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+  }, [locale]);
 
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -97,7 +97,7 @@ export function CodingProjectArchiveClient({
 
   // ─── Load data ────────────────────────────────────────────────────────────
   const loadProjects = useCallback((isInitial = false) => {
-    return fetch('/api/coding-projects?pageSize=100')
+    return fetch(`/api/coding-projects?pageSize=100&language=${locale}`)
       .then(res => res.json())
       .then(json => {
       setError(null);
@@ -111,7 +111,7 @@ export function CodingProjectArchiveClient({
     }).finally(() => {
       if (isInitial) setIsLoading(false);
     });
-  }, []);
+  }, [locale]);
 
   useEffect(() => {
     if (initialProjects.length === 0) {

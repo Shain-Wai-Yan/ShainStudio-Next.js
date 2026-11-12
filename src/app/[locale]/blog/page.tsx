@@ -1,3 +1,4 @@
+import { localizedCollectionSeo } from '@/lib/server/localized-content';
 import { serializeJsonLd } from '@/lib/utils/json-ld';
 import { Suspense } from 'react';
 import { Metadata } from 'next';
@@ -34,10 +35,7 @@ export async function generateMetadata(props: BlogPageProps): Promise<Metadata> 
   return {
     title: { absolute: brandedTitle(title, 'Shain Studio') },
     description: t.blog.description,
-    robots: isZh ? { index: false, follow: true } : { index: true, follow: true },
-    alternates: {
-      canonical: `${domain}/blog`,
-    },
+    ...await localizedCollectionSeo('blogs', '/blog', locale === 'zh' ? 'zh' : 'en'),
     openGraph: {
       type: 'website',
       url: `${domain}${urlPath}`,

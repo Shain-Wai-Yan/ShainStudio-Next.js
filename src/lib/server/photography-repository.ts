@@ -7,5 +7,5 @@ export interface PhotographyRepository {
   getCollections(language: PhotographyLocale): Promise<PhotoCollection[]>;
   getPhoto(documentId: string, language: PhotographyLocale): Promise<Photo | null>;
   getRelated(photo: Photo, limit: number): Promise<Photo[]>;
-  getSitemapPhotos(): Promise<Photo[]>;
+  getSitemapPhotos(language?: PhotographyLocale): Promise<Photo[]>;
 }

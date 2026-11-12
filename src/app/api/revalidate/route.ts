@@ -1,6 +1,7 @@
-import { revalidatePath, revalidateTag } from 'next/cache';
+import { revalidateTag } from 'next/cache';
 import { NextRequest, NextResponse } from 'next/server';
 import { createHash, timingSafeEqual } from 'node:crypto';
+import {CONTENT_TYPES} from '@/lib/strapi/content-contract';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -30,46 +31,12 @@ async function readPayload(request: NextRequest): Promise<unknown> {
   }
 }
 
-const CONTENT = {
-  blogs: { tag: 'blogs', paths: ['/blog', '/zh/blog'] },
-  'marketing-projects': {
-    tag: 'marketing-projects',
-    paths: ['/portfolio/marketing-in-motion', '/zh/portfolio/marketing-in-motion'],
-  },
-  'coding-projects': {
-    tag: 'coding-projects',
-    paths: ['/portfolio/coding-projects', '/zh/portfolio/coding-projects'],
-  },
-  photography: { tag: 'photography', paths: ['/hobbies', '/zh/hobbies', '/hobbies/photography', '/zh/hobbies/photography'] },
-  'marketing-plans': { tag: 'marketing-plans', paths: ['/portfolio/marketing-plans', '/zh/portfolio/marketing-plans'] },
-  'business-plans': { tag: 'business-plans', paths: ['/portfolio/business-plans', '/zh/portfolio/business-plans'] },
-  arts: { tag: 'arts', paths: ['/hobbies', '/zh/hobbies', '/hobbies/pencil-art', '/zh/hobbies/pencil-art'] },
-  certificates: { tag: 'certificates', paths: ['/certificate', '/zh/certificate'] },
-  clients: { tag: 'clients', paths: ['/en', '/zh'] },
-} as const;
-
-type ContentType = keyof typeof CONTENT;
-
-function contentType(model: unknown): ContentType | null {
-  const value = typeof model === 'string' ? model.toLowerCase() : '';
-  if (value.includes('blog')) return 'blogs';
-  if (value.includes('marketing-project')) return 'marketing-projects';
-  if (value.includes('coding-project')) return 'coding-projects';
-  if (value.includes('photograph')) return 'photography';
-  if (value.includes('marketing-plan')) return 'marketing-plans';
-  if (value.includes('business-plan')) return 'business-plans';
-  if (['art', 'arts', 'api::art.art', 'pencil-art'].includes(value)) return 'arts';
-  if (value.includes('certificate')) return 'certificates';
-  if (['client', 'clients', 'api::client.client'].includes(value)) return 'clients';
-  return null;
-}
-
-function slugFor(type: ContentType, value: unknown): string | null {
-  if (typeof value !== 'string' || !/^[a-z0-9-]{1,200}$/i.test(value)) return null;
-  if (type === 'blogs') return value.startsWith('zh-') ? `/zh/blog/${value}` : `/blog/${value}`;
-  if (type === 'marketing-projects') return `/portfolio/marketing-in-motion/${value}`;
-  if (type === 'coding-projects') return `/portfolio/coding-projects/${value}`;
-  if (type === 'arts') return `/hobbies/pencil-art/${value}`;
+const MODELS:Record<string,string>=Object.fromEntries(Object.entries(CONTENT_TYPES).map(([name,type])=>[name,type.endpoint]));
+function contentType(value: unknown): string | null {
+  if (typeof value !== 'string') return null;
+  for (const [name, endpoint] of Object.entries(MODELS)) {
+    if ([name, endpoint, `api::${name}.${name}`].includes(value)) return endpoint;
+  }
   return null;
 }
 
@@ -84,7 +51,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  let payload: { model?: unknown; uid?: unknown; event?: unknown; entry?: { slug?: unknown; documentId?: unknown; publishedAt?: unknown }; slug?: unknown; documentId?: unknown };
+  let payload: { model?: unknown; uid?: unknown; event?: unknown; entry?: { slug?: unknown; documentId?: unknown; publishedAt?: unknown; locale?: unknown }; slug?: unknown; documentId?: unknown };
   try {
     const value = await readPayload(request);
     if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('Invalid JSON payload');
@@ -101,32 +68,27 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unsupported Strapi content type' }, { status: 400 });
   }
 
-  const content = CONTENT[type];
+  const publishedDelete = payload.event === 'entry.delete' && typeof payload.entry?.publishedAt === 'string' && !!payload.entry.publishedAt;
+  if (!['entry.publish', 'entry.unpublish'].includes(String(payload.event)) && !publishedDelete) {
+    return NextResponse.json({ revalidated: false, skipped: true, type });
+  }
   if (type === 'clients') {
-    const publishedDelete = payload.event === 'entry.delete' && typeof payload.entry?.publishedAt === 'string' && !!payload.entry.publishedAt;
-    if (!['entry.publish', 'entry.unpublish'].includes(String(payload.event)) && !publishedDelete) {
-      return NextResponse.json({ revalidated: false, skipped: true, type });
-    }
-    // Both prerendered homepages depend on this tag. Hard path invalidation
-    // would also expire their data and defeat stale-on-error availability.
     revalidateTag('clients', 'max');
-    return NextResponse.json({ revalidated: true, type, paths: [...content.paths], mode: 'stale-while-revalidate' });
+    return NextResponse.json({ revalidated: true, type, paths: ['/en','/zh'], mode: 'stale-while-revalidate' });
   }
-  revalidateTag(content.tag, { expire: 0 });
-  for (const path of content.paths) revalidatePath(path);
-
-  const detailPath = slugFor(type, payload.entry?.slug ?? payload.slug);
-  const detailPaths = detailPath ? (type === 'arts' ? [detailPath, `/zh${detailPath}`] : [detailPath]) : [];
-  for (const path of detailPaths) revalidatePath(path);
-
-  const documentId = payload.entry?.documentId ?? payload.documentId;
-  const photoPath = type === 'photography' && typeof documentId === 'string' && /^[a-z0-9]{8,40}$/i.test(documentId)
-    ? `/hobbies/photography/photo/${documentId}`
-    : null;
-  if (photoPath) {
-    revalidatePath(photoPath);
-    revalidatePath(`/zh${photoPath}`);
+  const locale = payload.entry?.locale ?? 'en';
+  if (!['en','zh-CN'].includes(String(locale))) {
+    return NextResponse.json({ error: 'Unsupported content locale' }, { status: 400 });
   }
-
-  return NextResponse.json({ revalidated: true, type, paths: [...content.paths, ...detailPaths, ...(photoPath ? [photoPath, `/zh${photoPath}`] : [])] });
+  // Data dependencies invalidate ISR outputs, reciprocal hreflang and sitemap.
+  // Avoid path invalidation: it would expire unrelated locale snapshots.
+  const endpoints = new Set([type]);
+  if (['categories','tags','project-types'].includes(type)) {
+    for (const endpoint of ['blogs','coding-projects','marketing-projects','photographies','arts','certificates','business-plans','marketing-plans']) endpoints.add(endpoint);
+  }
+  // English publication also changes shared routing/assets in existing Chinese
+  // rows. Chinese-only edits still leave the English body cache intact.
+  const tags = [...endpoints].flatMap(endpoint => (locale==='en'?['en','zh-CN']:['zh-CN']).map(language=>`${endpoint}:${language}`));
+  for (const tag of tags) revalidateTag(tag, { expire: 0 });
+  return NextResponse.json({ revalidated: true, type, locale, tags });
 }

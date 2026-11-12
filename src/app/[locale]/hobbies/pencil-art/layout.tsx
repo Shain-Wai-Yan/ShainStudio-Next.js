@@ -1,8 +1,9 @@
+import { localizedCollectionSeo } from '@/lib/server/localized-content';
 import type { Metadata } from 'next';
 import { Alex_Brush } from 'next/font/google';
 import { getDictionary } from '@/lib/getDictionary';
 import { isSupportedLocale, DEFAULT_LOCALE } from '@/lib/locales';
-import { DEFAULT_OG_IMAGE, SITE_URL, brandedTitle } from '@/lib/seo';
+import { DEFAULT_OG_IMAGE, brandedTitle } from '@/lib/seo';
 
 interface PencilArtLayoutProps {
   children: React.ReactNode;
@@ -27,16 +28,8 @@ export async function generateMetadata(
   return {
     title: { absolute: brandedTitle(t.pencilArt.seo.title, 'Shain Studio') },
     description: t.pencilArt.seo.description,
-    robots: locale === 'zh' ? { index: false, follow: true } : { index: true, follow: true },
     authors: [{ name: locale === 'zh' ? '明元易' : 'Shain Wai Yan' }],
-    alternates: {
-      canonical: `${SITE_URL}/hobbies/pencil-art`,
-      languages: {
-        en: `${SITE_URL}/hobbies/pencil-art`,
-        zh: `${SITE_URL}/zh/hobbies/pencil-art`,
-        'x-default': `${SITE_URL}/hobbies/pencil-art`,
-      },
-    },
+    ...await localizedCollectionSeo('arts','/hobbies/pencil-art',locale),
     openGraph: {
       title: t.pencilArt.seo.openGraphTitle,
       description: t.pencilArt.seo.openGraphDesc,

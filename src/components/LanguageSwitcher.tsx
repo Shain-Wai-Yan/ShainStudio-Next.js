@@ -5,8 +5,9 @@ import { useEffect, useState } from 'react';
 import { BsChevronDown } from 'react-icons/bs';
 import { SiGoogletranslate } from 'react-icons/si';
 
-export default function LanguageSwitcher() {
-  const pathname = usePathname();
+export default function LanguageSwitcher({previewPath}: {previewPath?: string} = {}) {
+  const currentPathname = usePathname();
+  const pathname = previewPath ?? currentPathname;
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);

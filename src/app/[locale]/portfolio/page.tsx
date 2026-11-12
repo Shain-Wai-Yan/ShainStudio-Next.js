@@ -66,7 +66,7 @@ export default async function PortfolioPage({ params }: PortfolioProps) {
   // Fetch dynamic counts concurrently
   const [translations, dynamicCounts] = await Promise.all([
     getDictionary(locale),
-    getPortfolioCounts()
+    getPortfolioCounts(locale === 'zh' ? 'zh' : 'en')
   ]);
 
   
