@@ -1,4 +1,5 @@
 import type { MetadataRoute } from 'next';
+import { connection } from 'next/server';
 import { getLocalizedRows } from '@/lib/server/localized-content';
 import type { ContentLocalization } from '@/types/localization';
 const SITE_URL = 'https://www.shainwaiyan.com';
@@ -51,6 +52,9 @@ const collections = [
   ['marketing-plans','/portfolio/marketing-plans',null],
 ] as const;
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  // The sitemap needs published CMS data at request time, not during deployment.
+  // Keep locale snapshot caching/invalidation; unavailable data must still throw.
+  await connection();
   const pages: MetadataRoute.Sitemap = [...staticRoutes.main,...staticRoutes.portfolio,...staticRoutes.zhMain].map(route => ({
     url: `${SITE_URL}${route.path}`,changeFrequency:route.changeFrequency,priority:route.priority,
   }));
@@ -59,7 +63,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const path = new URL(page.url).pathname.replace(/^\/zh(?=\/|$)/,'') || '/';
     if (translatedStatic.has(path)) page.alternates={languages:{en:`${SITE_URL}${path}`,'zh-CN':`${SITE_URL}/zh${path === '/' ? '' : path}`,'x-default':`${SITE_URL}${path}`}};
   }
-  // Fetch complete locale snapshots; failed refreshes throw and retain prior ISR output.
+  // Fetch complete cached locale snapshots; never return a partial sitemap on failure.
   for (const [endpoint,listPath,prefix] of collections) {
     const options = ['blogs','coding-projects','marketing-projects'].includes(endpoint) ? {queryParams:{'populate[seo]':true}} : {};
     const [english,rows] = await Promise.all([getLocalizedRows(endpoint,'en',options),getLocalizedRows(endpoint,'zh',options)]);

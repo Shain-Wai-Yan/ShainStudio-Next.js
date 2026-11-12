@@ -12,7 +12,8 @@ import { SITE_URL, DEFAULT_OG_IMAGE, brandedTitle } from '@/lib/seo';
 export const revalidate = 3600; // Revalidate every hour
 
 export function generateStaticParams() {
-  return [{ locale: 'en' }, { locale: 'zh' }];
+  // Generate published listings on demand so deployment does not need a live CMS.
+  return [];
 }
 
 interface Props {
@@ -64,7 +65,10 @@ export default async function CodingProjectsPage({ params }: Props) {
   const dict = await getDictionary(locale);
   
   // Fetch coding projects from Strapi
-  const { projects: strapiProjects } = await getCodingProjects(1, 100, locale);
+  const { projects: strapiProjects, error } = await getCodingProjects(1, 100, locale);
+  // An outage is not an empty collection. Throw so ISR retains prior good output
+  // and a cold failed request can recover instead of caching an empty listing.
+  if (error) throw new Error('Published coding projects are temporarily unavailable.');
 
   // Prepare structured data
   const topProjectsForSeo = strapiProjects.slice(0, 10);

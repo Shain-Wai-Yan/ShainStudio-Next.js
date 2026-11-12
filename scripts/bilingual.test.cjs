@@ -189,3 +189,32 @@ test('authenticated events isolate locale invalidation, skip drafts and reject W
  assert.equal((await send({uid:'api::blog.blog',event:'entry.publish',entry:{locale:'*'}})).status,400);
  }finally{if(before===undefined)delete process.env.STRAPI_REVALIDATION_SECRET;else process.env.STRAPI_REVALIDATION_SECRET=before;}
 });
+
+
+test('sitemap defers CMS reads until a request and retains published locale links',async()=>{
+ let resume;const gate=new Promise(resolve=>{resume=resolve;});let reads=0;
+ const english={...row('english','English'),localization:{englishPublished:true,chinesePublished:false}};
+ const translated={...row('translated','中文','zh-CN'),localization:{englishPublished:true,chinesePublished:true}};
+ const sitemap=load('src/app/sitemap.ts',{
+  'next/server':{connection:()=>gate},
+  '@/lib/server/localized-content':{getLocalizedRows:async(endpoint,locale)=>{
+   reads++;return endpoint==='blogs'?(locale==='en'?[english,{...translated,locale:'en'}]:[english,translated]):[];
+  }},
+ }).default;
+ const pending=sitemap();await new Promise(resolve=>setImmediate(resolve));
+ assert.equal(reads,0,'Build-time rendering must stop before attempting CMS reads');
+ resume();const pages=await pending;
+ assert.ok(pages.some(page=>page.url==='https://www.shainwaiyan.com/blog/english'));
+ assert.ok(!pages.some(page=>page.url==='https://www.shainwaiyan.com/zh/blog/english'));
+ const chinese=pages.find(page=>page.url==='https://www.shainwaiyan.com/zh/blog/translated');
+ assert.equal(chinese.alternates.languages.en,'https://www.shainwaiyan.com/blog/translated');
+ assert.equal(chinese.alternates.languages['zh-CN'],chinese.url);
+});
+
+test('sitemap propagates unavailable CMS data instead of publishing partial URLs',async()=>{
+ const sitemap=load('src/app/sitemap.ts',{
+  'next/server':{connection:async()=>{}},
+  '@/lib/server/localized-content':{getLocalizedRows:async()=>{throw new Error('CMS unavailable fixture');}},
+ }).default;
+ await assert.rejects(sitemap(),/CMS unavailable fixture/);
+});

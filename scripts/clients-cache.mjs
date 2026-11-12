@@ -14,12 +14,16 @@ const secret = 'clients-cache-acceptance-secret';
 const apiToken = 'clients-cache-content-token-not-for-browser';
 const rows = name => [{ documentId: 'cacheclienta', name, image: { url: 'https://res.cloudinary.com/demo/image/upload/sample.jpg', mime: 'image/jpeg' } }];
 let chinesePublished = false;
+let sitemapCmsUnavailable = true;
 const projectReads = {en:0,'zh-CN':0};
 const project = {id:1,documentId:'bilingualfixture',slug:'bilingual-fixture',title:'BILINGUAL_ENGLISH',summary:'English summary',content:'<p>English body</p>',publishedAt:'2026-11-01T00:00:00Z',updatedAt:'2026-11-01T00:00:00Z',projectDate:'2026-11-01',category:null,tags:[],tools_useds:[],seo:null};
 let state = { fail: true, failPage: 0, data: rows('CACHE_ALPHA'), pageSize: 1, reads: 0 };
 const cms = http.createServer((req, res) => {
   const url = new URL(req.url, 'http://localhost');
   res.setHeader('content-type', 'application/json');
+  if (sitemapCmsUnavailable && url.pathname !== '/api/clients') {
+    res.writeHead(503); res.end(JSON.stringify({ error: 'Deliberate cold sitemap CMS outage' })); return;
+  }
   if (url.pathname === '/api/coding-projects') {
     const locale = url.searchParams.get('locale');
     assert.ok(['en','zh-CN'].includes(locale));
@@ -101,6 +105,7 @@ try {
   const code = await new Promise(resolve => build.on('exit', resolve));
   assert.equal(code, 0, logs.join('').slice(-8000));
   const manifest = JSON.parse(fs.readFileSync('.next/prerender-manifest.json', 'utf8'));
+  assert.equal(manifest.routes['/sitemap.xml'], undefined, 'CMS-dependent sitemap must not be prerendered at build time');
   for (const route of ['/en', '/zh']) {
     const info = manifest.routes[route] || manifest.routes[`${route}/`];
     assert.ok(info, `${route} must remain prerendered`);
@@ -110,6 +115,16 @@ try {
   for (let i = 0; i < 100; i++) { try { await html('/'); break; } catch (error) { if (i === 99) throw new Error(`Next production homepage failed: ${error.message}`); await delay(200); } }
   for (const locale of ['/', '/zh']) assert.ok(!(await html(locale)).includes('id="collaborations"'));
   console.log('PASS: cold-cache outage preserves both homepages and hides only the client strip.');
+  const unavailableSitemap = await fetch(origin + '/sitemap.xml', { signal: AbortSignal.timeout(15000) });
+  assert.equal(unavailableSitemap.status, 500, 'Cold sitemap outage must surface as an error');
+  assert.doesNotMatch(await unavailableSitemap.text(), /<urlset/, 'Do not publish a partial static-only sitemap');
+  const unavailableListing = await fetch(origin + '/portfolio/coding-projects', { signal: AbortSignal.timeout(15000) });
+  assert.equal(unavailableListing.status, 500, 'Do not cache a cold CMS outage as an empty published listing');
+  await unavailableListing.arrayBuffer();
+  sitemapCmsUnavailable = false;
+  assert.match(await html('/sitemap.xml'), /\/portfolio\/coding-projects\/bilingual-fixture/);
+  assert.match(await html('/portfolio/coding-projects'), /BILINGUAL_ENGLISH/, 'A recovered CMS must restore the published listing');
+  console.log('PASS: offline CMS does not prevent a production build; sitemap errors honestly and recovers when CMS returns.');
   const unauthorized = await fetch(`${origin}/api/revalidate`, { method: 'POST', body: JSON.stringify({ model: 'client', event: 'entry.publish' }) });
   assert.equal(unauthorized.status, 401);
 
@@ -175,7 +190,11 @@ try {
       && body.includes(`rel="canonical" href="https://www.shainwaiyan.com/zh${detail}"`)
       && sitemap.includes(`/zh${detail}`) && listing.includes('双语中文项目')
       && english.includes('hrefLang="zh-CN"') && english.includes('BILINGUAL_ENGLISH')) break;
-    if(attempt===99) throw new Error('Chinese publication failed to refresh detail, list, sitemap or reciprocal English hreflang.');
+    if(attempt===99) {
+      const checks={chineseTitle:body.includes('双语中文项目'),fallbackRemoved:!body.includes('English version — Chinese translation pending'),canonical:body.includes(`rel="canonical" href="https://www.shainwaiyan.com/zh${detail}"`),sitemap:sitemap.includes(`/zh${detail}`),listing:listing.includes('双语中文项目'),englishAlternate:english.includes('hrefLang="zh-CN"'),englishBody:english.includes('BILINGUAL_ENGLISH'),projectReads};
+      fs.writeFileSync(path.join(output,'publication-failure.json'),JSON.stringify(checks,null,2));
+      throw new Error('Chinese publication failed: '+JSON.stringify(checks));
+    }
     await delay(300);
   }
   assert.equal(projectReads.en,englishReads,'Chinese publication must retain cached English body snapshots');
