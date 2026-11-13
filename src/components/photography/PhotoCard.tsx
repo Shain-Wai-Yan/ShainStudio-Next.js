@@ -45,7 +45,7 @@ export function PhotoCard({ photo, onClick, priority = false, language }: PhotoC
         // from being split across two columns
         className="break-inside-avoid mb-3 rounded-xl overflow-hidden cursor-pointer bg-gray-100 dark:bg-gray-800 border border-dashed border-gray-200 dark:border-gray-700 h-44 flex items-center justify-center group hover:border-[#191970]/30 dark:hover:border-[#ffd700]/30 transition-all duration-300"
         onClick={detailHref ? handleClick : (event) => { event.preventDefault(); onClick(); }}
-        aria-label={`View photo: ${photo.title}`}
+        aria-label={`${language === 'zh' ? '查看照片' : 'View photo'}: ${photo.title}`}
       >
         <div className="text-center px-4">
           <svg className="w-7 h-7 mx-auto mb-2 text-gray-300 dark:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -75,7 +75,7 @@ export function PhotoCard({ photo, onClick, priority = false, language }: PhotoC
         boxShadow: '0 1px 8px rgba(25,25,112,0.07)',
       }}
       onClick={detailHref ? handleClick : (event) => { event.preventDefault(); onClick(); }}
-      aria-label={`View photo: ${photo.title}`}
+      aria-label={`${language === 'zh' ? '查看照片' : 'View photo'}: ${photo.title}`}
     >
       <CImage
         src={src}

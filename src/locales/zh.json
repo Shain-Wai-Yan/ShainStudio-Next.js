@@ -294,16 +294,16 @@
   "photography": {
     "title": "摄影",
     "subtitle": "通过镜头讲述视觉故事",
-    "description": "精选的摄影作品集，探索构图、光线和情感。每一张照片都捕捉了一个决定性时刻与有意的叙事。",
+    "description": "记录东枝与仰光的日常：山野、建筑、咖啡馆，以及不断变换的天光与云景。",
     "seo": {
       "title": "摄影作品集 | Shain Studio",
       "description": "探索明元易（Shain Wai Yan）的摄影作品，包含风景、建筑等精彩影像。",
       "openGraphTitle": "摄影作品集 | Shain Studio",
-      "openGraphDesc": "探索我的摄影作品集，包含风景、人像、建筑等多种风格的摄影作品。"
+      "openGraphDesc": "记录东枝与仰光的日常：山野、建筑、咖啡馆，以及不断变换的天光与云景。"
     },
     "labels": {
       "heroTitle": "摄影作品集",
-      "heroDescription": "通过镜头探索世界的美妙瞬间。每一张照片都讲述了一个独特的故事，捕捉了光线、色彩和情感的完美融合。",
+      "heroDescription": "记录东枝与仰光的日常：山野、建筑、咖啡馆，以及不断变换的天光与云景。",
       "errorText": "加载失败，请稍后再试。",
       "noPhotos": "暂无摄影作品。"
     },
@@ -311,6 +311,20 @@
       "home": "首页",
       "portfolio": "作品集",
       "photography": "摄影"
+    },
+    "controls": {
+      "share": "分享照片",
+      "copied": "链接已复制",
+      "close": "关闭照片",
+      "previous": "上一张照片",
+      "next": "下一张照片",
+      "back": "返回图库",
+      "permanent": "永久链接",
+      "unavailable": "图片暂不可用",
+      "studio": "Shain Studio 摄影",
+      "view": "查看照片",
+      "photo": "照片",
+      "related": "相关照片"
     }
   },
   "pencilArt": {

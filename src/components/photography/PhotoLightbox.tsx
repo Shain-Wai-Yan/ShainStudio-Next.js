@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import { Photo } from '@/lib/strapi/photography';
+import english from '@/locales/en.json';
+import chinese from '@/locales/zh.json';
 
 interface PhotoLightboxProps {
   language: 'en' | 'zh';
@@ -140,6 +142,7 @@ export function PhotoLightbox({
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
+  const t=(language === 'zh' ? chinese : english).photography.controls;
   const { activeSrc, blurClass, stage } = useProgressiveImage(photo.id, photo.image);
 
   const relatedPhotos = useMemo(() => getRelated(photo, allPhotos), [photo, allPhotos]);
@@ -209,7 +212,7 @@ export function PhotoLightbox({
           // 2. The lightbox is full-viewport so next/image's size optimisation
           //    doesn't add value — we already serve optimised Cloudinary URLs
           src={activeSrc}
-          alt={photo.title}
+          alt={photo.altText || photo.title}
           className={`max-w-full max-h-full object-contain rounded-xl shadow-2xl transition-all duration-500 ${blurClass}`}
           draggable={false}
         />
@@ -238,7 +241,7 @@ export function PhotoLightbox({
         <h2 className="text-white font-semibold text-base leading-tight truncate">
           {photo.title}
         </h2>
-        <button type="button" onClick={() => void sharePhoto()} className="mt-3 rounded-full border border-white/20 px-3 py-1.5 text-xs font-medium text-white/80 transition hover:border-[#ffd700]/60 hover:text-[#ffd700]">{copied ? 'Link copied' : 'Share photo'}</button>
+        <button type="button" onClick={() => void sharePhoto()} className="mt-3 rounded-full border border-white/20 px-3 py-1.5 text-xs font-medium text-white/80 transition hover:border-[#ffd700]/60 hover:text-[#ffd700]">{copied ? t.copied : t.share}</button>
         {photo.location && (
           <p className="text-white/50 text-sm mt-1 flex items-center gap-1.5">
             <svg className="w-3.5 h-3.5 shrink-0 text-[#ffd700]/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -272,7 +275,7 @@ export function PhotoLightbox({
       className={`fixed inset-0 z-[9999] flex transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
       role="dialog"
       aria-modal="true"
-      aria-label={`Photo: ${photo.title}`}
+      aria-label={`${t.photo}: ${photo.title}`}
     >
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black/95 backdrop-blur-sm" onClick={onClose} />
@@ -282,7 +285,7 @@ export function PhotoLightbox({
         ref={closeButtonRef}
         onClick={onClose}
         className="absolute top-4 right-4 z-20 w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all duration-200 hover:scale-110 border border-white/10"
-        aria-label="Close"
+        aria-label={t.close}
       >
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -295,7 +298,7 @@ export function PhotoLightbox({
         {/* Related sidebar */}
         <div className="w-64 xl:w-72 h-full flex flex-col border-r border-white/8 bg-black/40 shrink-0">
           <div className="px-4 pt-5 pb-3">
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-white/30">Related</p>
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-white/30">{t.related}</p>
             {photo.category && (
               <p className="text-xs text-[#ffd700]/70 mt-0.5 font-medium">{photo.category}</p>
             )}
@@ -343,7 +346,7 @@ export function PhotoLightbox({
             <button
               onClick={onPrevious}
               className="absolute left-[264px] xl:left-[288px] top-1/2 -translate-y-1/2 ml-3 z-20 w-10 h-10 rounded-full bg-white/10 hover:bg-[#191970]/80 text-white flex items-center justify-center transition-all duration-200 hover:scale-110 border border-white/10"
-              aria-label="Previous photo"
+              aria-label={t.previous}
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -355,7 +358,7 @@ export function PhotoLightbox({
             <button
               onClick={onNext}
               className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/10 hover:bg-[#191970]/80 text-white flex items-center justify-center transition-all duration-200 hover:scale-110 border border-white/10"
-              aria-label="Next photo"
+              aria-label={t.next}
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -385,7 +388,7 @@ export function PhotoLightbox({
           <button
             onClick={onPrevious}
             className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/50 text-white flex items-center justify-center border border-white/10"
-            aria-label="Previous"
+            aria-label={t.previous}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -396,7 +399,7 @@ export function PhotoLightbox({
           <button
             onClick={onNext}
             className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/50 text-white flex items-center justify-center border border-white/10"
-            aria-label="Next"
+            aria-label={t.next}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -434,7 +437,7 @@ export function PhotoLightbox({
         {relatedPhotos.length > 0 && (
           <div className="border-t border-white/8 bg-black/50">
             <p className="px-3 pt-2 pb-1 text-[9px] font-semibold uppercase tracking-widest text-white/25">
-              Related {photo.category && `· ${photo.category}`}
+              {t.related} {photo.category && `· ${photo.category}`}
             </p>
             <div
               className="flex gap-2 px-3 pb-3 overflow-x-auto"

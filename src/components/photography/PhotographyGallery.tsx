@@ -29,10 +29,10 @@ function appendUnique(current: Photo[], incoming: Photo[]): Photo[] {
   return [...current, ...incoming.filter((photo) => !existing.has(photoKey(photo)))];
 }
 
-function GallerySkeleton() {
+function GallerySkeleton({ language }: { language: 'en' | 'zh' }) {
   const heights = [260, 190, 330, 230, 300, 210, 280, 350, 220, 310, 200, 270];
   return (
-    <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-3" aria-label="Loading photography">
+    <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-3" aria-label={language === 'zh' ? '正在加载照片' : 'Loading photography'}>
       {heights.map((height, index) => <div key={index} className="mb-3 break-inside-avoid rounded-xl bg-gray-200 dark:bg-gray-800 animate-pulse" style={{ height }} />)}
     </div>
   );
@@ -108,7 +108,7 @@ export function PhotographyGallery({ language, initialFeed, initialCollections }
     if (selectedCollection) params.set('collection', selectedCollection);
     if (debouncedSearch) params.set('search', debouncedSearch);
     const response = await fetch(`/api/photography?${params}`, { signal });
-    if (!response.ok) throw new Error('Photography is temporarily unavailable.');
+    if (!response.ok) throw new Error(language === 'zh' ? '照片暂时无法加载，请稍后重试。' : 'Photography is temporarily unavailable.');
     return await response.json() as PhotoFeedPage;
   }, [debouncedSearch, language, seed, selectedCollection]);
 
@@ -336,7 +336,7 @@ export function PhotographyGallery({ language, initialFeed, initialCollections }
                   <button
                     type="button"
                     onClick={() => setSearch('')}
-                    aria-label="Clear search"
+                    aria-label={language === 'zh' ? '清除搜索' : 'Clear search'}
                     className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-0.5 text-gray-400 hover:text-gray-700 dark:hover:text-white"
                   >
                     <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -408,7 +408,7 @@ export function PhotographyGallery({ language, initialFeed, initialCollections }
                   <button
                     type="button"
                     onClick={() => setSearch('')}
-                    aria-label="Clear search"
+                    aria-label={language === 'zh' ? '清除搜索' : 'Clear search'}
                     className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-0.5 text-gray-400 hover:text-gray-700 dark:hover:text-white"
                   >
                     <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -434,7 +434,7 @@ export function PhotographyGallery({ language, initialFeed, initialCollections }
         </div>
       )}
 
-      {loading ? <GallerySkeleton /> : error && photos.length === 0 ? (
+      {loading ? <GallerySkeleton language={language} /> : error && photos.length === 0 ? (
         <div className="rounded-2xl border border-red-200 bg-red-50 p-8 text-center dark:border-red-900/50 dark:bg-red-950/20"><p className="mb-4 text-sm text-red-600 dark:text-red-400">{error}</p><button type="button" onClick={() => window.location.reload()} className="rounded-full bg-[#191970] px-5 py-2 text-sm font-semibold text-white">{labels.retry}</button></div>
       ) : photos.length === 0 ? <p className="py-24 text-center text-gray-500">{labels.empty}</p> : (
         <>

@@ -294,16 +294,16 @@
   "photography": {
     "title": "Photography",
     "subtitle": "Visual Storytelling Through the Lens",
-    "description": "A curated collection of photography exploring composition, light, and emotion. Each shot captures a decisive moment with intentional storytelling.",
+    "description": "Photographs from everyday life in Taunggyi and Yangon: landscapes, architecture, cafés and changing skies.",
     "seo": {
       "title": "Photography Portfolio | Shain Studio",
       "description": "Explore Shain Wai Yan's photography portfolio featuring stunning images of landscapes, architecture, and more.",
       "openGraphTitle": "Photography Portfolio | Shain Studio",
-      "openGraphDesc": "Stunning photography showcasing landscapes, architecture, and beautiful moments."
+      "openGraphDesc": "Photographs from everyday life in Taunggyi and Yangon: landscapes, architecture, cafés and changing skies."
     },
     "labels": {
       "heroTitle": "Photography Gallery",
-      "heroDescription": "Capturing moments and memories through the art of photography. Explore my collection of images featuring landscapes, architecture, and beautiful moments from around the world.",
+      "heroDescription": "Photographs from everyday life in Taunggyi and Yangon: landscapes, architecture, cafés and changing skies.",
       "errorText": "Unable to load photos. Please try again later.",
       "noPhotos": "No photos available at the moment."
     },
@@ -311,6 +311,20 @@
       "home": "Home",
       "portfolio": "Portfolio",
       "photography": "Photography"
+    },
+    "controls": {
+      "share": "Share photo",
+      "copied": "Link copied",
+      "close": "Close photo",
+      "previous": "Previous photo",
+      "next": "Next photo",
+      "back": "Back to gallery",
+      "permanent": "Permanent link",
+      "unavailable": "Image unavailable",
+      "studio": "Shain Studio Photography",
+      "view": "View photo",
+      "photo": "Photo",
+      "related": "Related photographs"
     }
   },
   "pencilArt": {
