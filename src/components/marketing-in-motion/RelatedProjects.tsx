@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import CImage from '@/components/ui/CImage';
-import { MarketingProject, formatProjectDate } from '@/lib/strapi/marketing-in-motion';
+import { MarketingProject, formatProjectDate, formatMarketingReadingTime } from '@/lib/strapi/marketing-in-motion';
 
 interface RelatedProjectsProps {
   projects: MarketingProject[];
@@ -49,6 +49,7 @@ export default function RelatedProjects({ projects, language }: RelatedProjectsP
               href={`${basePath}/${project.slug}`}
               index={idx + 1}
               dateLocale={dateLocale}
+              language={language}
             />
           ))}
         </div>
@@ -65,11 +66,13 @@ function RelatedRow({
   href,
   index,
   dateLocale,
+  language,
 }: {
   project: MarketingProject;
   href: string;
   index: number;
   dateLocale: string;
+  language: 'en' | 'zh';
 }) {
   const formattedDate = project.projectDate
     ? formatProjectDate(project.projectDate, dateLocale)
@@ -120,12 +123,12 @@ function RelatedRow({
           {project.readingTime && (
             <>
               <span className="text-white/20 text-[9px]">·</span>
-              <span className="text-[9px] text-white/30">{project.readingTime}</span>
+              <span className="text-[9px] text-white/30">{formatMarketingReadingTime(project.readingTime, language)}</span>
             </>
           )}
           {project.isFeatured && (
             <span className="text-[8px] font-bold bg-[#ffd700] text-[#191970] px-1.5 py-0.5 uppercase tracking-wider">
-              Featured
+              {language === 'zh' ? '精选' : 'Featured'}
             </span>
           )}
         </div>

@@ -10,7 +10,7 @@ import { MarketingProjectGrid } from './MarketingProjectGrid';
 import { MarketingProjectCard } from './MarketingProjectCard';
 import { Breadcrumb } from '@/components/Breadcrumb';
 import type { MarketingProject, FilterOptions } from '@/lib/strapi/marketing-in-motion';
-import { filterProjects, extractFilterOptions } from '@/lib/strapi/marketing-in-motion';
+import { filterProjects, extractFilterOptions, formatMarketingReadingTime } from '@/lib/strapi/marketing-in-motion';
 
 function useDebounce<T>(value: T, delay: number): T {
   const [debounced, setDebounced] = useState(value);
@@ -555,10 +555,10 @@ function ListRow({
           <span className="text-[10px] font-semibold uppercase tracking-wide text-[#191970] dark:text-[#d4af37]">
             {project.category}
           </span>
-          <span className="text-[10px] text-gray-400 dark:text-gray-500">·</span>
+          {project.readingTime && <><span className="text-[10px] text-gray-400 dark:text-gray-500">·</span>
           <span className="text-[10px] text-gray-400 dark:text-gray-500">
-            {project.readingTime}
-          </span>
+            {formatMarketingReadingTime(project.readingTime, locale)}
+          </span></>}
         </div>
         <h3 className="text-sm font-semibold text-gray-900 dark:text-[#e0e0e0] group-hover:text-[#191970] dark:group-hover:text-[#d4af37] transition-colors line-clamp-1">
           {project.title}

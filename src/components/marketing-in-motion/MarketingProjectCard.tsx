@@ -4,7 +4,7 @@ import ContentLanguageNotice from '@/components/shared/ContentLanguageNotice';
 import Link from 'next/link';
 import CImage from '@/components/ui/CImage';
 import type { MarketingProject } from '@/lib/strapi/marketing-in-motion';
-import { formatProjectDate } from '@/lib/strapi/marketing-in-motion';
+import { formatProjectDate, formatMarketingReadingTime } from '@/lib/strapi/marketing-in-motion';
 
 interface MarketingProjectCardProps {
   project: MarketingProject;
@@ -111,7 +111,7 @@ export function MarketingProjectCard({
             {project.readingTime && (
               <>
                 <span className="text-gray-300 dark:text-gray-600" aria-hidden="true">·</span>
-                <span className="text-[10px] text-gray-400 dark:text-gray-500">{project.readingTime}</span>
+                <span className="text-[10px] text-gray-400 dark:text-gray-500">{formatMarketingReadingTime(project.readingTime, locale)}</span>
               </>
             )}
           </div>

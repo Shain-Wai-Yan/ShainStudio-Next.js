@@ -213,10 +213,16 @@ function convertRichTextToHtml(content: unknown): string {
 }
 
 function calculateReadingTime(html: string): string {
-  const text = html.replace(/<[^>]*>/g, '');
-  const words = text.trim().split(/\s+/).length;
-  const minutes = Math.ceil(words / 200);
+  const text = html.replace(/<[^>]*>/g, ' ').trim();
+  if (!text) return '';
+  const han = text.match(/\p{Script=Han}/gu)?.length ?? 0;
+  const words = text.replace(/\p{Script=Han}/gu, ' ').match(/[\p{L}\p{N}]+/gu)?.length ?? 0;
+  const minutes = Math.max(1, Math.ceil(han / 400 + words / 200));
   return `${minutes} min read`;
+}
+
+export function formatMarketingReadingTime(value: string, locale: 'en' | 'zh'): string {
+  return locale === 'zh' ? value.replace(/ min read$/, ' 分钟阅读') : value;
 }
 
 // ─── Transform ────────────────────────────────────────────────────────────────
