@@ -65,7 +65,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
   // Fetch complete cached locale snapshots; never return a partial sitemap on failure.
   for (const [endpoint,listPath,prefix] of collections) {
-    const options = ['blogs','coding-projects','marketing-projects'].includes(endpoint) ? {queryParams:{'populate[seo]':true}} : {};
+    // Indexing needs identity, timestamps and per-locale noIndex flags only.
+    // Exclude article bodies and assets from every collection snapshot.
+    const queryParams: Record<string, string> = { 'fields[0]': 'updatedAt' };
+    if (['blogs','coding-projects','marketing-projects'].includes(endpoint)) {
+      queryParams['populate[seo][fields][0]'] = 'noIndex';
+    }
+    const options = { queryParams };
     const [english,rows] = await Promise.all([getLocalizedRows(endpoint,'en',options),getLocalizedRows(endpoint,'zh',options)]);
     const englishById = new Map(english.map(row => [row.documentId,row]));
     if (rows.some(row => (row.localization as ContentLocalization).chinesePublished)) {
