@@ -85,7 +85,7 @@ export function MarketingProjectCard({
           {/* Featured badge */}
           {isFeatured && (
             <span className="absolute top-3 right-3 px-2 py-0.5 text-xs font-semibold bg-[#ffd700] text-[#191970] uppercase tracking-wide">
-              ★ Featured
+              ★ {locale === 'zh' ? '精选' : 'Featured'}
             </span>
           )}
         </div>
