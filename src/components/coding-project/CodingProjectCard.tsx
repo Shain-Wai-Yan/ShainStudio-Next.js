@@ -69,8 +69,10 @@ export function CodingProjectCard({
       <div className="flex flex-col flex-1 p-5">
         <div className="flex items-center gap-2 mb-2 text-[10px] font-mono text-gray-400 dark:text-gray-500 uppercase tracking-widest">
           <span>{locale === 'zh' && project.type === 'General' ? '通用项目' : project.type}</span>
-          <span aria-hidden="true">&mdash;</span>
-          <span>{formatCodingReadingTime(project.readingTime, locale)}</span>
+          {project.readingTime && <>
+            <span aria-hidden="true">&mdash;</span>
+            <span>{formatCodingReadingTime(project.readingTime, locale)}</span>
+          </>}
         </div>
 
         <h3 className="text-lg font-bold text-gray-900 dark:text-white leading-tight mb-2 group-hover:text-[#191970] dark:group-hover:text-[#d4af37] transition-colors">
