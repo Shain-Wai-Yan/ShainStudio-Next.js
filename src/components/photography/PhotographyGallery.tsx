@@ -289,6 +289,11 @@ export function PhotographyGallery({ language, initialFeed, initialCollections }
 
   return (
     <section className="w-full" aria-labelledby="photography-collections">
+      {language === 'zh' && photos.some((photo) => photo.localization?.isFallback) && (
+        <p lang="zh-CN" className="mb-4 py-2 text-sm text-stone-500">
+          尚未发布中文版本的内容将显示英文原文。
+        </p>
+      )}
       {/* ── Collapsible Gallery Toolbar ── */}
       {!isToolbarOpen ? (
         <div className="sticky top-[80px] sm:top-[86px] z-20 mb-3 flex items-center justify-end">

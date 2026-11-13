@@ -94,8 +94,7 @@ export default async function PhotographyPage(props: PhotographyPageProps) {
           </p>
         </div>
 
-        {locale === 'zh' && <p lang="zh-CN" className="mx-auto max-w-7xl px-4 py-2 text-sm text-stone-500">尚未发布中文版本的内容将显示英文原文。</p>}
-      <PhotographyGallery
+        <PhotographyGallery
           language={locale as 'en' | 'zh'}
           initialFeed={initialFeed}
           initialCollections={initialCollections}
