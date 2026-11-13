@@ -29,29 +29,7 @@ interface BreadcrumbItem {
 export interface MarketingInMotionClientProps {
   locale?: 'en' | 'zh';
   breadcrumbItems: BreadcrumbItem[];
-  labels: {
-    heroTitle: string;
-    heroDescription: string;
-    featuredTitle: string;
-    searchPlaceholder: string;
-    allCategories: string;
-    allTools: string;
-    allTags: string;
-    allTypes: string;
-    refresh: string;
-    showing: string;
-    of: string;
-    projects: string;
-    viewDetails: string;
-    loadMore: string;
-    loadingText: string;
-    errorText: string;
-    retryText: string;
-    noProjects: string;
-    noProjectsHint: string;
-    prev: string;
-    next: string;
-  };
+  labels: typeof import('@/locales/en.json')['marketingInMotion']['labels'];
   initialProjects?: MarketingProject[];
 }
 
@@ -275,7 +253,7 @@ export function MarketingInMotionClient({
       </div>
 
       {/* Hero */}
-      <MarketingHero title={labels.heroTitle} description={labels.heroDescription} />
+      <MarketingHero eyebrow={labels.portfolio} title={labels.heroTitle} description={labels.heroDescription} />
 
       {/* Sticky controls */}
       <MarketingControls
@@ -286,14 +264,7 @@ export function MarketingInMotionClient({
         onFilterChange={handleFilterChange}
         onRefresh={handleRefresh}
         isRefreshing={isRefreshing}
-        labels={{
-          searchPlaceholder: labels.searchPlaceholder,
-          allCategories: labels.allCategories,
-          allTools: labels.allTools,
-          allTags: labels.allTags,
-          allTypes: labels.allTypes,
-          refresh: labels.refresh,
-        }}
+        labels={labels}
       />
 
       <main id="main-content" className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
@@ -356,19 +327,19 @@ export function MarketingInMotionClient({
                   focus:outline-none focus:border-[#191970] dark:focus:border-[#a67c00]
                   transition-colors
                 "
-                aria-label="Sort projects"
+                aria-label={labels.sortProjects}
               >
-                <option value="date-desc">Newest first</option>
-                <option value="date-asc">Oldest first</option>
-                <option value="title-asc">Title A–Z</option>
-                <option value="title-desc">Title Z–A</option>
+                <option value="date-desc">{labels.newestFirst}</option>
+                <option value="date-asc">{labels.oldestFirst}</option>
+                <option value="title-asc">{labels.titleAscending}</option>
+                <option value="title-desc">{labels.titleDescending}</option>
               </select>
 
               {/* View mode toggle */}
               <div className="flex border border-gray-200 dark:border-gray-700 overflow-hidden">
                 <button
                   onClick={() => setViewMode('grid')}
-                  aria-label="Grid view"
+                  aria-label={labels.gridView}
                   aria-pressed={viewMode === 'grid'}
                   className={`
                     w-8 h-8 flex items-center justify-center transition-colors
@@ -385,7 +356,7 @@ export function MarketingInMotionClient({
                 </button>
                 <button
                   onClick={() => setViewMode('list')}
-                  aria-label="List view"
+                  aria-label={labels.listView}
                   aria-pressed={viewMode === 'list'}
                   className={`
                     w-8 h-8 flex items-center justify-center transition-colors border-l border-gray-200 dark:border-gray-700
@@ -408,7 +379,7 @@ export function MarketingInMotionClient({
         {/* All projects grid */}
         <section aria-labelledby="projects-heading">
           <h2 id="projects-heading" className="sr-only">
-            All marketing projects
+            {labels.allProjects}
           </h2>
 
           {viewMode === 'grid' ? (
@@ -449,7 +420,7 @@ export function MarketingInMotionClient({
               <button
                 onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
                 className="px-2 h-10 flex items-center justify-center text-[#666] dark:text-[#b0b0b0] hover:text-[#191970] dark:hover:text-white transition-all text-xs font-bold tracking-wider"
-                aria-label="Previous page"
+                aria-label={labels.prev}
               >
                 {labels.prev}
               </button>
@@ -479,7 +450,7 @@ export function MarketingInMotionClient({
               <button
                 onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
                 className="px-2 h-10 flex items-center justify-center text-[#666] dark:text-[#b0b0b0] hover:text-[#191970] dark:hover:text-white transition-all text-xs font-bold tracking-wider"
-                aria-label="Next page"
+                aria-label={labels.next}
               >
                 {labels.next}
               </button>
@@ -491,7 +462,7 @@ export function MarketingInMotionClient({
       {/* Scroll to top */}
       <button
         onClick={scrollToTop}
-        aria-label="Scroll to top"
+        aria-label={labels.scrollToTop}
         className={`
           fixed bottom-6 right-6 z-50
           w-10 h-10 flex items-center justify-center

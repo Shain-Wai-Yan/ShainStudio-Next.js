@@ -98,7 +98,7 @@ export default async function MarketingInMotionPage(props: MarketingInMotionPage
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
       />
-      <Suspense fallback={<div className="py-20 text-center text-[#666] dark:text-[#b0b0b0]">Loading projects...</div>}>
+      <Suspense fallback={<div className="py-20 text-center text-[#666] dark:text-[#b0b0b0]">{t.marketingInMotion.labels.loadingText}</div>}>
         <MarketingInMotionClient
           locale={locale as 'en' | 'zh'}
           breadcrumbItems={BREADCRUMBS}

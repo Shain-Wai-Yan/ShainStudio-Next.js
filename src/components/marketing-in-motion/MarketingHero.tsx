@@ -1,11 +1,12 @@
 'use client';
 
 interface MarketingHeroProps {
+  eyebrow: string;
   title: string;
   description: string;
 }
 
-export function MarketingHero({ title, description }: MarketingHeroProps) {
+export function MarketingHero({ eyebrow, title, description }: MarketingHeroProps) {
   return (
     <section
       className="
@@ -46,7 +47,7 @@ export function MarketingHero({ title, description }: MarketingHeroProps) {
         <div className="inline-flex items-center gap-2 mb-4">
           <span className="h-px w-8 bg-[#191970] dark:bg-[#ffd700] opacity-60" />
           <span className="text-xs font-semibold tracking-[0.2em] uppercase text-[#191970] dark:text-[#ffd700] opacity-80">
-            Portfolio
+            {eyebrow}
           </span>
           <span className="h-px w-8 bg-[#191970] dark:bg-[#ffd700] opacity-60" />
         </div>

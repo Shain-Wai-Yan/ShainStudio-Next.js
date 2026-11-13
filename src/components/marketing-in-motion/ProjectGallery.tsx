@@ -94,7 +94,7 @@ export default function ProjectGallery({ images, title, language }: ProjectGalle
   if (!images || images.length === 0) return null;
 
   const imgLabel = (i: number) =>
-    `${title} — ${language === 'zh' ? '图片' : 'Image'} ${i + 1} of ${images.length}`;
+    language === 'zh' ? `${title} — 第 ${i + 1} 张，共 ${images.length} 张` : `${title} — Image ${i + 1} of ${images.length}`;
 
   return (
     <>
@@ -247,7 +247,7 @@ export default function ProjectGallery({ images, title, language }: ProjectGalle
                     ? 'text-[#ffd700] bg-[#ffd700]/10'
                     : 'text-white/60 hover:text-white hover:bg-white/10'}
                 `}
-                aria-label={isZoomed ? 'Zoom out' : 'Zoom in'}
+                aria-label={isZoomed ? (language === 'zh' ? '缩小' : 'Zoom out') : (language === 'zh' ? '放大' : 'Zoom in')}
               >
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   {isZoomed
@@ -265,7 +265,7 @@ export default function ProjectGallery({ images, title, language }: ProjectGalle
                 rel="noopener noreferrer"
                 title={language === 'zh' ? '下载图片' : 'Download image'}
                 className="w-8 h-8 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 transition-colors"
-                aria-label="Download image"
+                aria-label={language === 'zh' ? '下载图片' : 'Download image'}
                 onClick={(e) => e.stopPropagation()}
               >
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -278,7 +278,7 @@ export default function ProjectGallery({ images, title, language }: ProjectGalle
                 onClick={closeLightbox}
                 title={language === 'zh' ? '关闭 (Esc)' : 'Close (Esc)'}
                 className="w-8 h-8 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 transition-colors"
-                aria-label="Close"
+                aria-label={language === 'zh' ? '关闭' : 'Close'}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M18 6L6 18M6 6l12 12"/>
@@ -305,7 +305,7 @@ export default function ProjectGallery({ images, title, language }: ProjectGalle
                   transition-all duration-150
                   focus:outline-none focus-visible:ring-1 focus-visible:ring-white/50
                 "
-                aria-label="Previous image"
+                aria-label={language === 'zh' ? '上一张图片' : 'Previous image'}
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 18l-6-6 6-6"/></svg>
               </button>
@@ -344,7 +344,7 @@ export default function ProjectGallery({ images, title, language }: ProjectGalle
                   transition-all duration-150
                   focus:outline-none focus-visible:ring-1 focus-visible:ring-white/50
                 "
-                aria-label="Next image"
+                aria-label={language === 'zh' ? '下一张图片' : 'Next image'}
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6"/></svg>
               </button>
