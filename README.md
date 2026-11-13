@@ -80,14 +80,14 @@ npm run lint     # ESLint check
 
 ## Project Structure
 
-See [`ARCHITECTURE.md`](./ARCHITECTURE.md) for the full detailed architecture reference.
+The [CMS read contract](docs/CMS-READ-CONTRACT.md) describes published content access and preview isolation.
 
 ```
 src/
 ├── app/                # Next.js App Router (pages, API routes)
 │   ├── [locale]/       # All pages (EN + ZH via single source)
-│   └── api/            # 8 API route handlers
-├── components/         # Reusable React components (28 subdirs)
+│   └── api/            # API route handlers
+├── components/         # Reusable React components
 ├── lib/                # Utilities, Strapi client, GitHub/YouTube API
 ├── locales/            # en.json & zh.json translations
 └── types/              # Shared TypeScript types
@@ -100,7 +100,23 @@ src/
 - Auto-detection via `Accept-Language` header on first visit
 - Language preference stored in `NEXT_LOCALE` cookie (1 year)
 
-See [`I18N_QUICK_START.md`](./I18N_QUICK_START.md) for adding translations and pages.
+Add interface translations in `src/locales/en.json` and `src/locales/zh.json`;
+page implementations are shared under `src/app/[locale]`.
+CMS Chinese content uses Strapi locale `zh-CN`. Published translations have their
+own canonical URLs, reciprocal language links, and sitemap entries. Unpublished
+Chinese content falls back to labelled English with `noindex`.
+
+### Saved editorial previews
+
+Save an entry in Strapi, select its locale, then choose **Open preview**. The
+frontend's `/editor-preview` route renders the saved draft using the public page
+components. Preview responses remain private, uncached, and excluded from search.
+Expired preview links must be reopened from Strapi.
+
+Set `EDITORIAL_PREVIEW_ENABLED=true` and `EDITORIAL_ADMIN_ORIGIN` to the exact
+Strapi Admin origin allowed to embed previews. Signed tickets expire after five
+minutes; preview reads use their dedicated transport, never the published API token.
+Run `node scripts/editorial-preview.mjs` for the isolated production-mode checks.
 
 ## Deployment
 

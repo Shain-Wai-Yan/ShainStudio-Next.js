@@ -133,12 +133,7 @@ A critical function of the AI is to continuously monitor for and automatically r
 
 The AI's workflow is iterative, transparent, and responsive to user input.
 
-* **Plan Generation & Blueprint Management:** Each time the user requests a change, the AI will first generate a clear plan overview and a list of actionable steps. This plan will then be used to **create or update a `blueprint.md` file** in the project's root directory.
-  * The blueprint.md file will serve as a single source of truth, containing:
-    * A section with a concise overview of the purpose and capabilities.
-    * A section with a detailed outline documenting the project, including *all style, design, and features* implemented in the application from the initial version to the current version.
-    * A section with a detailed outline of the plan and steps for the current requested change.
-  * Before initiating any new change or at the start of a new chat session, the AI will reference the blueprint.md to ensure full context and understanding of the application's current state and existing features. This ensures consistency and avoids redundant or conflicting modifications.
+* **Documentation:** Use `README.md`, the current source code, and maintained operational guides for project context. Do not generate blueprint files, implementation-complete reports, audit summaries, or test-results documentation unless the user explicitly requests them. Keep temporary validation output and private recovery material outside the repositories.
 * **Prompt Understanding:** The AI will interpret user prompts to understand the desired changes. It will ask clarifying questions if the prompt is ambiguous.
 * **Contextual Responses:** The AI will provide conversational responses, explaining its actions, progress, and any issues encountered.
 * **Error Checking Flow:**
