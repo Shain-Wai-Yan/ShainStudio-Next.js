@@ -51,9 +51,9 @@ export function PencilArtDetailView({
     eyebrow: translations?.eyebrow ?? (locale === 'zh' ? '原创手绘作品' : 'ORIGINAL ARTWORK'),
     aboutPiece: translations?.aboutPiece ?? (locale === 'zh' ? '作品详情' : 'ABOUT THE PIECE'),
     dateCreated: translations?.dateCreated ?? (locale === 'zh' ? '创作时间' : 'Created'),
-    medium: translations?.medium ?? (locale === 'zh' ? '媒介质地' : 'Medium'),
+    medium: translations?.medium ?? (locale === 'zh' ? '创作媒材' : 'Medium'),
     defaultMedium:
-      translations?.defaultMedium ?? (locale === 'zh' ? '档案级棉浆纸 / 石墨铅笔' : 'Graphite on archival cotton paper'),
+      translations?.defaultMedium ?? (locale === 'zh' ? '纸本铅笔' : 'Pencil on paper'),
     viewOriginal: translations?.viewOriginal ?? (locale === 'zh' ? '查看高精大图' : 'Inspect Zoom'),
     copyLink: translations?.copyLink ?? (locale === 'zh' ? '分享作品' : 'Share Artwork'),
     copied: translations?.copied ?? (locale === 'zh' ? '链接已复制！' : 'Link Copied!'),
@@ -372,15 +372,15 @@ export function PencilArtDetailView({
             </div>
           </div>
 
-          {/* Description: Mini-text with preserved big capital drop cap, no extra border lines */}
+          {/* Preserve paragraph and verse breaks; use a drop cap for English only. */}
           {piece.description ? (
             <div
-              className="text-xs sm:text-[13px] leading-[1.85] text-neutral-600 dark:text-neutral-300 tracking-[0.01em] [&>p]:mb-3.5 [&>p:last-child]:mb-0 [&>p:first-of-type]:first-letter:float-left [&>p:first-of-type]:first-letter:text-4xl [&>p:first-of-type]:first-letter:font-serif [&>p:first-of-type]:first-letter:leading-none [&>p:first-of-type]:first-letter:mr-2.5 [&>p:first-of-type]:first-letter:text-[#191970] dark:[&>p:first-of-type]:first-letter:text-amber-300 [&>p:first-of-type]:first-letter:font-semibold"
+              className={`text-xs sm:text-[13px] leading-[1.85] text-neutral-600 dark:text-neutral-300 tracking-[0.01em] [&>p]:mb-3.5 [&>p:last-child]:mb-0 ${locale === 'zh' ? '' : '[&>p:first-of-type]:first-letter:float-left [&>p:first-of-type]:first-letter:text-4xl [&>p:first-of-type]:first-letter:font-serif [&>p:first-of-type]:first-letter:leading-none [&>p:first-of-type]:first-letter:mr-2.5 [&>p:first-of-type]:first-letter:text-[#191970] dark:[&>p:first-of-type]:first-letter:text-amber-300 [&>p:first-of-type]:first-letter:font-semibold'}`}
               dangerouslySetInnerHTML={{ __html: piece.description }}
             />
           ) : (
             <p className="text-xs sm:text-[13px] leading-[1.85] text-neutral-500 dark:text-neutral-400 italic">
-              Original pencil sketch and study exploring classical form and fine graphite nuances.
+              {locale === 'zh' ? '原创铅笔画。' : 'Original pencil drawing.'}
             </p>
           )}
 
