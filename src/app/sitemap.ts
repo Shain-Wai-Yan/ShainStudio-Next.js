@@ -2,6 +2,7 @@ import type { MetadataRoute } from 'next';
 import { connection } from 'next/server';
 import { getLocalizedRows } from '@/lib/server/localized-content';
 import type { ContentLocalization } from '@/types/localization';
+import { collectionLocalization, localizedSeo } from '@/lib/content-localization';
 const SITE_URL = 'https://www.shainwaiyan.com';
 export const revalidate = 300;
 const staticRoutes = {
@@ -28,9 +29,8 @@ const staticRoutes = {
     { path: '/portfolio/marketing-in-motion',         priority: 0.8, changeFrequency: 'weekly'  as const },
     { path: '/portfolio/marketing-plans',             priority: 0.7, changeFrequency: 'monthly' as const },
   ],
-  // Chinese STATIC pages only — pages with genuine translations
-  // Excluded: /zh/blog, /zh/blog/[slug], /zh/portfolio/*, /zh/certificate
-  // Reason: those pages serve identical Strapi/GitHub/YouTube content with no translation
+  // Static Chinese pages. CMS listings and details are added from publication state below.
+  // External-feed gaming/AMV pages retain their separate noindex policy.
   zhMain: [
     { path: '/zh',           priority: 0.9, changeFrequency: 'weekly'  as const },
     { path: '/zh/about',     priority: 0.8, changeFrequency: 'monthly' as const },
@@ -55,28 +55,36 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // The sitemap needs published CMS data at request time, not during deployment.
   // Keep locale snapshot caching/invalidation; unavailable data must still throw.
   await connection();
-  const pages: MetadataRoute.Sitemap = [...staticRoutes.main,...staticRoutes.portfolio,...staticRoutes.zhMain].map(route => ({
-    url: `${SITE_URL}${route.path}`,changeFrequency:route.changeFrequency,priority:route.priority,
-  }));
+  type SitemapEntry = MetadataRoute.Sitemap[number];
+  const pages = new Map<string, SitemapEntry>();
+  const addPage = (entry: SitemapEntry) => pages.set(entry.url, { ...pages.get(entry.url), ...entry });
+  for (const route of [...staticRoutes.main,...staticRoutes.portfolio,...staticRoutes.zhMain]) {
+    addPage({url:`${SITE_URL}${route.path}`,changeFrequency:route.changeFrequency,priority:route.priority});
+  }
   const translatedStatic = new Set(['/','/about','/portfolio','/hobbies','/contact']);
-  for (const page of pages) {
+  for (const page of pages.values()) {
     const path = new URL(page.url).pathname.replace(/^\/zh(?=\/|$)/,'') || '/';
     if (translatedStatic.has(path)) page.alternates={languages:{en:`${SITE_URL}${path}`,'zh-CN':`${SITE_URL}/zh${path === '/' ? '' : path}`,'x-default':`${SITE_URL}${path}`}};
   }
   // Fetch complete cached locale snapshots; never return a partial sitemap on failure.
   for (const [endpoint,listPath,prefix] of collections) {
-    // Indexing needs identity, timestamps and per-locale noIndex flags only.
-    // Exclude article bodies and assets from every collection snapshot.
+    // Read identity, timestamps, indexability and gallery image URLs; never article bodies.
     const queryParams: Record<string, string> = { 'fields[0]': 'updatedAt' };
     if (['blogs','coding-projects','marketing-projects'].includes(endpoint)) {
       queryParams['populate[seo][fields][0]'] = 'noIndex';
     }
+    if (['photographies','arts'].includes(endpoint)) queryParams['populate[image][fields][0]'] = 'url';
     const options = { queryParams };
     const [english,rows] = await Promise.all([getLocalizedRows(endpoint,'en',options),getLocalizedRows(endpoint,'zh',options)]);
     const englishById = new Map(english.map(row => [row.documentId,row]));
-    if (rows.some(row => (row.localization as ContentLocalization).chinesePublished)) {
-      pages.push({url:`${SITE_URL}/zh${listPath}`,changeFrequency:'weekly',priority:0.7});
-      if (endpoint === 'coding-projects') pages.push({url:`${SITE_URL}/zh${listPath}/archive`,changeFrequency:'weekly',priority:0.5});
+    const state = collectionLocalization('zh', rows as Array<{localization?: ContentLocalization}>);
+    const listPaths = endpoint === 'coding-projects' ? [listPath,`${listPath}/archive`] : [listPath];
+    for (const path of listPaths) {
+      const alternates = localizedSeo(path,'zh',state).alternates.languages;
+      if (alternates?.en) addPage({url:alternates.en,alternates:{languages:alternates}});
+      if (state.chinesePublished && alternates?.['zh-CN']) {
+        addPage({url:alternates['zh-CN'],changeFrequency:'weekly',priority:path.endsWith('/archive')?0.5:0.7,alternates:{languages:alternates}});
+      }
     }
     if (!prefix) continue;
     for (const row of rows) {
@@ -89,12 +97,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       const zhNoIndex = (row.seo as {noIndex?:boolean} | undefined)?.noIndex;
       if (state.englishPublished && !enNoIndex) languages.en = `${SITE_URL}${path}`;
       if (state.chinesePublished && !zhNoIndex) languages['zh-CN'] = `${SITE_URL}/zh${path}`;
+      if (!Object.keys(languages).length) continue;
       languages['x-default'] = languages.en ?? languages['zh-CN'];
-      for (const language of ['en','zh-CN']) if (languages[language]) pages.push({
-        url:languages[language],lastModified:typeof row.updatedAt === 'string' ? row.updatedAt : undefined,
-        changeFrequency:'monthly',priority:0.6,alternates:{languages},
-      });
+      for (const language of ['en','zh-CN']) if (languages[language]) {
+        const localizedRow = language === 'en' ? englishById.get(row.documentId) : row;
+        const image = localizedRow?.image as {url?:unknown} | undefined;
+        const images = typeof image?.url === 'string' && /^https?:\/\//i.test(image.url) ? [image.url] : undefined;
+        addPage({url:languages[language],lastModified:typeof localizedRow?.updatedAt === 'string' ? localizedRow.updatedAt : undefined,
+          changeFrequency:'monthly',priority:0.6,alternates:{languages},...(images?{images}:{})});
+      }
     }
   }
-  return pages;
+  return [...pages.values()];
 }

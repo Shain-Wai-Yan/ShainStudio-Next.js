@@ -165,7 +165,9 @@ try {
   for (const path of [detail,`/zh${detail}`,'/portfolio/coding-projects','/zh/portfolio/coding-projects','/sitemap.xml']) await html(path);
   let fallback = await html(`/zh${detail}`);
   assert.ok(fallback.includes('English version — Chinese translation pending'));
-  assert.match(fallback,/<meta name="robots" content="noindex, follow"/);
+  assert.match(fallback,/<meta name="robots" content="noindex, follow(?:,|")/);
+  assert.match(fallback, /<a[^>]+hrefLang="en"[^>]+href="\/portfolio\/coding-projects\/bilingual-fixture"/i, 'English language link must be server-rendered');
+  assert.match(fallback, /<a[^>]+hrefLang="zh-CN"[^>]+href="\/zh\/portfolio\/coding-projects\/bilingual-fixture"/i, 'Chinese language link must be server-rendered');
   assert.ok(fallback.includes(`rel="canonical" href="https://www.shainwaiyan.com${detail}"`));
   assert.ok(!(await html('/sitemap.xml')).includes(`/zh${detail}`));
   // Wait until the warm English page is a settled ISR HIT before counting reads.

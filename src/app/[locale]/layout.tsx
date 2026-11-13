@@ -47,7 +47,7 @@ export async function generateMetadata({ params }: Omit<LocaleLayoutProps, 'chil
       canonical: baseUrl,
       languages: {
         'en': SITE_URL,
-        'zh': `${SITE_URL}/zh`,
+        'zh-CN': `${SITE_URL}/zh`,
         'x-default': SITE_URL,
       },
       types: {

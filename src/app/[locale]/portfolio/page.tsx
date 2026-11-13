@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: PortfolioProps): Promise<Meta
       canonical: baseUrl,
       languages: {
         en: `${domain}/portfolio`,
-        zh: `${domain}/zh/portfolio`,
+        'zh-CN': `${domain}/zh/portfolio`,
         'x-default': `${domain}/portfolio`,
       },
     },

@@ -18,6 +18,7 @@ export default async function CodingProjectView({project, relatedProjects, local
   const jsonLdProject = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
+    inLanguage: locale === 'zh' ? 'zh-CN' : 'en-US',
     'name': project.title,
     'image': project.seo?.ogImage || project.coverImage || DEFAULT_OG_IMAGE,
     'description': project.summary,

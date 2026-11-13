@@ -78,7 +78,7 @@ export function languageAlternates(path = ''): Record<string, string> {
   const en = path ? `${SITE_URL}${path}` : SITE_URL;
   return {
     en,
-    zh: `${SITE_URL}/zh${path}`,
+    'zh-CN': `${SITE_URL}/zh${path}`,
     'x-default': en,
   };
 }

@@ -42,7 +42,7 @@ export async function generateMetadata({ params }: AboutProps): Promise<Metadata
       canonical: baseUrl,
       languages: {
         en: `${domain}/about`,
-        zh: `${domain}/zh/about`,
+        'zh-CN': `${domain}/zh/about`,
         'x-default': `${domain}/about`,
       },
     },

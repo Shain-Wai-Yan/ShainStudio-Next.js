@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: ContactPageProps): Promise<Me
       canonical: `${domain}${urlPath}`,
       languages: {
         en: `${domain}/contact`,
-        zh: `${domain}/zh/contact`,
+        'zh-CN': `${domain}/zh/contact`,
         'x-default': `${domain}/contact`
       },
     },

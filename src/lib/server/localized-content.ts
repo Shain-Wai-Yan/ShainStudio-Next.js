@@ -13,6 +13,21 @@ const RELATIONS: Record<string, string> = { category: 'categories', tags: 'tags'
 const MAX_SNAPSHOT_ROWS = 2500;
 const MAX_SNAPSHOT_BYTES = 8 * 1024 * 1024;
 const inFlight = new Map<string, Promise<Row[]>>();
+const MAX_ACTIVE_LOCALE_LOADS = 16;
+const MAX_WAITING_LOCALE_LOADS = 64;
+const LOCALE_ADMISSION_TIMEOUT_MS = 20_000;
+let waitingLocaleLoads = 0;
+
+async function waitForLocaleLoad(deadline: number): Promise<void> {
+  const remaining = deadline - Date.now();
+  if (remaining <= 0) throw new Error('CMS locale loader admission timed out');
+  await new Promise<void>((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error('CMS locale loader admission timed out')), remaining);
+    // A failed read also frees a slot. Its original caller still receives the error.
+    void Promise.race([...inFlight.values()].map(load => load.then(() => {}, () => {})))
+      .then(() => { clearTimeout(timer); resolve(); });
+  });
+}
 export const cmsLocale = (locale: ContentLocale) => locale === 'zh' ? 'zh-CN' : 'en';
 
 function flat(value: unknown): Row {
@@ -62,11 +77,22 @@ export async function loadPublishedLocale(endpoint: string, locale: ContentLocal
 
 function cachedLocale(endpoint: string, locale: ContentLocale, query: Query, seconds: number) {
   const key = JSON.stringify(Object.entries(query).sort(([a],[b]) => a.localeCompare(b)));
-  return unstable_cache(() => {
+  return unstable_cache(async () => {
     const flightKey = JSON.stringify([STRAPI_API_URL, endpoint, locale, key]);
     const existing = inFlight.get(flightKey);
     if (existing) return existing;
-    if (inFlight.size >= 16) throw new Error('CMS locale loader is busy');
+    if (inFlight.size >= MAX_ACTIVE_LOCALE_LOADS) {
+      if (waitingLocaleLoads >= MAX_WAITING_LOCALE_LOADS) throw new Error('CMS locale loader queue is full');
+      waitingLocaleLoads++;
+      try {
+        const deadline = Date.now() + LOCALE_ADMISSION_TIMEOUT_MS;
+        while (inFlight.size >= MAX_ACTIVE_LOCALE_LOADS) {
+          await waitForLocaleLoad(deadline);
+          const shared = inFlight.get(flightKey);
+          if (shared) return shared;
+        }
+      } finally { waitingLocaleLoads--; }
+    }
     const pending = loadPublishedLocale(endpoint, locale, query).finally(() => inFlight.delete(flightKey));
     inFlight.set(flightKey, pending);
     return pending;

@@ -51,3 +51,9 @@ export function getOtherLocale(locale: Locale): Locale {
 export function getHtmlLang(locale: Locale): string {
   return locale === 'zh' ? 'zh-CN' : 'en';
 }
+
+/** Canonical public path for the same page in another language, including rewrites. */
+export function switchLocalePath(pathname: string, locale: Locale): string {
+  const path = pathname.replace(/^\/(?:en|zh)(?=\/|$)/, '') || '/';
+  return locale === 'zh' ? `/zh${path === '/' ? '' : path}` : path;
+}

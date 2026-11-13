@@ -124,7 +124,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       canonical: `${SITE_URL}${path}`,
       languages: {
         en: `${SITE_URL}/hobbies`,
-        zh: `${SITE_URL}/zh/hobbies`,
+        'zh-CN': `${SITE_URL}/zh/hobbies`,
         'x-default': `${SITE_URL}/hobbies`,
       },
     },

@@ -12,7 +12,7 @@ export function localizedSeo(path: string, locale: ContentLocale, localization?:
   if (localization?.englishPublished ?? locale === 'en') languages.en = `${SITE_URL}${path}`;
   if (localization?.chinesePublished) languages['zh-CN'] = `${SITE_URL}/zh${path === '/' ? '' : path}`;
   if (Object.keys(languages).length) languages['x-default'] = languages.en ?? languages['zh-CN'];
-  return { robots: { index: !noIndex && (locale === 'en' || Boolean(translated)), follow:true },
+  return { robots: { index: !noIndex && (locale === 'en' || Boolean(translated)), follow:true, 'max-image-preview': 'large' as const },
     alternates: { canonical, ...(Object.keys(languages).length ? { languages } : {}) } };
 }
 

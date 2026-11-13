@@ -218,3 +218,66 @@ test('sitemap propagates unavailable CMS data instead of publishing partial URLs
  }).default;
  await assert.rejects(sitemap(),/CMS unavailable fixture/);
 });
+
+
+test('cold locale reads queue behind active snapshots instead of failing a crawler burst', async () => {
+ let release;const gate=new Promise(resolve=>{release=resolve;});let active=0,maxActive=0,reads=0;
+ const mod=harness(async(_endpoint,options)=>{
+  active++;reads++;maxActive=Math.max(maxActive,active);
+  try {
+   await gate;
+   const query=options.queryParams,documentId=query['filters[documentId][$eq]'];
+   return {data:{data:[row(documentId,'Published',query.locale)],meta:{pagination:{page:1,pageCount:1,total:1}}}};
+  } finally {active--;}
+ });
+ const pending=Array.from({length:24},(_,i)=>mod.getLocalizedRows('blogs','en',{queryParams:{'filters[documentId][$eq]':'queued'+i}}));
+ await new Promise(resolve=>setImmediate(resolve));
+ assert.equal(reads,16,'Only sixteen transport reads may start before slots are released');
+ release();
+ const results=await Promise.all(pending);
+ assert.equal(results.length,24);assert.ok(results.every(rows=>rows.length===1));
+ assert.ok(maxActive<=16,'Queued reads must preserve the transport concurrency limit');
+ assert.equal(reads,48,'Each distinct English/Chinese identity is fetched once');
+});
+
+
+test('sitemap lists reciprocal collection/archive alternates and each locale’s own modification date', async () => {
+ const en={...row('paired','English'),updatedAt:'2026-10-01T00:00:00Z',localization:{englishPublished:true,chinesePublished:true}};
+ const zh={...row('paired','中文','zh-CN'),updatedAt:'2026-11-01T00:00:00Z',localization:{englishPublished:true,chinesePublished:true}};
+ const sitemap=load('src/app/sitemap.ts',{
+  'next/server':{connection:async()=>{}},
+  '@/lib/server/localized-content':{getLocalizedRows:async(endpoint,locale)=>endpoint==='coding-projects'?[locale==='en'?en:zh]:[]},
+ }).default;
+ const pages=await sitemap();const origin='https://www.shainwaiyan.com';
+ for(const path of ['/portfolio/coding-projects','/portfolio/coding-projects/archive']) {
+  const english=pages.find(p=>p.url===origin+path),chinese=pages.find(p=>p.url===origin+'/zh'+path);
+  assert.ok(english&&chinese);assert.deepEqual(english.alternates,chinese.alternates);
+  assert.equal(english.alternates.languages.en,english.url);assert.equal(chinese.alternates.languages['zh-CN'],chinese.url);
+ }
+ assert.equal(pages.find(p=>p.url===origin+'/portfolio/coding-projects/paired').lastModified,en.updatedAt);
+ assert.equal(pages.find(p=>p.url===origin+'/zh/portfolio/coding-projects/paired').lastModified,zh.updatedAt);
+ assert.equal(new Set(pages.map(p=>p.url)).size,pages.length);
+});
+
+test('gallery sitemap exposes public image URLs and excludes noindex and unpublished language versions', async () => {
+ const en={...row('photo','English'),image:{url:'https://images.example.test/en.jpg'},localization:{englishPublished:true,chinesePublished:true}};
+ const zh={...row('photo','中文','zh-CN'),image:{url:'https://images.example.test/zh.jpg'},localization:{englishPublished:true,chinesePublished:true}};
+ const hidden={...row('hidden','Hidden'),seo:{noIndex:true},localization:{englishPublished:true,chinesePublished:true}};
+ const sitemap=load('src/app/sitemap.ts',{
+  'next/server':{connection:async()=>{}},
+  '@/lib/server/localized-content':{getLocalizedRows:async(endpoint,locale)=>endpoint==='photographies'?[locale==='en'?en:zh]:endpoint==='blogs'?[hidden]:[]},
+ }).default;
+ const pages=await sitemap();const origin='https://www.shainwaiyan.com';
+ assert.deepEqual(pages.find(p=>p.url===origin+'/hobbies/photography/photo/photo').images,[en.image.url]);
+ assert.deepEqual(pages.find(p=>p.url===origin+'/zh/hobbies/photography/photo/photo').images,[zh.image.url]);
+ assert.ok(!pages.some(p=>p.url.endsWith('/blog/hidden')));
+});
+
+test('language paths and annotations agree across static pages, CMS pages and locale rewrites', () => {
+ const {switchLocalePath}=load('src/lib/locales.ts');const {languageAlternates}=load('src/lib/seo.ts');
+ for(const path of ['/blog/a','/en/blog/a','/zh/blog/a']) {
+  assert.equal(switchLocalePath(path,'en'),'/blog/a');assert.equal(switchLocalePath(path,'zh'),'/zh/blog/a');
+ }
+ assert.equal(switchLocalePath('/zh','en'),'/');assert.equal(switchLocalePath('/en','zh'),'/zh');
+ assert.deepEqual(languageAlternates('/about'),{en:'https://www.shainwaiyan.com/about','zh-CN':'https://www.shainwaiyan.com/zh/about','x-default':'https://www.shainwaiyan.com/about'});
+});

@@ -42,7 +42,7 @@ export async function generateMetadata(
   ].filter(Boolean).join(', ');
 
   return {
-    title: { absolute: brandedTitle(project.seo?.metaTitle || `${project.title} | Software Architecture`, 'Shain Studio') },
+    title: { absolute: brandedTitle(project.seo?.metaTitle || `${project.title} | ${locale === 'zh' ? '软件架构' : 'Software Architecture'}`, 'Shain Studio') },
     description: project.seo?.metaDescription || project.summary,
 
     keywords: safeKeywords,

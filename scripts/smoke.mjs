@@ -17,11 +17,12 @@ const localizedStaticPaths = staticPaths.flatMap(pathname => {
   const english = pathname.replace(/^\/zh(?=\/|$)/, '') || '/';
   return [english, english === '/' ? '/zh' : `/zh${english}`];
 });
-const photoDetailPaths = sitemapPaths.filter(pathname => pathname.startsWith('/hobbies/photography/photo/'));
-const nonPhotoSitemapPaths = sitemapPaths.filter(pathname => !pathname.startsWith('/hobbies/photography/photo/'));
+const isPhotoDetail = pathname => /^\/(?:zh\/)?hobbies\/photography\/photo\//.test(pathname);
+const photoDetailPaths = sitemapPaths.filter(isPhotoDetail);
+const nonPhotoSitemapPaths = sitemapPaths.filter(pathname => !isPhotoDetail(pathname));
 // A representative sample validates the dynamic photo route without turning a
 // smoke run into hundreds of origin reads as the gallery grows.
-const paths = [...new Set([...nonPhotoSitemapPaths, ...photoDetailPaths.slice(0, 5), ...localizedStaticPaths])];
+const paths = [...new Set([...nonPhotoSitemapPaths, ...photoDetailPaths.filter(pathname => !pathname.startsWith('/zh/')).slice(0, 5), ...photoDetailPaths.filter(pathname => pathname.startsWith('/zh/')).slice(0, 5), ...localizedStaticPaths])];
 let index = 0;
 const failures = [];
 await Promise.all(Array.from({ length: 3 }, async () => {
@@ -80,24 +81,50 @@ assert.equal(websiteEntity?.creator?.['@id'], 'https://www.shainwaiyan.com/#pers
 assert.equal(structuredData.some(node => node['@type'] === 'Organization' && node.name === 'Shain Studio'), false,
   'Shain Studio must not be represented as an organization');
 
-for (const [pathname, canonical] of [
-  ['/zh/blog', '/blog'],
-  ['/zh/certificate', '/certificate'],
-  ['/zh/portfolio/coding-projects', '/portfolio/coding-projects'],
-  ['/zh/portfolio/marketing-in-motion', '/portfolio/marketing-in-motion'],
-  ['/zh/hobbies/photography', '/hobbies/photography'],
+function links(html) {
+  return [...html.matchAll(/<link\b[^>]*>/gi)].map(match => Object.fromEntries(
+    [...match[0].matchAll(/([\w-]+)="([^"]*)"/g)].map(([, key, value]) => [key.toLowerCase(), value])
+  ));
+}
+
+for (const sourcePath of [
+  '/blog', '/certificate', '/portfolio/coding-projects', '/portfolio/coding-projects/archive',
+  '/portfolio/marketing-in-motion', '/portfolio/marketing-plans', '/portfolio/business-plans',
+  '/hobbies/photography', '/hobbies/pencil-art',
 ]) {
-  const html = await (await fetch(`${base}${pathname}`)).text();
-  assert.match(metaContent(html, 'robots') ?? '', /noindex/, `${pathname}: untranslated page must be noindex`);
-  assert.match(html, new RegExp(`<link rel="canonical" href="https://www\\.shainwaiyan\\.com${canonical}"`), `${pathname}: canonical must target English source`);
-  assert.doesNotMatch(html, /hrefLang="zh"/i, `${pathname}: untranslated page must not advertise zh hreflang`);
+  const pathname = `/zh${sourcePath}`;
+  const response = await fetch(`${base}${pathname}`);
+  assert.equal(response.status, 200, pathname);
+  const html = await response.text();
+  const indexable = !/noindex/i.test(metaContent(html, 'robots') ?? '');
+  const pageLinks = links(html);
+  const canonical = pageLinks.find(link => link.rel === 'canonical')?.href;
+  assert.equal(canonical, `https://www.shainwaiyan.com${indexable ? pathname : sourcePath}`,
+    `${pathname}: canonical must reflect publication state`);
+  assert.equal(sitemapPaths.includes(pathname), indexable,
+    `${pathname}: sitemap inclusion must match publication state`);
+  if (indexable) {
+    assert.match(html.match(/<title>(.*?)<\/title>/is)?.[1] ?? '', /[\u3400-\u9fff]/,
+      `${pathname}: published Chinese listing needs a Chinese title`);
+    for (const [language, path] of [['en', sourcePath], ['zh-CN', pathname], ['x-default', sourcePath]]) {
+      assert.equal(pageLinks.find(link => link.hreflang === language)?.href, `https://www.shainwaiyan.com${path}`,
+        `${pathname}: missing ${language} alternate`);
+    }
+    const englishLinks = links(await (await fetch(`${base}${sourcePath}`)).text());
+    assert.equal(englishLinks.find(link => link.hreflang === 'zh-CN')?.href, canonical,
+      `${sourcePath}: English must link back to its published Chinese counterpart`);
+  } else {
+    assert.ok(!pageLinks.some(link => /^zh/i.test(link.hreflang ?? '')),
+      `${pathname}: fallback must not advertise a Chinese translation`);
+  }
 }
 
 const robotsText = await (await fetch(`${base}/robots.txt`)).text();
 assert.doesNotMatch(robotsText, /Disallow:\s*\/_next\//i, 'robots.txt must allow rendering assets');
 assert.doesNotMatch(robotsText, /Disallow:\s*\/zh/i, 'noindex pages must remain crawlable');
 assert.match(robotsText, /Sitemap:\s*https:\/\/www\.shainwaiyan\.com\/sitemap\.xml/i);
-assert.doesNotMatch(sitemap, /<loc>https:\/\/www\.shainwaiyan\.com\/zh\/(?:blog|certificate|portfolio\/[^<]+)/i, 'sitemap contains untranslated Chinese URLs');
+assert.equal([...sitemap.matchAll(/<loc>/g)].length, sitemapPaths.length, 'Sitemap contains duplicate page URLs');
+assert.match(sitemap, /hreflang="zh-CN"/, 'Sitemap must advertise published Chinese counterparts');
 assert.doesNotMatch(sitemap, /undefined|null/i, 'sitemap contains invalid values');
 
 for (const [pathname, status] of [

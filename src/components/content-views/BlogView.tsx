@@ -20,6 +20,7 @@ export default async function BlogView({blog, relatedBlogs, locale}: {blog: Blog
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
+    inLanguage: locale === 'zh' ? 'zh-CN' : 'en-US',
     '@id': `${SITE_URL}${urlPath}#article`,
     mainEntityOfPage: {
       '@type': 'WebPage',
