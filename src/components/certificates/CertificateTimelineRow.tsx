@@ -1,5 +1,7 @@
 'use client';
 
+import english from '@/locales/en.json';
+
 import ContentLanguageNotice from '@/components/shared/ContentLanguageNotice';
 import type { ContentLocalization } from '@/types/localization';
 import { Calendar, ChevronRight, CheckCircle } from 'lucide-react';
@@ -14,6 +16,7 @@ interface TimelineCertificate {
 }
 
 interface CertificateTimelineRowProps {
+  labels?: typeof english.certificate.controls;
   certificate: TimelineCertificate;
   onClick: (id: number) => void;
   index: number;
@@ -21,9 +24,9 @@ interface CertificateTimelineRowProps {
 }
 
 export function CertificateTimelineRow({
+  labels = english.certificate.controls,
   certificate,
   onClick,
-  index,
   isLast,
 }: CertificateTimelineRowProps) {
   // Generate first two letters of Issuer for medallion initials
@@ -31,22 +34,8 @@ export function CertificateTimelineRow({
     ? certificate.issuedBy.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase()
     : 'CR';
 
-  // Extract brief highlight skills from description
-  const commonSkills = ['Strategy', 'Analysis', 'Optimization', 'Execution', 'Leadership', 'Management'];
-  const matchedSkills = commonSkills.filter(skill =>
-    certificate.description.toLowerCase().includes(skill.toLowerCase()) ||
-    certificate.title.toLowerCase().includes(skill.toLowerCase())
-  );
-  const fallbackSkills = index % 3 === 0
-    ? ['Marketing Campaigns', 'Data Analytics']
-    : index % 3 === 1
-    ? ['Strategic Planning', 'Market Valuation']
-    : ['System Engineering', 'SEO Engineering'];
-
-  const displaySkills = matchedSkills.length > 0 ? matchedSkills.slice(0, 2) : fallbackSkills;
-
   return (
-    <article className="flex items-start gap-4 md:gap-6" aria-label={`${certificate.title} — issued by ${certificate.issuedBy}`}>
+    <article className="flex items-start gap-4 md:gap-6" aria-label={`${certificate.title} — ${labels.issuedBy}: ${certificate.issuedBy}`}>
 
       {/* ── Left Rail Column ─────────────────────────────────────── */}
       <div className="flex flex-col items-center flex-shrink-0 self-stretch">
@@ -93,7 +82,7 @@ export function CertificateTimelineRow({
               </h3><ContentLanguageNotice localization={certificate.localization} compact />
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-3.5 h-3.5 flex-shrink-0 text-[#ffd700] dark:text-[#a67c00]" />
-                <span className="text-xs font-bold text-gray-500 dark:text-gray-400 tracking-wide uppercase truncate">
+                <span className="text-xs font-bold text-gray-500 dark:text-gray-400 tracking-wide truncate">
                   {certificate.issuedBy}
                 </span>
               </div>
@@ -108,29 +97,14 @@ export function CertificateTimelineRow({
 
           {/* Short Description */}
           <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 line-clamp-2 leading-relaxed">
-            {certificate.description || 'No description available for this credential. Open detail panel to view formal achievement metrics.'}
+            {certificate.description || labels.noDescription}
           </p>
 
           {/* Validated Skills Tags + View link on one row */}
           <div className="flex items-center justify-between gap-2 pt-0.5">
-            <div className="flex flex-wrap gap-2">
-              {displaySkills.map((skill, sIdx) => (
-                <span
-                  key={sIdx}
-                  className="
-                    text-[0.65rem] font-bold tracking-wider uppercase px-2.5 py-1 rounded-md
-                    bg-[#191970]/5 dark:bg-[#a67c00]/10 border border-[#191970]/5 dark:border-[#a67c00]/20
-                    text-[#191970] dark:text-[#f9df85]
-                  "
-                >
-                  {skill}
-                </span>
-              ))}
-            </div>
-
             {/* View CTA inline */}
             <div className="flex-shrink-0 flex items-center gap-1 text-[0.65rem] font-bold tracking-[0.2em] text-gray-400 dark:text-gray-500 uppercase group-hover:text-[#191970] dark:group-hover:text-[#ffd700] transition-colors">
-              <span>VIEW</span>
+              <span>{labels.view}</span>
               <ChevronRight className="w-4 h-4 translate-x-0 group-hover:translate-x-1.5 transition-transform duration-400" />
             </div>
           </div>

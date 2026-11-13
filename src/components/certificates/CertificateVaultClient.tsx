@@ -133,7 +133,7 @@ function CertificateVaultInner({
                 value={searchQuery}
                 onChange={(e) => updateParam('q', e.target.value)}
                 placeholder={t.search}
-                aria-label="Search certificates"
+                aria-label={t.controls.search}
                 className="
                   w-full pl-10 pr-10 py-3 rounded-xl
                   bg-gray-50/50 dark:bg-gray-900/40 backdrop-blur-md
@@ -145,7 +145,7 @@ function CertificateVaultInner({
               {searchQuery && (
                 <button
                   onClick={() => updateParam('q', '')}
-                  aria-label="Clear search"
+                  aria-label={t.controls.clear}
                   className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800"
                 >
                   <X className="w-3.5 h-3.5" />
@@ -160,7 +160,7 @@ function CertificateVaultInner({
                 id="cert-year-filter"
                 value={activeYear}
                 onChange={(e) => updateParam('year', e.target.value)}
-                aria-label="Filter by year"
+                aria-label={t.controls.year}
                 className="
                   w-full sm:w-[220px] py-3 pl-10 pr-9 rounded-xl appearance-none cursor-pointer
                   bg-gray-50/50 dark:bg-gray-900/40 backdrop-blur-md
@@ -208,7 +208,7 @@ function CertificateVaultInner({
         </div>
 
         {/* Issuer chips */}
-        <nav aria-label="Filter by issuer" className="flex gap-2 overflow-x-auto py-4 no-scrollbar border-b border-gray-50 dark:border-gray-900/60 scroll-smooth">
+        <nav aria-label={t.controls.issuerFilter} className="flex gap-2 overflow-x-auto py-4 no-scrollbar border-b border-gray-50 dark:border-gray-900/60 scroll-smooth">
           <button
             onClick={() => updateParam('issuer', 'all')}
             aria-pressed={activeIssuer === 'all'}
@@ -242,7 +242,7 @@ function CertificateVaultInner({
         </nav>
 
         {/* Certificate list */}
-        <section aria-label="Certificate collection" className="pt-10">
+        <section aria-label={t.controls.collection} className="pt-10">
           {filtered.length === 0 ? (
             <div className="text-center py-20 bg-gray-50/50 dark:bg-gray-900/10 rounded-2xl border border-dashed border-gray-200 dark:border-gray-800">
               <Compass className="w-12 h-12 mx-auto text-gray-300 dark:text-gray-700 animate-pulse mb-3" />
@@ -250,11 +250,12 @@ function CertificateVaultInner({
                 {t.labels.noData || 'No credentials found'}
               </p>
               <p className="text-gray-400 dark:text-gray-600 text-sm">
-                Try resetting your filters or search queries
+                {t.controls.resetFilters}
               </p>
             </div>
           ) : activeLayout === 'showcase' ? (
             <ShowcaseCarousel3D
+          labels={t.controls}
               certificates={filtered.map(c => ({ id: c.id, title: c.Title, issuedBy: c.IssuedBy, imageUrl: c.imageUrl }))}
               onCertificateClick={(id) => updateParam('id', String(id))}
             />
@@ -263,6 +264,7 @@ function CertificateVaultInner({
               {filtered.map((cert, index) => (
                 <li key={cert.id}>
                   <CertificateTimelineRow
+          labels={t.controls}
                     certificate={{
                       localization: cert.localization,
                       id: cert.id,
@@ -283,6 +285,7 @@ function CertificateVaultInner({
               {filtered.map(cert => (
                 <li key={cert.id} className="aspect-[4/3] w-full">
                   <CertificateCard
+          labels={t.controls}
                     title={cert.Title}
                     issuedBy={cert.IssuedBy}
                     imageUrl={cert.imageUrl}
@@ -298,6 +301,7 @@ function CertificateVaultInner({
       {/* Modal */}
       {selectedCertificate && (
         <CertificateModal
+          labels={t.controls}
           certificate={{
             id: selectedCertificate.id,
             title: selectedCertificate.Title,
@@ -331,7 +335,7 @@ export function CertificateVaultClient(props: CertificateVaultClientProps) {
       <div className="bg-white dark:bg-gray-950 min-h-screen flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="w-10 h-10 rounded-full border-2 border-stone-200 border-t-[#e05b3e] animate-spin" />
-          <p className="text-stone-400 text-sm tracking-widest uppercase font-mono">Loading Vault…</p>
+          <p className="text-stone-400 text-sm tracking-widest uppercase font-mono">{props.dictionary.certificate.controls.loading}</p>
         </div>
       </div>
     }>

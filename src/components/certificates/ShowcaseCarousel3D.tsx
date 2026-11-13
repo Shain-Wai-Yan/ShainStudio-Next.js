@@ -1,5 +1,7 @@
 'use client';
 
+import english from '@/locales/en.json';
+
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import CImage from '@/components/ui/CImage';
 import { ChevronLeft, ChevronRight, Maximize2 } from 'lucide-react';
@@ -12,11 +14,13 @@ interface CarouselCertificate {
 }
 
 interface ShowcaseCarousel3DProps {
+  labels?: typeof english.certificate.controls;
   certificates: CarouselCertificate[];
   onCertificateClick: (id: number) => void;
 }
 
 export function ShowcaseCarousel3D({
+  labels = english.certificate.controls,
   certificates,
   onCertificateClick,
 }: ShowcaseCarousel3DProps) {
@@ -96,7 +100,7 @@ export function ShowcaseCarousel3D({
 
   const sharedNavButtons = (
     <div className="flex items-center justify-center gap-5 pt-6">
-      <button onClick={handlePrev} aria-label="Previous"
+      <button onClick={handlePrev} aria-label={labels.previous}
         className="p-2.5 sm:p-3 rounded-full border border-gray-200 dark:border-gray-800 bg-white/70 dark:bg-gray-900/70 hover:bg-white dark:hover:bg-gray-900 shadow-md hover:shadow-lg hover:border-[#ffd700]/40 transition-all duration-300 text-gray-600 dark:text-gray-300 active:scale-95">
         <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
       </button>
@@ -111,7 +115,7 @@ export function ShowcaseCarousel3D({
         ))}
       </div>
 
-      <button onClick={handleNext} aria-label="Next"
+      <button onClick={handleNext} aria-label={labels.next}
         className="p-2.5 sm:p-3 rounded-full border border-gray-200 dark:border-gray-800 bg-white/70 dark:bg-gray-900/70 hover:bg-white dark:hover:bg-gray-900 shadow-md hover:shadow-lg hover:border-[#ffd700]/40 transition-all duration-300 text-gray-600 dark:text-gray-300 active:scale-95">
         <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
       </button>
@@ -231,7 +235,7 @@ export function ShowcaseCarousel3D({
                   {isActive && (
                     <div className="flex items-center gap-0.5 text-[#191970] dark:text-[#ffd700] flex-shrink-0">
                       <Maximize2 className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
-                      <span>VIEW</span>
+                      <span>{labels.view}</span>
                     </div>
                   )}
                 </div>

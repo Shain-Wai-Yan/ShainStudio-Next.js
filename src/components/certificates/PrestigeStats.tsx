@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
-import { Award, Building, BookOpen, Layers } from 'lucide-react';
+import { useEffect, useRef } from 'react';
+import { Award, Building, Layers } from 'lucide-react';
 import { gsap } from '@/lib/gsapSetup';
 
 interface PrestigeStatsProps {
@@ -18,31 +18,7 @@ export function PrestigeStats({
   categoriesCount,
   dictionary,
 }: PrestigeStatsProps) {
-  const [hours, setHours] = useState(0);
-  const targetHours = certificatesCount * 25 + 40; // Approx 25 hours per cert + base
   const containerRef = useRef<HTMLDivElement>(null);
-
-  // Animate the continuous hours counter
-  useEffect(() => {
-    let start = 0;
-    const end = targetHours;
-    if (start === end) return;
-
-    const totalDuration = 1500; // 1.5s
-    const incrementTime = Math.max(Math.floor(totalDuration / end), 15);
-    
-    const timer = setInterval(() => {
-      start += Math.ceil(end / 60);
-      if (start >= end) {
-        clearInterval(timer);
-        setHours(end);
-      } else {
-        setHours(start);
-      }
-    }, incrementTime);
-
-    return () => clearInterval(timer);
-  }, [targetHours]);
 
   // GSAP subtle hover/entrance animations
   useEffect(() => {
@@ -65,7 +41,7 @@ export function PrestigeStats({
       value: certificatesCount,
       suffix: '',
       fig: 'FIG. 02',
-      unit: 'UNITS',
+      unit: dictionary.certificate.controls.units,
       icon: Award,
     },
     {
@@ -74,17 +50,8 @@ export function PrestigeStats({
       value: uniqueIssuersCount,
       suffix: '',
       fig: 'FIG. 03',
-      unit: 'PARTNERS',
+      unit: dictionary.certificate.controls.organizations,
       icon: Building,
-    },
-    {
-      id: 'hours',
-      label: t.hours,
-      value: hours,
-      suffix: '+',
-      fig: 'FIG. 04',
-      unit: 'HOURS',
-      icon: BookOpen,
     },
     {
       id: 'skills',
@@ -92,7 +59,7 @@ export function PrestigeStats({
       value: categoriesCount,
       suffix: '',
       fig: 'FIG. 05',
-      unit: 'ERAS',
+      unit: dictionary.certificate.controls.years,
       icon: Layers,
     },
   ];
@@ -107,12 +74,12 @@ export function PrestigeStats({
       <div className="absolute inset-x-0 bottom-0 h-[1px] bg-stone-200 dark:bg-stone-900 pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16">
-        <div className="grid grid-cols-2 lg:grid-cols-4 border border-stone-200 dark:border-stone-900 divide-x divide-y lg:divide-y-0 divide-stone-200 dark:divide-stone-900 bg-stone-50/20 dark:bg-stone-900/5">
+        <div className="grid grid-cols-1 sm:grid-cols-3 border border-stone-200 dark:border-stone-900 divide-x divide-y lg:divide-y-0 divide-stone-200 dark:divide-stone-900 bg-stone-50/20 dark:bg-stone-900/5">
           {statItems.map((item, index) => {
             const IconComponent = item.icon;
             // Handle divide positioning borders on standard 2x2 grid for mobile
-            const borderTopClass = index >= 2 ? 'border-t border-stone-200 dark:border-stone-900 lg:border-t-0' : '';
-            const borderLeftClass = index % 2 !== 0 ? 'border-l border-stone-200 dark:border-stone-900 lg:border-l-0' : '';
+            const borderTopClass = index > 0 ? 'border-t border-stone-200 dark:border-stone-900 sm:border-t-0' : '';
+            const borderLeftClass = index > 0 ? 'sm:border-l border-stone-200 dark:border-stone-900' : '';
 
             return (
               <div

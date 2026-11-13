@@ -1,10 +1,13 @@
 'use client';
 
+import english from '@/locales/en.json';
+
 import CImage from '@/components/ui/CImage';
 import { useState, useRef } from 'react';
-import { ZoomIn, ShieldCheck } from 'lucide-react';
+import { ZoomIn } from 'lucide-react';
 
 interface CertificateCardProps {
+  labels?: typeof english.certificate.controls;
   title: string;
   issuedBy: string;
   imageUrl: string;
@@ -12,6 +15,7 @@ interface CertificateCardProps {
 }
 
 export function CertificateCard({
+  labels = english.certificate.controls,
   title,
   issuedBy,
   imageUrl,
@@ -55,7 +59,7 @@ export function CertificateCard({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={handleMouseLeave}
       onClick={onClick}
-      aria-label={`${title} — issued by ${issuedBy}`}
+      aria-label={`${title} — ${labels.issuedBy}: ${issuedBy}`}
       style={{
         transform: isHovered
           ? `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`
@@ -106,7 +110,7 @@ export function CertificateCard({
             <div className="w-16 h-16 rounded-2xl bg-[#191970]/8 dark:bg-[#ffd700]/8 border border-[#191970]/10 dark:border-[#ffd700]/15 flex items-center justify-center">
               <span className="text-xl font-extrabold text-[#191970] dark:text-[#ffd700] tracking-tight">{initials}</span>
             </div>
-            <p className="text-[0.65rem] font-bold text-gray-400 dark:text-gray-600 tracking-widest uppercase">No Preview</p>
+            <p className="text-[0.65rem] font-bold text-gray-400 dark:text-gray-600 tracking-widest uppercase">{labels.noImage}</p>
           </div>
         )}
 
@@ -123,7 +127,7 @@ export function CertificateCard({
         {/* Zoom indicator — appears on hover */}
         <div className="absolute top-3 right-3 z-30 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/90 dark:bg-gray-950/90 border border-gray-100 dark:border-gray-800 shadow-md opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-400 ease-out pointer-events-none">
           <ZoomIn className="w-3.5 h-3.5 text-[#191970] dark:text-[#ffd700]" />
-          <span className="text-[0.6rem] font-extrabold tracking-widest text-[#191970] dark:text-[#ffd700] uppercase">View</span>
+          <span className="text-[0.6rem] font-extrabold tracking-widest text-[#191970] dark:text-[#ffd700] uppercase">{labels.view}</span>
         </div>
       </div>
 
@@ -144,13 +148,12 @@ export function CertificateCard({
           <h3 className="text-xs font-bold text-gray-900 dark:text-white leading-snug group-hover:text-[#191970] dark:group-hover:text-[#ffd700] transition-colors duration-300">
             {title}
           </h3>
-          <p className="text-[0.6rem] font-semibold text-gray-400 dark:text-gray-500 tracking-wide uppercase truncate mt-0.5">
+          <p className="text-[0.6rem] font-semibold text-gray-400 dark:text-gray-500 tracking-wide truncate mt-0.5">
             {issuedBy}
           </p>
         </div>
 
-        {/* Verified shield — always visible */}
-        <ShieldCheck className="flex-shrink-0 w-4 h-4 text-[#ffd700]/60 dark:text-[#a67c00]/70 group-hover:text-[#ffd700] dark:group-hover:text-[#d4af37] transition-colors duration-300" />
+
       </div>
     </article>
   );

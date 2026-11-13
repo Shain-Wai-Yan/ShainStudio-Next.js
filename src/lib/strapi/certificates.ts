@@ -75,7 +75,7 @@ export function transformCertificate(certificate: Certificate) {
 
   // Parse date
   const date = new Date(certificate.Date);
-  const formattedDate = date.toLocaleDateString('en-US', {
+  const formattedDate = date.toLocaleDateString(certificate.localization?.requestedLocale === 'zh' ? 'zh-CN' : 'en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',

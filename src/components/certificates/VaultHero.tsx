@@ -117,7 +117,7 @@ export function VaultHero({ certificates, dictionary, onCardClick }: VaultHeroPr
 
       {/* Far Left Edge: Vertical Branding Strip */}
       <div className="absolute left-4 top-1/2 -translate-y-1/2 [writing-mode:vertical-lr] rotate-180 text-[10px] font-bold tracking-[0.3em] uppercase text-stone-500/60 dark:text-stone-400/40 select-none vertical-brand-band hidden xl:block">
-        SKILLS &bull; SYSTEMS &bull; CREDENTIALS &bull; ERAS
+        {t.controls.branding}
       </div>
 
       {/* Far Right Edge: Vertical Branding Strip */}
@@ -186,7 +186,7 @@ export function VaultHero({ certificates, dictionary, onCardClick }: VaultHeroPr
                   <div className="space-y-1">
                     <span className="text-[9px] font-bold text-[#e05b3e] uppercase tracking-[0.2em] flex items-center gap-1.5">
                       <ShieldCheck className="w-3 h-3" />
-                      LATEST FEATURED PRESTIGE
+                      {t.controls.featured}
                     </span>
                     <h4 className="font-bold text-stone-900 dark:text-stone-100 text-sm md:text-base line-clamp-1 leading-snug group-hover:text-[#e05b3e] transition-colors duration-300">
                       {topCert.title}
@@ -242,7 +242,7 @@ export function VaultHero({ certificates, dictionary, onCardClick }: VaultHeroPr
               >
                 <CImage
                   src="/images/neoclassical_statue_collage.png"
-                  alt="Neoclassical Greek Marble Bust Collage Artwork"
+                  alt={t.controls.artwork}
                   fill
                   className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
                   sizes="450px"

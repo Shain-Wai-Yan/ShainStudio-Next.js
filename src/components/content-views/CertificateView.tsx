@@ -12,8 +12,7 @@ export default async function CertificateView({certificates,error,locale}:{certi
     return {
       '@type': 'EducationalOccupationalCredential',
       'name': transformed.Title,
-      'description': transformed.Description || `Verified credential issued by ${transformed.IssuedBy}`,
-      'credentialCategory': 'Professional Certificate',
+      'description': transformed.Description || t.certificate.controls.noDescription,
       'recognizedBy': {
         '@type': 'Organization',
         'name': transformed.IssuedBy,
@@ -27,31 +26,18 @@ export default async function CertificateView({certificates,error,locale}:{certi
     '@graph': [
       {
         '@type': 'WebPage',
-        '@id': `${domain}/certificate#webpage`,
-        'url': `${domain}/certificate`,
-        'name': 'Verified Professional Certifications | Shain Wai Yan',
-        'description': 'A curated vault of verified credentials from Google, Meta, HubSpot, and leading global platforms — spanning SEO, digital marketing, e-commerce, and strategy.',
-        'inLanguage': 'en-US',
+        '@id': `${domain}${basePath}/certificate#webpage`,
+        'url': `${domain}${basePath}/certificate`,
+        'name': t.certificate.seo.title,
+        'description': t.certificate.seo.description,
+        'inLanguage': locale === 'zh' ? 'zh-CN' : 'en-US',
         // Reference-only Person: credentials merge into the canonical #person
         // entity (defined in the root layout) instead of redefining it here.
         'mainEntity': {
           '@type': 'Person',
           '@id': PERSON_ID,
           'name': 'Shain Wai Yan',
-          'hasCredential': credentialItems.length > 0 ? credentialItems : [
-            {
-              '@type': 'EducationalOccupationalCredential',
-              'name': 'Google Digital Marketing & E-Commerce Professional Certificate',
-              'credentialCategory': 'Professional Certificate',
-              'recognizedBy': { '@type': 'Organization', 'name': 'Google' },
-            },
-            {
-              '@type': 'EducationalOccupationalCredential',
-              'name': 'Meta Social Media Marketing Professional Certificate',
-              'credentialCategory': 'Professional Certificate',
-              'recognizedBy': { '@type': 'Organization', 'name': 'Meta' },
-            },
-          ],
+          'hasCredential': credentialItems,
         },
       },
       {
@@ -60,14 +46,14 @@ export default async function CertificateView({certificates,error,locale}:{certi
           {
             '@type': 'ListItem',
             'position': 1,
-            'name': 'Home',
-            'item': domain,
+            'name': t.certificate.breadcrumbs.home,
+            'item': `${domain}${basePath || '/'}`,
           },
           {
             '@type': 'ListItem',
             'position': 2,
-            'name': 'Professional Certificates & Achievements',
-            'item': `${domain}/certificate`,
+            'name': t.certificate.labels.heroTitle,
+            'item': `${domain}${basePath}/certificate`,
           },
         ],
       },
@@ -76,7 +62,7 @@ export default async function CertificateView({certificates,error,locale}:{certi
 
   return (
     <>
-      {locale === 'zh' && <p lang="zh-CN" className="mx-auto max-w-7xl px-4 py-2 text-sm text-stone-500">尚未发布中文版本的内容将显示英文原文。</p>}
+      {locale === 'zh' && certificates.some(cert => cert.localization?.isFallback) && <p lang="zh-CN" className="mx-auto max-w-7xl px-4 py-2 text-sm text-stone-500">尚未发布中文版本的内容将显示英文原文。</p>}
       {/* JSON-LD Structured Data */}
       <script
         type="application/ld+json"

@@ -1,5 +1,7 @@
 'use client';
 
+import english from '@/locales/en.json';
+
 import { useState, useEffect, useRef } from 'react';
 import CImage from '@/components/ui/CImage';
 import { 
@@ -18,6 +20,7 @@ interface Certificate {
 }
 
 interface CertificateModalProps {
+  labels?: typeof english.certificate.controls;
   certificate: Certificate | null;
   isOpen: boolean;
   onClose: () => void;
@@ -28,6 +31,7 @@ interface CertificateModalProps {
 }
 
 export function CertificateModal({
+  labels = english.certificate.controls,
   certificate,
   isOpen,
   onClose,
@@ -100,7 +104,7 @@ export function CertificateModal({
   const handleShare = async () => {
     const shareData = {
       title: certificate.title,
-      text: `View Shain Wai Yan's professional credential: ${certificate.title} issued by ${certificate.issuedBy}`,
+      text: `${labels.shareIntro}: ${certificate.title} · ${labels.issuedBy}: ${certificate.issuedBy}`,
       url: window.location.href,
     };
     try {
@@ -121,28 +125,8 @@ export function CertificateModal({
   const handleZoomOut = () => setZoom((z) => Math.max(z - 0.25, 0.5));
   const handleZoomReset = () => setZoom(1);
 
-  // Generate unique custom license serial codes
-  const mockLicense = `SHA-CERT-${certificate.id}-${1204 + certificate.id * 19}`;
-
-  // Generate skill pill keywords dynamically
-  const skillKeywords = [
-    'Digital Transformation',
-    'Interactive Branding',
-    'Performance Optimization',
-    'Go-to-Market Campaigns',
-    'Corporate Strategy',
-    'Technical Execution',
-  ];
-  const activeSkills = indexBasedSkills(certificate.id, skillKeywords);
-
-  function indexBasedSkills(id: number, list: string[]) {
-    const idx1 = id % list.length;
-    const idx2 = (id + 2) % list.length;
-    return [list[idx1], list[idx2]];
-  }
-
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center select-none">
+    <div role="dialog" aria-modal="true" aria-label={certificate.title} className="fixed inset-0 z-[9999] flex items-center justify-center select-none">
       
       {/* Immersive Dim Backdrop */}
       <div
@@ -160,7 +144,7 @@ export function CertificateModal({
           <button
             onClick={() => setIsFullView(false)}
             className="absolute top-6 right-6 bg-white/10 hover:bg-white/20 border border-white/10 rounded-full p-3 transition-colors text-white"
-            aria-label="Exit full view"
+            aria-label={labels.exitFullView}
           >
             <X className="w-5 h-5" />
           </button>
@@ -197,7 +181,7 @@ export function CertificateModal({
               onClick={handleZoomOut}
               disabled={zoom <= 0.5}
               className="p-1.5 rounded-full hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-white"
-              aria-label="Zoom out"
+              aria-label={labels.zoomOut}
             >
               <ZoomOut className="w-4.5 h-4.5" />
             </button>
@@ -208,7 +192,7 @@ export function CertificateModal({
               onClick={handleZoomIn}
               disabled={zoom >= 3}
               className="p-1.5 rounded-full hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-white"
-              aria-label="Zoom in"
+              aria-label={labels.zoomIn}
             >
               <ZoomIn className="w-4.5 h-4.5" />
             </button>
@@ -217,7 +201,7 @@ export function CertificateModal({
               onClick={handleZoomReset}
               className="text-white hover:text-yellow-400 text-xs font-bold tracking-widest uppercase transition-colors"
             >
-              Reset
+              {labels.resetZoom}
             </button>
           </div>
 
@@ -251,7 +235,7 @@ export function CertificateModal({
           <button
             onClick={onClose}
             className="absolute top-4 right-4 z-40 bg-white/90 dark:bg-gray-800/90 hover:bg-red-50 dark:hover:bg-red-950/30 border border-gray-200 dark:border-gray-700 rounded-full p-2.5 hover:border-red-300 dark:hover:border-red-900/50 transition-all shadow-md"
-            aria-label="Close credentials panel"
+            aria-label={labels.close}
           >
             <X className="w-4.5 h-4.5 text-gray-700 dark:text-gray-300" />
           </button>
@@ -287,7 +271,7 @@ export function CertificateModal({
                   {/* Floating Action Hint */}
                   <div className="absolute bottom-4 right-4 z-20 flex items-center gap-1 px-3 py-1.5 rounded-full bg-black/60 border border-white/10 text-[0.6rem] font-bold text-white tracking-widest uppercase backdrop-blur-md shadow-md opacity-70 hover:opacity-100 transition-opacity">
                     <RotateCw className="w-3 h-3" />
-                    <span>Flip card</span>
+                    <span>{labels.flip}</span>
                   </div>
                 </div>
 
@@ -304,47 +288,32 @@ export function CertificateModal({
                       <div className="flex items-center gap-1.5 text-[#191970] dark:text-[#f9df85]">
                         <ShieldCheck className="w-3.5 h-3.5 sm:w-5 sm:h-5 text-[#ffd700] flex-shrink-0" />
                         <span className="text-[7px] sm:text-[0.65rem] font-extrabold tracking-[0.2em] uppercase font-secondary">
-                          Verified Audit
+                          {labels.details}
                         </span>
                       </div>
                       <h4 className="text-[6px] sm:text-[0.55rem] font-bold text-gray-400 uppercase tracking-widest leading-none">
-                        Serial Registration
+                        {labels.collection}
                       </h4>
                     </div>
-                    {/* Simulated wax logo */}
+                    {/* Decorative certificate emblem */}
                     <div className="w-8 h-8 sm:w-11 sm:h-11 rounded-full border border-[#ffd700]/30 dark:border-[#a67c00]/40 flex items-center justify-center bg-[#ffd700]/5 dark:bg-[#a67c00]/10">
                       <Award className="w-4 h-4 sm:w-5 sm:h-5 text-[#ffd700] dark:text-[#d4af37]" />
                     </div>
                   </div>
 
-                  {/* Core License details */}
+                  {/* Saved certificate details */}
                   <div className="space-y-2 sm:space-y-4 z-10">
                     <div className="space-y-0.5 sm:space-y-1">
                       <p className="text-[6px] sm:text-[0.55rem] font-extrabold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">
-                        Credential Title
+                        {labels.title}
                       </p>
                       <h3 className="font-extrabold text-gray-900 dark:text-white text-[10px] sm:text-base line-clamp-2 leading-tight">
                         {certificate.title}
                       </h3>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-2 sm:gap-4">
-                      <div className="min-w-0">
-                        <p className="text-[6px] sm:text-[0.55rem] font-extrabold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">
-                          {certificate.issuedBy ? 'Issued By' : 'Institution'}
-                        </p>
-                        <p className="text-[8px] sm:text-xs font-bold text-[#191970] dark:text-[#f9df85] leading-normal uppercase break-words">
-                          {certificate.issuedBy}
-                        </p>
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-[6px] sm:text-[0.55rem] font-extrabold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">
-                          Verification ID
-                        </p>
-                        <p className="text-[8px] sm:text-xs font-bold text-gray-800 dark:text-gray-300 font-mono tracking-wider break-all">
-                          {mockLicense}
-                        </p>
-                      </div>
+                    <div className="grid gap-2 sm:gap-4">
+
                     </div>
                   </div>
 
@@ -352,27 +321,19 @@ export function CertificateModal({
                   <div className="flex justify-between items-end border-t border-gray-100 dark:border-gray-800/80 pt-2 sm:pt-4 z-10 pb-6 sm:pb-0">
                     <div className="space-y-0.5">
                       <p className="text-[6px] sm:text-[0.55rem] font-extrabold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">
-                        Date of Issue
+                        {labels.issued}
                       </p>
                       <p className="text-[8px] sm:text-xs font-bold text-gray-700 dark:text-gray-400">
                         {certificate.formattedDate}
                       </p>
                     </div>
-                    {/* Simulated validation signature */}
-                    <div className="text-right">
-                      <div className="font-serif italic text-[10px] sm:text-sm text-[#191970] dark:text-[#ffd700] leading-none select-none tracking-wider font-semibold">
-                        Shain Studio
-                      </div>
-                      <p className="text-[6px] sm:text-[0.5rem] font-bold text-gray-400 uppercase tracking-widest mt-1">
-                        Systems Register
-                      </p>
-                    </div>
+
                   </div>
 
                   {/* Flip Action Backplate */}
                   <div className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 z-20 flex items-center gap-1 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full bg-black/60 border border-white/10 text-[8px] sm:text-[0.6rem] font-bold text-white tracking-widest uppercase backdrop-blur-md shadow-md opacity-70 hover:opacity-100 transition-opacity">
                     <RotateCw className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
-                    <span>View front</span>
+                    <span>{labels.front}</span>
                   </div>
 
                 </div>
@@ -381,7 +342,7 @@ export function CertificateModal({
             ) : (
               <div className="text-gray-400 text-center">
                 <HelpCircle className="w-14 h-14 mx-auto opacity-35 mb-2" />
-                <p className="text-sm font-semibold">No Image Available</p>
+                <p className="text-sm font-semibold">{labels.noImage}</p>
               </div>
             )}
           </div>
@@ -406,33 +367,13 @@ export function CertificateModal({
               {/* Description Panel */}
               <div className="space-y-1">
                 <p className="text-[0.6rem] font-bold text-gray-400 uppercase tracking-[0.2em]">
-                  Description
+                  {labels.description}
                 </p>
-                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed font-medium">
-                  {certificate.description || 'Verified formal program credentials confirming the completion of key professional learning objectives and practical strategy projects.'}
+                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed font-medium whitespace-pre-line">
+                  {certificate.description || labels.noDescription}
                 </p>
               </div>
 
-              {/* Core Skill Pills */}
-              <div className="space-y-2">
-                <p className="text-[0.6rem] font-bold text-gray-400 uppercase tracking-[0.2em]">
-                  Validated Skills
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {activeSkills.map((skill, idx) => (
-                    <span
-                      key={idx}
-                      className="
-                        text-[0.65rem] font-extrabold tracking-wider uppercase px-3 py-1.5 rounded-lg
-                        bg-[#191970]/5 dark:bg-[#a67c00]/10 border border-[#191970]/5 dark:border-[#a67c00]/25
-                        text-[#191970] dark:text-[#f9df85]
-                      "
-                    >
-                      {skill}
-                    </span>
-                  ))}
-                </div>
-              </div>
             </div>
 
             {/* Actions & Nav Controls panel */}
@@ -450,7 +391,7 @@ export function CertificateModal({
                   "
                 >
                   <RotateCw className="w-4 h-4 text-gray-400 group-hover:rotate-45" />
-                  Flip Card
+                  {labels.flip}
                 </button>
 
                 {/* Download */}
@@ -462,7 +403,7 @@ export function CertificateModal({
                   "
                 >
                   <Download className="w-4 h-4" />
-                  Download
+                  {labels.download}
                 </button>
 
                 {/* Share/Web API */}
@@ -478,7 +419,7 @@ export function CertificateModal({
                   `}
                 >
                   <Share2 className="w-4 h-4" />
-                  {shareSuccess ? 'Copied!' : 'Share'}
+                  {shareSuccess ? labels.copied : labels.share}
                 </button>
               </div>
 
@@ -494,7 +435,7 @@ export function CertificateModal({
                   "
                 >
                   <ChevronLeft className="w-4 h-4" />
-                  Prev
+                  {labels.previous}
                 </button>
 
                 <button
@@ -504,7 +445,7 @@ export function CertificateModal({
                     bg-white dark:bg-gray-900 text-gray-400 dark:text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300
                     flex items-center justify-center
                   "
-                  title="Cinematic Full View"
+                  title={labels.fullView}
                 >
                   <Maximize2 className="w-4 h-4" />
                 </button>
@@ -518,13 +459,13 @@ export function CertificateModal({
                     disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-1.5
                   "
                 >
-                  Next
+                  {labels.next}
                   <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
 
               <p className="text-center text-[0.6rem] font-bold text-gray-400 uppercase tracking-widest">
-                Use ← → keys to shift · ESC to dismiss · F to Flip
+                {labels.keyboard}
               </p>
 
             </div>
