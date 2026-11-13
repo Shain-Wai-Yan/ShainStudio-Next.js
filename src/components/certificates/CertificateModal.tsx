@@ -358,7 +358,7 @@ export function CertificateModal({
                 </h2>
                 <div className="flex items-center gap-2">
                   <CheckCircle className="w-4 h-4 text-[#ffd700] dark:text-[#a67c00]" />
-                  <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  <span className="text-xs font-bold text-gray-500 dark:text-gray-400 tracking-wider">
                     {certificate.issuedBy}
                   </span>
                 </div>

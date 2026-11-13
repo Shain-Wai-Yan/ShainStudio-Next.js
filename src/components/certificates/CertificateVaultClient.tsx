@@ -255,7 +255,7 @@ function CertificateVaultInner({
             </div>
           ) : activeLayout === 'showcase' ? (
             <ShowcaseCarousel3D
-          labels={t.controls}
+              labels={t.controls}
               certificates={filtered.map(c => ({ id: c.id, title: c.Title, issuedBy: c.IssuedBy, imageUrl: c.imageUrl }))}
               onCertificateClick={(id) => updateParam('id', String(id))}
             />
@@ -264,7 +264,7 @@ function CertificateVaultInner({
               {filtered.map((cert, index) => (
                 <li key={cert.id}>
                   <CertificateTimelineRow
-          labels={t.controls}
+                    labels={t.controls}
                     certificate={{
                       localization: cert.localization,
                       id: cert.id,
@@ -285,7 +285,7 @@ function CertificateVaultInner({
               {filtered.map(cert => (
                 <li key={cert.id} className="aspect-[4/3] w-full">
                   <CertificateCard
-          labels={t.controls}
+                    labels={t.controls}
                     title={cert.Title}
                     issuedBy={cert.IssuedBy}
                     imageUrl={cert.imageUrl}
