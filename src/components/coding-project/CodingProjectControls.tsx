@@ -11,14 +11,7 @@ interface CodingProjectControlsProps {
   onFilterChange: (key: keyof CodingProjectControlsProps['filters'], value: string) => void;
   onRefresh: () => void;
   isRefreshing: boolean;
-  labels: {
-    searchPlaceholder: string;
-    allCategories: string;
-    allTools: string;
-    allTags: string;
-    allTypes: string;
-    refresh: string;
-  };
+  labels: typeof import('@/locales/en.json')['codingProjects']['labels'];
 }
 
 export function CodingProjectControls({
@@ -58,7 +51,7 @@ export function CodingProjectControls({
   return (
     <section
       className="sticky top-[70px] z-40 bg-white/95 dark:bg-[#121212]/95 backdrop-blur-xl border-b border-gray-200 dark:border-gray-800 shadow-sm transition-colors duration-200"
-      aria-label="Filter controls"
+      aria-label={labels.filterControls}
     >
       {/* ── Desktop row ─────────────────────────────────────────────────────── */}
       <div className="hidden md:flex max-w-7xl mx-auto px-4 sm:px-6 py-3 items-center gap-2 flex-wrap">
@@ -68,18 +61,19 @@ export function CodingProjectControls({
           onChange={handleSearch}
           onClear={() => onSearchChange('')}
           placeholder={labels.searchPlaceholder}
+          clearLabel={labels.clearSearch}
         />
 
         {/* Filter selects */}
         <Select value={filters.category} onChange={(v) => onFilterChange('category', v)} options={filterOptions.categories} defaultLabel={labels.allCategories} />
         <Select value={filters.tools} onChange={(v) => onFilterChange('tools', v)} options={filterOptions.tools} defaultLabel={labels.allTools} />
         <Select value={filters.tag} onChange={(v) => onFilterChange('tag', v)} options={filterOptions.tags} defaultLabel={labels.allTags} />
-        <Select value={filters.type} onChange={(v) => onFilterChange('type', v)} options={filterOptions.types} defaultLabel={labels.allTypes} />
+        <Select value={filters.type} onChange={(v) => onFilterChange('type', v)} options={filterOptions.types.filter(type => type !== 'General')} defaultLabel={labels.allTypes} />
 
         {/* Clear */}
         {hasAnyActive && (
           <button onClick={handleClearAll} className="h-10 px-3 text-xs font-medium text-red-500 dark:text-red-400 border border-red-200 dark:border-red-800 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors focus:outline-none rounded">
-            Clear all
+            {labels.clearAll}
           </button>
         )}
 
@@ -98,6 +92,7 @@ export function CodingProjectControls({
               onChange={handleSearch}
               onClear={() => onSearchChange('')}
               placeholder={labels.searchPlaceholder}
+              clearLabel={labels.clearSearch}
             />
           </div>
 
@@ -105,7 +100,7 @@ export function CodingProjectControls({
           <button
             onClick={() => setFiltersOpen((o) => !o)}
             aria-expanded={filtersOpen}
-            aria-label="Toggle filters"
+            aria-label={labels.toggleFilters}
             className={`
               relative flex-shrink-0 flex items-center gap-1.5 h-10 px-3 rounded
               border text-xs font-semibold transition-all duration-150
@@ -118,7 +113,7 @@ export function CodingProjectControls({
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/>
             </svg>
-            Filters
+            {labels.filtersButton}
             {activeFilterCount > 0 && (
               <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-[#d4af37] text-[#191970] text-[9px] font-black flex items-center justify-center">
                 {activeFilterCount}
@@ -137,20 +132,20 @@ export function CodingProjectControls({
               <Select value={filters.category} onChange={(v) => onFilterChange('category', v)} options={filterOptions.categories} defaultLabel={labels.allCategories} fullWidth />
               <Select value={filters.tools} onChange={(v) => onFilterChange('tools', v)} options={filterOptions.tools} defaultLabel={labels.allTools} fullWidth />
               <Select value={filters.tag} onChange={(v) => onFilterChange('tag', v)} options={filterOptions.tags} defaultLabel={labels.allTags} fullWidth />
-              <Select value={filters.type} onChange={(v) => onFilterChange('type', v)} options={filterOptions.types} defaultLabel={labels.allTypes} fullWidth />
+              <Select value={filters.type} onChange={(v) => onFilterChange('type', v)} options={filterOptions.types.filter(type => type !== 'General')} defaultLabel={labels.allTypes} fullWidth />
             </div>
 
             {/* Clear + close row */}
             <div className="flex items-center justify-between mt-3 pt-2 border-t border-gray-200 dark:border-gray-700">
               {hasAnyActive ? (
                 <button onClick={handleClearAll} className="text-xs font-medium text-red-500 hover:text-red-600 dark:text-red-400 transition-colors">
-                  Clear all filters
+                  {labels.clearAll}
                 </button>
               ) : (
-                <span className="text-xs text-gray-400">No active filters</span>
+                <span className="text-xs text-gray-400">{labels.noActiveFilters}</span>
               )}
               <button onClick={() => setFiltersOpen(false)} className="text-xs font-semibold text-[#191970] dark:text-[#d4af37] hover:underline">
-                Done
+                {labels.done}
               </button>
             </div>
           </div>
@@ -159,11 +154,11 @@ export function CodingProjectControls({
         {/* Active filter chips (always visible on mobile if any) */}
         {hasAnyActive && (
           <div className="flex items-center gap-1.5 px-4 pb-2 flex-wrap">
-            {search && <Chip label={`"${search}"`} onRemove={() => onSearchChange('')} />}
-            {filters.category && <Chip label={filters.category} onRemove={() => onFilterChange('category', '')} />}
-            {filters.tools && <Chip label={filters.tools} onRemove={() => onFilterChange('tools', '')} />}
-            {filters.tag && <Chip label={`#${filters.tag}`} onRemove={() => onFilterChange('tag', '')} />}
-            {filters.type && <Chip label={filters.type} onRemove={() => onFilterChange('type', '')} />}
+            {search && <Chip removeLabel={labels.removeFilter} label={`"${search}"`} onRemove={() => onSearchChange('')} />}
+            {filters.category && <Chip removeLabel={labels.removeFilter} label={filters.category} onRemove={() => onFilterChange('category', '')} />}
+            {filters.tools && <Chip removeLabel={labels.removeFilter} label={filters.tools} onRemove={() => onFilterChange('tools', '')} />}
+            {filters.tag && <Chip removeLabel={labels.removeFilter} label={`#${filters.tag}`} onRemove={() => onFilterChange('tag', '')} />}
+            {filters.type && <Chip removeLabel={labels.removeFilter} label={filters.type} onRemove={() => onFilterChange('type', '')} />}
           </div>
         )}
       </div>
@@ -171,11 +166,11 @@ export function CodingProjectControls({
       {/* ── Desktop active chips ─────────────────────────────────────────────── */}
       {hasAnyActive && (
         <div className="hidden md:flex items-center gap-1.5 max-w-7xl mx-auto px-4 sm:px-6 pb-2 flex-wrap">
-          {search && <Chip label={`Search: "${search}"`} onRemove={() => onSearchChange('')} />}
-          {filters.category && <Chip label={`Category: ${filters.category}`} onRemove={() => onFilterChange('category', '')} />}
-          {filters.tools && <Chip label={`Tool: ${filters.tools}`} onRemove={() => onFilterChange('tools', '')} />}
-          {filters.tag && <Chip label={`Tag: #${filters.tag}`} onRemove={() => onFilterChange('tag', '')} />}
-          {filters.type && <Chip label={`Type: ${filters.type}`} onRemove={() => onFilterChange('type', '')} />}
+          {search && <Chip removeLabel={labels.removeFilter} label={`${labels.search}: "${search}"`} onRemove={() => onSearchChange('')} />}
+          {filters.category && <Chip removeLabel={labels.removeFilter} label={`${labels.category}: ${filters.category}`} onRemove={() => onFilterChange('category', '')} />}
+          {filters.tools && <Chip removeLabel={labels.removeFilter} label={`${labels.tool}: ${filters.tools}`} onRemove={() => onFilterChange('tools', '')} />}
+          {filters.tag && <Chip removeLabel={labels.removeFilter} label={`${labels.tag}: #${filters.tag}`} onRemove={() => onFilterChange('tag', '')} />}
+          {filters.type && <Chip removeLabel={labels.removeFilter} label={`${labels.type}: ${filters.type}`} onRemove={() => onFilterChange('type', '')} />}
         </div>
       )}
     </section>
@@ -185,12 +180,13 @@ export function CodingProjectControls({
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
 function SearchInput({
-  value, onChange, onClear, placeholder,
+  value, onChange, onClear, placeholder, clearLabel,
 }: {
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onClear: () => void;
   placeholder: string;
+  clearLabel: string;
 }) {
   return (
     <div className="relative w-full md:w-[240px] lg:w-[320px]">
@@ -215,7 +211,7 @@ function SearchInput({
         "
       />
       {value && (
-        <button onClick={onClear} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors" aria-label="Clear search">
+        <button onClick={onClear} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors" aria-label={clearLabel}>
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
         </button>
       )}
@@ -292,11 +288,11 @@ function RefreshButton({ onClick, isRefreshing, label }: { onClick: () => void; 
   );
 }
 
-function Chip({ label, onRemove }: { label: string; onRemove: () => void }) {
+function Chip({ label, onRemove, removeLabel }: { label: string; onRemove: () => void; removeLabel: string }) {
   return (
     <span className="inline-flex items-center gap-1 pl-2 pr-1 py-0.5 text-[10px] font-medium bg-gray-100 dark:bg-[#2a2a2a] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 rounded max-w-[160px]">
       <span className="truncate">{label}</span>
-      <button onClick={onRemove} className="flex-shrink-0 hover:text-red-500 dark:hover:text-red-400 transition-colors" aria-label={`Remove ${label} filter`}>
+      <button onClick={onRemove} className="flex-shrink-0 hover:text-red-500 dark:hover:text-red-400 transition-colors" aria-label={`${removeLabel}: ${label}`}>
         <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M18 6L6 18M6 6l12 12"/></svg>
       </button>
     </span>

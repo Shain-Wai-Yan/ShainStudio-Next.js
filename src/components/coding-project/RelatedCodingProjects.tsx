@@ -49,6 +49,7 @@ export default function RelatedCodingProjects({ projects, language }: RelatedCod
               href={`${basePath}/${project.slug}`}
               index={idx + 1}
               dateLocale={dateLocale}
+              language={language}
             />
           ))}
         </div>
@@ -65,11 +66,13 @@ function RelatedRow({
   href,
   index,
   dateLocale,
+  language,
 }: {
   project: CodingProject;
   href: string;
   index: number;
   dateLocale: string;
+  language: 'en' | 'zh';
 }) {
   const formattedDate = project.projectDate
     ? formatProjectDate(project.projectDate, dateLocale)
@@ -121,7 +124,7 @@ function RelatedRow({
           )}
           {project.isFeatured && (
             <span className="text-[8px] font-bold bg-[#ffd700] text-[#191970] px-1.5 py-0.5 uppercase tracking-wider">
-              Featured
+              {language === 'zh' ? '精选' : 'Featured'}
             </span>
           )}
         </div>

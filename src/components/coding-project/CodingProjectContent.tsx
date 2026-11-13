@@ -79,7 +79,7 @@ export default function CodingProjectContent({ project, language }: CodingProjec
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="transition-transform duration-150 group-hover:-translate-x-0.5">
             <path d="M19 12H5M12 5l-7 7 7 7"/>
           </svg>
-          {language === 'zh' ? '返回编码项目' : 'Back to Coding Projects'}
+          {language === 'zh' ? '返回编程项目' : 'Back to Coding Projects'}
         </Link>
 
         <Link

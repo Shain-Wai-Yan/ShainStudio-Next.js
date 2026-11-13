@@ -3,6 +3,7 @@
 import ContentLanguageNotice from '@/components/shared/ContentLanguageNotice';
 import Link from 'next/link';
 import CImage from '@/components/ui/CImage';
+import { formatCodingReadingTime } from '@/lib/strapi/coding-projects';
 import type { CodingProject } from '@/lib/strapi/coding-projects';
 import { SiGithub } from 'react-icons/si';
 import { FaExternalLinkAlt } from 'react-icons/fa';
@@ -67,9 +68,9 @@ export function CodingProjectCard({
       {/* ── Body ── */}
       <div className="flex flex-col flex-1 p-5">
         <div className="flex items-center gap-2 mb-2 text-[10px] font-mono text-gray-400 dark:text-gray-500 uppercase tracking-widest">
-          <span>{project.type}</span>
+          <span>{locale === 'zh' && project.type === 'General' ? '通用项目' : project.type}</span>
           <span aria-hidden="true">&mdash;</span>
-          <span>{project.readingTime}</span>
+          <span>{formatCodingReadingTime(project.readingTime, locale)}</span>
         </div>
 
         <h3 className="text-lg font-bold text-gray-900 dark:text-white leading-tight mb-2 group-hover:text-[#191970] dark:group-hover:text-[#d4af37] transition-colors">
@@ -117,9 +118,9 @@ export function CodingProjectCard({
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={(e) => e.stopPropagation()}
-                title="View GitHub Repository"
+                title={locale === 'zh' ? '查看 GitHub 代码仓库' : 'View GitHub Repository'}
                 className="w-8 h-8 rounded-full flex items-center justify-center bg-gray-50 hover:bg-gray-100 dark:bg-gray-800 hover:dark:bg-gray-700 text-gray-600 dark:text-gray-300 transition-colors"
-                aria-label="GitHub Repository"
+                aria-label={locale === 'zh' ? 'GitHub 代码仓库' : 'GitHub Repository'}
               >
                 <SiGithub className="w-3.5 h-3.5" />
               </a>
@@ -130,9 +131,9 @@ export function CodingProjectCard({
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={(e) => e.stopPropagation()}
-                title="View Live Demo"
+                title={locale === 'zh' ? '查看在线演示' : 'View Live Demo'}
                 className="w-8 h-8 rounded-full flex items-center justify-center bg-[#191970]/5 hover:bg-[#191970]/10 dark:bg-[#d4af37]/10 hover:dark:bg-[#d4af37]/20 text-[#191970] dark:text-[#d4af37] transition-colors"
-                aria-label="Live Demo"
+                aria-label={locale === 'zh' ? '在线演示' : 'Live Demo'}
               >
                 <FaExternalLinkAlt className="w-3 h-3" />
               </a>

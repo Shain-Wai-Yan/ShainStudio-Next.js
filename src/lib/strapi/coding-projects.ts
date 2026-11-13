@@ -141,12 +141,15 @@ function listQueryParams(page: number, pageSize: number): Record<string, string 
 // ─── Utils ───────────────────────────────────────────────────────────────────
 
 function calculateReadingTime(html: string): string {
-  if (!html) return '1 min read';
-  // Robust HTML stripping for server-side (DOMParser not available)
-  const text = html.replace(/<[^>]*>?/gm, '');
-  const words = text.trim().split(/\s+/).length;
-  const minutes = Math.ceil(words / 200);
-  return `${minutes} min read`;
+  const text = html.replace(/<[^>]*>/g, ' ').trim();
+  if (!text) return '';
+  const han = text.match(/\p{Script=Han}/gu)?.length ?? 0;
+  const words = text.replace(/\p{Script=Han}/gu, ' ').match(/[\p{L}\p{N}]+/gu)?.length ?? 0;
+  return `${Math.max(1, Math.ceil(han / 400 + words / 200))} min read`;
+}
+
+export function formatCodingReadingTime(value: string, locale: 'en' | 'zh'): string {
+  return locale === 'zh' ? value.replace(/ min read$/, ' 分钟阅读') : value;
 }
 
 export function formatProjectDate(dateString: string, locale = 'en-US'): string {

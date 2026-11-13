@@ -233,7 +233,21 @@
       "loadingText": "Loading coding projects...",
       "errorText": "Oops! Something went wrong",
       "retryText": "Try Again",
-      "loading": "Loading..."
+      "loading": "Loading...",
+      "filterControls": "Filter controls",
+      "toggleFilters": "Toggle filters",
+      "filtersButton": "Filters",
+      "clearAll": "Clear all filters",
+      "noActiveFilters": "No active filters",
+      "done": "Done",
+      "clearSearch": "Clear search",
+      "removeFilter": "Remove filter",
+      "search": "Search",
+      "category": "Category",
+      "tool": "Tool",
+      "tag": "Tag",
+      "type": "Type",
+      "scrollToTop": "Scroll to top"
     },
     "shelf": {
       "eyebrow": "Selected work",

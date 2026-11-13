@@ -182,7 +182,7 @@ export function CodingProjectShelf({
   };
 
   return (
-    <section aria-label="Coding projects shelf" className="py-7 transform-gpu">
+    <section aria-label={locale === 'zh' ? '编程项目展示' : 'Coding projects shelf'} className="py-7 transform-gpu">
       {/* Header Row */}
       <div className="flex flex-row flex-wrap items-end justify-between mb-4 gap-4 px-1">
         <div>
@@ -207,7 +207,7 @@ export function CodingProjectShelf({
               onClick={() => scrollPage(-1)}
               disabled={!canPrev}
               className={`w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 dark:border-gray-600 transition-opacity ${!canPrev ? 'opacity-25 cursor-default' : 'hover:bg-gray-50 dark:hover:bg-gray-800'}`}
-              aria-label="Previous page"
+              aria-label={locale === 'zh' ? '上一页' : 'Previous page'}
             >
               <svg className="w-4 h-4 text-gray-700 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -217,7 +217,7 @@ export function CodingProjectShelf({
               onClick={() => scrollPage(1)}
               disabled={!canNext}
               className={`w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 dark:border-gray-600 transition-opacity ${!canNext ? 'opacity-25 cursor-default' : 'hover:bg-gray-50 dark:hover:bg-gray-800'}`}
-              aria-label="Next page"
+              aria-label={locale === 'zh' ? '下一页' : 'Next page'}
             >
               <svg className="w-4 h-4 text-gray-700 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -260,7 +260,7 @@ export function CodingProjectShelf({
           onMouseLeave={handleMouseLeave}
           onMouseUp={handleMouseUp}
           onMouseMove={handleMouseMove}
-          aria-label="Scroll to browse projects"
+          aria-label={locale === 'zh' ? '滚动浏览项目' : 'Scroll to browse projects'}
           className={`px-4 py-4 grid grid-rows-2 grid-flow-col gap-4 md:gap-5 overflow-x-auto overflow-y-hidden select-none outline-none [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
           style={{ gridAutoColumns: `${CARD_W}px` }}
         >
@@ -291,7 +291,7 @@ export function CodingProjectShelf({
                 <Link 
                   href={`${basePath}/portfolio/coding-projects/${project.slug}`} 
                   className="absolute inset-0 z-10" 
-                  aria-label={`View ${project.title}`}
+                  aria-label={`${labels.viewProject} ${project.title}`}
                   draggable={false}
                 />
 
@@ -315,7 +315,7 @@ export function CodingProjectShelf({
                   
                   {/* Category Type Badge */}
                   <div className="absolute top-2 left-2 px-1.5 py-0.5 bg-black/60 backdrop-blur-sm rounded text-white text-[9px] uppercase tracking-[0.08em] font-semibold">
-                    {project.type}
+                    {locale === 'zh' && project.type === 'General' ? '通用项目' : project.type}
                   </div>
                   
                   {/* Featured Badge Overlay */}
@@ -399,7 +399,7 @@ export function CodingProjectShelf({
 
           <div
             role="progressbar"
-            aria-label="Scroll position"
+            aria-label={locale === 'zh' ? '滚动位置' : 'Scroll position'}
             aria-valuenow={Math.round(scrollRatio * 100)}
             aria-valuemin={0}
             aria-valuemax={100}

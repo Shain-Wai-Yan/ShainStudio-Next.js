@@ -126,10 +126,10 @@ export default async function CodingProjectsArchivePage({ params }: Props) {
   };
 
   const breadcrumbItems = [
-    { label: dict.marketingInMotion.breadcrumbs.home, href: '/' },
-    { label: dict.marketingInMotion.breadcrumbs.portfolio, href: '/portfolio' },
-    { label: dict.codingProjects.title, href: '/portfolio/coding-projects' },
-    { label: archiveTitle, href: '/portfolio/coding-projects/archive' }
+    { label: dict.marketingInMotion.breadcrumbs.home, href: `${basePath}/` },
+    { label: dict.marketingInMotion.breadcrumbs.portfolio, href: `${basePath}/portfolio` },
+    { label: dict.codingProjects.title, href: `${basePath}/portfolio/coding-projects` },
+    { label: archiveTitle, href: `${basePath}/portfolio/coding-projects/archive` }
   ];
 
   return (
@@ -145,6 +145,7 @@ export default async function CodingProjectsArchivePage({ params }: Props) {
           breadcrumbItems={breadcrumbItems}
           initialProjects={strapiProjects}
           labels={{
+          controls: dict.codingProjects.labels,
           heroTitle: archiveTitle,
           heroDescription: archiveDescription,
           searchPlaceholder: dict.codingProjects.labels.searchPlaceholder,

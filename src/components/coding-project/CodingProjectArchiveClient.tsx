@@ -35,6 +35,7 @@ export interface CodingProjectArchiveClientProps {
     retryText: string;
     noProjects: string;
     noProjectsHint: string;
+    controls: typeof import('@/locales/en.json')['codingProjects']['labels'];
   };
   initialProjects?: CodingProject[];
 }
@@ -208,14 +209,7 @@ export function CodingProjectArchiveClient({
         onFilterChange={handleFilterChange}
         onRefresh={handleRefresh}
         isRefreshing={isRefreshing}
-        labels={{
-          searchPlaceholder: labels.searchPlaceholder,
-          allCategories: labels.allCategories,
-          allTools: labels.allTools,
-          allTags: labels.allTags,
-          allTypes: labels.allTypes,
-          refresh: labels.refresh,
-        }}
+        labels={labels.controls}
       />
 
       {/* Main Grid Content */}
@@ -278,7 +272,7 @@ export function CodingProjectArchiveClient({
       {/* Scroll to top */}
       <button
         onClick={scrollToTop}
-        aria-label="Scroll to top"
+        aria-label={labels.controls.scrollToTop}
         className={`
           fixed bottom-6 right-6 z-50 rounded-full
           w-12 h-12 flex items-center justify-center
