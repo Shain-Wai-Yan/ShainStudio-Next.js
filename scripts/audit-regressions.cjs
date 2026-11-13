@@ -695,3 +695,30 @@ test('persisted analytics denial takes precedence over the enabled default', () 
     else process.env.NODE_ENV = previousEnvironment;
   }
 });
+
+
+test('certificate display preserves official names, ambiguous acronyms, scores and locale dates', () => {
+  const { transformCertificate } = load('src/lib/strapi/certificates.ts', {
+    './client': { extractUrl: () => 'https://images.example.test/certificate.png' },
+  });
+  const fixture = {id: 1, Title: 'HSK（四级）成绩报告', Description: '277 / 300', Date: '2025-03-09', Image: null};
+  for (const [supplied, expected] of [
+    ['Issuer : Strategy First University ', 'Strategy First University'],
+    ['Issuer : SFU in collaboration with RIT', 'SFU in collaboration with RIT'],
+    ['Issuer : Sfux', 'SFUx'],
+    ['Issuer : Sfu in collaboration with Rit', 'SFU in collaboration with RIT'],
+    ['Issuer : Confucius chinese institue', 'Confucius Institute'],
+    ['Issuer: HubSpot Academy', 'HubSpot Academy'],
+    ['Issuer: Unlisted Organization (ABC)', 'Unlisted Organization (ABC)'],
+  ]) {
+    const source = {...fixture, Issuer: supplied, localization: {requestedLocale: 'zh'}};
+    const result = transformCertificate(source);
+    assert.equal(result.IssuedBy, expected);
+    assert.equal(result.Issuer, supplied);
+    assert.equal(result.Title, fixture.Title);
+    assert.equal(result.Description, fixture.Description);
+    assert.equal(result.Date, fixture.Date);
+    assert.match(result.formattedDate, /2025年3月9日/);
+  }
+  assert.equal(transformCertificate({...fixture, Issuer: 'Google'}).formattedDate, 'March 9, 2025');
+});

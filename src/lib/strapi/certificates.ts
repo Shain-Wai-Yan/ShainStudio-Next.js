@@ -82,9 +82,16 @@ export function transformCertificate(certificate: Certificate) {
   });
 
   // Clean up "Issuer: X" or "Issuer : X" prefix from the Issuer field
-  const cleanedIssuedBy = certificate.Issuer
+  const suppliedIssuer = certificate.Issuer
     ? certificate.Issuer.replace(/^Issuer\s*:\s*/i, '').trim()
     : '';
+  // Correct known spelling/case variants without expanding ambiguous acronyms.
+  const issuerNames: Record<string, string> = {
+    'Sfux': 'SFUx',
+    'Sfu in collaboration with Rit': 'SFU in collaboration with RIT',
+    'Confucius chinese institue': 'Confucius Institute',
+  };
+  const cleanedIssuedBy = issuerNames[suppliedIssuer] ?? suppliedIssuer;
 
   return {
     ...certificate,

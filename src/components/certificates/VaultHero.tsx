@@ -191,7 +191,7 @@ export function VaultHero({ certificates, dictionary, onCardClick }: VaultHeroPr
                     <h4 className="font-bold text-stone-900 dark:text-stone-100 text-sm md:text-base line-clamp-1 leading-snug group-hover:text-[#e05b3e] transition-colors duration-300">
                       {topCert.title}
                     </h4>
-                    <p className="text-[10px] text-stone-400 dark:text-stone-500 uppercase tracking-widest font-bold m-0 p-0">
+                    <p className="text-[10px] text-stone-400 dark:text-stone-500 tracking-widest font-bold m-0 p-0">
                       {topCert.issuedBy} &bull; {topCert.formattedDate}
                     </p>
                   </div>

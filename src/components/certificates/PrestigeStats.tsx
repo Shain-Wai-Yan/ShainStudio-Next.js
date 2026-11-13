@@ -74,7 +74,7 @@ export function PrestigeStats({
       <div className="absolute inset-x-0 bottom-0 h-[1px] bg-stone-200 dark:bg-stone-900 pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16">
-        <div className="grid grid-cols-1 sm:grid-cols-3 border border-stone-200 dark:border-stone-900 divide-x divide-y lg:divide-y-0 divide-stone-200 dark:divide-stone-900 bg-stone-50/20 dark:bg-stone-900/5">
+        <div className="grid grid-cols-3 border border-stone-200 dark:border-stone-900 divide-x divide-y lg:divide-y-0 divide-stone-200 dark:divide-stone-900 bg-stone-50/20 dark:bg-stone-900/5">
           {statItems.map((item, index) => {
             const IconComponent = item.icon;
             // Handle divide positioning borders on standard 2x2 grid for mobile
@@ -85,7 +85,7 @@ export function PrestigeStats({
               <div
                 key={item.id}
                 className={`
-                  group relative p-6 md:p-8 flex flex-col justify-between aspect-[1.3/1] sm:aspect-[1.5/1] lg:aspect-[1.3/1]
+                  group relative p-3 sm:p-6 md:p-8 flex flex-col justify-between min-h-36 sm:min-h-0 sm:aspect-[1.5/1] lg:aspect-[1.3/1]
                   bg-white/60 dark:bg-stone-950/20 backdrop-blur-md
                   hover:bg-white dark:hover:bg-stone-950/60
                   transition-all duration-500 ease-out stat-box-reveal
