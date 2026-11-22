@@ -191,14 +191,34 @@ test('authenticated events isolate locale invalidation, skip drafts and reject W
 });
 
 
+test('sitemap reads one tagged snapshot per locale and keeps both locale records', async () => {
+ const calls=[];
+ const mod=harness(async(endpoint,{queryParams})=>{
+  calls.push({endpoint,queryParams});
+  const locale=queryParams.locale;
+  const data=[row('shared',locale==='en'?'English':'中文',locale)];
+  return {data:{data,meta:{pagination:{page:1,total:1,pageCount:1}}}};
+ });
+ const {english,rows}=await mod.getSitemapLocaleRows('blogs',{'fields[0]':'updatedAt'});
+ assert.equal(english[0].title,'English');
+ assert.equal(rows[0].title,'中文');
+ assert.equal(rows[0].localization.englishPublished,true);
+ assert.deepEqual(calls.map(({queryParams})=>queryParams.locale),['en','zh-CN']);
+ assert.deepEqual(mod.cache.map(({options})=>options.tags),[['blogs:en'],['blogs:zh-CN']]);
+ assert.ok(calls.every(({queryParams})=>queryParams['fields[0]']==='updatedAt'));
+});
+
 test('sitemap defers CMS reads until a request and retains published locale links',async()=>{
  let resume;const gate=new Promise(resolve=>{resume=resolve;});let reads=0;
  const english={...row('english','English'),localization:{englishPublished:true,chinesePublished:false}};
  const translated={...row('translated','中文','zh-CN'),localization:{englishPublished:true,chinesePublished:true}};
- const sitemap=load('src/app/sitemap.ts',{
+ const sitemap=load('src/lib/server/sitemap.ts',{
   'next/server':{connection:()=>gate},
-  '@/lib/server/localized-content':{getLocalizedRows:async(endpoint,locale)=>{
-   reads++;return endpoint==='blogs'?(locale==='en'?[english,{...translated,locale:'en'}]:[english,translated]):[];
+  '@/lib/server/localized-content':{getSitemapLocaleRows:async(endpoint)=>{
+   reads++;
+   return endpoint === 'blogs'
+    ? { english: [english, {...translated, locale: 'en'}], rows: [english, translated] }
+    : { english: [], rows: [] };
   }},
  }).default;
  const pending=sitemap();await new Promise(resolve=>setImmediate(resolve));
@@ -212,9 +232,9 @@ test('sitemap defers CMS reads until a request and retains published locale link
 });
 
 test('sitemap propagates unavailable CMS data instead of publishing partial URLs',async()=>{
- const sitemap=load('src/app/sitemap.ts',{
+ const sitemap=load('src/lib/server/sitemap.ts',{
   'next/server':{connection:async()=>{}},
-  '@/lib/server/localized-content':{getLocalizedRows:async()=>{throw new Error('CMS unavailable fixture');}},
+  '@/lib/server/localized-content':{getSitemapLocaleRows:async()=>{throw new Error('CMS unavailable fixture');}},
  }).default;
  await assert.rejects(sitemap(),/CMS unavailable fixture/);
 });
@@ -244,9 +264,9 @@ test('cold locale reads queue behind active snapshots instead of failing a crawl
 test('sitemap lists reciprocal collection/archive alternates and each locale’s own modification date', async () => {
  const en={...row('paired','English'),updatedAt:'2026-10-01T00:00:00Z',localization:{englishPublished:true,chinesePublished:true}};
  const zh={...row('paired','中文','zh-CN'),updatedAt:'2026-11-01T00:00:00Z',localization:{englishPublished:true,chinesePublished:true}};
- const sitemap=load('src/app/sitemap.ts',{
+ const sitemap=load('src/lib/server/sitemap.ts',{
   'next/server':{connection:async()=>{}},
-  '@/lib/server/localized-content':{getLocalizedRows:async(endpoint,locale)=>endpoint==='coding-projects'?[locale==='en'?en:zh]:[]},
+  '@/lib/server/localized-content':{getSitemapLocaleRows:async(endpoint)=>endpoint==='coding-projects'?{english:[en],rows:[zh]}:{english:[],rows:[]}},
  }).default;
  const pages=await sitemap();const origin='https://www.shainwaiyan.com';
  for(const path of ['/portfolio/coding-projects','/portfolio/coding-projects/archive']) {
@@ -263,9 +283,9 @@ test('gallery sitemap exposes public image URLs and excludes noindex and unpubli
  const en={...row('photo','English'),image:{url:'https://images.example.test/en.jpg'},localization:{englishPublished:true,chinesePublished:true}};
  const zh={...row('photo','中文','zh-CN'),image:{url:'https://images.example.test/zh.jpg'},localization:{englishPublished:true,chinesePublished:true}};
  const hidden={...row('hidden','Hidden'),seo:{noIndex:true},localization:{englishPublished:true,chinesePublished:true}};
- const sitemap=load('src/app/sitemap.ts',{
+ const sitemap=load('src/lib/server/sitemap.ts',{
   'next/server':{connection:async()=>{}},
-  '@/lib/server/localized-content':{getLocalizedRows:async(endpoint,locale)=>endpoint==='photographies'?[locale==='en'?en:zh]:endpoint==='blogs'?[hidden]:[]},
+  '@/lib/server/localized-content':{getSitemapLocaleRows:async(endpoint)=>endpoint==='photographies'?{english:[en],rows:[zh]}:endpoint==='blogs'?{english:[hidden],rows:[hidden]}:{english:[],rows:[]}},
  }).default;
  const pages=await sitemap();const origin='https://www.shainwaiyan.com';
  assert.deepEqual(pages.find(p=>p.url===origin+'/hobbies/photography/photo/photo').images,[en.image.url]);

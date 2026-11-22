@@ -1,10 +1,9 @@
 import type { MetadataRoute } from 'next';
 import { connection } from 'next/server';
-import { getLocalizedRows } from '@/lib/server/localized-content';
+import { getSitemapLocaleRows } from '@/lib/server/localized-content';
 import type { ContentLocalization } from '@/types/localization';
 import { collectionLocalization, localizedSeo } from '@/lib/content-localization';
 const SITE_URL = 'https://www.shainwaiyan.com';
-export const revalidate = 300;
 const staticRoutes = {
   // English main pages
   main: [
@@ -52,8 +51,6 @@ const collections = [
   ['marketing-plans','/portfolio/marketing-plans',null],
 ] as const;
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  // The sitemap needs published CMS data at request time, not during deployment.
-  // Keep locale snapshot caching/invalidation; unavailable data must still throw.
   await connection();
   type SitemapEntry = MetadataRoute.Sitemap[number];
   const pages = new Map<string, SitemapEntry>();
@@ -74,8 +71,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       queryParams['populate[seo][fields][0]'] = 'noIndex';
     }
     if (['photographies','arts'].includes(endpoint)) queryParams['populate[image][fields][0]'] = 'url';
-    const options = { queryParams };
-    const [english,rows] = await Promise.all([getLocalizedRows(endpoint,'en',options),getLocalizedRows(endpoint,'zh',options)]);
+    const { english, rows } = await getSitemapLocaleRows(endpoint, queryParams);
     const englishById = new Map(english.map(row => [row.documentId,row]));
     const state = collectionLocalization('zh', rows as Array<{localization?: ContentLocalization}>);
     const listPaths = endpoint === 'coding-projects' ? [listPath,`${listPath}/archive`] : [listPath];

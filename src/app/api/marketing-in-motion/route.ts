@@ -1,3 +1,4 @@
+import { publicCacheHeaders } from '@/lib/server/public-cache';
 import { boundedInteger } from '@/lib/utils/pagination';
 /**
  * Marketing in Motion API Route
@@ -7,7 +8,7 @@ import { boundedInteger } from '@/lib/utils/pagination';
 import { NextRequest, NextResponse } from 'next/server';
 import { getMarketingProject, getMarketingProjects } from '@/lib/server/project-data';
 
-const CACHE_HEADERS = { 'Cache-Control': 'private, no-store' };
+const CACHE_HEADERS = publicCacheHeaders();
 
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
@@ -21,10 +22,10 @@ export async function GET(request: NextRequest) {
   if (slug) {
     const { project, error } = await getMarketingProject(slug, language);
     if (error) {
-      return NextResponse.json({ error }, { status: 500 });
+      return NextResponse.json({ error }, { status: 500, headers: { 'Cache-Control': 'no-store' } });
     }
     if (!project) {
-      return NextResponse.json({ error: 'Not found' }, { status: 404 });
+      return NextResponse.json({ error: 'Not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
     }
     return NextResponse.json({ data: project }, { headers: CACHE_HEADERS });
   }
@@ -32,7 +33,7 @@ export async function GET(request: NextRequest) {
   // ─── List with pagination ─────────────────────────────────────────────────
   const { projects, total, error } = await getMarketingProjects(page, pageSize, language);
   if (error) {
-    return NextResponse.json({ error }, { status: 500 });
+    return NextResponse.json({ error }, { status: 500, headers: { 'Cache-Control': 'no-store' } });
   }
 
   return NextResponse.json({

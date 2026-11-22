@@ -143,11 +143,13 @@ function matches(value: unknown, filter: Row): boolean {
 }
 
 export function pageResolvedRows(rows: Row[], query: Query) {
-  const filtered = rows.filter(row => matches(row,parseFilters(query)));
-  const sorts = Object.entries(query).filter(([key]) => key === 'sort' || key.startsWith('sort[')).map(([,value]) => String(value));
+  const filters = parseFilters(query);
+  const filtered = rows.filter(row => matches(row, filters));
+  const sorts = Object.entries(query)
+    .filter(([key]) => key === 'sort' || key.startsWith('sort['))
+    .map(([,value]) => String(value).split(':'));
   filtered.sort((a,b) => {
-    for (const sort of sorts) {
-      const [field,direction] = sort.split(':');
+    for (const [field, direction] of sorts) {
       const compared = String(a[field] ?? '').localeCompare(String(b[field] ?? ''),'en',{numeric:true});
       if (compared) return direction === 'desc' ? -compared : compared;
     }
@@ -159,7 +161,7 @@ export function pageResolvedRows(rows: Row[], query: Query) {
     meta: { pagination: { page,pageSize,total:filtered.length,pageCount:Math.ceil(filtered.length/pageSize) } } };
 }
 
-export async function getLocalizedRows(endpoint: string, locale: ContentLocale, options: FetchOptions = {}): Promise<Row[]> {
+function prepareLocaleQuery(endpoint: string, options: FetchOptions): Query {
   if (!LOCALIZED.has(endpoint)) throw new Error('Unsupported localized collection');
   const query: Query = {};
   for (const [key,value] of Object.entries(options.queryParams ?? {})) {
@@ -184,6 +186,21 @@ export async function getLocalizedRows(endpoint: string, locale: ContentLocale, 
     delete query.populate;
     Object.assign(query,publicPopulation(endpoint));
   }
+  return query;
+}
+
+/** The sitemap needs both locales' indexing fields, with no taxonomy overlays. */
+export async function getSitemapLocaleRows(endpoint: string, queryParams: Query) {
+  const query = prepareLocaleQuery(endpoint, { queryParams });
+  const [english, chinese] = await Promise.all([
+    cachedLocale(endpoint, 'en', query, 300),
+    cachedLocale(endpoint, 'zh', query, 300),
+  ]);
+  return { english, rows: resolvePublishedRows(english, chinese, 'zh') };
+}
+
+export async function getLocalizedRows(endpoint: string, locale: ContentLocale, options: FetchOptions = {}): Promise<Row[]> {
+  const query = prepareLocaleQuery(endpoint, options);
   const seconds = options.revalidate ?? 300;
   // Separate cached locale snapshots retain English body data when Chinese changes.
   const english = await cachedLocale(endpoint,'en',query,seconds);

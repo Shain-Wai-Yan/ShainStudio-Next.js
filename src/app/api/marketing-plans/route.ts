@@ -1,3 +1,4 @@
+import { publicCacheHeaders } from '@/lib/server/public-cache';
 import { localizedSource } from '@/lib/server/localized-content';
 import { NextResponse } from 'next/server';
 import { fetchMarketingPlans, transformMarketingPlan } from '@/lib/strapi/marketing-plans';
@@ -5,13 +6,13 @@ import { fetchMarketingPlans, transformMarketingPlan } from '@/lib/strapi/market
 export async function GET(request: Request) {
   const result = await fetchMarketingPlans(1, 100, localizedSource(new URL(request.url).searchParams.get('language') === 'zh' ? 'zh' : 'en'));
   if (result.error) {
-    return NextResponse.json({ error: result.error }, { status: 500 });
+    return NextResponse.json({ error: result.error }, { status: 500, headers: { 'Cache-Control': 'no-store' } });
   }
 
   return NextResponse.json({
     data: result.plans.map(transformMarketingPlan),
     meta: { pagination: { total: result.total } },
   }, {
-    headers: { 'Cache-Control': 'private, no-store' },
+    headers: publicCacheHeaders(),
   });
 }
